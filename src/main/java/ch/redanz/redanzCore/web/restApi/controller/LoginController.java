@@ -23,7 +23,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@CrossOrigin(origins="http://localhost:4200", allowedHeaders = "*")
+@CrossOrigin(origins={"https://redanz.ch", "http://localhost.ch/4200", "http://redanz.ch"}, allowedHeaders = "*")
 @RequestMapping("core-api/login")
 public class LoginController {
   private final UserService userService;
