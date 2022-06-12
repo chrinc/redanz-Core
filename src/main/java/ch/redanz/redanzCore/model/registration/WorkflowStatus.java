@@ -1,0 +1,37 @@
+package ch.redanz.redanzCore.model.registration;
+
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
+
+@Entity
+@Table(name="workflow_status")
+@Getter
+@Setter
+public class WorkflowStatus implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "workflow_status_id")
+    private Long workflowStatusId;
+    private String name;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workflowStatus")
+    @JsonIgnore
+//    @Expose(serialize = false, deserialize = false)
+    private List<WorkflowTransition> transitionList;
+
+    public WorkflowStatus() { }
+    public WorkflowStatus(String name) {
+        this.name = name;
+    }
+
+}
+
