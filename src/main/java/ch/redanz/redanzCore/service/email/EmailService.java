@@ -80,7 +80,7 @@ public class EmailService {
       );
 
       log.info("send email {}", "with subject: " + subject + " should go to: " + toEmail + " and goes to: " + emailReceiver);
-      Transport.send(msg);
+//      Transport.send(msg);
     }
     catch (Exception e) {
       e.printStackTrace();
