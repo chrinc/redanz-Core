@@ -59,7 +59,7 @@ public class ProfileController {
 
   @GetMapping(path = "/country/all")
   public List<Country> getAllCountries() {
-//    log.info("inc, send getCountries: {}.", countryService.getAllCountries());
+    log.info("inc, send getCountries");
     return countryService.getAllCountries();
   }
 
