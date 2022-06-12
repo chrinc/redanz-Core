@@ -45,7 +45,12 @@ public class ProfileController {
 
   @PostMapping(path = "/user/registration")
   public long register(@RequestBody UserResponse request) {
+    log.info("inc@user registration");
+//    log.info("request: {}", request);
+//    log.info("request email: {}", request.getEmail());
+//    log.info("request password: {}", request.getPassword());
     userRegistrationService.register(request);
+//    return Long.getLong("3");
     return userService.getUser(request.getEmail()).getUserId();
   }
 

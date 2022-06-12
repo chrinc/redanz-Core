@@ -1,13 +1,13 @@
 package ch.redanz.redanzCore.model.profile.response;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
-@EqualsAndHashCode
-@ToString
+@Setter
+//@EqualsAndHashCode
+//@ToString
+@Slf4j
 @AllArgsConstructor
 public class UserResponse {
   private final String email;

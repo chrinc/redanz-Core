@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Arrays.stream;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -36,6 +37,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
       String authorizationHeader = request.getHeader(AUTHORIZATION);
       log.info("inc@CustomAuthorizationFilter, authorizationHeader: {}", authorizationHeader);
       log.info("inc@CustomAuthorizationFilter, request.getServletPath(): {}", request.getServletPath());
+      log.info("inc, header: allow Origin? {}", request.getHeader(ACCESS_CONTROL_ALLOW_ORIGIN));
+      log.info("inc, header: allow request URL {}", request.getRequestURL());
       if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 
         try {
