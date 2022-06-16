@@ -25,7 +25,7 @@ import java.util.List;
 public enum RegistrationConfig {
   NORMA_REGISTRATION  ( UserConfig.NORMA_USER   ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.FOLLOWER),
   WILLIAM_REGISTRATION( UserConfig.WILLIAM_USER ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.SOLOJAZZ, null),
-  ELNORA_REGISTRATION ( UserConfig.ELNORA_USER  ,EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.SOLOJAZZ, null),
+//  ELNORA_REGISTRATION ( UserConfig.ELNORA_USER  ,EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.SOLOJAZZ, null),
   ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER  ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.FOLLOWER),
   NAOMI_REGISTRATION  ( UserConfig.NAOMI_USER   ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH),
   ESTHER_REGISTRATION ( UserConfig.ESTHER_USER  ,EventConfig.EVENT2022, BundleConfig.PARTYPASS, null, null),

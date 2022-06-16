@@ -50,29 +50,6 @@ public class RegistrationController {
   @Autowired
   Configuration mailConfig;
 
-  @GetMapping(path="/event/all")
-  public List<Event> getAllEvents() {
-    log.info("inc, send getAllTracks: {}.", registrationService.getAllEvents());
-    return registrationService.getAllEvents();
-  }
-
-  @GetMapping(path="/event/current")
-  public Event getCurrentEvent() {
-    log.info("inc, send getAllTracks: {}.", registrationService.getCurrentEvent());
-    return registrationService.getCurrentEvent();
-  }
-  @GetMapping(path="/workflow_status_list")
-  public List<WorkflowStatus> getWorkflowStatusList() {
-    log.info("inc, send workflow status: {}.", registrationService.getWorkflowStatusList());
-    List<WorkflowStatus> workflowStatusList = registrationService.getWorkflowStatusList();
-    workflowStatusList.remove(
-       workflowStatusList.indexOf(
-          workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.CANCELLED.getName())
-       )
-    );
-    return workflowStatusList;
-  }
-
   @GetMapping(path="/registration")
   @Transactional
   public ch.redanz.redanzCore.model.registration.response.RegistrationResponse getRegistration(
@@ -145,5 +122,17 @@ public class RegistrationController {
       registrationMatchingService,
       mailConfig
     ).submitRegistration(userId, registrationRequest, environment.getProperty("link.login"));
+  }
+
+  @GetMapping(path="/workflow/status/all")
+  public List<WorkflowStatus> getWorkflowStatusList() {
+    log.info("inc, send workflow status: {}.", registrationService.getWorkflowStatusList());
+    List<WorkflowStatus> workflowStatusList = registrationService.getWorkflowStatusList();
+    workflowStatusList.remove(
+            workflowStatusList.indexOf(
+                    workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.CANCELLED.getName())
+            )
+    );
+    return workflowStatusList;
   }
 }

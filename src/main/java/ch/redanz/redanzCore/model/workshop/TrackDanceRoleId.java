@@ -1,27 +1,19 @@
 package ch.redanz.redanzCore.model.workshop;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Getter
+@Setter
 public class TrackDanceRoleId implements Serializable {
 
   private Long danceRoleId;
   private Long trackId;
-
-  public Long getDanceRoleId() {
-    return danceRoleId;
-  }
-  public void setDanceRoleId(Long danceRoleId) {
-    this.danceRoleId = danceRoleId;
-  }
-  public Long getTrackId() {
-    return trackId;
-  }
-  public void setTrackId(Long trackId) {
-    this.trackId = trackId;
-  }
 
   @Override
   public boolean equals(Object o) {

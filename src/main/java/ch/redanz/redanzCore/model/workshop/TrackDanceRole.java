@@ -1,6 +1,8 @@
 package ch.redanz.redanzCore.model.workshop;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
@@ -8,6 +10,8 @@ import java.io.Serializable;
 
 @Entity
 @Table(name="track_dance_role")
+@Getter
+@Setter
 @Slf4j
 public class TrackDanceRole implements Serializable {
 
@@ -31,22 +35,5 @@ public class TrackDanceRole implements Serializable {
     this.danceRole = danceRole;
     this.track = track;
   }
-
-  public DanceRole getDanceRole() {
-    return danceRole;
-  }
-
-  public void setDanceRole(DanceRole danceRole) {
-    this.danceRole = danceRole;
-  }
-
-  public Track getTrack() {
-    return track;
-  }
-
-  public void setTrack(Track track) {
-    this.track = track;
-  }
-
 }
 

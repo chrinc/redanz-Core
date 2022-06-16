@@ -51,9 +51,7 @@ public class RegistrationService {
 //  String loginLink;
 
 
-  public List<Event> getAllEvents() { return eventService.findAll(); }
   public List<Registration> findAll() {return registrationRepo.findAll(); }
-  public Event getCurrentEvent() { return eventService.findByName(EventConfig.EVENT2022.getName());}
   public List<WorkflowStatus> getWorkflowStatusList() {return workflowStatusService.findAll();}
   public void register(Registration registration) { registrationRepo.save(registration);}
   public Optional<Registration> findByParticipantAndEvent(Person participant, Event event) {

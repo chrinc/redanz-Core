@@ -21,6 +21,7 @@ public class Bundle implements Serializable {
   private String name;
   private Integer price;
   private String description;
+
   private Integer capacity;
 
   @OneToMany(cascade=CascadeType.ALL, mappedBy = "bundle")

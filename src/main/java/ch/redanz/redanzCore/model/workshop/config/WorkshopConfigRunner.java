@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Order(200)
 public class WorkshopConfigRunner implements CommandLineRunner {
-  private final UserRepo userRepo;
   private final BundleRepo bundleRepo;
   private final TrackRepo trackRepo;
   private final TrackBundleRepo trackBundleRepo;
@@ -25,10 +24,8 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   private final DanceRoleRepo danceRoleRepo;
   private final TrackDanceRoleRepo trackDanceRoleRepo;
   private final WorkflowStatusRepo workflowStatusRepo;
-  private final PersonRepo personRepo;
-  private final RegistrationRepo registrationRepo;
-  private final RegistrationMatchingRepo registrationMatchingRepo;
-  private final WorkflowTransitionRepo workflowTransitionRepo;
+  private final LanguageRepo languageRepo;
+  private final OutTextRepo outTextRepo;
 
   @Override
   public void run(String... args) throws Exception {
@@ -46,6 +43,8 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       danceRoleRepo.saveAll(DanceRoleConfig.setup());
       trackDanceRoleRepo.saveAll(TrackDanceRoleConfig.setup(trackRepo, danceRoleRepo));
       workflowStatusRepo.saveAll(WorkflowStatusConfig.setup());
+      languageRepo.saveAll(LanguageConfig.setup());
+      outTextRepo.saveAll(OutTextConfig.setup(languageRepo));
     }
   }
 }

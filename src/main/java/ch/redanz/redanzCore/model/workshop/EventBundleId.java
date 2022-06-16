@@ -1,30 +1,21 @@
 package ch.redanz.redanzCore.model.workshop;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Getter
+@Setter
+@NoArgsConstructor
 public class EventBundleId implements Serializable {
 
   private Long bundleId;
   private Long eventId;
-
-  public Long getBundleId() {
-    return bundleId;
-  }
-
-  public void setBundleId(Long bundleId) {
-    this.bundleId = bundleId;
-  }
-
-  public Long getEventId() {
-    return eventId;
-  }
-
-  public void setEventId(Long eventId) {
-    this.eventId = eventId;
-  }
 
   @Override
   public boolean equals(Object o) {

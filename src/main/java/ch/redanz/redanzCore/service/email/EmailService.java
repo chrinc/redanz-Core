@@ -21,6 +21,7 @@ public class EmailService {
   private static String emailSmtpPort;
   private static String emailDebug;
   private static String emailHostName;
+  private static boolean sendEmail;
 
   @Autowired
   public EmailService(
@@ -30,7 +31,8 @@ public class EmailService {
     @Value("${email.smtp.host}") String emailSmtpHost,
     @Value("${email.debug}") String emailDebug,
     @Value("${email.host.name}") String emailHostName,
-    @Value("${email.smtp.port}") String emailSmtpPort
+    @Value("${email.smtp.port}") String emailSmtpPort,
+    @Value("${email.send}") boolean sendEmail
   ) {
     this.hostEmail = hostEmail;
     this.hostPassword = hostPassword;
@@ -39,6 +41,7 @@ public class EmailService {
     this.emailHostName = emailHostName;
     this.emailDebug = emailDebug;
     this.emailSmtpPort = emailSmtpPort;
+    this.sendEmail = sendEmail;
   }
 
   @Bean("devSession")
@@ -79,8 +82,9 @@ public class EmailService {
         Message.RecipientType.TO, InternetAddress.parse(emailReceiver, false)
       );
 
-      log.info("send email {}", "with subject: " + subject + " should go to: " + toEmail + " and goes to: " + emailReceiver);
-//      Transport.send(msg);
+      log.info("send email {}", "with subject: " + subject + " should go to: " + toEmail + " and goes to: " + emailReceiver + ", send Email: " + Boolean.valueOf(sendEmail));
+      log.info("send email {}", sendEmail);
+      if (Boolean.valueOf(sendEmail)) Transport.send(msg);
     }
     catch (Exception e) {
       e.printStackTrace();
