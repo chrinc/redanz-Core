@@ -1,10 +1,16 @@
 package ch.redanz.redanzCore.model.workshop;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name="food")
 public class Food implements Serializable {
   @Id
@@ -15,11 +21,11 @@ public class Food implements Serializable {
   private Integer price;
   private String description;
 
-  @OneToMany(cascade=CascadeType.ALL, mappedBy = "food")
-  private List<FoodRegistration> foodRegistrationList;
-
   public Food () {}
 
-  // getter
-  // setter
+  public Food(String name, Integer price, String description) {
+    this.name = name;
+    this.price = price;
+    this.description = description;
+  }
 }

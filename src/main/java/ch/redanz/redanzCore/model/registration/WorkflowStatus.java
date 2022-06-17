@@ -21,7 +21,11 @@ public class WorkflowStatus implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "workflow_status_id")
     private Long workflowStatusId;
+
+    @JsonIgnore
     private String name;
+
+    private String label;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "workflowStatus")
     @JsonIgnore
@@ -29,8 +33,9 @@ public class WorkflowStatus implements Serializable {
     private List<WorkflowTransition> transitionList;
 
     public WorkflowStatus() { }
-    public WorkflowStatus(String name) {
+    public WorkflowStatus(String name, String label) {
         this.name = name;
+        this.label = label;
     }
 
 }

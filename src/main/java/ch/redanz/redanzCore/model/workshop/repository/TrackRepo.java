@@ -7,7 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TrackRepo extends JpaRepository<Track, Long> {
   Track findByName(String name);
-
   Track findByTrackId(Long trackId);
-
 }

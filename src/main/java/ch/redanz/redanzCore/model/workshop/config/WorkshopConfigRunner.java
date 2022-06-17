@@ -1,7 +1,5 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.profile.repository.PersonRepo;
-import ch.redanz.redanzCore.model.profile.repository.UserRepo;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
 import ch.redanz.redanzCore.model.registration.repository.*;
 import ch.redanz.redanzCore.model.workshop.repository.*;
@@ -26,6 +24,9 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   private final WorkflowStatusRepo workflowStatusRepo;
   private final LanguageRepo languageRepo;
   private final OutTextRepo outTextRepo;
+  private final TypeSlotRepo typeSlotRepo;
+  private final SlotRepo slotRepo;
+  private final FoodRepo foodRepo;
 
   @Override
   public void run(String... args) throws Exception {
@@ -45,6 +46,10 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       workflowStatusRepo.saveAll(WorkflowStatusConfig.setup());
       languageRepo.saveAll(LanguageConfig.setup());
       outTextRepo.saveAll(OutTextConfig.setup(languageRepo));
+//      volunteerSlotRepo.saveAll(SlotTypeConfig.setup());
+      slotRepo.saveAll(SlotConfig.setup());
+      foodRepo.saveAll(FoodConfig.setup());
+      typeSlotRepo.saveAll(TypeSlotConfig.setup(slotRepo, foodRepo));
     }
   }
 }
