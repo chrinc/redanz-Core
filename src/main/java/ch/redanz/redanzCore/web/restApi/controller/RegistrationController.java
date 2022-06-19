@@ -1,6 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
-import ch.redanz.redanzCore.model.profile.response.RegistrationRequest;
+
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.Registration;
@@ -8,22 +8,23 @@ import ch.redanz.redanzCore.model.registration.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.WorkflowTransition;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
-import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.Event;
-import ch.redanz.redanzCore.model.registration.service.*;
-import ch.redanz.redanzCore.model.workshop.service.*;
+import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
+import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
+import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
+import com.google.gson.JsonParser;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,16 +34,13 @@ import java.util.Optional;
 @AllArgsConstructor
 public class RegistrationController {
   private final RegistrationService registrationService;
-  private final TrackService trackService;
-  private final BundleService bundleService;
   private final EventService eventService;
   private final PersonService personService;
   private final RegistrationMatchingService registrationMatchingService;
   private final UserService userService;
   private final WorkflowStatusService workflowStatusService;
   private final WorkflowTransitionService workflowTransitionService;
-  private final DanceRoleService danceRoleService;
-  private final RegistrationRepo registrationRepo;
+
 
   @Autowired
   private Environment environment;
@@ -52,7 +50,7 @@ public class RegistrationController {
 
   @GetMapping(path="/registration")
   @Transactional
-  public ch.redanz.redanzCore.model.registration.response.RegistrationResponse getRegistration(
+  public RegistrationResponse getRegistration(
           @RequestParam("userId") Long userId,
           @RequestParam("eventId") Long eventId
   ) {
@@ -63,10 +61,9 @@ public class RegistrationController {
                     eventService.findByEventId(eventId)
             );
 
-    log.info("inc find registration");
     if (registrationOptional.isPresent()) {
       Registration registration = registrationOptional.get();
-      ch.redanz.redanzCore.model.registration.response.RegistrationResponse registrationResponse = new ch.redanz.redanzCore.model.registration.response.RegistrationResponse(
+      RegistrationResponse registrationResponse = new RegistrationResponse(
         registration.getRegistrationId(),
         registration.getParticipant().getUser().getUserId(),
         registration.getEvent().getEventId(),
@@ -87,15 +84,51 @@ public class RegistrationController {
         registrationResponse.setDanceRoleId(registration.getDanceRole().getDanceRoleId());
       }
 
+
       // partner Email
       RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
       if (registrationMatching != null) {
         registrationResponse.setPartnerEmail(registrationMatching.getPartnerEmail());
       }
 
+
       // workflow Status
       WorkflowTransition workflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
       registrationResponse.setWorkflowStatus(workflowTransition.getWorkflowStatus());
+
+      // Food Registration
+      registrationResponse.setFoodRegistrations(
+              registrationService.getFoodRegistrations(registration)
+      );
+
+      log.info("inc bfr host Registration");
+      // Host Registration
+      registrationResponse.setHostRegistration(
+              registrationService.getHostRegistrations(registration)
+      );
+
+      // Hostee Registration
+      registrationResponse.setHosteeRegistration(
+              registrationService.getHosteeRegistrations(registration)
+      );
+
+      // Volunteer Registration
+      registrationResponse.setVolunteerRegistration(
+              registrationService.getVolunteerRegistration(registration)
+      );
+
+      log.info("inc get scholarship registration");
+      // Scholarship Registration
+      registrationResponse.setScholarshipRegistration(
+              registrationService.getScholarshipRegistration(registration)
+      );
+
+
+      log.info("inc getDonationRegistration");
+      // Scholarship Registration
+      registrationResponse.setDonationRegistration(
+        registrationService.getDonationRegistration(registration)
+      );
 
       return registrationResponse;
     }
@@ -106,23 +139,15 @@ public class RegistrationController {
   @Transactional
   public void register(
           @RequestParam("userId") Long userId,
-          @RequestBody RegistrationRequest registrationRequest
+          @RequestBody String jsonObject
   ) throws IOException, TemplateException {
-//    log.info("inc@submit, loginlink {}", loginLink);
-    new RegistrationService(
-      eventService,
-      workflowStatusService,
-      workflowTransitionService,
-      registrationRepo,
-      bundleService,
-      trackService,
-      danceRoleService,
-      personService,
-      userService,
-      registrationMatchingService,
-      mailConfig
-    ).submitRegistration(userId, registrationRequest, environment.getProperty("link.login"));
-  }
+    log.info("inc, userId: {}", userId);
+    registrationService.submitRegistration(
+      userId,
+      JsonParser.parseString(jsonObject).getAsJsonObject(),
+      environment.getProperty("link.login")
+    );
+}
 
   @GetMapping(path="/workflow/status/all")
   public List<WorkflowStatus> getWorkflowStatusList() {
@@ -133,6 +158,7 @@ public class RegistrationController {
                     workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.CANCELLED.getName())
             )
     );
+
     return workflowStatusList;
   }
 }

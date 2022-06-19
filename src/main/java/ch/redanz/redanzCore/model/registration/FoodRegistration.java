@@ -20,19 +20,29 @@ import javax.persistence.*;
 public class FoodRegistration {
   @EmbeddedId
   private FoodRegistrationId foodRegistrationId = new FoodRegistrationId();
+//
+//  @MapsId("registrationId")
+//  @OneToOne(fetch = FetchType.EAGER)
+//  @JoinColumn(name="registration_id")
+//  private Registration registration;
+//
+//  @MapsId("slotId")
+//  @OneToOne(fetch = FetchType.EAGER)
+//  @JoinColumn(name="slot_id")
+//  private Slot slot;
+//
+//  @MapsId("foodId")
+//  @OneToOne(fetch = FetchType.EAGER)
+//  @JoinColumn(name="food_id")
+//  private Food food;
 
-  @MapsId("registrationId")
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name="registration_id")
-  private Registration registration;
+//  public FoodRegistration(FoodRegistrationId foodRegistrationId) {
+//    this.foodRegistrationId = foodRegistrationId;
+//  }
 
-  @MapsId("slotId")
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name="slot_id")
-  private Slot slot;
-
-  @MapsId("foodId")
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name="food_id")
-  private Food food;
+//  public FoodRegistration(Registration registration, Slot slot, Food food) {
+//    this.registration = registration;
+//    this.slot = slot;
+//    this.food = food;
+//  }
 }

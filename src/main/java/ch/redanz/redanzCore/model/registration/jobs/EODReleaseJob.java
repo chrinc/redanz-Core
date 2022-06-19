@@ -47,18 +47,18 @@ public class EODReleaseJob {
 //  @Scheduled(cron = "0 50 15 * * MON-SUN")
   @Scheduled(cron = "0 0/15 * * * *")
   public void runRelease() throws InterruptedException {
-    registrationService.getAllSubmittedRegistrations().forEach(registration -> {
-      if (isRelease(registration)) {
-        releaseToConfirming(registration);
-        try {
-          sendEmailConfirmation(registration);
-        } catch (IOException e) {
-          e.printStackTrace();
-        } catch (TemplateException e) {
-          e.printStackTrace();
-        }
-      }
-    });
+//    registrationService.getAllSubmittedRegistrations().forEach(registration -> {
+//      if (isRelease(registration)) {
+//        releaseToConfirming(registration);
+//        try {
+//          sendEmailConfirmation(registration);
+//        } catch (IOException e) {
+//          e.printStackTrace();
+//        } catch (TemplateException e) {
+//          e.printStackTrace();
+//        }
+//      }
+//    });
   }
 
   private boolean isRelease(Registration registration) {

@@ -22,7 +22,6 @@ public class WorkflowStatus implements Serializable {
     @Column(name = "workflow_status_id")
     private Long workflowStatusId;
 
-    @JsonIgnore
     private String name;
 
     private String label;

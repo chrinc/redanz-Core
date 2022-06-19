@@ -22,6 +22,12 @@ public enum UserConfig {
   BILLY_USER  ("billy_user@gmail.com"  , "password", UserRole.PARTICIPANT, false, true),
   NAOMI_USER  ("naomi_user@gmail.com"  , "password", UserRole.PARTICIPANT, false, true),
   ESTHER_USER ("esther_user@gmail.com" , "password", UserRole.PARTICIPANT, false, true),
+  ANN_USER     ("ann_user@gmail.com" , "password", UserRole.PARTICIPANT, false, true),
+  MILDRED_USER ("mildred_user@gmail.com" , "password", UserRole.PARTICIPANT, false, true),
+  RUTHIE_USER  ("ruthie_user@gmail.com" , "password", UserRole.PARTICIPANT, false, true),
+  WILLA_USER   ("willa_user@gmail.com" , "password", UserRole.PARTICIPANT, false, true),
+  HARRY_USER   ("harry_user@gmail.com" , "password", UserRole.PARTICIPANT, false, true),
+  OLIVER_USER  ("oliver_user@gmail.com" , "password", UserRole.PARTICIPANT, false, true),
 
   // Organizers
   ORG_SONNY_USER("org_sonny_user@gmail.com", "password", UserRole.ORGANIZER, false, true),

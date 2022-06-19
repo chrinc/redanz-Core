@@ -30,4 +30,6 @@ public class PersonService {
   public Person findByUser(User user) {return personRepo.findByUser(user);}
   public Person findByPersonId(Long personId) {return personRepo.findByPersonId(personId);}
   public List<Person> findAll() {return personRepo.findAll();}
+
+  public void savePerson(Person person) {personRepo.save(person);};
 }

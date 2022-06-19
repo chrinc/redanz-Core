@@ -27,6 +27,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   private final TypeSlotRepo typeSlotRepo;
   private final SlotRepo slotRepo;
   private final FoodRepo foodRepo;
+  private final SleepUtilRepository sleepUtilRepository;
 
   @Override
   public void run(String... args) throws Exception {
@@ -50,6 +51,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       slotRepo.saveAll(SlotConfig.setup());
       foodRepo.saveAll(FoodConfig.setup());
       typeSlotRepo.saveAll(TypeSlotConfig.setup(slotRepo, foodRepo));
+      sleepUtilRepository.saveAll(SleepUtilConfig.setup());
     }
   }
 }

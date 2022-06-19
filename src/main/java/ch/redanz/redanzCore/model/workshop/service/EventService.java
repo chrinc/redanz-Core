@@ -22,11 +22,6 @@ public class EventService {
     private final EventRepo eventRepo;
     private final OutTextRepo outTextRepo;
 
-//    @Autowired
-//    public EventService(EventRepo eventRepo) {
-//        this.eventRepo = eventRepo;
-//    }
-
     public List<Event> getAllEvents() { return eventRepo.findAll(); }
 
     public Event getCurrentEvent() { return eventRepo.findByName(EventConfig.EVENT2022.getName());}

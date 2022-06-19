@@ -10,27 +10,27 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name="scholarship_registration")
+@Table(name="donation_registration")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ScholarshipRegistration implements Serializable {
+public class DonationRegistration implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "scholarship_registration_id")
-  private Long scholarshipRegistrationId;
+  @Column(name = "donation_registration_id")
+  private Long donationRegistrationId;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="registration_id")
   @JsonIgnore
   private Registration registration;
 
-  private String intro;
+  private Integer amount;
 
-  public ScholarshipRegistration(Registration registration, String intro) {
+  public DonationRegistration(Registration registration, Integer amount) {
     this.registration = registration;
-    this.intro = intro;
+    this.amount = amount;
   }
 }

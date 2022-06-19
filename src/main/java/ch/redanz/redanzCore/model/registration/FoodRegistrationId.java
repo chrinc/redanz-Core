@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.registration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @NoArgsConstructor
 public class FoodRegistrationId implements Serializable {
 
+  @JsonIgnore
   @Column(name="registration_id")
   private long registrationId;
 
