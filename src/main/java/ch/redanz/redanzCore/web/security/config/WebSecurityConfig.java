@@ -37,6 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //    http.authorizeRequests().antMatchers("/checkout").permitAll();
     http.authorizeRequests().antMatchers("/core-api/profile/user/registration/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/profile/**").permitAll();
+    http.authorizeRequests().antMatchers("/core-api/login/check-server").permitAll();
 //    http.authorizeRequests().antMatchers("/login").permitAll();
 //    http.authorizeRequests().antMatchers("/**").permitAll();
     http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
@@ -47,7 +48,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //    http.authorizeRequests().antMatchers("/api/token/refresh/**").permitAll();
 //    http.authorizeRequests().anyRequest().authenticated();
     http.addFilter(customAuthenticationFilter);
-    http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(new CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter.class);
+
     http.formLogin().failureHandler(authenticationFailureHandler());
   }
 

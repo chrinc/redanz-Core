@@ -48,9 +48,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
   ) throws IOException, ServletException {
 
     User user = (User)authentication.getPrincipal();
-    // @todo, lock-up secret
-
-    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+    Algorithm algorithm = Algorithm.HMAC256(JWTConfig.getJwtSecret().getBytes());
     String access_token = JWT.create()
       .withSubject(user.getUsername())
       .withExpiresAt(new Date(System.currentTimeMillis() + 10000 * 60 * 1000))

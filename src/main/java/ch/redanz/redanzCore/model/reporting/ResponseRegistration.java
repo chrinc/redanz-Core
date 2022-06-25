@@ -11,11 +11,13 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class ResponseRegistration {
+  private Long userId;
   private String bundle;
   private String track;
   private String firstName;
   private String lastName;
   private String danceRole;
+  private Long parterUserId;
   private String partnerFirstName;
   private String partnerLastName;
   private String partnerDanceRole;

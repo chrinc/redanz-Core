@@ -5,7 +5,10 @@ import ch.redanz.redanzCore.model.profile.Person;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
 import ch.redanz.redanzCore.model.profile.service.*;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
+import com.stripe.param.TokenCreateParams;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -28,6 +32,7 @@ public class ProfileController {
   private final CountryService countryService;
   private final PersonService personService;
   private final UserService userService;
+  private final ProfileService profileService;
   private final ConfirmationTokenService confirmationTokenService;
   private final UserRegistrationService userRegistrationService;
 
@@ -46,11 +51,7 @@ public class ProfileController {
   @PostMapping(path = "/user/registration")
   public long register(@RequestBody UserResponse request) {
     log.info("inc@user registration");
-//    log.info("request: {}", request);
-//    log.info("request email: {}", request.getEmail());
-//    log.info("request password: {}", request.getPassword());
     userRegistrationService.register(request);
-//    return Long.getLong("3");
     return userService.getUser(request.getEmail()).getUserId();
   }
 
@@ -67,6 +68,11 @@ public class ProfileController {
     log.info("inc, send getCountries");
     return countryService.getAllCountries();
   }
+  @GetMapping(path = "/out-text/all")
+  public HashMap getOutText() {
+    log.info("inc, send getOutText: {}.", profileService.getOutText());
+    return profileService.getOutText();
+  }
 
   @PostMapping(path = "/person")
   public void register(
@@ -74,12 +80,17 @@ public class ProfileController {
     @RequestBody PersonResponse personResponse
   ) throws IOException, TemplateException {
     String link = environment.getProperty("link.confirm.token.prefix") + confirmationTokenService.getTokenByUser(userService.findByUserId(userId));
-    log.info("inc, mail host is {}", environment.getProperty("email.host"));
-    new ProfileService(
-      personService,
-      userService,
-      countryService,
-      mailConfig
-    ).registerProfile(userId, personResponse, link);
+    profileService.registerProfile(userId, personResponse, link);
+  }
+  @PostMapping(path = "/person/update")
+  public void updatePerson(
+    @RequestParam("userId") Long userId,
+    @RequestBody PersonResponse personResponse
+  ) {
+    try {
+      profileService.updateProfile(userId, personResponse);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 }

@@ -29,7 +29,8 @@ public class HostSleepUtilRegistration implements Serializable {
     @JsonIgnore
     private HostRegistration hostRegistration;
 
-    @Column(name = "sleep_util")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sleep_util_id")
     private SleepUtil sleepUtil;
 
     @Column(name = "sleep_util_count")

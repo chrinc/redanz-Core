@@ -25,58 +25,39 @@ import java.util.List;
 @RequestMapping("core-api/app/report")
 public class ReportController {
 
-  private final PersonService personService;
-  private final RegistrationMatchingService registrationMatchingService;
-  private final RegistrationService registrationService;
+  private final ReportRegistrationService reportRegistrationService;
+  private final ReportPersonService reportPersonService;
 
-  private final WorkflowTransitionService workflowTransitionService;
-  private final WorkflowStatusService workflowStatusService;
 
   @Autowired
   Configuration mailConfig;
 
   @GetMapping(path = "/person/all")
   public List<ResponsePerson> getAllPersonsReport() {
-    return new ReportPersonService(personService).getAllPersonsReport();
+    return reportPersonService.getAllPersonsReport();
   }
 
   @GetMapping(path = "/registration/all")
   public List<ResponseRegistration> getAllRegistrationsReport() {
-    return new ReportRegistrationService(
-      registrationService,
-      registrationMatchingService,
-      workflowTransitionService,
-      workflowStatusService
-    ).getAllRegistrationsReport();
+    return reportRegistrationService.getAllRegistrationsReport();
   }
 
   @GetMapping(path = "/registration/open")
   public List<ResponseRegistration> getOpenRegistrationsReport() {
-    return new ReportRegistrationService(
-      registrationService,
-      registrationMatchingService,
-      workflowTransitionService,
-      workflowStatusService
-    ).getOpenRegistrationsReport();
+    return reportRegistrationService.getOpenRegistrationsReport();
   }
 
   @GetMapping(path = "/registration/confirming")
   public List<ResponseRegistration> getConfirmingRegistrationsReport() {
-    return new ReportRegistrationService(
-      registrationService,
-      registrationMatchingService,
-      workflowTransitionService,
-      workflowStatusService
-    ).getConfirmingRegistrationsReport();
+    return reportRegistrationService.getConfirmingRegistrationsReport();
+  }
+  @GetMapping(path = "/registration/submitted")
+  public List<ResponseRegistration> getSubmittedRegistrationsReport() {
+    return reportRegistrationService.getSubmittedRegistrationsReport();
   }
 
   @GetMapping(path = "/registration/done")
   public List<ResponseRegistration> getDoneRegistrationsReport() {
-    return new ReportRegistrationService(
-      registrationService,
-      registrationMatchingService,
-      workflowTransitionService,
-      workflowStatusService
-    ).getDoneRegistrationsReport();
+    return reportRegistrationService.getDoneRegistrationsReport();
   }
 }

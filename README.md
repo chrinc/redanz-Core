@@ -30,7 +30,7 @@ Necessary tools for testing and development
 - Find Folder: ``cd /usr/local/redanz/redanzCore``
 - Start Spring on Server:
 ``java -jar $SNAPSHOT --email.host.username=[EMAIL-HOST] --email.host.password=[PW] --email.receiver.dev=[EMAIL-DEV]``
-
+- encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
 #### **Insert Image**
 Image:
 [https://skulls-b072a-default-rtdb.firebaseio.com//](https://skulls-b072a-default-rtdb.firebaseio.com/)

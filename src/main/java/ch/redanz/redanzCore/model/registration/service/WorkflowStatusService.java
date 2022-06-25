@@ -38,6 +38,11 @@ public class WorkflowStatusService {
         confirmingWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.CONFIRMING.getName()));
         return confirmingWorkflowStatusList;
     }
+    public List<WorkflowStatus> findAllSubmitted() {
+        List<WorkflowStatus> confirmingWorkflowStatusList = new ArrayList<>();
+        confirmingWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.SUBMITTED.getName()));
+        return confirmingWorkflowStatusList;
+    }
     public List<WorkflowStatus> findAllCancelled() {
         List<WorkflowStatus> cancelledWorkflowStatusList = new ArrayList<>();
         cancelledWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.CANCELLED.getName()));

@@ -13,4 +13,5 @@ import java.util.List;
 public interface WorkflowTransitionRepo extends JpaRepository<WorkflowTransition, WorkflowTransitionId> {
   WorkflowTransition findFirstByRegistrationOrderByTransitionTimestampDesc(Registration registration);
   List<WorkflowTransition> findAllByWorkflowStatus(WorkflowStatus workflowStatus);
+
 }

@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.profile;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,7 +31,9 @@ import java.util.Collections;
     )
     @JoinColumn(name = "user_id")
     private Long userId;
+    @JsonIgnore
     private String email;
+    @JsonIgnore
     private String password;
 
 
@@ -50,9 +53,9 @@ import java.util.Collections;
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-
+    @JsonIgnore
     private Boolean locked = false;
-
+    @JsonIgnore
     private Boolean enabled = false;
 
 //  public User () {}

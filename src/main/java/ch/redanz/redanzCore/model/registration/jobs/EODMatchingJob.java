@@ -48,11 +48,11 @@ public class EODMatchingJob {
 
 
     registrationMatchings.forEach(baseMatcher -> {
-        boolean baseMatcherHasPartnerEmail = !baseMatcher.getPartnerEmail().isEmpty();
+        boolean baseMatcherHasPartnerEmail = baseMatcher.getPartnerEmail() != null;
         Registration baseMatcherRegistration1 = baseMatcher.getRegistration1();
 
       registrationMatchings.forEach(lookupMatcher -> {
-        boolean lookupMatcherHasPartnerEmail = !lookupMatcher.getPartnerEmail().isEmpty();
+        boolean lookupMatcherHasPartnerEmail = lookupMatcher.getPartnerEmail() != null;
 
         // lookup partner by email
         if (

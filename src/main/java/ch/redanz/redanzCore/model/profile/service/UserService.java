@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.profile.service;
 
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.model.profile.User;
@@ -67,7 +68,7 @@ public class UserService implements UserDetailsService {
     if(userExists) {
       // todo check of attributes are the same and
       // todo if ch.redanz.redanzCore.email not confirmed send confirmation ch.redanz.redanzCore.email.
-      throw new ApiRequestException("Email already taken.");
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_TAKEN_EN.getOutTextKey());
     }
     String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
     user.setPassword(encodedPassword);

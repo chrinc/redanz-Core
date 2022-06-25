@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -36,6 +37,9 @@ public class ReportRegistrationService {
   public List<ResponseRegistration> getConfirmingRegistrationsReport() {
     return getRegistrations(workflowStatusService.findAllConfirming());
   }
+  public List<ResponseRegistration> getSubmittedRegistrationsReport() {
+    return getRegistrations(workflowStatusService.findAllSubmitted());
+  }
 
   public List<ResponseRegistration> getDoneRegistrationsReport() {
     return getRegistrations(workflowStatusService.findAllDone());
@@ -52,7 +56,6 @@ public class ReportRegistrationService {
       List<WorkflowStatus> registrationWorkflowStatusList = new ArrayList<>(){{
         add(workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration).getWorkflowStatus());
       }};
-
       if (hasPartner) {
         registrationWorkflowStatusList.add(
           workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(
@@ -62,30 +65,37 @@ public class ReportRegistrationService {
 
       if (workflowStatusList.contains(getLowestWorkflowStatus(registrationWorkflowStatusList))){
 
-        // make sure leader is left, follower right
-        boolean ignoreRegistration =
-          hasPartner && (
-            registration.getDanceRole().getName().equals(DanceRoleConfig.FOLLOWER.getName()) ||
-              registrationMatching.getRegistration2().getDanceRole().getName().equals(DanceRoleConfig.LEADER.getName())
-          );
+        boolean ignoreRegistration = false;
 
-        if (
-          hasPartner &&
-            registration.getDanceRole().getName().equals(DanceRoleConfig.SWITCH.getName()) &&
-            registrationMatching.getRegistration2().getDanceRole().getName().equals(DanceRoleConfig.SWITCH.getName())
-        ) {
-          partnerRegistrations.add(registrationMatching.getRegistration2());
+        if (hasPartner) {
+          boolean rolesMatch = registration.getDanceRole().getName().equals(registrationMatching.getRegistration2().getDanceRole().getName());
+          boolean registration1IsFollower = registration.getDanceRole().getName().equals(DanceRoleConfig.FOLLOWER.getName());
+          boolean registration2IsFollower = registrationMatching.getRegistration2().getDanceRole().getName().equals(DanceRoleConfig.FOLLOWER.getName());
+          boolean registration1IsLeader = registration.getDanceRole().getName().equals(DanceRoleConfig.LEADER.getName());
+          boolean registration2IsLeader = registrationMatching.getRegistration2().getDanceRole().getName().equals(DanceRoleConfig.LEADER.getName());
+
+          // make sure leader is left, follower right
+          ignoreRegistration =
+            registration1IsFollower && !registration2IsFollower
+                || (!registration1IsLeader && registration2IsLeader)
+            ;
+
+          if (rolesMatch) {
+            partnerRegistrations.add(registrationMatching.getRegistration2());
+          }
         }
 
         // make sure AxB BxA Registrations are eliminated
         if (!ignoreRegistration && !partnerRegistrations.contains(registration)) {
           registrations.add(
             new ResponseRegistration(
+              registration.getParticipant().getUser().getUserId(),
               registration.getBundle().getName(),
               registration.getTrack() == null ? null : registration.getTrack().getName(),
               registration.getParticipant().getFirstName(),
               registration.getParticipant().getLastName(),
               registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
+              hasPartner ? registrationMatching.getRegistration2().getParticipant().getUser().getUserId() : null,
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getFirstName() : null,
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getLastName() : null,
               hasPartner ? registrationMatching.getRegistration2().getDanceRole().getName() : null

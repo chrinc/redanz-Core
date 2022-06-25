@@ -1,18 +1,25 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
+import ch.redanz.redanzCore.model.profile.Person;
 import ch.redanz.redanzCore.model.profile.User;
+import ch.redanz.redanzCore.model.profile.service.ProfileService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.web.security.config.JWTConfig;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -27,6 +34,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RequestMapping("core-api/login")
 public class LoginController {
   private final UserService userService;
+  private final ProfileService profileService;
 
   @GetMapping(path="/user_id")
   public Long getUserId(
@@ -34,6 +42,22 @@ public class LoginController {
   ) {
     log.info("inc, send getAllTracks: {}.", userService.getUser(email));
     return userService.getUser(email).getUserId();
+  }
+  @GetMapping(path="/check-server")
+  public Integer checkServer(
+  ) {
+    return 1;
+  }
+  @GetMapping(path="/profile")
+  public Person profile(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      log.info("userId: {}", userId);
+      return profileService.getProfile(userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 
   @GetMapping("/token/refresh")
@@ -44,8 +68,7 @@ public class LoginController {
       try {
         String token = authorizationHeader.substring("Bearer ".length());
 
-        //  @todo lockup secret, keep it the same
-        Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+        Algorithm algorithm = Algorithm.HMAC256(JWTConfig.getJwtSecret().getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(token);
         String username = decodedJWT.getSubject();

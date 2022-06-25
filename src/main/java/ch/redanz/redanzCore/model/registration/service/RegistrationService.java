@@ -5,12 +5,15 @@ import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.*;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
+import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.workshop.Event;
 import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.profile.Person;
 import ch.redanz.redanzCore.model.registration.repository.*;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.email.EmailService;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -95,6 +98,22 @@ public class RegistrationService {
     );
 
     return hosteeRegistrationMap;
+  }
+
+  public void doMatch(Registration registration1, Registration registration2){
+    log.info("inc, bfr match 1");
+    RegistrationMatching registrationMatching1 = registrationMatchingService.findByRegistration1(registration1).get();
+    registrationMatching1.setRegistration2(registration2);
+
+    log.info("inc, bfr match 2");
+    RegistrationMatching registrationMatching2 = registrationMatchingService.findByRegistration1(registration2).get();
+    registrationMatching2.setRegistration2(registration1);
+
+    log.info("inc, bfr save ");
+    registrationMatchingService.save(registrationMatching1);
+    registrationMatchingService.save(registrationMatching2);
+
+    log.info("inc, done");
   }
 
   public Map<String, String> getScholarshipRegistration(Registration registration) {
@@ -208,37 +227,125 @@ public class RegistrationService {
 
 //  @Transactional
   public void submitRegistration(Long userId, JsonObject request, String link) throws IOException, TemplateException {
-    RegistrationRequest registrationRequest= new RegistrationRequest(
-            request.get("eventId").getAsLong(),
-            request.get("bundleId").getAsLong(),
-            request.get("trackId").isJsonNull() ? null : request.get("trackId").getAsLong(),
-            request.get("danceRoleId").isJsonNull() ? null : request.get("danceRoleId").getAsLong() ,
-            request.get("partnerEmail").isJsonNull() ? null : request.get("partnerEmail").getAsString()
-    );
+      log.info("request: {}", request);
+      RegistrationRequest registrationRequest = new RegistrationRequest(
+        request.get("eventId").getAsLong(),
+        request.get("bundleId").getAsLong(),
+        request.get("trackId")== null ? null : request.get("trackId").getAsLong(),
+        request.get("danceRoleId") == null ? null : request.get("danceRoleId").getAsLong(),
+        request.get("partnerEmail")== null ? null : request.get("partnerEmail").getAsString()
+      );
 
-    Registration registration = saveRegistration(registrationRequest, userId);
+      Registration registration = saveRegistration(registrationRequest, userId);
 
-    if (!request.get("foodRegistration").getAsJsonArray().isEmpty()) {
-      saveFoodRegistration(registration, request.get("foodRegistration").getAsJsonArray());
+      if (!request.get("foodRegistration").getAsJsonArray().isEmpty()) {
+        saveFoodRegistration(registration, request.get("foodRegistration").getAsJsonArray());
+      }
+
+    log.info("inc, hostRegistration: {}", request.get("hostRegistration"));
+      if (!request.get("hostRegistration").getAsJsonArray().isEmpty()) {
+        saveHostRegistration(registration, request.get("hostRegistration").getAsJsonArray());
+      }
+    log.info("inc, hosteeRegistration: {}", request.get("hosteeRegistration"));
+
+      if (!request.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
+        saveHosteeRegistration(registration, request.get("hosteeRegistration").getAsJsonArray());
+      }
+      log.info("inc, volunteerRegistration: {}", request.get("volunteerRegistration"));
+      if (request.get("volunteerRegistration") != null) {
+        saveVolunteerRegistration(registration, request.get("volunteerRegistration").getAsJsonObject());
+      }
+
+      if (request.get("scholarshipRegistration") != null) {
+        saveScholarishpRegistration(registration, request.get("scholarshipRegistration").getAsJsonArray());
+      }
+
+      if (!request.get("donationRegistration").isJsonNull()) {
+        saveDonationRegistration(registration, request.get("donationRegistration").getAsJsonArray());
+      }
+      saveWorkflowStatus(registration);
+      doMatching(registration, registrationRequest);
+      sendEmailConfirmation(registration, mailConfig, link, userId);
+  }
+  public Registration getRegistration(Long userId, Event event) {
+    return registrationRepo.findByParticipantAndEvent(
+      personService.findByUser(userService.findByUserId(userId)),
+      event
+    ).get();
+  }
+
+  public RegistrationResponse getRegistrationResponse(Long userId, Long eventId) {
+    Optional<Registration> registrationOptional =
+      findByParticipantAndEvent(
+        personService.findByUser(userService.findByUserId(userId)),
+        eventService.findByEventId(eventId)
+      );
+
+    if (registrationOptional.isPresent()) {
+      Registration registration = registrationOptional.get();
+      RegistrationResponse registrationResponse = new RegistrationResponse(
+        registration.getRegistrationId(),
+        registration.getParticipant().getUser().getUserId(),
+        registration.getEvent().getEventId(),
+        registration.getBundle().getBundleId()
+      );
+
+      registrationResponse.setEventId(registration.getEvent().getEventId());
+      registrationResponse.setRegistrationId(registration.getRegistrationId());
+      registrationResponse.setBundleId(registration.getBundle().getBundleId());
+
+      // track
+      if (registration.getTrack() != null) {
+        registrationResponse.setTrackId(registration.getTrack().getTrackId());
+      }
+
+      // dance role
+      if (registration.getDanceRole() != null) {
+        registrationResponse.setDanceRoleId(registration.getDanceRole().getDanceRoleId());
+      }
+
+      // partner Email
+      RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
+      if (registrationMatching != null) {
+        registrationResponse.setPartnerEmail(registrationMatching.getPartnerEmail());
+      }
+
+      // workflow Status
+      WorkflowTransition workflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
+      registrationResponse.setWorkflowStatus(workflowTransition.getWorkflowStatus());
+
+      // Food Registration
+      registrationResponse.setFoodRegistrations(
+        getFoodRegistrations(registration)
+      );
+
+      // Host Registration
+      registrationResponse.setHostRegistration(
+        getHostRegistrations(registration)
+      );
+
+      // Hostee Registration
+      registrationResponse.setHosteeRegistration(
+        getHosteeRegistrations(registration)
+      );
+
+      // Volunteer Registration
+      registrationResponse.setVolunteerRegistration(
+        getVolunteerRegistration(registration)
+      );
+
+      // Scholarship Registration
+      registrationResponse.setScholarshipRegistration(
+        getScholarshipRegistration(registration)
+      );
+
+      // Scholarship Registration
+      registrationResponse.setDonationRegistration(
+        getDonationRegistration(registration)
+      );
+      return registrationResponse;
     }
-    if (!request.get("hostRegistration").getAsJsonArray().isEmpty()) {
-      saveHostRegistration(registration, request.get("hostRegistration").getAsJsonArray());
-    }
-    if (!request.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
-      saveHosteeRegistration(registration, request.get("hosteeRegistration").getAsJsonArray());
-    }
-    if (request.get("volunteerRegistration") != null) {
-      saveVolunteerRegistration(registration, request.get("volunteerRegistration").getAsJsonObject());
-    }
-    if (request.get("scholarshipRegistration") != null) {
-      saveScholarishpRegistration(registration, request.get("scholarshipRegistration").getAsJsonArray());
-    }
-    if (request.get("donationRegistration") != null) {
-      saveDonationRegistration(registration, request.get("donationRegistration").getAsJsonArray());
-    }
-    saveWorkflowStatus(registration);
-    doMatching(registration, registrationRequest);
-    sendEmailConfirmation(registration, mailConfig, link, userId);
+    return null;
   }
 
   private void saveScholarishpRegistration(Registration registration, JsonArray scholarshipRegistration) {
@@ -290,6 +397,8 @@ public class RegistrationService {
     personService.savePerson(person);
   }
 
+
+
   private void saveHosteeRegistration(Registration registration, JsonArray hosteeRegistration) {
     JsonObject slotsJson = hosteeRegistration.get(0).getAsJsonObject();
     JsonObject isShareRoomsJson = hosteeRegistration.get(1).getAsJsonObject();
@@ -305,7 +414,7 @@ public class RegistrationService {
           !isShareRoomsJson.get("isShareRooms").isJsonNull() && isShareRoomsJson.get("isShareRooms").getAsBoolean(),
           nameRoomMateJson.get("nameRoomMate").isJsonNull() ? null : nameRoomMateJson.get("nameRoomMate").getAsString(),
           !isSharedBedJson.get("isSharedBed").isJsonNull() && isSharedBedJson.get("isSharedBed").getAsBoolean(),
-          hosteeCommentJson.get("hosteeComment").isJsonNull() ? null : hosteeCommentJson.get("hosteeComment").getAsString()
+          hosteeCommentJson.get("hosteeComment") == null ? null : hosteeCommentJson.get("hosteeComment").getAsString()
         )
     );
 
@@ -343,32 +452,37 @@ public class RegistrationService {
     JsonObject sleepUtilsJson = hostRegistration.get(2).getAsJsonObject();
     JsonObject hostCommentJson = hostRegistration.get(3).getAsJsonObject();
 
-    log.info("hostRegistration, hostCommentJson: {}", hostCommentJson);
+    log.info("hostRegistration, hostCommentJson null?: {}", hostCommentJson.get("hostComment") == null);
 
     // host registration
     hostRegistrationRepository.save(
         new HostRegistration(
                 registration,
                 personCountJson.get("personCount").isJsonNull() ? 0 : personCountJson.get("personCount").getAsInt(),
-                hostCommentJson.get("hostComment").isJsonNull() ? null : hostCommentJson.get("hostComment").getAsString()
+                hostCommentJson.get("hostComment") == null ? "" : hostCommentJson.get("hostComment").getAsString()
         )
     );
+    log.info("hostRegistration, sleep utils null ?: {}", sleepUtilsJson.get("sleepUtils") == null);
+    log.info("hostRegistration, sleep utils null ?: {}", sleepUtilsJson.get("sleepUtils").getAsJsonArray());
 
     // host sleep util registration
-    if (!sleepUtilsJson.get("sleepUtils").isJsonNull()) {
+    if (sleepUtilsJson.get("sleepUtils") != null) {
       sleepUtilsJson.get("sleepUtils").getAsJsonArray().forEach(sleepUtil -> {
-        hostSleepUtilRegistrationRepository.save(
-          new HostSleepUtilRegistration(
-            hostRegistrationRepository.findAllByRegistration(registration),
-            sleepUtilService.findBySleepUtilId(sleepUtil.getAsJsonObject().get("sleepUtilId").getAsLong()),
-            sleepUtil.getAsJsonObject().get("count").getAsInt()
-          )
-        );
+        if (sleepUtil.getAsJsonObject().get("count") != null) {
+          hostSleepUtilRegistrationRepository.save(
+            new HostSleepUtilRegistration(
+              hostRegistrationRepository.findAllByRegistration(registration),
+              sleepUtilService.findBySleepUtilId(sleepUtil.getAsJsonObject().get("sleepUtilId").getAsLong()),
+              sleepUtil.getAsJsonObject().get("count").getAsInt()
+            )
+          );
+        };
       });
     }
 
+    log.info("hostRegistration, slots null?: {}", slotsJson.get("slots") == null);
     // host slot registration
-    if (!slotsJson.get("slots").isJsonNull()) {
+    if (slotsJson.get("slots") != null) {
       slotsJson.get("slots").getAsJsonArray().forEach(slot -> {
           hostSlotRegistraitionRepository.save(
                   new HostSlotRegistration(
@@ -378,6 +492,8 @@ public class RegistrationService {
           );
       });
     }
+
+    log.info("all done" );
   }
 
   private void saveFoodRegistration(Registration registration, JsonArray foodRegistration) {
@@ -409,6 +525,8 @@ public class RegistrationService {
             personService.findByUser(userService.findByUserId(userId))
     );
 
+    log.info("(registration. track?: {}", request);
+    log.info("(registration. request.getTrackId()?: {}", request.getTrackId());
     if (request.getTrackId() != null) {
       newRegistration.setTrack(trackService.findByTrackId(request.getTrackId()));
     }
@@ -442,6 +560,10 @@ public class RegistrationService {
     }
   }
 
+  private void sendConfirmingReminder() {
+//    workflowStatusService..
+  }
+
   private void sendEmailConfirmation(
           Registration registration,
           Configuration mailConfig,
@@ -461,4 +583,7 @@ public class RegistrationService {
             FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
     );
   }
+
+//  public void doMatch(RegistrationResponse registration, RegistrationResponse registration1) {
+//  }
 }

@@ -13,11 +13,15 @@ import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingServi
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
+import ch.redanz.redanzCore.model.workshop.config.EventConfig;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonParser;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -34,12 +38,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class RegistrationController {
   private final RegistrationService registrationService;
-  private final EventService eventService;
-  private final PersonService personService;
-  private final RegistrationMatchingService registrationMatchingService;
-  private final UserService userService;
   private final WorkflowStatusService workflowStatusService;
-  private final WorkflowTransitionService workflowTransitionService;
+  private final EventService eventService;
 
 
   @Autowired
@@ -55,84 +55,32 @@ public class RegistrationController {
           @RequestParam("eventId") Long eventId
   ) {
 
-    Optional<Registration> registrationOptional =
-            registrationService.findByParticipantAndEvent(
-                    personService.findByUser(userService.findByUserId(userId)),
-                    eventService.findByEventId(eventId)
-            );
-
-    if (registrationOptional.isPresent()) {
-      Registration registration = registrationOptional.get();
-      RegistrationResponse registrationResponse = new RegistrationResponse(
-        registration.getRegistrationId(),
-        registration.getParticipant().getUser().getUserId(),
-        registration.getEvent().getEventId(),
-        registration.getBundle().getBundleId()
-      );
-
-      registrationResponse.setEventId(registration.getEvent().getEventId());
-      registrationResponse.setRegistrationId(registration.getRegistrationId());
-      registrationResponse.setBundleId(registration.getBundle().getBundleId());
-
-      // track
-      if (registration.getTrack() != null) {
-        registrationResponse.setTrackId(registration.getTrack().getTrackId());
-      }
-
-      // dance role
-      if (registration.getDanceRole() != null) {
-        registrationResponse.setDanceRoleId(registration.getDanceRole().getDanceRoleId());
-      }
-
-
-      // partner Email
-      RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
-      if (registrationMatching != null) {
-        registrationResponse.setPartnerEmail(registrationMatching.getPartnerEmail());
-      }
-
-
-      // workflow Status
-      WorkflowTransition workflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
-      registrationResponse.setWorkflowStatus(workflowTransition.getWorkflowStatus());
-
-      // Food Registration
-      registrationResponse.setFoodRegistrations(
-              registrationService.getFoodRegistrations(registration)
-      );
-
-      log.info("inc bfr host Registration");
-      // Host Registration
-      registrationResponse.setHostRegistration(
-              registrationService.getHostRegistrations(registration)
-      );
-
-      // Hostee Registration
-      registrationResponse.setHosteeRegistration(
-              registrationService.getHosteeRegistrations(registration)
-      );
-
-      // Volunteer Registration
-      registrationResponse.setVolunteerRegistration(
-              registrationService.getVolunteerRegistration(registration)
-      );
-
-      log.info("inc get scholarship registration");
-      // Scholarship Registration
-      registrationResponse.setScholarshipRegistration(
-              registrationService.getScholarshipRegistration(registration)
-      );
-
-
-      log.info("inc getDonationRegistration");
-      // Scholarship Registration
-      registrationResponse.setDonationRegistration(
-        registrationService.getDonationRegistration(registration)
-      );
-
-      return registrationResponse;
+    try {
+      return registrationService.getRegistrationResponse(userId, eventId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
-    return null;
+  }
+  @GetMapping(path="/manual-match")
+  @Transactional
+  public void manualMatch(
+          @RequestParam("userId") Long userId,
+          @RequestParam("user2Id") Long user2Id // @todo: add event Id
+  ) {
+    try {
+      registrationService.doMatch(
+        registrationService.getRegistration(
+          userId,
+          eventService.getCurrentEvent()
+        ),
+        registrationService.getRegistration(
+          user2Id,
+          eventService.getCurrentEvent()
+        )
+      );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 
   @PostMapping(path="/submit")
@@ -142,23 +90,30 @@ public class RegistrationController {
           @RequestBody String jsonObject
   ) throws IOException, TemplateException {
     log.info("inc, userId: {}", userId);
-    registrationService.submitRegistration(
-      userId,
-      JsonParser.parseString(jsonObject).getAsJsonObject(),
-      environment.getProperty("link.login")
-    );
-}
+    try {
+      registrationService.submitRegistration(
+        userId,
+        JsonParser.parseString(jsonObject).getAsJsonObject(),
+        environment.getProperty("link.login")
+      );
+    } catch(Exception exception) {
+        log.info("inc, throw api Request Exception?");
+        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+    }
+  }
 
   @GetMapping(path="/workflow/status/all")
   public List<WorkflowStatus> getWorkflowStatusList() {
-    log.info("inc, send workflow status: {}.", registrationService.getWorkflowStatusList());
     List<WorkflowStatus> workflowStatusList = registrationService.getWorkflowStatusList();
     workflowStatusList.remove(
             workflowStatusList.indexOf(
                     workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.CANCELLED.getName())
             )
     );
-
     return workflowStatusList;
+  }
+  @GetMapping(path="/confirming/reminder")
+  public void sendConfirmingReminder() {
+//    registrationService.sendConfirmingReminder();
   }
 }

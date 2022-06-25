@@ -73,20 +73,17 @@ public enum OutTextConfig {
     LABEL_SLEEP_UTIL_COUCH_EN("LABEL-SLEEP-UTIL-COUCH", "Couch", "EN"),
     LABEL_SLEEP_UTIL_COUCH_GE("LABEL-SLEEP-UTIL-COUCH", "Sofa", "GE"),
     LABEL_SLEEP_UTIL_BAG_EN("LABEL-SLEEP-UTIL-BAG", "Sleeping Bag", "EN"),
-    LABEL_SLEEP_UTIL_BAG_GE("LABEL-SLEEP-UTIL-BAG", "Schlafsack", "GE");
+    LABEL_SLEEP_UTIL_BAG_GE("LABEL-SLEEP-UTIL-BAG", "Schlafsack", "GE"),
 
-//    // Volunteer Slots
-//    LABEL_SLOT_FRIDAY_MORNING_EN("LABEL_SLOT_FRIDAY_MORNING", "Friday Morning", "EN"),
-//    LABEL_SLOT_FRIDAY_AFTERNOON_EN("LABEL_SLOT_FRIDAY_MORNING","Friday Afternoon", "EN"),
-//    LABEL_SLOT_FRIDAY_EVENING_EN("LABEL_SLOT_FRIDAY_EVENING", "Friday Evening", "EN"),
-//    LABEL_SLOT_SUNDAY_EVENING_EN("LABEL_SLOT_SUNDAY_EVENING", "Sunday Evening", "EN"),
-//    LABEL_SLOT_SUNDAY_NIGHT_EN("LABEL_SLOT_SUNDAY_NIGHT", "Sunday Night (to Monday)", "EN"),
-//    LABEL_SLOT_FRIDAY_MORNING_GE("LABEL_SLOT_FRIDAY_MORNING", "Freitag Vormittag", "GE"),
-//    LABEL_SLOT_FRIDAY_AFTERNOON_GE("LABEL_SLOT_FRIDAY_MORNING","Freitag Nachmittag", "GE"),
-//    LABEL_SLOT_FRIDAY_EVENING_GE("LABEL_SLOT_FRIDAY_EVENING", "Freitag Abend", "GE"),
-//    LABEL_SLOT_SUNDAY_EVENING_GE("LABEL_SLOT_SUNDAY_EVENING", "Sonntag Abend", "GE"),
-//    LABEL_SLOT_SUNDAY_NIGHT_GE("LABEL_SLOT_SUNDAY_NIGHT", "Sonntag Nacht (auf Montag)", "GE")
-    ;
+    // EXCEPTION HANDLING
+    LABEL_ERROR_USER_TAKEN_EN("LABEL-ERROR-USER-TAKEN", "Email already taken", "EN"),
+    LABEL_ERROR_USER_TAKEN_GE("LABEL-ERROR-USER-TAKEN", "Die Email-Adresse wird bereits verwendet", "GE"),
+    LABEL_ERROR_SUBMIT_EN("LABEL-ERROR-SUBMIT", "Submission Failed, please try again later", "EN"),
+    LABEL_ERROR_SUBMIT_GE("LABEL-ERROR-SUBMIT", "Eingabe fehlgeschlagen, bitte versuche es später erneut", "GE"),
+    LABEL_ERROR_UNEXPECTED_EN("LABEL-ERROR-UNEXPECTED", "There has been an error, try again later", "EN"),
+    LABEL_ERROR_UNEXPECTED_GE("LABEL-ERROR-UNEXPECTED", "Es ist ein Fehler aufgetreten, bitte versuche es später erneut", "GE"),
+    LABEL_ERROR_UNAUTHORIZED_EN("LABEL-ERROR-UNAUTHORIZED", "Unauthorized Attempt", "EN"),
+    LABEL_ERROR_UNAUTHORIZED_GE("LABEL-ERROR-UNAUTHORIZED", "Fehlende Berechtigung", "GE");
 
     private final String outTextKey;
     private final String outText;
