@@ -25,12 +25,24 @@ Necessary tools for testing and development
   - `init sql inserts with source (pwd shows path to folder) eg: ` source /Users/Chrine/Documents/GitHub/redAnz-Core/redanzCore/src/main/resources/init_sql_countries.sql
  
  #### on Server
- 
+ - Create SSH key for git-repository
+     - ``ssh-keygen -t ed25519 -C [email@address]``
+     - ``touch ~/ssh/config``
+         - ``AddKeysToAgend yes`` 
+         - `ÌdentityFile ~/.ssh/id_ed25519`
+     - ``cat ~.ssh/id_ed25519``
+     - Copy the Key to SSH Keys on github.com
+ - Clone the repository to the server: 
+     `git fetch origin`
+     `git status`
+     `git pull`
 - JAVA_HOME: ``export JAVA_HOME = /usr/lib/jvm/java-11-openjdk-amd64``
 - SNAPSHOT: ``export SNAPSHOT=[currentSnapshot]``
 - Find Folder: ``cd /usr/local/redanz/redanzCore``
 - Start Spring on Server:
-``java -jar $SNAPSHOT --email.host.username=[EMAIL-HOST] --email.host.password=[PW] --email.receiver.dev=[EMAIL-DEV]``
+--spring.profiles.active=prod --redanz.master.password=
+``java -jar $snapshot --spring.profiles.active=prod --email.host.password=$pass``
+`snapshot=[snapshot], pass=[password] => escape with \ before special characters`
 - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
 #### **Insert Image**
 Image:
