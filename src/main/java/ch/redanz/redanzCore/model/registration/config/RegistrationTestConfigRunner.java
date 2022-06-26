@@ -48,6 +48,8 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final WorkflowTransitionService workflowTransitionService;
   private final WorkflowStatusService workflowStatusService;
   private final Map<RegistrationMatching, RegistrationMatching> matchingPairs;
+  private final EODMatchingJob eodMatchingJob;
+  private final EODReleaseJob eodReleaseJob;
 
 
   @Autowired
@@ -73,20 +75,20 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
 
     // run EOD Scheduler first time
     Thread.sleep(1000);
-    EODMatchingJob eodMatchingJob = new EODMatchingJob(
-      registrationMatchingService,
-      workflowTransitionService,
-      matchingPairs
-    );
+//    EODMatchingJob eodMatchingJob = new EODMatchingJob(
+//      registrationMatchingService,
+//      workflowTransitionService,
+//      matchingPairs
+//    );
     eodMatchingJob.runMatching();
-    EODReleaseJob eodReleaseJob = new EODReleaseJob(
-      registrationMatchingService,
-      workflowTransitionService,
-      workflowStatusService,
-      registrationService,
-      environment,
-      mailConfig
-    );
+//    EODReleaseJob eodReleaseJob = new EODReleaseJob(
+//      registrationMatchingService,
+//      workflowTransitionService,
+//      workflowStatusService,
+//      registrationService,
+//      environment,
+//      mailConfig
+//    );
     eodReleaseJob.runRelease();
     Thread.sleep(1000);
     workflowTransitionRepo.saveAll(WorkflowTransitionConfig.setup(

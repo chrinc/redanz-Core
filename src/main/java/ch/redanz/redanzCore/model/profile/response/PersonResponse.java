@@ -16,4 +16,5 @@ public class PersonResponse {
     private final String postalCode;
     private final String city;
     private final Long countryId;
+    private final String language;
 }

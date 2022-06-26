@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface OutTextRepo extends JpaRepository<OutText, OutTextId> {
   OutText findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(String outTextKey, String languageKey);
+  List<OutText> findAllByType(String type);
 }

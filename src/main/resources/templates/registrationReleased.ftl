@@ -6,19 +6,19 @@
   </head>
   <body>
     <div style="width:730px;background:#ececec;text-align:left;font-family: Arial;">
-      <img src="https://stirit.ch/wp-content/uploads/2020/05/stirit20_WEB_header_1a.png" style="margin:15px" width="700"><br/>
+      <img src="https://stirit.ch/wp-content/uploads/2022/06/web_header_01.png" style="margin:15px" width="700"><br/>
       <div style="padding:15px;">
         <h3>Hi ${firstName}</h3>
         <p>
-          Hurray - we've got a spot for you at the this year's Workshop.
-          As soon as we receive your payment, we will confirm your participation.
+          ${header01}.
+          ${header02}.
         </p>
         <p>
-          Please find the payment details in your  <a href=${link} >redanz account</a>
+           ${details} <a href=${link} > ${account}.</a>
         </p>
-        <p>See you soon</p>
-        Best Regards </br>
-        Team redAnz
+        <p>${see_you}</p>
+        ${regards}</br>
+        ${team}
       </div>
     </div>
   </body>

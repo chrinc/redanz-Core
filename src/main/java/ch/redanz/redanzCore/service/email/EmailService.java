@@ -75,7 +75,7 @@ public class EmailService {
       msg.setFrom(new InternetAddress(hostEmail, emailHostName));
       msg.setReplyTo(InternetAddress.parse(hostEmail, false));
       msg.setSubject(subject, "UTF-8");
-      msg.setContent(body, "text/html");
+      msg.setContent(body, "text/html; charset=UTF-8");
       msg.setSentDate(new Date());
       String emailReceiver = emailReceiverDev.isEmpty() ? toEmail: emailReceiverDev;
       msg.setRecipients(

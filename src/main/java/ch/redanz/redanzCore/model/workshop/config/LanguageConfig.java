@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.Bundle;
-import ch.redanz.redanzCore.model.workshop.Language;
+import ch.redanz.redanzCore.model.profile.Language;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -11,6 +11,7 @@ import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.profile.Person;
 import ch.redanz.redanzCore.model.registration.repository.*;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.repository.LanguageRepo;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.email.EmailService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -24,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
@@ -58,6 +60,8 @@ public class RegistrationService {
   private final VolunteerSlotRegistrationRepo volunteerSlotRegistrationRepo;
   private final DonationRegistrationRepo donationRegistrationRepo;
   private final ScholarshipRegistrationRepo scholarshipRegistrationRepo;
+  private final LanguageRepo languageRepo;
+  private final OutTextService outTextService;
 
 
 
@@ -225,7 +229,7 @@ public class RegistrationService {
     return submittedRegistrations;
   }
 
-//  @Transactional
+  @Transactional
   public void submitRegistration(Long userId, JsonObject request, String link) throws IOException, TemplateException {
       log.info("request: {}", request);
       RegistrationRequest registrationRequest = new RegistrationRequest(
@@ -265,6 +269,7 @@ public class RegistrationService {
       }
       saveWorkflowStatus(registration);
       doMatching(registration, registrationRequest);
+      log.info("inc, bfr send email ");
       sendEmailConfirmation(registration, mailConfig, link, userId);
   }
   public Registration getRegistration(Long userId, Event event) {
@@ -575,15 +580,132 @@ public class RegistrationService {
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationSubmitted.ftl");
 
-//    EmailService emailService = new EmailService();
+    String languageKey =
+      registration.getParticipant().getPersonLang() == null ?
+        languageRepo.findLanguageByLanguageKey("GE").getLanguageKey() :
+        registration.getParticipant().getPersonLang().getLanguageKey();
+
+    model.put("header",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SUBMITTED_HEADER_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("base",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SUBMITTED_BASE_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("find_details_01",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SUBMITTED_DETAILS01_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("account",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("see_you",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("regards",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("team",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    log.info("inc, bfr send email");
     EmailService.sendEmail(
-            EmailService.getSession(),
-            userService.findByUserId(userId).getEmail(),
-            "Registration Submitted",
-            FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      EmailService.getSession(),
+      userService.findByUserId(userId).getEmail(),
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText(),
+      FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
     );
   }
 
-//  public void doMatch(RegistrationResponse registration, RegistrationResponse registration1) {
-//  }
+  private void sendEmailBookingConfirmation(
+          Person person,
+          Configuration mailConfig
+  ) throws IOException, TemplateException {
+    Map<String, Object> model = new HashMap<>();
+    model.put("firstName", person.getFirstName());
+    Template template = mailConfig.getTemplate("registrationDone.ftl");
+
+    String languageKey =
+      person.getPersonLang() == null ?
+        languageRepo.findLanguageByLanguageKey("GE").getLanguageKey() :
+        person.getPersonLang().getLanguageKey();
+
+    model.put("header",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_HEADER_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("base",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_BASE_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("see_you",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("regards",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("team",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    log.info("inc, bfr send email");
+    EmailService.sendEmail(
+      EmailService.getSession(),
+      person.getUser().getEmail(),
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText(),
+      FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+    );
+  }
+
+  public void onPaymentReceived(Long userId) throws IOException, TemplateException {
+    workflowTransitionService.saveWorkflowTransition(
+      new WorkflowTransition(
+        workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.DONE.getName()),
+        findByParticipantAndEvent(
+          personService.findByUser(userService.findByUserId(userId)),
+          eventService.findByName(EventConfig.EVENT2022.getName())
+        ).get(),
+        LocalDateTime.now()
+      )
+    );
+    sendEmailBookingConfirmation(personService.findByUser(userService.findByUserId(userId)), mailConfig);
+  }
 }

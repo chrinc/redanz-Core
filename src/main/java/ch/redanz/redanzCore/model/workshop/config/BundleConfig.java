@@ -10,8 +10,9 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public enum BundleConfig {
-  FULLPASS("Full Pass", 320, OutTextConfig.LABEL_FULLPASS_DESC_EN.getOutTextKey(), 20),
-  HALFPASS("Half Pass", 250, OutTextConfig.LABEL_HALFPASS_DESC_EN.getOutTextKey(), 20),
+  HALFPASS("FUN Pass", 250, OutTextConfig.LABEL_HALFPASS_DESC_EN.getOutTextKey(), 20),
+  FULLPASS("Extra FUN Pass", 320, OutTextConfig.LABEL_FULLPASS_DESC_EN.getOutTextKey(), 20),
+  LEVELPASS("FUNdamentals Pass", 250, OutTextConfig.LABEL_LEVELPASS_DESC_EN.getOutTextKey(), 20),
   PARTYPASS("Party Pass", 90, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 180);
 
   private final String name;

@@ -5,10 +5,12 @@ import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.registration.WorkflowTransition;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.service.payment.CreatePayment;
 import ch.redanz.redanzCore.service.payment.CreatePaymentResponse;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.stripe.exception.StripeException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +48,9 @@ import java.time.LocalDateTime;
 //    return this.stripeClient.chargeCreditCard(token, amount);
 //  }
   @PostMapping("/create-payment-intent")
-  public CreatePaymentResponse createPaymentIntent(@RequestBody CreatePayment createPayment) throws StripeException {
+  public CreatePaymentResponse createPaymentIntent(
+    @RequestBody CreatePayment createPayment
+  ) throws StripeException {
     log.info("inc, got create payment? {}", createPayment);
     PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder()
         .setCurrency("chf")
@@ -65,19 +69,14 @@ import java.time.LocalDateTime;
     @RequestParam("userId") Long userId
   ) throws Exception {
     log.info("inc, received user: {}", userId);
-    userService.findByUserId(userId);
+    try {
+//      userService.findByUserId(userId);
+      registrationService.onPaymentReceived(userId);
 
-    workflowTransitionService.saveWorkflowTransition(
-        new WorkflowTransition(
-          workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.DONE.getName()),
-          registrationService.findByParticipantAndEvent(
-                  personService.findByUser(userService.findByUserId(userId)),
-                  eventService.findByName(EventConfig.EVENT2022.getName())
-          ).get(),
-          LocalDateTime.now()
 
-      )
-    );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 }
 

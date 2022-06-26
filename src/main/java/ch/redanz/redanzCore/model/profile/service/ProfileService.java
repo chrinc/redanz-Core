@@ -7,7 +7,9 @@ import ch.redanz.redanzCore.model.profile.repository.UserRepo;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.workshop.OutText;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.repository.LanguageRepo;
 import ch.redanz.redanzCore.model.workshop.repository.OutTextRepo;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -33,7 +35,8 @@ public class ProfileService {
   private final CountryService countryService;
   private final PersonRepo personRepo;
   private final UserRepo userRepo;
-  private final OutTextRepo outTextRepo;
+  private final OutTextService outTextService;
+  private final LanguageRepo languageRepo;
   Configuration mailConfig;
 
   public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink) throws IOException, TemplateException {
@@ -45,23 +48,67 @@ public class ProfileService {
       personResponse.getStreet(),
       personResponse.getPostalCode(),
       personResponse.getCity(),
-      countryService.findCountry(personResponse.getCountryId())
-
+      countryService.findCountry(personResponse.getCountryId()),
+      languageRepo.findLanguageByLanguageKey(personResponse.getLanguage())
     );
 
     newPerson.setUpdateTimestamp(LocalDateTime.now());
     personService.addPerson(newPerson);
+    String languageKey =
+      newPerson.getPersonLang() == null ?
+        languageRepo.findLanguageByLanguageKey("GE").getLanguageKey() :
+        newPerson.getPersonLang().getLanguageKey();
 
     Map<String, Object> model = new HashMap<>();
     model.put("link", registrationLink);
     model.put("firstName", newPerson.getFirstName());
-    Template template = mailConfig.getTemplate("profileReceived.ftl");
 
-//    EmailService emailService = new EmailService();
+    model.put("base",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("activate_now",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("expires",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("regards",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("see_you",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("team",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+//    model.put("")
+    Template template = mailConfig.getTemplate("profileReceived.ftl");
     EmailService.sendEmail(
       EmailService.getSession(),
       userService.findByUserId(userId).getEmail(),
-      "Email Confirmation",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CONFIRM_SUBJECT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
     );
   }
@@ -85,30 +132,4 @@ public class ProfileService {
      return personRepo.findByUser(userRepo.findByUserId(userId));
   }
 
-  public HashMap getOutText() {
-    HashMap outTextMap = new HashMap();
-    List<OutTextConfig> profileOutText = new ArrayList<>();
-    profileOutText.add(OutTextConfig.LABEL_ERROR_SUBMIT_GE);
-    profileOutText.add(OutTextConfig.LABEL_ERROR_SUBMIT_EN);
-    profileOutText.add(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE);
-    profileOutText.add(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN);
-    profileOutText.add(OutTextConfig.LABEL_ERROR_USER_TAKEN_GE);
-    profileOutText.add(OutTextConfig.LABEL_ERROR_USER_TAKEN_EN);
-    profileOutText.add(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_GE);
-    profileOutText.add(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN);
-    profileOutText.forEach(outTextConfig -> {
-      OutText outText =  (
-        outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(
-          outTextConfig.getOutTextKey(),
-          outTextConfig.getLanguageKey()
-        )
-      );
-
-      outTextMap.put(
-        outText.getOutTextId().getOutTextKey()  + "." + outText.getOutTextId().getOutTextLanguageKey(),
-        outText.getOutText()
-      );
-    });
-    return outTextMap;
-  }
 }

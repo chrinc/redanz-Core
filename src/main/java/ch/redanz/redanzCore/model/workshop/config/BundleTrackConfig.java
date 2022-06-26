@@ -12,13 +12,15 @@ import java.util.List;
 @Slf4j
 @Getter
 public enum BundleTrackConfig {
-  FULL_ADVANCED(BundleConfig.FULLPASS, TrackConfig.LINDY_ADVANCED),
-  FULL_INTERMEDIATE(BundleConfig.FULLPASS, TrackConfig.LINDY_INTERMEDIATE),
-  FULL_SOLOJAZZ(BundleConfig.FULLPASS, TrackConfig.SOLOJAZZ),
+  LEVEL_ADVANCED(BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED),
+  LEVEL_INTERMEDIATE(BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE),
+  LEVEL_BEGINNER(BundleConfig.LEVELPASS, TrackConfig.LINDY_BEGINNER),
+  FULL_FUN_TRACK(BundleConfig.FULLPASS, TrackConfig.FUN_TRACK),
+  HALF_FUN_TRACK(BundleConfig.HALFPASS, TrackConfig.FUN_TRACK);
 
-  HALF_ADVANCED(BundleConfig.HALFPASS, TrackConfig.LINDY_ADVANCED),
-  HALF_INTERMEDIATE(BundleConfig.HALFPASS, TrackConfig.LINDY_INTERMEDIATE),
-  HALF_SOLOJAZZ(BundleConfig.HALFPASS, TrackConfig.SOLOJAZZ);
+//  HALF_ADVANCED(BundleConfig.HALFPASS, TrackConfig.LINDY_ADVANCED),
+//  HALF_INTERMEDIATE(BundleConfig.HALFPASS, TrackConfig.LINDY_INTERMEDIATE),
+//  HALF_SOLOJAZZ(BundleConfig.HALFPASS, TrackConfig.SOLOJAZZ);
 
   private final BundleConfig bundle;
   private final TrackConfig track;

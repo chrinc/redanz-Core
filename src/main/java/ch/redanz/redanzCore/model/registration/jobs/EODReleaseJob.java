@@ -7,6 +7,9 @@ import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingServi
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.repository.LanguageRepo;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -36,6 +39,8 @@ public class EODReleaseJob {
   private final WorkflowTransitionService workflowTransitionService;
   private final WorkflowStatusService workflowStatusService;
   private final RegistrationService registrationService;
+  private final OutTextService outTextService;
+  private final LanguageRepo languageRepo;
 
   @Autowired
   private Environment environment;
@@ -91,11 +96,63 @@ public class EODReleaseJob {
     model.put("link", environment.getProperty("link.login"));
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationReleased.ftl");
-//    EmailService emailService = new EmailService();
+
+    String languageKey =
+      registration.getParticipant().getPersonLang() == null ?
+        languageRepo.findLanguageByLanguageKey("GE").getLanguageKey() :
+        registration.getParticipant().getPersonLang().getLanguageKey();
+
+    model.put("header01",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_RELEASED_HEADER01_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("header02",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_RELEASED_HEADER02_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("details",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_RELEASED_DETAILS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("account",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("see_you",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("regards",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("team",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
     EmailService.sendEmail(
       EmailService.getSession(),
       registration.getParticipant().getUser().getEmail(),
-      "You have a spot at Redanz",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
     );
   }

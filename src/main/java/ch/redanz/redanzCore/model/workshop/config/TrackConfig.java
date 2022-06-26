@@ -13,9 +13,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public enum TrackConfig {
-  SOLOJAZZ("Solo Jazz", "Solo Jazz Description", 40, false, null),
-  LINDY_ADVANCED("Lindy Advanced", "", 20, true, DanceLevel.ADVANCED),
-  LINDY_INTERMEDIATE("Lindy Intermediate", "", 60, true, DanceLevel.INTERMEDIATE);
+//  SOLOJAZZ("Solo Jazz", "Solo Jazz Description", 40, false, null),
+  LINDY_ADVANCED("Exploring FUNdamentals", "", 20, true, DanceLevel.ADVANCED),
+  LINDY_INTERMEDIATE("Expanding FUNdamentals", "", 60, true, DanceLevel.INTERMEDIATE),
+  LINDY_BEGINNER("Building FUNdamentals", "", 60, true, DanceLevel.BEGINNER),
+  FUN_TRACK("FUN Track", "", 60, true, null);
 
   private final String name;
   private final String description;

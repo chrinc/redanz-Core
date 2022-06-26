@@ -22,6 +22,7 @@ Necessary tools for testing and development
   - ``export PATH=":/usr/local/mysql/bin"``
   - ``mysql -u root -p incIsRoot``
   - ``use redanz``
+  - `init sql inserts with source (pwd shows path to folder) eg: ` source /Users/Chrine/Documents/GitHub/redAnz-Core/redanzCore/src/main/resources/init_sql_countries.sql
  
  #### on Server
  

@@ -6,6 +6,7 @@ import ch.redanz.redanzCore.model.workshop.Slot;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
 import ch.redanz.redanzCore.model.workshop.service.AccommodationService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +26,7 @@ public class EventController {
 
     private final EventService eventService;
     private final SlotService slotService;
+    private final OutTextService outTextService;
     private final AccommodationService accommodationService;
 
     @GetMapping(path="/all")
@@ -40,8 +43,15 @@ public class EventController {
 
     @GetMapping(path="/out-text/all")
     public HashMap getOutText() {
-        log.info("inc, send getOutText: {}.", eventService.getAllOutText());
-        return eventService.getAllOutText();
+        ArrayList<String> types = new ArrayList<>() {
+            {
+                add("FRONT_LOGIN");
+                add("FRONT_BASE");
+            }
+        };
+
+        log.info("inc, send getOutText: {}.", outTextService.getOutTextByType(types));
+        return outTextService.getOutTextByType(types);
     }
     
     @GetMapping(path="/volunteer/slot/all")

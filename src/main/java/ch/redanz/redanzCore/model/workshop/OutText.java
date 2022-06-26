@@ -29,8 +29,12 @@ public class OutText implements Serializable  {
 
     private String outText;
 
-    public OutText(OutTextId outTextId, String outText) {
+    @JsonIgnore
+    private String type;
+
+    public OutText(OutTextId outTextId, String outText, String type) {
         this.outTextId = outTextId;
         this.outText = outText;
+        this.type = type;
     }
 }

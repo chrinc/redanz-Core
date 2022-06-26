@@ -6,6 +6,7 @@ import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
 import ch.redanz.redanzCore.model.profile.service.*;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
 import com.stripe.param.TokenCreateParams;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,7 +32,7 @@ import java.util.List;
 @RequestMapping("core-api/profile")
 public class ProfileController {
   private final CountryService countryService;
-  private final PersonService personService;
+  private final OutTextService outTextService;
   private final UserService userService;
   private final ProfileService profileService;
   private final ConfirmationTokenService confirmationTokenService;
@@ -70,8 +72,14 @@ public class ProfileController {
   }
   @GetMapping(path = "/out-text/all")
   public HashMap getOutText() {
-    log.info("inc, send getOutText: {}.", profileService.getOutText());
-    return profileService.getOutText();
+    ArrayList<String> types = new ArrayList<>() {
+      {
+        add("FRONT_BASE");
+      }
+    };
+
+    log.info("inc, send getOutText: {}.", outTextService.getOutTextByType(types));
+    return outTextService.getOutTextByType(types);
   }
 
   @PostMapping(path = "/person")

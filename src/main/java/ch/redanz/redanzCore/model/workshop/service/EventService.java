@@ -20,24 +20,10 @@ import java.util.List;
 @AllArgsConstructor
 public class EventService {
     private final EventRepo eventRepo;
-    private final OutTextRepo outTextRepo;
 
     public List<Event> getAllEvents() { return eventRepo.findAll(); }
 
     public Event getCurrentEvent() { return eventRepo.findByName(EventConfig.EVENT2022.getName());}
-    public HashMap getAllOutText() {
-        HashMap outTextMap = new HashMap();
-
-        outTextRepo.findAll().forEach(outText -> {
-            outTextMap.put(
-                    outText.getOutTextId().getOutTextKey()  + "." + outText.getOutTextId().getOutTextLanguageKey(),
-                    outText.getOutText()
-            );
-        });
-
-        return outTextMap;
-    }
-
 
     public Event findByEventId(Long eventId) {
         return eventRepo.findByEventId(eventId);

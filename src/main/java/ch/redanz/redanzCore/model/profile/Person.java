@@ -40,8 +40,9 @@ public class Person implements Serializable {
   @JoinColumn(name="country_id")
   private Country country;
 
-  @Column(name="person_lang")
-  private String personLang;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name="language_key")
+  private Language personLang;
 
   @Column(name="update_timestamp")
   private LocalDateTime updateTimestamp;
@@ -56,7 +57,8 @@ public class Person implements Serializable {
     String street,
     String postalCode,
     String city,
-    Country country
+    Country country,
+    Language personLang
   ) {
     this.user = user;
     this.firstName = firstName;
@@ -65,6 +67,7 @@ public class Person implements Serializable {
     this.postalCode = postalCode;
     this.city = city;
     this.country = country;
+    this.personLang = personLang;
   }
 
   public Person(User user, String firstName, String lastName, String street, String postalCode, String city) {

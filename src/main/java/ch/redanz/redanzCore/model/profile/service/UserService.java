@@ -32,14 +32,8 @@ public class UserService implements UserDetailsService {
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepo.findByEmail(email);
       if (user == null) {
-        log.error("inc, user not found, ch.redanz.redanzCore.email {}", email);
-      } else {
-
-//        log.info("inc, user found, ch.redanz.redanzCore.email {}", user.getEmail());
-//        log.info("inc, user found, password {}", user.getPassword());
-//        log.info("inc, user found, authorities {}", user.getAuthorities());
+        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
       }
-
 
       return new org.springframework.security.core.userdetails.User(
         user.getEmail(),
@@ -66,8 +60,6 @@ public class UserService implements UserDetailsService {
 //    log.info("inc, signUpUser user: {}.", user);
 
     if(userExists) {
-      // todo check of attributes are the same and
-      // todo if ch.redanz.redanzCore.email not confirmed send confirmation ch.redanz.redanzCore.email.
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_TAKEN_EN.getOutTextKey());
     }
     String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
@@ -89,8 +81,6 @@ public class UserService implements UserDetailsService {
     return token;
   }
   public int enableUser(String email) {
-
-    log.info("inc, enableUser ch.redanz.redanzCore.email: {}.", email);
     return userRepo.enableUser(email);
   }
 }

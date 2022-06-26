@@ -20,7 +20,15 @@ public enum TrackDanceRoleConfig {
 
   LINDY_INTERMEDIATE_LEADER(TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.LEADER),
   LINDY_INTERMEDIATE_FOLLOWER(TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.FOLLOWER),
-  LINDY_INTERMEDIATE_SWITCH(TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH);
+  LINDY_INTERMEDIATE_SWITCH(TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH),
+
+  LINDY_BEGINNER_LEADER(TrackConfig.LINDY_BEGINNER, DanceRoleConfig.LEADER),
+  LINDY_BEGINNER_FOLLOWER(TrackConfig.LINDY_BEGINNER, DanceRoleConfig.FOLLOWER),
+  LINDY_BEGINNER_SWITCH(TrackConfig.LINDY_BEGINNER, DanceRoleConfig.SWITCH),
+
+  FUN_LEADER(TrackConfig.FUN_TRACK, DanceRoleConfig.LEADER),
+  FUN_FOLLOWER(TrackConfig.FUN_TRACK, DanceRoleConfig.FOLLOWER),
+  FUN_SWITCH(TrackConfig.FUN_TRACK, DanceRoleConfig.SWITCH);
 
   private final TrackConfig trackConfig;
   private final DanceRoleConfig danceRoleConfig;

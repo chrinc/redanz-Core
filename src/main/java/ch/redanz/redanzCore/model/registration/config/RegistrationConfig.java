@@ -23,16 +23,16 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public enum RegistrationConfig {
-  NORMA_REGISTRATION  ( UserConfig.NORMA_USER   ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.FOLLOWER),
-  WILLIAM_REGISTRATION( UserConfig.WILLIAM_USER ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.SOLOJAZZ, null),
+  NORMA_REGISTRATION  ( UserConfig.NORMA_USER   ,EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.FOLLOWER),
+  WILLIAM_REGISTRATION( UserConfig.WILLIAM_USER ,EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.FOLLOWER),
 //  ELNORA_REGISTRATION ( UserConfig.ELNORA_USER  ,EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.SOLOJAZZ, null),
-  ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER  ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.FOLLOWER),
-  NAOMI_REGISTRATION  ( UserConfig.NAOMI_USER   ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH),
+  ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER  ,EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.FOLLOWER),
+  NAOMI_REGISTRATION  ( UserConfig.NAOMI_USER   ,EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH),
   ESTHER_REGISTRATION ( UserConfig.ESTHER_USER  ,EventConfig.EVENT2022, BundleConfig.PARTYPASS, null, null),
-  EDDIE_REGISTRATION  ( UserConfig.EDDIE_USER   ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.LEADER),
-  BILLY_REGISTRATION  ( UserConfig.BILLY_USER   ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH),
-  FRANKY_REGISTRATION ( UserConfig.FRANKY_USER  ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.LEADER),
-  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER ,EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.FOLLOWER);
+  EDDIE_REGISTRATION  ( UserConfig.EDDIE_USER   ,EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.LEADER),
+  BILLY_REGISTRATION  ( UserConfig.BILLY_USER   ,EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH),
+  FRANKY_REGISTRATION ( UserConfig.FRANKY_USER  ,EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.LEADER),
+  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER ,EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.FOLLOWER);
 
 
   private final UserConfig userConfig;
