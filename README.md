@@ -40,9 +40,12 @@ Necessary tools for testing and development
 - SNAPSHOT: ``export SNAPSHOT=[currentSnapshot]``
 - Find Folder: ``cd /usr/local/redanz/redanzCore``
 - Start Spring on Server:
+-- clean inst all:
+`mvn clean install`
 --spring.profiles.active=prod --redanz.master.password=
 ``java -jar $snapshot --spring.profiles.active=prod --email.host.password=$pass``
 `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
+
 - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
 #### **Insert Image**
 Image:

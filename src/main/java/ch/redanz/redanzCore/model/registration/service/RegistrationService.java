@@ -708,4 +708,15 @@ public class RegistrationService {
     );
     sendEmailBookingConfirmation(personService.findByUser(userService.findByUserId(userId)), mailConfig);
   }
+
+  public void onPaymentConfirmed(JsonObject request) throws IOException, TemplateException {
+    JsonObject transaction = request.get("transaction").getAsJsonObject();
+    log.info("inc@onPaymentConfirmed, transaction: {}", transaction);
+    Long userId = transaction.get("referenceId").getAsLong();
+    Number amount = transaction.get("invoice").getAsJsonObject().get("amount").getAsNumber();
+    log.info("inc@onPaymentConfirmed, userId: {}", userId);
+    log.info("inc@onPaymentConfirmed, amount: {}", amount);
+    //    @todo check amount first
+    onPaymentReceived(userId);
+  }
 }
