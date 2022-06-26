@@ -38,7 +38,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     if(request.getServletPath().equals("/core-api/login")
       || request.getServletPath().equals("/core-api/login/token/refresh")
-  //     || request.getServletPath().equals("/core-api/zahls/checkout/confirm")
+      || request.getServletPath().equals("/core-api/zahls/checkout/confirm")
 
     ) {
       filterChain.doFilter(request, response);

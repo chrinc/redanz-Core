@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 //    http.authorizeRequests().antMatchers("/checkout").permitAll();
     http.authorizeRequests().antMatchers("/core-api/profile/user/registration/**").permitAll();
-    http.authorizeRequests().antMatchers("/core-api/zahls/checkout/confirm/**").permitAll();
+    http.authorizeRequests().antMatchers("/core-api/zahls/checkout/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/profile/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/login/check-server").permitAll();
 //    http.authorizeRequests().antMatchers("/login").permitAll();
