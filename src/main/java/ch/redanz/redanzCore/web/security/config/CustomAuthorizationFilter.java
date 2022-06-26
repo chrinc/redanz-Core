@@ -38,11 +38,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     String baseUrl = "http://redanz.ch";
     String baseUrl2 = "https://redanz.ch";
+    log.info("inc, request.getServletPath(): {}",request.getServletPath());
+    log.info("inc, request.getServletPath() equals: {}",request.getServletPath().equals("/core-api/zahls/checkout/confirm"));
+    log.info("inc, request.getServletPath() ==: {}",request.getServletPath() == "/core-api/zahls/checkout/confirm");
     if(
          request.getServletPath().equals("/core-api/login")
       || request.getServletPath().equals("/core-api/login/token/refresh")
-      || request.getServletPath().equals("http://redanz.ch/core-api/zahls/checkout/confirm")
-      || request.getServletPath().equals("https://redanz.ch/core-api/zahls/checkout/confirm")
+      || request.getServletPath().equals("/core-api/zahls/checkout/confirm")
     ) {
       filterChain.doFilter(request, response);
     } else {
