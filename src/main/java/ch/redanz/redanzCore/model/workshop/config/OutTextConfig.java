@@ -77,6 +77,25 @@ public enum OutTextConfig {
     LABEL_SLEEP_UTIL_BAG_EN            ("FRONT_LOGIN","LABEL-SLEEP-UTIL-BAG", "Sleeping Bag", "EN"),
     LABEL_SLEEP_UTIL_BAG_GE            ("FRONT_LOGIN","LABEL-SLEEP-UTIL-BAG", "Schlafsack", "GE"),
 
+    // VOLUNTEERING / DONATION / SCHOLARSHIP
+    LABEL_DONATION_EN                  ("FRONT_LOGIN","LABEL_DONATION", "Donation", "EN"),
+    LABEL_DONATION_GE                  ("FRONT_LOGIN","LABEL_DONATION", "Spende", "GE"),
+
+
+    // discounts
+    LABEL_DISCOUNT_EARLY_BIRD_EN            ("FRONT_LOGIN","LABEL_DISCOUNT_EARLY_BIRD"        , "Early Bird", "EN"),
+    LABEL_DISCOUNT_EARLY_BIRD_GE            ("FRONT_LOGIN","LABEL_DISCOUNT_EARLY_BIRD"        , "Early Bird", "GE"),
+    LABEL_DISCOUNT_STUDENT_EN               ("FRONT_LOGIN","LABEL_DISCOUNT_STUDENT"           , "student", "EN"),
+    LABEL_DISCOUNT_STUDENT_GE               ("FRONT_LOGIN","LABEL_DISCOUNT_STUDENT"           , "Student", "GE"),
+    LABEL_DISCOUNT_ABROAD_EN                ("FRONT_LOGIN","LABEL_DISCOUNT_ABROAD"            , "Travel from abroad", "EN"),
+    LABEL_DISCOUNT_ABROAD_GE                ("FRONT_LOGIN","LABEL_DISCOUNT_ABROAD"            , "Anreise vom Ausland", "GE"),
+    LABEL_DISCOUNT_EARLY_BIRD_DESC_EN       ("FRONT_LOGIN","LABEL_DISCOUNT_EARLY_BIRD_DESC"   , "Early Bird", "EN"),
+    LABEL_DISCOUNT_EARLY_BIRD_DESC_GE       ("FRONT_LOGIN","LABEL_DISCOUNT_EARLY_BIRD_DESC"   , "Early Bird", "GE"),
+    LABEL_DISCOUNT_STUDENT_DESC_EN          ("FRONT_LOGIN","LABEL_DISCOUNT_STUDENT_DESC"      , "Are you student?", "EN"),
+    LABEL_DISCOUNT_STUDENT_DESC_GE          ("FRONT_LOGIN","LABEL_DISCOUNT_STUDENT_DESC"      , "Bist du Student?", "GE"),
+    LABEL_DISCOUNT_ABROAD_DESC_EN      ("FRONT_LOGIN","LABEL_DISCOUNT_ABROAD_DESC"  , "Are you travelling from abroad?", "EN"),
+    LABEL_DISCOUNT_ABROAD_DESC_GE      ("FRONT_LOGIN","LABEL_DISCOUNT_ABROAD_DESC"  , "Reist du vom Ausland an?", "GE"),
+
     // EXCEPTION HANDLING
     LABEL_ERROR_USER_TAKEN_EN          ("FRONT_BASE","LABEL-ERROR-USER-TAKEN", "Email already taken", "EN"),
     LABEL_ERROR_USER_TAKEN_GE          ("FRONT_BASE","LABEL-ERROR-USER-TAKEN", "Die Email-Adresse wird bereits verwendet", "GE"),

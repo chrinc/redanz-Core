@@ -1,5 +1,7 @@
 package ch.redanz.redanzCore.model.registration;
 
+import ch.redanz.redanzCore.model.workshop.Discount;
+import ch.redanz.redanzCore.model.workshop.SleepUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,30 +9,32 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
-@Table(name="donation_registration")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DonationRegistration implements Serializable {
+@Table(name="discount_registration")
+public class DiscountRegistration {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "donation_registration_id")
-  private Long donationRegistrationId;
+  @Column(name = "discount_registration_id")
+  private Long discountRegistrationId;
+
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="registration_id")
   @JsonIgnore
   private Registration registration;
 
-  private double amount;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "discount_id")
+  private Discount discount;
 
-  public DonationRegistration(Registration registration, double amount) {
+  public DiscountRegistration(Registration registration, Discount discount) {
     this.registration = registration;
-    this.amount = amount;
+    this.discount = discount;
   }
 }

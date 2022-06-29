@@ -11,6 +11,7 @@ import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.profile.Person;
 import ch.redanz.redanzCore.model.registration.repository.*;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.repository.DiscountRepo;
 import ch.redanz.redanzCore.model.workshop.repository.LanguageRepo;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.email.EmailService;
@@ -62,6 +63,8 @@ public class RegistrationService {
   private final ScholarshipRegistrationRepo scholarshipRegistrationRepo;
   private final LanguageRepo languageRepo;
   private final OutTextService outTextService;
+  private final DiscountRegistrationRepo discountRegistrationRepo;
+  private final DiscountService discountService;
 
 
 
@@ -77,8 +80,31 @@ public class RegistrationService {
     return registrationRepo.findByParticipantAndEvent(participant, event);
   }
 
+  public List<Registration> findAllByCurrentEvent(){
+    return registrationRepo.findAllByEvent(eventService.getCurrentEvent());
+  }
+
+  public List<Registration> findAllByCurrentEventAndWorkflowStatus(WorkflowStatus workflowStatus){
+    List<Registration> registrationsList = new ArrayList<>();
+    findAllByCurrentEvent().forEach(registration -> {
+      if (
+        workflowStatus.equals(
+          workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(
+            registration
+          )
+        )
+      ) {
+        registrationsList.add(registration);
+      }
+    });
+    return registrationsList;
+  }
+
   public List<FoodRegistration> getFoodRegistrations(Registration registration) {
     return foodRegistrationRepo.findAllByFoodRegistrationIdRegistrationId(registration.getRegistrationId());
+  }
+  public List<DiscountRegistration> getDiscountRegistrations(Registration registration) {
+    return discountRegistrationRepo.findAllByRegistration(registration);
   }
   public Map<String, List<Object>> getHosteeRegistrations(Registration registration) {
     Map<String, List<Object>> hosteeRegistrationMap = new HashMap<>();
@@ -246,6 +272,10 @@ public class RegistrationService {
         saveFoodRegistration(registration, request.get("foodRegistration").getAsJsonArray());
       }
 
+      if (!request.get("discountRegistration").getAsJsonArray().isEmpty()) {
+        saveDiscountRegistration(registration, request.get("discountRegistration").getAsJsonArray());
+      }
+
     log.info("inc, hostRegistration: {}", request.get("hostRegistration"));
       if (!request.get("hostRegistration").getAsJsonArray().isEmpty()) {
         saveHostRegistration(registration, request.get("hostRegistration").getAsJsonArray());
@@ -347,6 +377,10 @@ public class RegistrationService {
       // Scholarship Registration
       registrationResponse.setDonationRegistration(
         getDonationRegistration(registration)
+      );
+
+      registrationResponse.setDiscountRegistrations(
+        getDiscountRegistrations(registration)
       );
       return registrationResponse;
     }
@@ -511,6 +545,17 @@ public class RegistrationService {
                           foodSlot.getAsJsonObject().get("food").getAsJsonObject().get("foodId").getAsLong(),
                           foodSlot.getAsJsonObject().get("slot").getAsJsonObject().get("slotId").getAsLong()
                   )
+          )
+      );
+    });
+  }
+
+  private void saveDiscountRegistration(Registration registration, JsonArray discountRegistration) {
+    discountRegistration.forEach(discount -> {
+      discountRegistrationRepo.save(
+          new DiscountRegistration(
+            registration,
+            discountService.findByDiscountId(discount.getAsJsonObject().get("discountId").getAsLong())
           )
       );
     });

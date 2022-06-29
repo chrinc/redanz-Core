@@ -8,8 +8,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
 @Table(name="sleep_util")
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

@@ -28,6 +28,8 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   private final SlotRepo slotRepo;
   private final FoodRepo foodRepo;
   private final SleepUtilRepository sleepUtilRepository;
+  private final TrackDiscountRepo trackDiscountRepo;
+  private final DiscountRepo discountRepo;
 
   @Override
   public void run(String... args) throws Exception {
@@ -47,11 +49,12 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       workflowStatusRepo.saveAll(WorkflowStatusConfig.setup());
       languageRepo.saveAll(LanguageConfig.setup());
       outTextRepo.saveAll(OutTextConfig.setup(languageRepo));
-//      volunteerSlotRepo.saveAll(SlotTypeConfig.setup());
       slotRepo.saveAll(SlotConfig.setup());
       foodRepo.saveAll(FoodConfig.setup());
       typeSlotRepo.saveAll(TypeSlotConfig.setup(slotRepo, foodRepo));
       sleepUtilRepository.saveAll(SleepUtilConfig.setup());
+      discountRepo.saveAll(DiscountConfig.setup());
+      trackDiscountRepo.saveAll(TrackDiscountConfig.setup(trackRepo, discountRepo));
     }
   }
 }

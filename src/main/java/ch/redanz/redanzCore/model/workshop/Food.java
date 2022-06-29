@@ -18,12 +18,12 @@ public class Food implements Serializable {
   @Column(name="food_id")
   private Long foodId;
   private String name;
-  private Integer price;
+  private double price;
   private String description;
 
   public Food () {}
 
-  public Food(String name, Integer price, String description) {
+  public Food(String name, double price, String description) {
     this.name = name;
     this.price = price;
     this.description = description;

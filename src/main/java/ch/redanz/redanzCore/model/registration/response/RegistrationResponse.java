@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.registration.response;
 
+import ch.redanz.redanzCore.model.registration.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.WorkflowStatus;
 import lombok.*;
@@ -26,6 +27,7 @@ public class RegistrationResponse {
   private Map<String, List<Object>> volunteerRegistration;
   private Map<String, String> scholarshipRegistration;
   private Map<String, String> donationRegistration;
+  private List<DiscountRegistration> discountRegistrations;
 
 
   public RegistrationResponse() {}

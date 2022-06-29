@@ -54,7 +54,6 @@ public class RegistrationController {
           @RequestParam("userId") Long userId,
           @RequestParam("eventId") Long eventId
   ) {
-
     try {
       return registrationService.getRegistrationResponse(userId, eventId);
     } catch (Exception exception) {

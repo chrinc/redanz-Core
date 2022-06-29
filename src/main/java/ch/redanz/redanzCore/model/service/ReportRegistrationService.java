@@ -52,7 +52,6 @@ public class ReportRegistrationService {
     registrationService.findAll().forEach(registration -> {
       RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
       boolean hasPartner = registrationMatching != null && registrationMatching.getRegistration2() != null;
-      WorkflowStatus workflowStatus = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration).getWorkflowStatus();
       List<WorkflowStatus> registrationWorkflowStatusList = new ArrayList<>(){{
         add(workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration).getWorkflowStatus());
       }};

@@ -1,15 +1,20 @@
 package ch.redanz.redanzCore.model.workshop;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.websocket.server.ServerEndpoint;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Slf4j
+@Getter
+@Setter
 @Table(name="bundle")
 public class Bundle implements Serializable {
 
@@ -19,7 +24,7 @@ public class Bundle implements Serializable {
   private Long bundleId;
 
   private String name;
-  private Integer price;
+  private double price;
   private String description;
 
   private Integer capacity;
@@ -35,7 +40,7 @@ public class Bundle implements Serializable {
 
   public Bundle(
     String name,
-    Integer price,
+    double price,
     String description,
     Integer capacity
   ) {
@@ -43,54 +48,6 @@ public class Bundle implements Serializable {
     this.price = price;
     this.description = description;
     this.capacity = capacity;
-  }
-
-  public Long getBundleId() {
-    return bundleId;
-  }
-
-  public void setBundleId(Long bundleId) {
-    this.bundleId = bundleId;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Integer getPrice() {
-    return price;
-  }
-
-  public void setPrice(Integer price) {
-    this.price = price;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public Integer getCapacity() {
-    return capacity;
-  }
-
-  public void setCapacity(Integer capacity) {
-    this.capacity = capacity;
-  }
-
-  public List<BundleTrack> getBundleTracks() {
-    return bundleTracks;
-  }
-
-  public void setTrackBundles(List<BundleTrack> bundleTracks) {
-    this.bundleTracks = bundleTracks;
   }
 }
 
