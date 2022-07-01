@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.response;
 
-import ch.redanz.redanzCore.model.workshop.SleepUtil;
-import ch.redanz.redanzCore.model.workshop.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.SleepUtil;
+import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

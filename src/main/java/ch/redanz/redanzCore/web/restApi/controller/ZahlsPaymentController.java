@@ -1,20 +1,21 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
-import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.registration.service.PaymentService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.service.payment.CreatePayment;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.TimeoutException;
+
 @RestController
-//@RequestMapping("app/confirming")
 @AllArgsConstructor
 @Slf4j
 @RequestMapping(path="core-api/zahls")
@@ -36,23 +37,27 @@ public class ZahlsPaymentController {
     }
   }
   @GetMapping("/payment-confirmation")
-  public boolean getPaymentConfirmation(
+  public ResponseEntity<Boolean> getPaymentConfirmation(
     @RequestParam Long userId
   ) {
     try {
-      return paymentService.awaitPaymentConfirmation(
+      return
+        ResponseEntity.ok().body(paymentService.awaitPaymentConfirmation(
         registrationService.getRegistration(userId, eventService.getCurrentEvent())
+        )
       );
+    } catch (TimeoutException timeoutException) {
+        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_TIMEOUT_EN.getOutTextKey(), HttpStatus.REQUEST_TIMEOUT);
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
   @PostMapping("/checkout/confirm")
   public void confirmPayment(
     @RequestBody String jsonObject
-  ) throws Exception {
+  ) {
     try {
-      registrationService.onPaymentConfirmed(
+      paymentService.onPaymentConfirmed(
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
     } catch (Exception exception) {

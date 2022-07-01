@@ -1,11 +1,11 @@
 package ch.redanz.redanzCore.model.profile.service;
 
-import ch.redanz.redanzCore.model.profile.User;
+import ch.redanz.redanzCore.model.profile.entities.User;
+import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
-import ch.redanz.redanzCore.model.profile.UserRole;
+import ch.redanz.redanzCore.service.email.EmailValidator;
 import ch.redanz.redanzCore.web.security.ConfirmationToken;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
-import ch.redanz.redanzCore.service.email.EmailValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class UserRegistrationService {
       throw new IllegalStateException("email not valid");
     }
 
-    String token = userService.signUpUser(
+    String token = userService.signUpNewUser(
       new User(request.getEmail(),
         request.getPassword(),
         UserRole.PARTICIPANT) // @Todo variable?

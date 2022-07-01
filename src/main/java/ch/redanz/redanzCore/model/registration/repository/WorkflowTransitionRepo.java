@@ -1,9 +1,9 @@
 package ch.redanz.redanzCore.model.registration.repository;
 
-import ch.redanz.redanzCore.model.registration.Registration;
-import ch.redanz.redanzCore.model.registration.WorkflowStatus;
-import ch.redanz.redanzCore.model.registration.WorkflowTransition;
-import ch.redanz.redanzCore.model.registration.WorkflowTransitionId;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowTransitionId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

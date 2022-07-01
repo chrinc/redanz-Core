@@ -1,18 +1,16 @@
 package ch.redanz.redanzCore.model.registration.config;
 
 import ch.redanz.redanzCore.model.profile.config.UserConfig;
-import ch.redanz.redanzCore.model.profile.repository.PersonRepo;
-import ch.redanz.redanzCore.model.profile.repository.UserRepo;
-import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
-import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
-import ch.redanz.redanzCore.model.registration.RegistrationMatching;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
+import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.workshop.config.EventConfig;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -30,25 +28,23 @@ public enum RegistrationMatchingConfig {
   private final String partnerEmail;
   private final EventConfig eventConfig;
 
-  public static List<RegistrationMatching> setup(
-    EventRepo eventRepo,
-    RegistrationRepo registrationRepo,
-    PersonRepo personRepo,
-    UserRepo userRepo
+  public static void setup(
+    EventService eventService,
+    RegistrationService registrationService,
+    PersonService personService,
+    UserService userService,
+    RegistrationMatchingService registrationMatchingService
   ) {
-    List<RegistrationMatching> registrationMatchings = new ArrayList<>();
-
     for (RegistrationMatchingConfig registrationMatchingConfig : RegistrationMatchingConfig.values()) {
-      registrationMatchings.add(
+      registrationMatchingService.save(
         new RegistrationMatching(
-          registrationRepo.findByParticipantAndEvent(
-            personRepo.findByUser(userRepo.findByEmail(registrationMatchingConfig.user1Email)),
-            eventRepo.findByName(registrationMatchingConfig.eventConfig.getName())
+          registrationService.findByParticipantAndEvent(
+            personService.findByUser(userService.getUser(registrationMatchingConfig.user1Email)),
+            eventService.findByName(registrationMatchingConfig.eventConfig.getName())
           ).get(),
           registrationMatchingConfig.partnerEmail
         )
       );
     }
-    return registrationMatchings;
   }
 }

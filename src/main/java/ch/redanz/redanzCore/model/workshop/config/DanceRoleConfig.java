@@ -1,11 +1,10 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.DanceRole;
+import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
+import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
 @Slf4j
 @Getter
 public enum DanceRoleConfig {
@@ -22,17 +21,15 @@ public enum DanceRoleConfig {
     this.description = description;
   }
 
-  public static List<DanceRole> setup() {
-    List<DanceRole> transitions = new ArrayList<>();
+  public static void setup(DanceRoleService danceRoleService) {
 
     for (DanceRoleConfig danceRoleConfig : DanceRoleConfig.values()) {
-      transitions.add(
+      danceRoleService.save(
         new DanceRole(
           danceRoleConfig.getName(),
           danceRoleConfig.getDescription()
         )
       );
     }
-    return transitions;
   }
 }

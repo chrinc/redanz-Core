@@ -1,8 +1,8 @@
 package ch.redanz.redanzCore.model.registration.response;
 
-import ch.redanz.redanzCore.model.registration.DiscountRegistration;
-import ch.redanz.redanzCore.model.registration.FoodRegistration;
-import ch.redanz.redanzCore.model.registration.WorkflowStatus;
+import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
+import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import lombok.*;
 
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.Map;
 @Setter
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 public class RegistrationResponse {
   private Long registrationId;
   private Long userId;
@@ -28,9 +29,6 @@ public class RegistrationResponse {
   private Map<String, String> scholarshipRegistration;
   private Map<String, String> donationRegistration;
   private List<DiscountRegistration> discountRegistrations;
-
-
-  public RegistrationResponse() {}
 
   public RegistrationResponse(Long registrationId, Long userId, Long eventId, Long bundleId) {
     this.registrationId = registrationId;

@@ -3,7 +3,7 @@
 //import ch.redanz.redanzCore.model.profile.repository.PersonRepo;
 //import ch.redanz.redanzCore.model.profile.repository.UserRepo;
 //import ch.redanz.redanzCore.model.registration.repository.*;
-//import ch.redanz.redanzCore.model.registration.RegistrationMatching;
+//import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 //import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
 //import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 //import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;

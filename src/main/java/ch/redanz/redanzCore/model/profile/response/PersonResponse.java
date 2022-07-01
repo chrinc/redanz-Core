@@ -10,11 +10,11 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class PersonResponse {
-    private final String firstName;
-    private final String lastName;
-    private final String street;
-    private final String postalCode;
-    private final String city;
-    private final Long countryId;
-    private final String language;
+  private final String firstName;
+  private final String lastName;
+  private final String street;
+  private final String postalCode;
+  private final String city;
+  private final Long countryId;
+  private final String language;
 }

@@ -1,6 +1,6 @@
 //package ch.redanz.redanzCore.controller;
 //
-//import ch.redanz.redanzCore.model.profile.Person;
+//import ch.redanz.redanzCore.model.profile.entities.Person;
 //import ch.redanz.redanzCore.model.profile.service.PersonService;
 //import ch.redanz.redanzCore.model.profile.service.UserService;
 //import org.springframework.http.HttpStatus;

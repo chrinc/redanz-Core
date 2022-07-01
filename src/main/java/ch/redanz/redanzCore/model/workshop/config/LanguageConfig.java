@@ -1,31 +1,27 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.profile.Language;
+import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public enum LanguageConfig {
-    ENGLISH( "EN", "English"),
-    GERMAN( "GE","German");
+  ENGLISH("EN", "English"),
+  GERMAN("GE", "German");
 
-    private final String key;
-    private final String name;
+  private final String key;
+  private final String name;
 
-    public static List<Language> setup() {
-        List<Language> transitions = new ArrayList<>();
-        for (LanguageConfig languageConfig : LanguageConfig.values()) {
-            transitions.add(
-                    new Language(
-                            languageConfig.getKey(),
-                            languageConfig.getName()
-                    )
-            );
-        }
-        return transitions;
+  public static void setup(LanguageService languageService) {
+    for (LanguageConfig languageConfig : LanguageConfig.values()) {
+      languageService.save(
+        new Language(
+          languageConfig.getKey(),
+          languageConfig.getName()
+        )
+      );
     }
+  }
 }

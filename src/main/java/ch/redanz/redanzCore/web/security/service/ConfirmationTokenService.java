@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.web.security.service;
 
 import ch.redanz.redanzCore.web.security.ConfirmationToken;
-import ch.redanz.redanzCore.model.profile.User;
+import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.web.security.repository.ConfirmationTokenRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

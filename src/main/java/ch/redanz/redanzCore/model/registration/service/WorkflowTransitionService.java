@@ -1,27 +1,41 @@
 package ch.redanz.redanzCore.model.registration.service;
 
-import ch.redanz.redanzCore.model.registration.Registration;
-import ch.redanz.redanzCore.model.registration.WorkflowStatus;
-import ch.redanz.redanzCore.model.registration.WorkflowTransition;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
+import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.WorkflowTransitionRepo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class WorkflowTransitionService {
-    private final WorkflowTransitionRepo workflowTransitionRepo;
+  private final WorkflowTransitionRepo workflowTransitionRepo;
+  private final RegistrationRepo registrationRepo;
 
-    public void saveWorkflowTransition(WorkflowTransition workflowTransition) {
-        workflowTransitionRepo.save(workflowTransition);
-    }
+  public void save(WorkflowTransition workflowTransition) {
+    workflowTransitionRepo.save(workflowTransition);
+  }
 
-//    public List<WorkflowTransition>(WorkflowStatus workflowStatus)
-//    return
+  public WorkflowTransition findFirstByRegistrationOrderByTransitionTimestampDesc(Registration registration) {
+    return workflowTransitionRepo.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
+  }
 
-    public WorkflowTransition findFirstByRegistrationOrderByTransitionTimestampDesc(Registration registration) {
-        return workflowTransitionRepo.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
-    }
+  public void setWorkflowStatus(Registration registration, WorkflowStatus workflowStatus) {
+    LocalDateTime currentTimestamp = LocalDateTime.now();
+    WorkflowTransition workflowTransition = new WorkflowTransition(
+      workflowStatus,
+      registration,
+      currentTimestamp
+    );
+    workflowTransitionRepo.save(workflowTransition);
+    registration.setWorkflowStatus(workflowStatus);
+    registration.setWorkflowStatusDate(currentTimestamp);
+    registrationRepo.save(registration);
+  }
 }

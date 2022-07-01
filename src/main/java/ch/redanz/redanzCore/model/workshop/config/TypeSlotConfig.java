@@ -1,16 +1,12 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.Event;
-import ch.redanz.redanzCore.model.workshop.TypeSlot;
-import ch.redanz.redanzCore.model.workshop.repository.FoodRepo;
-import ch.redanz.redanzCore.model.workshop.repository.SlotRepo;
+import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
+import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -24,7 +20,7 @@ public enum TypeSlotConfig {
   VOLUNTEER_SLOT_SUNDAY_NIGHT("volunteer", SlotConfig.SLOT_SUNDAY_NIGHT            , null),
 
   FOOD_SLOT_FRIDAY  ("food", SlotConfig.SLOT_FRIDAY   , FoodConfig.FOOD_SOUP),
-  FOOD_SLOT_SATURDAY("food", SlotConfig.SLOT_SATURDAY , FoodConfig.FOOD_VEGGI_ASSIAN),
+  FOOD_SLOT_SATURDAY("food", SlotConfig.SLOT_SATURDAY , FoodConfig.FOOD_VEGGIE_ASIAN),
   FOOD_SLOT_SUNDAY  ("food", SlotConfig.SLOT_SUNDAY   , FoodConfig.FOOD_SOUP),
 
   ACCOMMODATION_SLOT_THURSDAY( "accommodation"    , SlotConfig.SLOT_THURSDAY    , null),
@@ -36,37 +32,26 @@ public enum TypeSlotConfig {
   private final SlotConfig slotConfig;
   private final Object typeConfig;
 
-  public static List<TypeSlot> setup(SlotRepo slotRepo, FoodRepo foodRepo) {
-    List<TypeSlot> transitions = new ArrayList<>();
+  public static void setup(SlotService slotService, FoodService foodService) {
     for (TypeSlotConfig typeSlotConfig : TypeSlotConfig.values()) {
-      if (typeSlotConfig.getTypeConfig() != null) {
-      log.info("inc@TypeSlotConfig, typeSlotConfig.class?: {}", typeSlotConfig.equals(FoodConfig.class));
-      log.info("inc@TypeSlotConfig, typeSlotConfig.null?: {}", typeSlotConfig.getTypeConfig());
-      log.info("inc@TypeSlotConfig, getTypeConfig().getClass(): {}", typeSlotConfig.getTypeConfig().getClass());
-      log.info("inc@TypeSlotConfig, FoodConfig.class?: {}", FoodConfig.class);
-
-      }
       if (typeSlotConfig.getTypeConfig() != null && Objects.equals(typeSlotConfig.getTypeConfig().getClass(), FoodConfig.class)) {
-        log.info("inc@TypeSlotConfig, typeSlotConfig.type: {}", typeSlotConfig.getType());
+        assert typeSlotConfig.getTypeConfig() instanceof FoodConfig;
         FoodConfig foodConfig = (FoodConfig) typeSlotConfig.getTypeConfig();
-        log.info("inc@TypeSlotConfig, foodConfig.getName(): {}", foodConfig.getName());
-        log.info("inc@TypeSlotConfig, foodRepo.findByName(foodConfig.getName()): {}", foodRepo.findByName(foodConfig.getName()));
-        transitions.add(
+        slotService.save(
           new TypeSlot(
             typeSlotConfig.getType(),
-            slotRepo.findByName(typeSlotConfig.getSlotConfig().getName()),
-            foodRepo.findByName(foodConfig.getName()).getFoodId()
+            slotService.findByName(typeSlotConfig.getSlotConfig().getName()),
+            foodService.findByName(foodConfig.getName()).getFoodId()
           )
         );
       } else {
-        transitions.add(
+        slotService.save(
           new TypeSlot(
             typeSlotConfig.getType(),
-            slotRepo.findByName(typeSlotConfig.getSlotConfig().getName())
+            slotService.findByName(typeSlotConfig.getSlotConfig().getName())
           )
         );
       }
     }
-    return transitions;
   }
 }

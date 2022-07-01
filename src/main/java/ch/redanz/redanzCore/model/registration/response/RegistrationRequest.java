@@ -5,8 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -17,8 +15,5 @@ public class RegistrationRequest {
   private final Long trackId;
   private final Long danceRoleId;
   private final String partnerEmail;
-//  private final List<Object> foodRegistration;
-//  private final List<Object> hostRegistration;
-
 }
 

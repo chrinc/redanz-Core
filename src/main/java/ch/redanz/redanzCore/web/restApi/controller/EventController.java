@@ -1,8 +1,8 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
-import ch.redanz.redanzCore.model.workshop.Event;
-import ch.redanz.redanzCore.model.workshop.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
 import ch.redanz.redanzCore.model.workshop.service.AccommodationService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
@@ -23,7 +23,6 @@ import java.util.List;
 @RequestMapping("core-api/app/event")
 @AllArgsConstructor
 public class EventController {
-
     private final EventService eventService;
     private final SlotService slotService;
     private final OutTextService outTextService;

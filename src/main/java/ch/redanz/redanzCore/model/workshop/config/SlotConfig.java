@@ -1,12 +1,10 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -24,16 +22,13 @@ public enum SlotConfig {
 
   private final String name;
 
-  public static List<Slot> setup() {
-    List<Slot> transitionList = new ArrayList<>();
-
+  public static void setup(SlotService slotService) {
     for (SlotConfig slotConfig : SlotConfig.values()) {
-      transitionList.add(
+      slotService.save(
         new Slot(
           slotConfig.getName()
         )
       );
     }
-    return transitionList;
   }
 }

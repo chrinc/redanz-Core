@@ -1,6 +1,6 @@
 package ch.redanz.redanzCore.web.security.config;
 
-import ch.redanz.redanzCore.model.profile.UserRole;
+import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static java.util.Arrays.stream;
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -36,11 +35,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    String baseUrl = "http://redanz.ch";
-    String baseUrl2 = "https://redanz.ch";
-    log.info("inc, request.getServletPath(): {}",request.getServletPath());
-    log.info("inc, request.getServletPath() equals: {}",request.getServletPath().equals("/core-api/zahls/checkout/confirm"));
-    log.info("inc, request.getServletPath() ==: {}",request.getServletPath() == "/core-api/zahls/checkout/confirm");
     if(
          request.getServletPath().equals("/core-api/login")
       || request.getServletPath().equals("/core-api/login/token/refresh")
@@ -49,16 +43,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
       filterChain.doFilter(request, response);
     } else {
       String authorizationHeader = request.getHeader(AUTHORIZATION);
-      log.info("inc@CustomAuthorizationFilter, authorizationHeader: {}", authorizationHeader);
-      log.info("inc@CustomAuthorizationFilter, request.getServletPath(): {}", request.getServletPath());
-      log.info("inc, header: allow Origin? {}", request.getHeader(ACCESS_CONTROL_ALLOW_ORIGIN));
-      log.info("inc, header: allow request URL {}", request.getRequestURL());
       if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-
-
-        log.info("inc, get user Id? {}", request.getParameter("userId"));
-
-
         try {
           String token = authorizationHeader.substring("Bearer ".length());
 

@@ -16,7 +16,7 @@
           ${base}
         </p>
         <p>
-          ${find_details_01} <a href=${link}>${account}.</a>
+          ${details} <a href=${link} > ${account}.</a>
         </p>
         <p>${see_you}</p>
         ${regards} </br>

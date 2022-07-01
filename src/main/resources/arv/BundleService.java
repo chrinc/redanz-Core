@@ -1,7 +1,7 @@
 //package ch.redanz.redanzCore.service;
 //
 //import ch.redanz.redanzCore.model.event.Bundle;
-//import ch.redanz.redanzCore.model.profile.Person;
+//import ch.redanz.redanzCore.model.profile.entities.Person;
 //import ch.redanz.redanzCore.model.workshop.repository.BundleRepo;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Service;

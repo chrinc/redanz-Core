@@ -1,14 +1,10 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.EventBundle;
-import ch.redanz.redanzCore.model.workshop.repository.BundleRepo;
-import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
+import ch.redanz.redanzCore.model.workshop.entities.EventBundle;
+import ch.redanz.redanzCore.model.workshop.service.BundleService;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -25,17 +21,16 @@ public enum EventBundleConfig {
     this.event = event;
     this.bundle = bundle;
   }
-  public static List<EventBundle> setup(BundleRepo bundleRepo, EventRepo eventRepo) {
-    List<EventBundle> transitions = new ArrayList<>();
+
+  public static void setup(BundleService bundleService, EventService eventService) {
 
     for (EventBundleConfig eventBundleConfig : EventBundleConfig.values()) {
-      transitions.add(
+      eventService.save(
         new EventBundle(
-          bundleRepo.findByName(eventBundleConfig.getBundle().getName()),
-          eventRepo.findByName(eventBundleConfig.getEvent().getName())
+          bundleService.findByName(eventBundleConfig.getBundle().getName()),
+          eventService.findByName(eventBundleConfig.getEvent().getName())
         )
       );
     }
-    return transitions;
   }
 }

@@ -1,13 +1,10 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.BundleTrack;
-import ch.redanz.redanzCore.model.workshop.repository.BundleRepo;
-import ch.redanz.redanzCore.model.workshop.repository.TrackRepo;
+import ch.redanz.redanzCore.model.workshop.entities.BundleTrack;
+import ch.redanz.redanzCore.model.workshop.service.BundleService;
+import ch.redanz.redanzCore.model.workshop.service.TrackService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -18,10 +15,6 @@ public enum BundleTrackConfig {
   FULL_FUN_TRACK(BundleConfig.FULLPASS, TrackConfig.FUN_TRACK),
   HALF_FUN_TRACK(BundleConfig.HALFPASS, TrackConfig.FUN_TRACK);
 
-//  HALF_ADVANCED(BundleConfig.HALFPASS, TrackConfig.LINDY_ADVANCED),
-//  HALF_INTERMEDIATE(BundleConfig.HALFPASS, TrackConfig.LINDY_INTERMEDIATE),
-//  HALF_SOLOJAZZ(BundleConfig.HALFPASS, TrackConfig.SOLOJAZZ);
-
   private final BundleConfig bundle;
   private final TrackConfig track;
 
@@ -30,17 +23,14 @@ public enum BundleTrackConfig {
     this.track = track;
   }
 
-  public static List<BundleTrack> setup(TrackRepo trackRepo, BundleRepo bundleRepo) {
-    List<BundleTrack> transitions = new ArrayList<>();
-
+  public static void setup(BundleService bundleService, TrackService trackService) {
     for (BundleTrackConfig bundleTrackConfig : BundleTrackConfig.values()) {
-      transitions.add(
+      bundleService.save(
         new BundleTrack(
-          trackRepo.findByName(bundleTrackConfig.getTrack().getName()),
-          bundleRepo.findByName(bundleTrackConfig.getBundle().getName())
+          trackService.findByName(bundleTrackConfig.getTrack().getName()),
+          bundleService.findByName(bundleTrackConfig.getBundle().getName())
         )
       );
     }
-    return transitions;
   }
 }

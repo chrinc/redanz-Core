@@ -1,14 +1,12 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
 import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
-import ch.redanz.redanzCore.model.registration.RegistrationMatching;
-import ch.redanz.redanzCore.model.registration.Registration;
-import ch.redanz.redanzCore.model.registration.WorkflowTransition;
+import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -16,7 +14,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +26,11 @@ import java.util.Map;
 @EnableAsync
 public class EODMatchingJob {
 
-
   private final RegistrationMatchingService registrationMatchingService;
   private final WorkflowTransitionService workflowTransitionService;
   private Map<RegistrationMatching, RegistrationMatching> matchingPairs;
 
-
-
-//  @Scheduled(cron = "${cron.matching.scheduler.value}")
+  //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 47 15 * * MON-SUN")
   @Scheduled(cron = "0 0/15 * * * *")
   public void runMatching() throws InterruptedException {
@@ -48,8 +42,8 @@ public class EODMatchingJob {
 
 
     registrationMatchings.forEach(baseMatcher -> {
-        boolean baseMatcherHasPartnerEmail = baseMatcher.getPartnerEmail() != null;
-        Registration baseMatcherRegistration1 = baseMatcher.getRegistration1();
+      boolean baseMatcherHasPartnerEmail = baseMatcher.getPartnerEmail() != null;
+      Registration baseMatcherRegistration1 = baseMatcher.getRegistration1();
 
       registrationMatchings.forEach(lookupMatcher -> {
         boolean lookupMatcherHasPartnerEmail = lookupMatcher.getPartnerEmail() != null;
@@ -59,16 +53,16 @@ public class EODMatchingJob {
           // exclude self comparison
           !baseMatcher.equals(lookupMatcher) &&
 
-          // both registrations applied with a partner
-          (
-            baseMatcherHasPartnerEmail && lookupMatcherHasPartnerEmail &&
+            // both registrations applied with a partner
+            (
+              baseMatcherHasPartnerEmail && lookupMatcherHasPartnerEmail &&
 
-            // check email match
-            isEmailMatch(baseMatcher, lookupMatcher) ||
+                // check email match
+                isEmailMatch(baseMatcher, lookupMatcher) ||
 
-            // otherwise none of the registrations can have a PartnerEmail
-            !baseMatcherHasPartnerEmail && !lookupMatcherHasPartnerEmail
-          ) &&
+                // otherwise none of the registrations can have a PartnerEmail
+                !baseMatcherHasPartnerEmail && !lookupMatcherHasPartnerEmail
+            ) &&
 
             // check registration match
             registrationIsMatch(baseMatcherRegistration1, lookupMatcher.getRegistration1()) &&
@@ -86,9 +80,9 @@ public class EODMatchingJob {
 
     onFoundMatch();
   }
+
   private void onFoundMatch() {
     matchingPairs.forEach((baseMatching, lookupMatching) -> {
-      log.info("inc@foundMatch: {}", baseMatching.getRegistration1().getParticipant().getFirstName() + " dances with " + lookupMatching.getRegistration1().getParticipant().getFirstName());
 
       // update registration_matching
       baseMatching.setRegistration2(lookupMatching.getRegistration1());

@@ -1,11 +1,9 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.Bundle;
+import ch.redanz.redanzCore.model.workshop.entities.Bundle;
+import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -20,10 +18,9 @@ public enum BundleConfig {
   private final String description;
   private final Integer capacity;
 
-  public static List<Bundle> setup() {
-    List<Bundle> transitions = new ArrayList<>();
+  public static void setup(BundleService bundleService) {
     for (BundleConfig bundleConfig : BundleConfig.values()) {
-      transitions.add(
+      bundleService.save(
         new Bundle(
           bundleConfig.getName(),
           bundleConfig.getPrice(),
@@ -32,6 +29,5 @@ public enum BundleConfig {
         )
       );
     }
-    return transitions;
   }
 }

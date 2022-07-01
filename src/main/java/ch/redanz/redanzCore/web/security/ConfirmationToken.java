@@ -1,6 +1,6 @@
 package ch.redanz.redanzCore.web.security;
 
-import ch.redanz.redanzCore.model.profile.User;
+import ch.redanz.redanzCore.model.profile.entities.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

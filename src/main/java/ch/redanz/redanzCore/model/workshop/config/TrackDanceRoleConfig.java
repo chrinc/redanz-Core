@@ -1,14 +1,11 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.TrackDanceRole;
-import ch.redanz.redanzCore.model.workshop.repository.DanceRoleRepo;
-import ch.redanz.redanzCore.model.workshop.repository.TrackRepo;
+import ch.redanz.redanzCore.model.workshop.entities.TrackDanceRole;
+import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
+import ch.redanz.redanzCore.model.workshop.service.TrackService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -33,17 +30,14 @@ public enum TrackDanceRoleConfig {
   private final TrackConfig trackConfig;
   private final DanceRoleConfig danceRoleConfig;
 
-  public static List<TrackDanceRole> setup(TrackRepo trackRepo, DanceRoleRepo danceRoleRepo) {
-    List<TrackDanceRole> transitions = new ArrayList<>();
-
+  public static void setup(TrackService trackService, DanceRoleService danceRoleService) {
     for (TrackDanceRoleConfig trackDanceRoleConfig : TrackDanceRoleConfig.values()) {
-      transitions.add(
+      trackService.save(
         new TrackDanceRole(
-          danceRoleRepo.findByName(trackDanceRoleConfig.getDanceRoleConfig().getName()),
-          trackRepo.findByName(trackDanceRoleConfig.getTrackConfig().getName())
+          danceRoleService.findByName(trackDanceRoleConfig.getDanceRoleConfig().getName()),
+          trackService.findByName(trackDanceRoleConfig.getTrackConfig().getName())
         )
       );
     }
-    return transitions;
   }
 }

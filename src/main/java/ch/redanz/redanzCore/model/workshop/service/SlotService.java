@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
-import ch.redanz.redanzCore.model.workshop.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
 import ch.redanz.redanzCore.model.workshop.repository.SlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TypeSlotRepo;
 import lombok.AllArgsConstructor;
@@ -15,10 +16,17 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class SlotService {
-  
+
   TypeSlotRepo typeSlotRepo;
   FoodService foodService;
   SlotRepo slotRepo;
+  public void save(Slot slot) {
+    slotRepo.save(slot);
+  }
+
+  public void save(TypeSlot typeSlot) {
+    typeSlotRepo.save(typeSlot);
+  }
 
   public List<Slot> getAllVolunteerSlots() {
     return getAllSlots("volunteer");
@@ -42,8 +50,12 @@ public class SlotService {
   public List<Slot> getAllAccommodationSlots() {
     return getAllSlots("accommodation");
   }
+
   public Slot findBySlotId(Long slotId) {
     return slotRepo.findBySlotId(slotId);
+  }
+  public Slot findByName(String name) {
+    return slotRepo.findByName(name);
   }
 
   private List<Slot> getAllSlots(String type) {

@@ -13,6 +13,5 @@ import java.util.Map;
 @ToString
 @AllArgsConstructor
 public class FoodRegistrationRequest {
-    private List<Map<String, Map<String, String>>> foodSlot;
-
+  private List<Map<String, Map<String, String>>> foodSlot;
 }

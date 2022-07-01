@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
-//@EqualsAndHashCode
-//@ToString
 @Slf4j
 @AllArgsConstructor
 public class UserResponse {

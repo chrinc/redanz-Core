@@ -1,11 +1,9 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.Event;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -22,11 +20,10 @@ public enum EventConfig {
     this.description = description;
   }
 
-  public static List<Event> setup() {
-    List<Event> transitionList = new ArrayList<>();
+  public static void setup(EventService eventService) {
 
     for (EventConfig trackConfig : EventConfig.values()) {
-      transitionList.add(
+      eventService.save(
         new Event(
           trackConfig.getName(),
           trackConfig.getCapacity(),
@@ -34,6 +31,5 @@ public enum EventConfig {
         )
       );
     }
-    return transitionList;
   }
 }

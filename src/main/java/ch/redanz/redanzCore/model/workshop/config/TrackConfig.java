@@ -1,19 +1,16 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.DanceLevel;
-import ch.redanz.redanzCore.model.workshop.Track;
+import ch.redanz.redanzCore.model.workshop.entities.DanceLevel;
+import ch.redanz.redanzCore.model.workshop.entities.Track;
+import ch.redanz.redanzCore.model.workshop.service.TrackService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
 @AllArgsConstructor
 public enum TrackConfig {
-//  SOLOJAZZ("Solo Jazz", "Solo Jazz Description", 40, false, null),
   LINDY_ADVANCED("Exploring FUNdamentals", "", 20, true, DanceLevel.ADVANCED),
   LINDY_INTERMEDIATE("Expanding FUNdamentals", "", 60, true, DanceLevel.INTERMEDIATE),
   LINDY_BEGINNER("Building FUNdamentals", "", 60, true, DanceLevel.BEGINNER),
@@ -25,11 +22,9 @@ public enum TrackConfig {
   private final Boolean partnerRequired;
   private final DanceLevel requiredDanceLevel;
 
-  public static List<Track> setup() {
-    List<Track> transitionList = new ArrayList<>();
-
+  public static void setup(TrackService trackService) {
     for (TrackConfig trackConfig : TrackConfig.values()) {
-      transitionList.add(
+      trackService.save(
         new Track(
           trackConfig.getName(),
           trackConfig.getDescription(),
@@ -39,6 +34,5 @@ public enum TrackConfig {
         )
       );
     }
-    return transitionList;
   }
 }

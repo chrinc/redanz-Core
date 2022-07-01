@@ -1,14 +1,11 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 
-import ch.redanz.redanzCore.model.workshop.Food;
-import ch.redanz.redanzCore.model.workshop.SleepUtil;
+import ch.redanz.redanzCore.model.workshop.entities.SleepUtil;
+import ch.redanz.redanzCore.model.workshop.service.SleepUtilService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -20,18 +17,15 @@ public enum SleepUtilConfig {
   SLEEP_UTIL_MAT(OutTextConfig.LABEL_SLEEP_UTIL_MAT_EN.getOutTextKey()),
   SLEEP_UTIL_BAG(OutTextConfig.LABEL_SLEEP_UTIL_BAG_EN.getOutTextKey());
 
-  private String name;
+  private final String name;
 
-  public static List<SleepUtil> setup() {
-    List<SleepUtil> transitionList = new ArrayList<>();
-
+  public static void setup(SleepUtilService sleepUtilService) {
     for (SleepUtilConfig sleepUtilConfig : SleepUtilConfig.values()) {
-      transitionList.add(
+      sleepUtilService.save(
         new SleepUtil(
           sleepUtilConfig.getName()
         )
       );
     }
-    return transitionList;
   }
 }

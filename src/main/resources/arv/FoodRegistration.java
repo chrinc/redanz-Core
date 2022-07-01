@@ -1,6 +1,6 @@
 //package ch.redanz.redanzCore.model.workshop;
 //
-//import ch.redanz.redanzCore.model.registration.Registration;
+//import ch.redanz.redanzCore.model.registration.entities.Registration;
 //
 //import javax.persistence.*;
 //import java.io.Serializable;

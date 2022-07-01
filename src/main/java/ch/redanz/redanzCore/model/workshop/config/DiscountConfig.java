@@ -1,12 +1,10 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.workshop.Discount;
+import ch.redanz.redanzCore.model.workshop.entities.Discount;
+import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -20,11 +18,10 @@ public enum DiscountConfig {
   private final String description;
   private final double discount;
 
-  public static List<Discount> setup() {
-    List<Discount> transitionList = new ArrayList<>();
+  public static void setup(DiscountService discountService) {
 
     for (DiscountConfig discountConfig : DiscountConfig.values()) {
-      transitionList.add(
+      discountService.save(
         new Discount(
           discountConfig.getName(),
           discountConfig.getDiscount(),
@@ -32,6 +29,5 @@ public enum DiscountConfig {
         )
       );
     }
-    return transitionList;
   }
 }

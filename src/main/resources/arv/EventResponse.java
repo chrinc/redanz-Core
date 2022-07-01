@@ -3,7 +3,7 @@
 //import ch.redanz.redanzCore.model.event.Bundle;
 //import ch.redanz.redanzCore.model.event.DanceRole;
 //import ch.redanz.redanzCore.model.event.Track;
-//import ch.redanz.redanzCore.model.registration.WorkflowStatus;
+//import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 //import lombok.AllArgsConstructor;
 //import lombok.Getter;
 //import lombok.Setter;

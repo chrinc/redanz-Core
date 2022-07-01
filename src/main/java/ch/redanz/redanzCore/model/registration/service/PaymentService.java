@@ -1,20 +1,26 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.Registration;
-import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.DonationRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
-import ch.redanz.redanzCore.model.workshop.Food;
+import ch.redanz.redanzCore.model.workshop.entities.Food;
 import ch.redanz.redanzCore.model.workshop.config.DiscountConfig;
+import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
+import com.google.gson.JsonObject;
+import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
@@ -30,38 +36,34 @@ public class PaymentService {
   private final WorkflowTransitionService workflowTransitionService;
   private final DiscountService discountService;
   private final DiscountRegistrationRepo discountRegistrationRepo;
-
-//  private boolean arrived;
+  private final PersonService personService;
+  private final UserService userService;
+  private final EventService eventService;
+  private final  RegistrationEmailService registrationEmailService;
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
-    long timeout = 1000L * 60 * 10; // 10 minutes
+    long timeout = 1000L * 60 * 5; // 5 minutes
     long waitTime = 2000;
     long t0 = System.currentTimeMillis() + timeout;
     while (!checkPaymentConfirmed(registration)) {
       long delay = t0 - System.currentTimeMillis();
-      log.info("delay: {}", delay);
       if (delay < 0) {
-        log.info("throw ?");
         throw new TimeoutException();
       }
-      log.info("inc, wait?");
       wait(waitTime);
     }
-    log.info("return ?");
     return true;
   }
 
   private synchronized boolean checkPaymentConfirmed(Registration registration) {
     return
       workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration)
-        .getWorkflowStatus().equals(workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.DONE.getName()));
+        .getWorkflowStatus().equals(workflowStatusService.getDone());
   }
 
   public PaymentDetailsResponse getPaymentDetails(Registration registration) {
-//    User user = userService.findByUserId(userId);
     HashMap<String, Double> items = new HashMap<>();
     HashMap<String, Double> discounts = new HashMap<>();
-
 
     // pass
     items.put(registration.getBundle().getName(), registration.getBundle().getPrice());
@@ -75,8 +77,6 @@ public class PaymentService {
       );
     });
 
-
-
     // donation
     if (donationRegistrationRepo.findByRegistration(registration) != null) {
       items.put(OutTextConfig.LABEL_DONATION_EN.getOutTextKey(), donationRegistrationRepo.findByRegistration(registration).getAmount());
@@ -85,10 +85,9 @@ public class PaymentService {
     // discounts
     // @Todo: Set Early Bird Constants
     if (registrationService.findAllByCurrentEventAndWorkflowStatus(
-      workflowStatusService.findByWorkflowStatusName(WorkflowStatusConfig.DONE.getName())
+      workflowStatusService.getDone()
     ).size() < 50) {
       discounts.put(DiscountConfig.EARLY_BIRD.getName(), discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount());
-
     }
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
       discounts.put(discountRegistration.getDiscount().getName(), discountRegistration.getDiscount().getDiscount());
@@ -103,5 +102,25 @@ public class PaymentService {
         discounts,
         totalAmount
       );
+  }
+  public void onPaymentReceived(Long userId) throws IOException, TemplateException {
+    workflowTransitionService.setWorkflowStatus(
+      registrationService.findByParticipantAndEvent(
+        personService.findByUser(userService.findByUserId(userId)),
+        eventService.findByName(EventConfig.EVENT2022.getName())
+      ).get(),
+      workflowStatusService.getDone()
+    );
+    registrationEmailService.sendEmailBookingConfirmation(personService.findByUser(userService.findByUserId(userId)));
+  }
+  public void onPaymentConfirmed(JsonObject request) throws IOException, TemplateException {
+    JsonObject transaction = request.get("transaction").getAsJsonObject();
+    log.info("inc@onPaymentConfirmed, transaction: {}", transaction);
+    Long userId = transaction.get("referenceId").getAsLong();
+    Number amount = transaction.get("invoice").getAsJsonObject().get("amount").getAsNumber();
+    log.info("inc@onPaymentConfirmed, userId: {}", userId);
+    log.info("inc@onPaymentConfirmed, amount: {}", amount);
+    //    @todo check amount first
+    onPaymentReceived(userId);
   }
 }

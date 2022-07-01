@@ -1,8 +1,11 @@
 package ch.redanz.redanzCore.model.registration.repository;
 
-import ch.redanz.redanzCore.model.workshop.Event;
-import ch.redanz.redanzCore.model.profile.Person;
-import ch.redanz.redanzCore.model.registration.Registration;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
+import ch.redanz.redanzCore.model.workshop.entities.Bundle;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.workshop.entities.Track;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +16,8 @@ import java.util.Optional;
 public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     Optional<Registration> findByParticipantAndEvent(Person participant, Event event);
     List<Registration> findAllByEvent(Event event);
-//    Registration findByParticipantIdAndEventId(Long personId);
+    List<Registration> findAllByWorkflowStatusAndEvent(WorkflowStatus workflowStatus, Event event);
+    int countAllByWorkflowStatusAndEvent(WorkflowStatus workflowStatus, Event event);
+    int countAllByBundleAndWorkflowStatusAndEvent(Bundle bundle, WorkflowStatus workflowStatus, Event event);
+    int countAllByTrackAndWorkflowStatusAndEvent(Track track, WorkflowStatus workflowStatus, Event event);
 }
