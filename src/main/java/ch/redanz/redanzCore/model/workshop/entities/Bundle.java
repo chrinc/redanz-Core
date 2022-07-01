@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,14 +27,17 @@ public class Bundle implements Serializable {
   private String name;
   private double price;
   private String description;
-
   private Integer capacity;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle")
-  @JsonIgnore
-  private final List<EventBundle> eventBundles = new ArrayList<>();
+  @Column(name = "sold_out")
+  private boolean soldOut;
+
+//  @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle")
+//  @JsonIgnore
+//  private final List<EventBundle> eventBundles = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle")
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<BundleTrack> bundleTracks = new ArrayList<>();
 
   public Bundle() {

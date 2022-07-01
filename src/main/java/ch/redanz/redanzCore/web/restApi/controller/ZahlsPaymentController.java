@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException;
 @RestController
 @AllArgsConstructor
 @Slf4j
-@RequestMapping(path="core-api/zahls")
+@RequestMapping(path = "core-api/zahls")
 public class ZahlsPaymentController {
   private final RegistrationService registrationService;
   private final PaymentService paymentService;
@@ -36,6 +36,7 @@ public class ZahlsPaymentController {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
+
   @GetMapping("/payment-confirmation")
   public ResponseEntity<Boolean> getPaymentConfirmation(
     @RequestParam Long userId
@@ -43,15 +44,16 @@ public class ZahlsPaymentController {
     try {
       return
         ResponseEntity.ok().body(paymentService.awaitPaymentConfirmation(
-        registrationService.getRegistration(userId, eventService.getCurrentEvent())
-        )
-      );
+            registrationService.getRegistration(userId, eventService.getCurrentEvent())
+          )
+        );
     } catch (TimeoutException timeoutException) {
-        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_TIMEOUT_EN.getOutTextKey(), HttpStatus.REQUEST_TIMEOUT);
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_TIMEOUT_EN.getOutTextKey(), HttpStatus.REQUEST_TIMEOUT);
     } catch (Exception exception) {
-        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
+
   @PostMapping("/checkout/confirm")
   public void confirmPayment(
     @RequestBody String jsonObject

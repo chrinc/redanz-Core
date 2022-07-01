@@ -52,6 +52,7 @@ public class EODCancelJob {
             workflowStatusService.getCancelled()
           );
           registrationEmailService.sendCancellationEmail(registration, registrationEmail);
+          registrationService.updateSoldOut();
         } catch (IOException | TemplateException e) {
           throw new RuntimeException(e);
         }

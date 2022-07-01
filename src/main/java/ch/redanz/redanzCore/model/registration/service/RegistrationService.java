@@ -54,6 +54,68 @@ public class RegistrationService {
     registrationRepo.save(registration);
   }
 
+  public void updateSoldOut(){
+
+    // Event
+    Event currentEvent = eventService.getCurrentEvent();
+
+    log.info("inc@SoldOut?, eventCapa: {}", currentEvent.getCapacity());
+    log.info("inc@SoldOut?, countReleasedAndDone(): {}", countReleasedAndDone());
+    if (countReleasedAndDone() >= currentEvent.getCapacity()) {
+      if (!currentEvent.isSoldOut()) {
+        currentEvent.setSoldOut(true);
+        eventService.save(currentEvent);
+      }
+    } else {
+      if (currentEvent.isSoldOut()) {
+        currentEvent.setSoldOut(false);
+        eventService.save(currentEvent);
+      }
+    }
+
+    // Bundle
+    currentEvent.getEventBundles().forEach(eventBundle -> {
+      Bundle bundle = eventBundle.getBundle();
+
+      log.info("inc@SoldOut?, bundleName: {}", bundle.getName());
+      log.info("inc@SoldOut?, bundleCapa: {}", bundle.getCapacity());
+      log.info("inc@SoldOut?, countBundlesReleasedAndDone(): {}", countBundlesReleasedAndDone(bundle));
+      if (countBundlesReleasedAndDone(bundle) >= bundle.getCapacity()) {
+        if (!bundle.isSoldOut()) {
+          bundle.setSoldOut(true);
+          bundleService.save(bundle);
+        }
+      } else {
+        if (bundle.isSoldOut()) {
+          bundle.setSoldOut(false);
+          bundleService.save(bundle);
+        }
+      }
+
+      // Tracks
+      if (!bundle.getBundleTracks().isEmpty()) {
+        bundle.getBundleTracks().forEach(bundleTrack -> {
+          Track track = bundleTrack.getTrack();
+
+          log.info("inc@SoldOut?, trackName: {}", track.getName());
+          log.info("inc@SoldOut?, trackCapa: {}", track.getCapacity());
+          log.info("inc@SoldOut?, countBundlesReleasedAndDone(): {}", countTracksReleasedAndDone(track));
+          if (countTracksReleasedAndDone(track) >= track.getCapacity()) {
+            if (!track.isSoldOut()) {
+              track.setSoldOut(true);
+              trackService.save(track);
+            }
+          } else {
+            if (track.isSoldOut()) {
+              track.setSoldOut(false);
+              trackService.save(track);
+            }
+          }
+        });
+      }
+    });
+  }
+
   public List<Registration> findAllCurrentEvent() {
     return registrationRepo.findAllByEvent(eventService.getCurrentEvent());
   }

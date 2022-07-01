@@ -23,45 +23,40 @@ import java.util.List;
 @RequestMapping("core-api/app/event")
 @AllArgsConstructor
 public class EventController {
-    private final EventService eventService;
-    private final SlotService slotService;
-    private final OutTextService outTextService;
-    private final AccommodationService accommodationService;
+  private final EventService eventService;
+  private final SlotService slotService;
+  private final OutTextService outTextService;
+  private final AccommodationService accommodationService;
 
-    @GetMapping(path="/all")
-    public List<Event> getAllEvents() {
-        log.info("inc, send getAllTracks: {}.", eventService.getAllEvents());
-        return eventService.getAllEvents();
-    }
+  @GetMapping(path = "/all")
+  public List<Event> getAllEvents() {
+    return eventService.getAllEvents();
+  }
 
-    @GetMapping(path="/current")
-    public Event getCurrentEvent() {
-        log.info("inc, send getAllTracks: {}.", eventService.getCurrentEvent());
-        return eventService.getCurrentEvent();
-    }
+  @GetMapping(path = "/current")
+  public Event getCurrentEvent() {
+    return eventService.getCurrentEvent();
+  }
 
-    @GetMapping(path="/out-text/all")
-    public HashMap getOutText() {
-        ArrayList<String> types = new ArrayList<>() {
-            {
-                add("FRONT_LOGIN");
-                add("FRONT_BASE");
-            }
-        };
+  @GetMapping(path = "/out-text/all")
+  public HashMap getOutText() {
+    ArrayList<String> types = new ArrayList<>() {
+      {
+        add("FRONT_LOGIN");
+        add("FRONT_BASE");
+      }
+    };
 
-        log.info("inc, send getOutText: {}.", outTextService.getOutTextByType(types));
-        return outTextService.getOutTextByType(types);
-    }
-    
-    @GetMapping(path="/volunteer/slot/all")
-    public List<Slot> getAllVolunteerSlots() {
-        log.info("inc, send getOutText: {}.", slotService.getAllVolunteerSlots());
-        return slotService.getAllVolunteerSlots();
-    }
+    return outTextService.getOutTextByType(types);
+  }
 
-    @GetMapping(path="/accommodation/all")
-    public AccommodationResponse getAccommodationSlots() {
-        log.info("inc, send getOutText: {}.", accommodationService.getAll());
-        return accommodationService.getAll();
-    }
+  @GetMapping(path = "/volunteer/slot/all")
+  public List<Slot> getAllVolunteerSlots() {
+    return slotService.getAllVolunteerSlots();
+  }
+
+  @GetMapping(path = "/accommodation/all")
+  public AccommodationResponse getAccommodationSlots() {
+    return accommodationService.getAll();
+  }
 }

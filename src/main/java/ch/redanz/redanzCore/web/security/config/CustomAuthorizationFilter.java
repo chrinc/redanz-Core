@@ -52,9 +52,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           DecodedJWT decodedJWT = verifier.verify(token);
           String username = decodedJWT.getSubject();
           String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-//          Long userId = decodedJWT.getClaim("userId").asLong();
           Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-//          log.info("inc, regular response: {}", response);
           stream(roles).forEach(role ->{
             authorities.add(new SimpleGrantedAuthority(role));
           });
@@ -78,14 +76,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                );
           }
 
-
           UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(username, null, authorities);
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//          log.info("inc@customAuthFilter, response_ {}", response.getHeaderNames());
           filterChain.doFilter(request, response);
         } catch (Exception exception) {
-//          log.error("Error logging in: {}", exception.getMessage());
           response.setHeader("error", exception.getMessage());
           response.setStatus(FORBIDDEN.value());
 //          response.sendError(FORBIDDEN.value());
@@ -95,7 +90,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           new ObjectMapper().writeValue(response.getOutputStream(), error);
         }
       } else {
-        log.info("Authorized, public, response: {}", response);
         filterChain.doFilter(request, response);
       }
     }

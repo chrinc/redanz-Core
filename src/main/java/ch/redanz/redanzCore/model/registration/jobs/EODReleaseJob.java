@@ -33,9 +33,6 @@ public class EODReleaseJob {
   private final RegistrationEmailService registrationEmailService;
 
   @Autowired
-  private Environment environment;
-
-  @Autowired
   Configuration mailConfig;
 
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
@@ -88,5 +85,6 @@ public class EODReleaseJob {
       registration,
       workflowStatusService.getConfirming()
     );
+    registrationService.updateSoldOut();
   }
 }

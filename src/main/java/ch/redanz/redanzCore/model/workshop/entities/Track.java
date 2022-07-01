@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -37,9 +39,13 @@ public class Track implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "track")
   private List<TrackDiscount> trackDiscounts = new ArrayList<>();
 
-  @JsonIgnore
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "track")
-  private List<BundleTrack> bundleTracks = new ArrayList<>();
+//  @JsonIgnore
+//  @OneToMany(cascade = CascadeType.ALL, mappedBy = "track")
+//  @LazyCollection(LazyCollectionOption.FALSE)
+//  private List<BundleTrack> bundleTracks = new ArrayList<>();
+
+  @Column(name = "sold_out")
+  private boolean soldOut;
 
   public Track() {
   }

@@ -21,9 +21,13 @@ public class Event implements Serializable {
 
   private String name;
   private Integer capacity;
+
+  @Column(name = "sold_out")
+  private boolean soldOut = false;
+
   private String description;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
   private Collection<EventBundle> eventBundles;
 
   public Event() {
