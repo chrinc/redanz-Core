@@ -59,8 +59,6 @@ public class RegistrationService {
     // Event
     Event currentEvent = eventService.getCurrentEvent();
 
-    log.info("inc@SoldOut?, eventCapa: {}", currentEvent.getCapacity());
-    log.info("inc@SoldOut?, countReleasedAndDone(): {}", countReleasedAndDone());
     if (countReleasedAndDone() >= currentEvent.getCapacity()) {
       if (!currentEvent.isSoldOut()) {
         currentEvent.setSoldOut(true);
@@ -76,10 +74,6 @@ public class RegistrationService {
     // Bundle
     currentEvent.getEventBundles().forEach(eventBundle -> {
       Bundle bundle = eventBundle.getBundle();
-
-      log.info("inc@SoldOut?, bundleName: {}", bundle.getName());
-      log.info("inc@SoldOut?, bundleCapa: {}", bundle.getCapacity());
-      log.info("inc@SoldOut?, countBundlesReleasedAndDone(): {}", countBundlesReleasedAndDone(bundle));
       if (countBundlesReleasedAndDone(bundle) >= bundle.getCapacity()) {
         if (!bundle.isSoldOut()) {
           bundle.setSoldOut(true);
@@ -96,10 +90,6 @@ public class RegistrationService {
       if (!bundle.getBundleTracks().isEmpty()) {
         bundle.getBundleTracks().forEach(bundleTrack -> {
           Track track = bundleTrack.getTrack();
-
-          log.info("inc@SoldOut?, trackName: {}", track.getName());
-          log.info("inc@SoldOut?, trackCapa: {}", track.getCapacity());
-          log.info("inc@SoldOut?, countBundlesReleasedAndDone(): {}", countTracksReleasedAndDone(track));
           if (countTracksReleasedAndDone(track) >= track.getCapacity()) {
             if (!track.isSoldOut()) {
               track.setSoldOut(true);
