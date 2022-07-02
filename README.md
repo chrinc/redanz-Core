@@ -36,17 +36,20 @@ Necessary tools for testing and development
      `git fetch origin`
      `git status`
      `git pull`
-- JAVA_HOME: ``export JAVA_HOME = /usr/lib/jvm/java-11-openjdk-amd64``
-- SNAPSHOT: ``export SNAPSHOT=[currentSnapshot]``
-- Find Folder: ``cd /usr/local/redanz/redanzCore``
-- Start Spring on Server:
+ - JAVA_HOME: ``export JAVA_HOME = /usr/lib/jvm/java-11-openjdk-amd64``
+ - SNAPSHOT: ``export SNAPSHOT=[currentSnapshot]``
+ - Find Folder: ``cd /usr/local/redanz/redanzCore``
+ - screen: 
+   - `Ctrl + A and then Ctrl + D` to leave the session
+   - `screen -r`
+ - Start Spring on Server:
 -- clean inst all:
 `mvn clean install`
 --spring.profiles.active=prod --redanz.master.password=
 ``java -jar $snapshot --spring.profiles.active=prod --email.host.password=$pass``
 `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
 
-- encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
+ - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
 #### **Insert Image**
 Image:
 [https://skulls-b072a-default-rtdb.firebaseio.com//](https://skulls-b072a-default-rtdb.firebaseio.com/)
