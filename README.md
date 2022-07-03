@@ -28,9 +28,9 @@ Necessary tools for testing and development
  - Create SSH key for git-repository
      - ``ssh-keygen -t ed25519 -C [email@address]``
      - ``touch ~/ssh/config``
-         - ``AddKeysToAgend yes`` 
+         - `AddKeysToAgend yes`
          - `ÌdentityFile ~/.ssh/id_ed25519`
-     - ``cat ~.ssh/id_ed25519``
+     - `cat ~.ssh/id_ed25519`
      - Copy the Key to SSH Keys on github.com
  - Clone the repository to the server: 
      `git fetch origin`
