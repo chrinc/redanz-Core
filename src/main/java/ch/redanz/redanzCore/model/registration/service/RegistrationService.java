@@ -10,14 +10,16 @@ import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
+import ch.redanz.redanzCore.model.workshop.config.EventConfig;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Track;
-import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.TrackService;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -188,50 +190,84 @@ public class RegistrationService {
 
   @Transactional
   public void submitRegistration(Long userId, JsonObject request) throws IOException, TemplateException {
-    log.info("request: {}", request);
+    log.info("inc@submitRegistration, request: {}", request);
+    if (findByParticipantAndEvent(
+      personService.findByUser(userService.findByUserId(userId)),
+      eventService.getCurrentEvent()
+    ).isPresent()) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_DUPLICATE_EN.getOutTextKey());
+    }
+
     RegistrationRequest registrationRequest = new RegistrationRequest(
       request.get("eventId").getAsLong(),
       request.get("bundleId").getAsLong(),
-      request.get("trackId") == null ? null : request.get("trackId").getAsLong(),
-      request.get("danceRoleId") == null ? null : request.get("danceRoleId").getAsLong(),
-      request.get("partnerEmail") == null ? null : request.get("partnerEmail").getAsString()
+      request.get("trackId").isJsonNull() ? null : request.get("trackId").getAsLong(),
+      (request.get("danceRoleId") == null || request.get("danceRoleId").isJsonNull()) ? null : request.get("danceRoleId").getAsLong(),
+      (request.get("partnerEmail") == null || request.get("partnerEmail").isJsonNull()) ? null : request.get("partnerEmail").getAsString()
     );
+    try {
+      saveNewRegistration(registrationRequest, userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
+    }
 
-    saveNewRegistration(registrationRequest, userId);
     Registration registration = findByParticipantAndEvent(
       personService.findByUser(userService.findByUserId(userId)),
       eventService.getCurrentEvent()
     ).get();
 
-    if (!request.get("foodRegistration").getAsJsonArray().isEmpty()) {
-      foodRegistrationService.saveFoodRegistration(registration, request.get("foodRegistration").getAsJsonArray());
+    try {
+      if (request.get("foodRegistration") != null && !request.get("foodRegistration").getAsJsonArray().isEmpty()) {
+        foodRegistrationService.saveFoodRegistration(registration, request.get("foodRegistration").getAsJsonArray());
+      }
+      if (request.get("discountRegistration") != null && !request.get("discountRegistration").getAsJsonArray().isEmpty()) {
+        discountRegistrationService.saveDiscountRegistration(registration, request.get("discountRegistration").getAsJsonArray());
+      }
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_TRACK_GE.getOutTextKey());
     }
-    if (!request.get("discountRegistration").getAsJsonArray().isEmpty()) {
-      discountRegistrationService.saveDiscountRegistration(registration, request.get("discountRegistration").getAsJsonArray());
-    }
-    if (!request.get("hostRegistration").getAsJsonArray().isEmpty()) {
-      hostingService.saveHostRegistration(registration, request.get("hostRegistration").getAsJsonArray());
-    }
-    if (!request.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
-      hostingService.saveHosteeRegistration(registration, request.get("hosteeRegistration").getAsJsonArray());
-    }
-    if (request.get("volunteerRegistration") != null) {
-      volunteerService.saveVolunteerRegistration(registration, request.get("volunteerRegistration").getAsJsonObject());
-    }
-    if (request.get("scholarshipRegistration") != null) {
-      donationRegistrationService.saveScholarishpRegistration(registration, request.get("scholarshipRegistration").getAsJsonArray());
-    }
-    if (!request.get("donationRegistration").isJsonNull()) {
-      donationRegistrationService.saveDonationRegistration(registration, request.get("donationRegistration").getAsJsonArray());
-    }
-    workflowTransitionService.setWorkflowStatus(
-      registration
-      , workflowStatusService.getSubmitted()
-    );
-    registrationMatchingService.setRegistrationMatching(registration, registrationRequest);
-    registrationEmailService.sendRegistrationSubmittedEmail(registration);
-  }
 
+    try {
+      if (request.get("hosteeRegistration") != null && !request.get("hostRegistration").getAsJsonArray().isEmpty()) {
+        hostingService.saveHostRegistration(registration, request.get("hostRegistration").getAsJsonArray());
+      }
+      if (request.get("hosteeRegistration") != null && !request.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
+        hostingService.saveHosteeRegistration(registration, request.get("hosteeRegistration").getAsJsonArray());
+      }
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_ACCOMMODATION_EN.getOutTextKey());
+    }
+
+    try {
+      if (request.get("volunteerRegistration") != null && !request.get("volunteerRegistration").isJsonNull()) {
+        volunteerService.saveVolunteerRegistration(registration, request.get("volunteerRegistration").getAsJsonObject());
+      }
+      if (request.get("scholarshipRegistration") != null && !request.get("scholarshipRegistration").isJsonNull()) {
+        donationRegistrationService.saveScholarishpRegistration(registration, request.get("scholarshipRegistration").getAsJsonArray());
+      }
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_VOLUNTEERING_EN.getOutTextKey());
+    }
+
+    try {
+      if (request.get("donationRegistration") != null && !request.get("donationRegistration").isJsonNull()) {
+        donationRegistrationService.saveDonationRegistration(registration, request.get("donationRegistration").getAsJsonArray());
+      }
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_DONATION_EN.getOutTextKey());
+    }
+
+    try {
+      workflowTransitionService.setWorkflowStatus(
+        registration
+        , workflowStatusService.getSubmitted()
+      );
+      registrationMatchingService.setRegistrationMatching(registration, registrationRequest);
+      registrationEmailService.sendRegistrationSubmittedEmail(registration);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_WORKFLOW_EN.getOutTextKey());
+    }
+  }
   public Registration getRegistration(Long userId, Event event) {
     return registrationRepo.findByParticipantAndEvent(
       personService.findByUser(userService.findByUserId(userId)),

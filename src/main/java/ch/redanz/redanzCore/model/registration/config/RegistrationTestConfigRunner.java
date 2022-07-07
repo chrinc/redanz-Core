@@ -5,10 +5,7 @@ import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.jobs.EODMatchingJob;
 import ch.redanz.redanzCore.model.registration.jobs.EODReleaseJob;
 import ch.redanz.redanzCore.model.registration.service.*;
-import ch.redanz.redanzCore.model.workshop.service.BundleService;
-import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.TrackService;
+import ch.redanz.redanzCore.model.workshop.service.*;
 import freemarker.template.Configuration;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +20,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Order(800)
 @Profile("dev || test")
+//@Profile("test")
 public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final UserService userService;
   private final BundleService bundleService;
@@ -31,12 +29,18 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final DanceRoleService danceRoleService;
   private final WorkflowStatusService workflowStatusService;
   private final PersonService personService;
+
   private final RegistrationMatchingService registrationMatchingService;
   private final RegistrationEmailService registrationEmailService;
   private final EODMatchingJob eodMatchingJob;
   private final EODReleaseJob eodReleaseJob;
   private final RegistrationService registrationService;
   private final WorkflowTransitionService workflowTransitionService;
+  private final DiscountService discountService;
+  private final DiscountRegistrationService discountRegistrationService;
+  private final FoodService foodService;
+  private final SlotService slotService;
+  private final FoodRegistrationService foodRegistrationService;
 
   @Autowired
   Configuration mailConfig;
@@ -44,14 +48,15 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
     RegistrationConfig.setup(
-      personService, registrationService, bundleService, trackService, danceRoleService, userService, eventService, registrationEmailService
+      personService, registrationService, bundleService, trackService, danceRoleService
+      ,userService, eventService, registrationEmailService, discountService, discountRegistrationService
+      ,foodService, slotService, foodRegistrationService
     );
-    // loads test data
-//    registrationEmailRepo.saveAll(setupEmailRegistration(registrationList));
 
     RegistrationMatchingConfig.setup(
       eventService, registrationService, personService, userService, registrationMatchingService
     );
+
 
     WorkflowTransitionConfig.setup(
       eventService, registrationService, personService, userService, workflowStatusService, WorkflowStatusConfig.SUBMITTED,

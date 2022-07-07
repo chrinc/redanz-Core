@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.service.email;
 
+import ch.redanz.redanzCore.model.profile.config.UserConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Service;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Properties;
 
 @Service
@@ -17,7 +20,6 @@ import java.util.Properties;
 public class EmailService {
   private static String hostEmail;
   private static String hostPassword;
-  private static String emailReceiverDev;
   private static String emailSmtpHost;
   private static String emailSmtpPort;
   private static String emailDebug;
@@ -28,7 +30,6 @@ public class EmailService {
   public EmailService(
     @Value("${email.host.username}") String hostEmail,
     @Value("${email.host.password}") String hostPassword,
-    @Value("${email.dev.receiver}") String emailReceiverDev,
     @Value("${email.smtp.host}") String emailSmtpHost,
     @Value("${email.debug}") String emailDebug,
     @Value("${email.host.name}") String emailHostName,
@@ -37,7 +38,6 @@ public class EmailService {
   ) {
     this.hostEmail = hostEmail;
     this.hostPassword = hostPassword;
-    this.emailReceiverDev = emailReceiverDev;
     this.emailSmtpHost = emailSmtpHost;
     this.emailHostName = emailHostName;
     this.emailDebug = emailDebug;
@@ -75,11 +75,15 @@ public class EmailService {
       msg.setSubject(subject, "UTF-8");
       msg.setContent(body, "text/html; charset=UTF-8");
       msg.setSentDate(new Date());
-      String emailReceiver = emailReceiverDev.isEmpty() ? toEmail : emailReceiverDev;
-      msg.setRecipients(
-        Message.RecipientType.TO, InternetAddress.parse(emailReceiver, false)
+
+      boolean emailIsConfig = Arrays.stream(
+        UserConfig.values()).anyMatch(
+        userConfig -> Objects.equals(userConfig.getEmail(), toEmail)
       );
-      if (sendEmail) Transport.send(msg);
+      msg.setRecipients(
+        Message.RecipientType.TO, InternetAddress.parse(toEmail, false)
+      );
+      if (!emailIsConfig && sendEmail) Transport.send(msg);
     } catch (Exception e) {
       e.printStackTrace();
     }

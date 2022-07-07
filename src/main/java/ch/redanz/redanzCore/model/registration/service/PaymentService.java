@@ -11,9 +11,11 @@ import ch.redanz.redanzCore.model.workshop.entities.Food;
 import ch.redanz.redanzCore.model.workshop.config.DiscountConfig;
 import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
+import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -21,8 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @AllArgsConstructor
@@ -40,6 +44,8 @@ public class PaymentService {
   private final UserService userService;
   private final EventService eventService;
   private final  RegistrationEmailService registrationEmailService;
+  private final SlotService slotService;
+
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
     long timeout = 1000L * 60 * 5; // 5 minutes
@@ -62,24 +68,46 @@ public class PaymentService {
   }
 
   public PaymentDetailsResponse getPaymentDetails(Registration registration) {
-    HashMap<String, Double> items = new HashMap<>();
-    HashMap<String, Double> discounts = new HashMap<>();
+    List<List<String>> items = new ArrayList<>();
+    List<List<String>> foodSlots = new ArrayList<>();
+    List<List<String>> donation = new ArrayList<>();
+    List<List<String>> discounts = new ArrayList<>();
+
+    AtomicInteger totalAmount = new AtomicInteger();
+    totalAmount.set((int) registration.getBundle().getPrice());
 
     // pass
-    items.put(registration.getBundle().getName(), registration.getBundle().getPrice());
+    items.add(
+      List.of(
+        registration.getBundle().getName(),
+        String.valueOf((int) registration.getBundle().getPrice())
+      )
+    );
 
     // food
     foodRegistrationRepo.findAllByFoodRegistrationIdRegistrationId(registration.getRegistrationId()).forEach(foodRegistration -> {
-      Food foodItem = foodService.findByFoodId(foodRegistration.getFoodRegistrationId().getFoodId());
-      items.put(
-        foodItem.getName(),
-        foodItem.getPrice()
+      Food food = foodService.findByFoodId(foodRegistration.getFoodRegistrationId().getFoodId());
+      Slot slot = slotService.findBySlotId(foodRegistration.getFoodRegistrationId().getSlotId());
+      totalAmount.addAndGet((int) food.getPrice());
+      foodSlots.add(
+        List.of(
+          food.getName(),
+          slot.getName(),
+          String.valueOf((int) food.getPrice())
+        )
       );
     });
 
     // donation
     if (donationRegistrationRepo.findByRegistration(registration) != null) {
-      items.put(OutTextConfig.LABEL_DONATION_EN.getOutTextKey(), donationRegistrationRepo.findByRegistration(registration).getAmount());
+      int donationAmount = (int) donationRegistrationRepo.findByRegistration(registration).getAmount();
+      totalAmount.addAndGet(donationAmount);
+      donation.add(
+        List.of(
+          OutTextConfig.LABEL_DONATION_EN.getOutTextKey(),
+          String.valueOf(donation)
+        )
+      );
     }
 
     // discounts
@@ -87,18 +115,33 @@ public class PaymentService {
     if (registrationService.findAllByCurrentEventAndWorkflowStatus(
       workflowStatusService.getDone()
     ).size() < 50) {
-      discounts.put(DiscountConfig.EARLY_BIRD.getName(), discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount());
+      int earlyBirdDiscount = (int) discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount();
+      totalAmount.addAndGet(earlyBirdDiscount * (-1));
+      discounts.add(
+        List.of(
+          DiscountConfig.EARLY_BIRD.getName(),
+          String.valueOf(earlyBirdDiscount)
+        )
+      );
+
+
     }
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
-      discounts.put(discountRegistration.getDiscount().getName(), discountRegistration.getDiscount().getDiscount());
+      int discount = (int) discountRegistration.getDiscount().getDiscount();
+      totalAmount.addAndGet(discount * (-1));
+      discounts.add(
+        List.of(
+          discountRegistration.getDiscount().getName(),
+          String.valueOf(discount)
+        )
+      );
     });
 
-    Double totalAmount =
-      (items.values().stream().mapToDouble(Double::doubleValue).sum()
-        - discounts.values().stream().mapToDouble(Double::doubleValue).sum());
     return
       new PaymentDetailsResponse(
         items,
+        foodSlots,
+        donation,
         discounts,
         totalAmount
       );

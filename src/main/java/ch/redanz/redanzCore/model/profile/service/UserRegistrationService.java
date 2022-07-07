@@ -3,9 +3,13 @@ package ch.redanz.redanzCore.model.profile.service;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.service.email.EmailValidator;
 import ch.redanz.redanzCore.web.security.ConfirmationToken;
+import ch.redanz.redanzCore.web.security.PasswordResetToken;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
+import ch.redanz.redanzCore.web.security.service.PasswordResetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,7 @@ public class UserRegistrationService {
   private final EmailValidator emailValidator;
   private final UserService userService;
   private final ConfirmationTokenService confirmationTokenService;
+  private final PasswordResetService passwordResetService;
 
   public String register(UserResponse request) {
     boolean isValidEmail = emailValidator.test(request.getEmail());
@@ -57,5 +62,28 @@ public class UserRegistrationService {
       confirmationToken.getUser().getEmail()
     );
     return "confirmed";
+  }
+
+  @Transactional
+  public boolean validatePasswordResetToken(String token) {
+    log.info("inc@validateResetToken: {}", token);
+    try {
+      final PasswordResetToken passToken = passwordResetService.findByToken(token);
+
+      if (isTokenFound(passToken)
+        && !isTokenExpired(passToken)) {
+        return true;
+      } else throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  private boolean isTokenFound(PasswordResetToken passToken) {
+    return passToken != null;
+  }
+
+  private boolean isTokenExpired(PasswordResetToken passToken) {
+    return passToken.getExpiresAt().isBefore(LocalDateTime.now());
   }
 }

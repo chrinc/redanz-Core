@@ -79,8 +79,9 @@ public class RegistrationController {
         userId,
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
-      log.info("inc, throw api Request Exception?");
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
   }

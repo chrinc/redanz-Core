@@ -27,13 +27,9 @@ public class VolunteerService {
 
 
   public void saveVolunteerRegistration(Registration registration, JsonObject volunteerRegistration) {
-    log.info("inc volunteerRegistration: {}", volunteerRegistration);
     String intro = volunteerRegistration.get("intro").isJsonNull() ? null : volunteerRegistration.get("intro").getAsString();
-    log.info("inc introJson: {}", intro);
     String mobile = volunteerRegistration.get("mobile").isJsonNull() ? null : volunteerRegistration.get("mobile").getAsString();
-    log.info("inc mobileJson: {}", mobile);
     JsonArray slotsJson = volunteerRegistration.get("slots").getAsJsonArray();
-    log.info("inc slotsJson: {}", slotsJson);
 
     // volunteer registration
     volunteerRegistrationRepo.save(
@@ -64,31 +60,22 @@ public class VolunteerService {
 
     VolunteerRegistration volunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
     List<Object> volunteerRegistrations = new ArrayList<>();
-    log.info("volunteerRegistration 1");
-
-    log.info("volunteerRegistration null? : {}", volunteerRegistrations == null);
 
     if (volunteerRegistration != null) {
 
       volunteerRegistrations.add(volunteerRegistration);
-      log.info("volunteerRegistration 2");
       volunteerRegistrationMap.put(
         "volunteerRegistration"
         , volunteerRegistrations
       );
-      log.info("volunteerRegistration 3");
-
       volunteerRegistrationMap.put(
         "volunteerSlotRegistration"
         , Collections.singletonList(volunteerSlotRegistrationRepo.findAllByVolunteerRegistration(volunteerRegistration))
       );
-      log.info("volunteerRegistration 4");
-
       volunteerRegistrationMap.put(
         "mobile",
         Collections.singletonList(volunteerRegistration.getRegistration().getParticipant().getMobile())
       );
-      log.info("volunteerRegistration 5");
 
       return volunteerRegistrationMap;
     } else {

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.TimeoutException;
@@ -49,6 +50,18 @@ public class ZahlsPaymentController {
         );
     } catch (TimeoutException timeoutException) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_TIMEOUT_EN.getOutTextKey(), HttpStatus.REQUEST_TIMEOUT);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/manual-pay")
+  @Transactional
+  public void manualPay(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      paymentService.onPaymentReceived(userId);
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }

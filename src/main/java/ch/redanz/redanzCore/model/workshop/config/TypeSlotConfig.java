@@ -19,9 +19,8 @@ public enum TypeSlotConfig {
   VOLUNTEER_SLOT_SUNDAY_EVENING("volunteer", SlotConfig.SLOT_SUNDAY_EVENING        , null),
   VOLUNTEER_SLOT_SUNDAY_NIGHT("volunteer", SlotConfig.SLOT_SUNDAY_NIGHT            , null),
 
-  FOOD_SLOT_FRIDAY  ("food", SlotConfig.SLOT_FRIDAY   , FoodConfig.FOOD_SOUP),
-  FOOD_SLOT_SATURDAY("food", SlotConfig.SLOT_SATURDAY , FoodConfig.FOOD_VEGGIE_ASIAN),
-  FOOD_SLOT_SUNDAY  ("food", SlotConfig.SLOT_SUNDAY   , FoodConfig.FOOD_SOUP),
+  FOOD_SLOT_FRIDAY  ("food", SlotConfig.SLOT_FRIDAY_EVENING   , FoodConfig.FOOD_VEDA),
+  FOOD_SLOT_SATURDAY("food", SlotConfig.SLOT_SATURDAY_LUNCH , FoodConfig.FOOD_VEDA),
 
   ACCOMMODATION_SLOT_THURSDAY( "accommodation"    , SlotConfig.SLOT_THURSDAY    , null),
   ACCOMMODATION_SLOT_FRIDAY(   "accommodation"    , SlotConfig.SLOT_FRIDAY      , null),
