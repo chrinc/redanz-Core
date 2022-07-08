@@ -28,6 +28,8 @@ public enum WorkflowTransitionConfig {
   SUBMIT8(WorkflowStatusConfig.SUBMITTED,  UserConfig.NAOMI_USER.getEmail(), EventConfig.EVENT2022),
   SUBMIT9(WorkflowStatusConfig.SUBMITTED,  UserConfig.ESTHER_USER.getEmail(), EventConfig.EVENT2022),
   SUBMIT10(WorkflowStatusConfig.SUBMITTED, UserConfig.CLAUDIA_USER.getEmail(), EventConfig.EVENT2022),
+  SUBMIT11(WorkflowStatusConfig.SUBMITTED,  UserConfig.OLIVER_USER.getEmail(), EventConfig.EVENT2022),
+  SUBMIT12(WorkflowStatusConfig.SUBMITTED, UserConfig.HARRY_USER.getEmail(), EventConfig.EVENT2022),
 
 
   DONE1(WorkflowStatusConfig.DONE,  UserConfig.FRANKY_USER.getEmail(), EventConfig.EVENT2022),

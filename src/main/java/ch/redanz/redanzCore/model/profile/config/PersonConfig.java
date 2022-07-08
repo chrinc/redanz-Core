@@ -52,7 +52,9 @@ public enum PersonConfig {
           personConfig.street,
           personConfig.postalCode,
           personConfig.city,
-          countryService.findCountry(personConfig.countryId),
+          // countries need to be loaded first
+          null,
+//          countryService.findCountry(personConfig.countryId),
           languageService.findLanguageByLanguageKey(personConfig.getLanguageConfig().getKey())
         )
       );

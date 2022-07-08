@@ -1,9 +1,9 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
+import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
-import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
 import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
@@ -32,7 +32,7 @@ public class EODMatchingJob {
 
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 47 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/15 * * * *")
+  @Scheduled(cron = "0 0/2 * * * *")
   public void runMatching() {
     doMatching(registrationMatchingService.findRegistrationMatchingByRegistration2IsNull());
   }
@@ -83,6 +83,27 @@ public class EODMatchingJob {
 
   private void onFoundMatch() {
     matchingPairs.forEach((baseMatching, lookupMatching) -> {
+      log.info("inc, matched: {}", baseMatching.getRegistration1().getParticipant().getFirstName()
+        + " matched with " + lookupMatching.getRegistration1().getParticipant().getFirstName()
+      );
+
+      log.info("inc, bundle 1: {}", baseMatching.getRegistration1().getBundle().getName()
+        + " matches bundle 2: " + lookupMatching.getRegistration1().getBundle().getName()
+      );
+
+      log.info("inc, partner Email 1: {}", baseMatching.getPartnerEmail()
+        + " matches partner Email 2: " + lookupMatching.getPartnerEmail()
+      );
+
+      if (baseMatching.getRegistration1().getTrack() != null) {
+        log.info("inc, track 1: {}", baseMatching.getRegistration1().getTrack().getName()
+          + " matches track 2: " + lookupMatching.getRegistration1().getTrack().getName()
+        );
+        log.info("inc, partner dance role 1: {}", baseMatching.getRegistration1().getDanceRole().getName()
+          + " matches partner dance role 2: " + lookupMatching.getRegistration1().getDanceRole().getName()
+        );
+      }
+
 
       // update registration_matching
       baseMatching.setRegistration2(lookupMatching.getRegistration1());

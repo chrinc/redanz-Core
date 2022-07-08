@@ -197,6 +197,7 @@ public class RegistrationService {
     ).isPresent()) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_DUPLICATE_EN.getOutTextKey());
     }
+    log.info("inc,find registration done");
 
     RegistrationRequest registrationRequest = new RegistrationRequest(
       request.get("eventId").getAsLong(),

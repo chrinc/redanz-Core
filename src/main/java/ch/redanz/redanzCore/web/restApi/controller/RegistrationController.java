@@ -73,7 +73,6 @@ public class RegistrationController {
     @RequestParam("userId") Long userId,
     @RequestBody String jsonObject
   ) {
-    log.info("inc, userId: {}", userId);
     try {
       registrationService.submitRegistration(
         userId,

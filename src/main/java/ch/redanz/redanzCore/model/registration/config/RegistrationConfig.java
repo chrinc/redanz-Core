@@ -30,8 +30,8 @@ public enum RegistrationConfig {
   NORMA_REGISTRATION  (
     UserConfig.NORMA_USER,
     EventConfig.EVENT2022,
-    BundleConfig.LEVELPASS,
-    TrackConfig.LINDY_ADVANCED,
+    BundleConfig.FULLPASS,
+    TrackConfig.FUN_TRACK,
     DanceRoleConfig.FOLLOWER,
     null,
     null
@@ -61,10 +61,36 @@ public enum RegistrationConfig {
   ),
   NAOMI_REGISTRATION(UserConfig.NAOMI_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, null, null),
   ESTHER_REGISTRATION(UserConfig.ESTHER_USER, EventConfig.EVENT2022, BundleConfig.PARTYPASS, null, null, null, null),
-  EDDIE_REGISTRATION(UserConfig.EDDIE_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED, DanceRoleConfig.LEADER, List.of(DiscountConfig.STUDENT, DiscountConfig.ABROAD), null),
+  EDDIE_REGISTRATION(
+    UserConfig.EDDIE_USER
+    ,EventConfig.EVENT2022
+    ,BundleConfig.LEVELPASS
+    ,TrackConfig.LINDY_ADVANCED
+    ,DanceRoleConfig.FOLLOWER
+    ,List.of(DiscountConfig.STUDENT
+    ,DiscountConfig.ABROAD
+  ), null),
+  OLIVER_REGISTRATION(
+    UserConfig.OLIVER_USER
+    ,EventConfig.EVENT2022
+    ,BundleConfig.FULLPASS
+    ,TrackConfig.FUN_TRACK
+    ,DanceRoleConfig.LEADER
+    ,List.of(DiscountConfig.STUDENT
+    ,DiscountConfig.ABROAD
+  ), null),
+  HARRY_REGISTRATION(
+    UserConfig.HARRY_USER
+    ,EventConfig.EVENT2022
+    ,BundleConfig.FULLPASS
+    ,TrackConfig.FUN_TRACK
+    ,DanceRoleConfig.FOLLOWER
+    ,List.of(DiscountConfig.STUDENT
+    ,DiscountConfig.ABROAD
+  ), null),
   BILLY_REGISTRATION(UserConfig.BILLY_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, List.of(DiscountConfig.STUDENT, DiscountConfig.ABROAD), null),
   FRANKY_REGISTRATION(UserConfig.FRANKY_USER, EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.LEADER, null, null),
-  CLAUDIA_REGISTRATION(UserConfig.CLAUDIA_USER, EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.FOLLOWER, null, null);
+  CLAUDIA_REGISTRATION(UserConfig.CLAUDIA_USER, EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.SWITCH, null, null);
 
   private final UserConfig userConfig;
   private final EventConfig eventConfig;
