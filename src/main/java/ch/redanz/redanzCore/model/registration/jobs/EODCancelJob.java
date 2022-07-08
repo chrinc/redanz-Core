@@ -34,10 +34,9 @@ public class EODCancelJob {
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
   private final WorkflowStatusService workflowStatusService;
-  private final OutTextService outTextService;
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 47 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/2 * * * *")
+  @Scheduled(cron = "0 0/15 * * * *")
   public void runCancelJob() {
     registrationService.getAllConfirmingRegistrations().forEach(registration -> {
       RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);

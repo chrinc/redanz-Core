@@ -33,11 +33,11 @@ public class EODMatchingJob {
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 47 15 * * MON-SUN")
   @Scheduled(cron = "0 0/15 * * * *")
-  public void runMatching() throws InterruptedException {
+  public void runMatching() {
     doMatching(registrationMatchingService.findRegistrationMatchingByRegistration2IsNull());
   }
 
-  private void doMatching(List<RegistrationMatching> registrationMatchings) throws InterruptedException {
+  private void doMatching(List<RegistrationMatching> registrationMatchings) {
     matchingPairs = new HashMap<>();
 
 

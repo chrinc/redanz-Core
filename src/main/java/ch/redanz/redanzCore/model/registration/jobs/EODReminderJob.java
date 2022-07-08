@@ -31,7 +31,7 @@ public class EODReminderJob {
 
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 47 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/2 * * * *")
+  @Scheduled(cron = "0 0/15 * * * *")
   public void runReminderJob() {
     registrationService.getAllConfirmingRegistrations().forEach(registration -> {
       LocalDateTime releasedAt = registration.getWorkflowStatusDate();

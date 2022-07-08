@@ -38,8 +38,9 @@ public class EODReleaseJob {
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 50 15 * * MON-SUN")
   @Scheduled(cron = "0 0/15 * * * *")
-  public void runRelease() throws InterruptedException {
+  public void runRelease() {
     registrationService.getAllSubmittedRegistrations().forEach(registration -> {
+      log.info("Job: runRelease");
 
       RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
       if (isRelease(registration)) {
@@ -62,13 +63,11 @@ public class EODReleaseJob {
 
   private boolean isMatchingOK (Registration registration) {
     if (registrationMatchingService.findByRegistration1(registration).isPresent()) {
-      if (registrationMatchingService.findByRegistration1(registration).get().getRegistration2() != null) {
-        return true;
-      } else
-        return false;
+      return registrationMatchingService.findByRegistration1(registration).get().getRegistration2() != null;
     } else return true;
   }
   private boolean isCapacityOK (Registration registration) {
+
     return
       registrationService.countReleasedAndDone() < eventService.getCurrentEvent().getCapacity() &&
       registrationService.countBundlesReleasedAndDone(

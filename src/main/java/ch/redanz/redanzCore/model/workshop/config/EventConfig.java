@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum EventConfig {
-  EVENT2022("Event 2022", 7, "Weekend Dance Workshop");
+  EVENT2022("Event 2022", 320, "Weekend Dance Workshop");
 
   private final String name;
   private final Integer capacity;

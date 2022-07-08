@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.web.security.config;
 
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,6 +11,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -17,12 +20,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @AllArgsConstructor
 @EnableWebSecurity
+@Slf4j
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final UserService userService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -41,6 +49,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.addFilter(customAuthenticationFilter);
     http.addFilterBefore(new CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter.class);
     http.formLogin().failureHandler(authenticationFailureHandler());
+
+//    http.formLogin().failureHandler((request, response, exception) -> {
+//      String email = request.getParameter("email");
+//      String error = exception.getMessage();
+//      System.out.println("A failed login attempt with email: "
+//        + email + ". Reason: " + error);
+//
+//      String redirectUrl = request.getContextPath() + "/login?error";
+//      response.sendRedirect(redirectUrl);
+//    });
+
+
   }
 
   @Override
@@ -50,6 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public AuthenticationFailureHandler authenticationFailureHandler() {
+    log.info("inc@authenticationFailure Handler...");
     return new CustomAuthenticationFailureHandler();
   }
 
@@ -79,4 +100,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }
+
 }

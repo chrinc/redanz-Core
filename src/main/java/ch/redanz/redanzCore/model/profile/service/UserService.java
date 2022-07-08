@@ -39,19 +39,24 @@ public class UserService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepo.findByEmail(email);
+    log.info("inc load User by username");
     if (user == null) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
+      throw new UsernameNotFoundException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
     }
-
-    return new org.springframework.security.core.userdetails.User(
-      user.getEmail(),
-      user.getPassword(),
-      user.getEnabled(),
-      user.isAccountNonExpired(),
-      user.isCredentialsNonExpired(),
-      user.isAccountNonLocked(),
-      user.getAuthorities()
-    );
+    try {
+      return new org.springframework.security.core.userdetails.User(
+        user.getEmail(),
+        user.getPassword(),
+        user.getEnabled(),
+        user.isAccountNonExpired(),
+        user.isCredentialsNonExpired(),
+        user.isAccountNonLocked(),
+        user.getAuthorities()
+      );
+    } catch(UsernameNotFoundException usernameNotFoundException) {
+      log.info("inc here?");
+      throw new UsernameNotFoundException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
+    }
   }
 
   public void save(User user) {
@@ -93,7 +98,7 @@ public class UserService implements UserDetailsService {
     return token;
   }
 
-  public int enableUser(String email) {
-    return userRepo.enableUser(email);
+  public void enableUser(String email) {
+    userRepo.enableUser(email);
   }
 }

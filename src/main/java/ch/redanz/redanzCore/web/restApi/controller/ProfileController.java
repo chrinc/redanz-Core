@@ -74,7 +74,10 @@ public class ProfileController {
       log.info("email?: {}", email);
       User user = userService.getUser(email);
       if (user == null) {
-        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
+
+        // do not inform user about missing user in database.
+        return;
+        // throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
       }
 
       String token = UUID.randomUUID().toString();
@@ -112,7 +115,6 @@ public class ProfileController {
       log.info("token: {}", token);
       log.info("password: {}", password);
       userRegistrationService.validatePasswordResetToken(token);
-      passwordResetService.findByToken(token).getUser();
       passwordResetService.updatePassword(passwordResetService.findByToken(token).getUser(), password);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());

@@ -10,7 +10,6 @@ Necessary tools for testing and development
 
 ##### What Todo
 - https://start.spring.io/
-![start_spring_io](reference/start_spring_io.png)
 
 - Setup Domain Classes in Project (e.g. registration / )
 - Setup MySQL Configuration (in resources/application.properties)
@@ -23,7 +22,12 @@ Necessary tools for testing and development
   - ``mysql -u root -p incIsRoot``
   - ``use redanz``
     - `init sql inserts with source (pwd shows path to folder) eg: ` source /Users/Chrine/Documents/GitHub/redAnz-Core/redanzCore/src/main/resources/init_sql_countries.sql
- 
+    - `on ubuntu: ` source /usr/local/redanz/redanzCore/redanz-Core/src/main/resources/init_sql_countries.sql
+- Save mysql db:
+  - export: ``mysqldump -u root -p redanz > /usr/local/redanz/redanzCore/data/[YYMMDD]_redanz_backup.sql``
+  - copy with sftp-client to kdrive
+  - import: ``mysql -u root -p redanz_backup < /Users/inc/kDrive/030_associations_communities/020_lindyhop/003_Stirit/2211_stirit/2211_registration/data/220708_redanz_backup.sql
+    ``
  #### on Server
  - Create SSH key for git-repository
      - ``ssh-keygen -t ed25519 -C [email@address]``
@@ -50,9 +54,3 @@ Necessary tools for testing and development
 `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
 
  - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
-#### **Insert Image**
-Image:
-[https://skulls-b072a-default-rtdb.firebaseio.com//](https://skulls-b072a-default-rtdb.firebaseio.com/)
-
-![snr_db_model](app/documentation/skulls_db_model.png)
-

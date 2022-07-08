@@ -12,7 +12,8 @@
         >
     </div>
 </div>
-<div style="width:730px;background:#ececec;text-align:left;font-family: Arial;">
+
+<div style="width:100%;background:#ececec;text-align:left;font-family: Arial,serif;">
     <div style="padding:15px;">
         <h3>Hi ${firstName}</h3>
         <p>
