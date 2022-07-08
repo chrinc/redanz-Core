@@ -37,7 +37,7 @@ public class EODReleaseJob {
 
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 50 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/15 * * * *")
+  @Scheduled(cron = "0 0/2 * * * *")
   public void runRelease() {
     registrationService.getAllSubmittedRegistrations().forEach(registration -> {
       log.info("Job: runRelease");
