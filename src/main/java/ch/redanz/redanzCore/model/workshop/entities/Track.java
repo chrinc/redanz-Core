@@ -39,11 +39,6 @@ public class Track implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "track")
   private List<TrackDiscount> trackDiscounts = new ArrayList<>();
 
-//  @JsonIgnore
-//  @OneToMany(cascade = CascadeType.ALL, mappedBy = "track")
-//  @LazyCollection(LazyCollectionOption.FALSE)
-//  private List<BundleTrack> bundleTracks = new ArrayList<>();
-
   @Column(name = "sold_out")
   private boolean soldOut;
 

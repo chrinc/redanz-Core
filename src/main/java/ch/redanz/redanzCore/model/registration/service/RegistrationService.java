@@ -51,6 +51,7 @@ public class RegistrationService {
   private final DonationRegistrationService donationRegistrationService;
   private final DiscountRegistrationService discountRegistrationService;
   private final RegistrationEmailService registrationEmailService;
+  private final SpecialRegistrationService specialRegistrationService;
 
   public void update(Registration registration) {
     registrationRepo.save(registration);
@@ -191,13 +192,15 @@ public class RegistrationService {
   @Transactional
   public void submitRegistration(Long userId, JsonObject request) throws IOException, TemplateException {
     log.info("inc@submitRegistration, request: {}", request);
+    // ignore if user already has a registration
+
+
     if (findByParticipantAndEvent(
       personService.findByUser(userService.findByUserId(userId)),
       eventService.getCurrentEvent()
     ).isPresent()) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_DUPLICATE_EN.getOutTextKey());
     }
-    log.info("inc,find registration done");
 
     RegistrationRequest registrationRequest = new RegistrationRequest(
       request.get("eventId").getAsLong(),
@@ -225,7 +228,15 @@ public class RegistrationService {
         discountRegistrationService.saveDiscountRegistration(registration, request.get("discountRegistration").getAsJsonArray());
       }
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_TRACK_GE.getOutTextKey());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_ACCOMMODATION_EN.getOutTextKey());
+    }
+
+    try {
+      if (request.get("specialRegistration") != null && !request.get("specialRegistration").getAsJsonArray().isEmpty()) {
+        specialRegistrationService.saveSpecialRegistration(registration, request.get("specialRegistration").getAsJsonArray());
+      }
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_ACCOMMODATION_EN.getOutTextKey());
     }
 
     try {
@@ -268,6 +279,9 @@ public class RegistrationService {
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_WORKFLOW_EN.getOutTextKey());
     }
+
+
+
   }
   public Registration getRegistration(Long userId, Event event) {
     return registrationRepo.findByParticipantAndEvent(
@@ -346,8 +360,14 @@ public class RegistrationService {
         donationRegistrationService.getDonationRegistration(registration)
       );
 
+      // Discounts
       registrationResponse.setDiscountRegistrations(
         discountRegistrationService.findAllByRegistration(registration)
+      );
+
+      // Specials
+      registrationResponse.setSpecialRegistrations(
+        specialRegistrationService.findAllByRegistration(registration)
       );
       return registrationResponse;
     }

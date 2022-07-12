@@ -16,6 +16,7 @@ public class PersonService {
   public void save(Person person) {
     personRepo.save(person);
   }
+  public void delete(Person person) {personRepo.delete(person);}
 
   public void addPerson(Person person) {
     personRepo.save(person);

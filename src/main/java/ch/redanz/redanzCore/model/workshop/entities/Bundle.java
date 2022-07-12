@@ -32,10 +32,6 @@ public class Bundle implements Serializable {
   @Column(name = "sold_out")
   private boolean soldOut;
 
-//  @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle")
-//  @JsonIgnore
-//  private final List<EventBundle> eventBundles = new ArrayList<>();
-
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle")
   @LazyCollection(LazyCollectionOption.FALSE)
   private List<BundleTrack> bundleTracks = new ArrayList<>();

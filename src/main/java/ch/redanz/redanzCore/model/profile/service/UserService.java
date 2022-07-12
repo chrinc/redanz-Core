@@ -62,7 +62,8 @@ public class UserService implements UserDetailsService {
   public void save(User user) {
     userRepo.save(user);
   }
-
+  public void delete(User user) {userRepo.delete(user);
+  }
   public User getUser(String email) {
     return userRepo.findByEmail(email);
   }

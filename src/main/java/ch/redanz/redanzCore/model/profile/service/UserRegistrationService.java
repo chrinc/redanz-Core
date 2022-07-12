@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.profile.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
@@ -12,6 +13,8 @@ import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
 import ch.redanz.redanzCore.web.security.service.PasswordResetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,6 +28,10 @@ public class UserRegistrationService {
   private final UserService userService;
   private final ConfirmationTokenService confirmationTokenService;
   private final PasswordResetService passwordResetService;
+  private final PersonService personService;
+
+  @Autowired
+  private Environment environment;
 
   public String register(UserResponse request) {
     boolean isValidEmail = emailValidator.test(request.getEmail());
@@ -43,30 +50,43 @@ public class UserRegistrationService {
 
   @Transactional
   public String confirmToken(String token) {
+    String baseUrl = environment.getProperty("link.email.confirmed");
+
     ConfirmationToken confirmationToken = confirmationTokenService
       .getToken(token)
       .orElseThrow(() ->
         new IllegalStateException("token not found")
       );
-
+    String lang = personService.findByUser(confirmationToken.getUser()).getPersonLang().getLanguageKey().toLowerCase();
     if (confirmationToken.getConfirmedAt() != null) {
-      throw new IllegalStateException("email already confirmed");
+      return
+        baseUrl
+          + "/" + OutTextConfig.LABEL_ERROR_EMAIL_CONFIRMED_EN.getOutTextKey().toLowerCase()
+          + "/" + lang;
     }
 
     LocalDateTime expiredAt = confirmationToken.getExpiresAt();
     if (expiredAt.isBefore(LocalDateTime.now())) {
-      throw new IllegalStateException("token expired");
+      userService.delete(confirmationToken.getUser());
+      personService.delete(personService.findByUser(confirmationToken.getUser()));
+      return
+        baseUrl
+          + "/" + OutTextConfig.LABEL_ERROR_EMAIL_CONFIRMED_EN.getOutTextKey().toLowerCase()
+          + "/" + lang;
     }
     confirmationTokenService.setConfirmedAt(token);
     userService.enableUser(
       confirmationToken.getUser().getEmail()
     );
-    return "confirmed";
+
+    return
+      baseUrl
+        + "/" + OutTextConfig.LABEL_EMAIL_CONFIRMED_EN.getOutTextKey().toLowerCase()
+        + "/" + lang;
   }
 
   @Transactional
   public boolean validatePasswordResetToken(String token) {
-    log.info("inc@validateResetToken: {}", token);
     try {
       final PasswordResetToken passToken = passwordResetService.findByToken(token);
 

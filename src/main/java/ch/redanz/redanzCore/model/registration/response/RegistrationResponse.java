@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.registration.response;
 
 import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
+import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import lombok.*;
 
@@ -29,6 +30,7 @@ public class RegistrationResponse {
   private Map<String, String> scholarshipRegistration;
   private Map<String, String> donationRegistration;
   private List<DiscountRegistration> discountRegistrations;
+  private List<SpecialRegistration> specialRegistrations;
 
   public RegistrationResponse(Long registrationId, Long userId, Long eventId, Long bundleId) {
     this.registrationId = registrationId;

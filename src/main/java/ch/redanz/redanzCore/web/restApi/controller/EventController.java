@@ -3,11 +3,9 @@ package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
-import ch.redanz.redanzCore.model.workshop.service.AccommodationService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.model.workshop.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +25,7 @@ public class EventController {
   private final SlotService slotService;
   private final OutTextService outTextService;
   private final AccommodationService accommodationService;
+  private final SpecialService specialService;
 
   @GetMapping(path = "/all")
   public List<Event> getAllEvents() {
@@ -58,5 +57,10 @@ public class EventController {
   @GetMapping(path = "/accommodation/all")
   public AccommodationResponse getAccommodationSlots() {
     return accommodationService.getAll();
+  }
+
+  @GetMapping(path = "/special/all")
+  public List<Special> getSpecials() {
+    return specialService.findAll();
   }
 }

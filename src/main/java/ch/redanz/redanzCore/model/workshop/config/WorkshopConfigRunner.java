@@ -26,6 +26,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   private final FoodService foodService;
   private final SleepUtilService sleepUtilService;
   private final DiscountService discountService;
+  private final SpecialService specialService;
 
   @Override
   public void run(String... args) {
@@ -51,6 +52,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       SleepUtilConfig.setup(sleepUtilService);
       DiscountConfig.setup(discountService);
       TrackDiscountConfig.setup(trackService, discountService);
+      SpecialConfig.setup(specialService);
     }
   }
 }

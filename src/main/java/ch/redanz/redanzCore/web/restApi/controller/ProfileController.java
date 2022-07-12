@@ -55,9 +55,9 @@ public class ProfileController {
 
   @GetMapping(path = "/user/registration/confirm")
   public ResponseEntity<Void> confirm(@RequestParam("token") String token) {
-    userRegistrationService.confirmToken(token);
+    String link = userRegistrationService.confirmToken(token);
     return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(
-      Objects.requireNonNull(environment.getProperty("link.email.confirmed"))
+      Objects.requireNonNull(link)
     )).build();
   }
 
@@ -71,7 +71,6 @@ public class ProfileController {
     @RequestParam("email") String email
   ) {
     try {
-      log.info("email?: {}", email);
       User user = userService.getUser(email);
       if (user == null) {
 
@@ -97,7 +96,6 @@ public class ProfileController {
   public void checkPasswordToken(
     @RequestParam("token") String token) {
     try {
-      log.info("token: {}", token);
       userRegistrationService.validatePasswordResetToken(token);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
@@ -112,8 +110,6 @@ public class ProfileController {
     @RequestParam("password") String password
   ) {
     try {
-      log.info("token: {}", token);
-      log.info("password: {}", password);
       userRegistrationService.validatePasswordResetToken(token);
       passwordResetService.updatePassword(passwordResetService.findByToken(token).getUser(), password);
     } catch (ApiRequestException apiRequestException) {
