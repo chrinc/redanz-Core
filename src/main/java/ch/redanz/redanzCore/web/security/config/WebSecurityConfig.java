@@ -49,18 +49,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.addFilter(customAuthenticationFilter);
     http.addFilterBefore(new CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter.class);
     http.formLogin().failureHandler(authenticationFailureHandler());
-
-//    http.formLogin().failureHandler((request, response, exception) -> {
-//      String email = request.getParameter("email");
-//      String error = exception.getMessage();
-//      System.out.println("A failed login attempt with email: "
-//        + email + ". Reason: " + error);
-//
-//      String redirectUrl = request.getContextPath() + "/login?error";
-//      response.sendRedirect(redirectUrl);
-//    });
-
-
   }
 
   @Override
@@ -70,7 +58,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public AuthenticationFailureHandler authenticationFailureHandler() {
-    log.info("inc@authenticationFailure Handler...");
     return new CustomAuthenticationFailureHandler();
   }
 
