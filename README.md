@@ -26,7 +26,8 @@ Necessary tools for testing and development
 - Save mysql db:
   - export: ``mysqldump -u root -p redanz > /usr/local/redanz/redanzCore/data/[YYMMDD]_redanz_backup.sql``
   - copy with sftp-client to kdrive
-  - import: ``mysql -u root -p redanz_backup < /Users/inc/kDrive/030_associations_communities/020_lindyhop/003_Stirit/2211_stirit/2211_registration/data/220708_redanz_backup.sql
+  - import: ``mysql -u root -p redanz_backup < /Users/inc/kDrive/030_associations_communities/020_lindyhop/003_Stirit/2211_stirit/2211_registration/data/220708_redanz_backup.sql``
+  - import: ``mysql -u root -p redanz < /usr/local/redanz/redanzCore/data/[YYMMDD]_redanz_backup.sql``
     ``
   - check submissions: `
     select 

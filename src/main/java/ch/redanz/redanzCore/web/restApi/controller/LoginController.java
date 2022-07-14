@@ -33,6 +33,11 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
     ,"http://localhost.ch/4200"
     ,"http://redanz.ch"
     ,"https://register.stirit.ch"
+    ,"http://register.stirit.ch"
+    ,"https://stirit.ch"
+    ,"http://stirit.ch"
+    ,"http://stirit.redanz.ch"
+    ,"https://stirit.redanz.ch"
   }, allowedHeaders = "*"
 
 )
