@@ -80,6 +80,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
+
+    configuration.setAllowedOrigins(Arrays.asList("https://stirit.redanz.ch","https://redanz.ch", "https://register.stirit.ch"));
     configuration.addAllowedOriginPattern(CorsConfiguration.ALL);
     configuration.setAllowedMethods(List.of(CorsConfiguration.ALL));
     configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
