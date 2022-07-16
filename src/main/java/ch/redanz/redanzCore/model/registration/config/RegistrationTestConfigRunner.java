@@ -41,6 +41,7 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final FoodService foodService;
   private final SlotService slotService;
   private final FoodRegistrationService foodRegistrationService;
+  private final DonationRegistrationService donationRegistrationService;
 
   @Autowired
   Configuration mailConfig;
@@ -50,7 +51,7 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
     RegistrationConfig.setup(
       personService, registrationService, bundleService, trackService, danceRoleService
       ,userService, eventService, registrationEmailService, discountService, discountRegistrationService
-      ,foodService, slotService, foodRegistrationService
+      ,foodService, slotService, foodRegistrationService, donationRegistrationService
     );
 
     RegistrationMatchingConfig.setup(

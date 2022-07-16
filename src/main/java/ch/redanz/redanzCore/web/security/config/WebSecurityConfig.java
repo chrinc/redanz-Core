@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests().antMatchers("/core-api/profile/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/login/check-server").permitAll();
     http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
-//    http.cors();
+    http.cors();
     http.csrf().disable();
     http.addFilter(customAuthenticationFilter);
     http.addFilterBefore(new CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter.class);
@@ -74,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowCredentials(true);
-    configuration.setAllowedOrigins(Arrays.asList("https://stirit.redanz.ch","https://redanz.ch", "https://register.stirit.ch"));
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://stirit.redanz.ch","https://redanz.ch", "https://register.stirit.ch"));
     configuration.addAllowedOriginPattern(CorsConfiguration.ALL);
     configuration.setAllowedMethods(List.of(CorsConfiguration.ALL));
     configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));

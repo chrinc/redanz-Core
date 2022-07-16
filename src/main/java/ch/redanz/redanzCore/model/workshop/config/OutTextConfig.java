@@ -79,10 +79,16 @@ public enum OutTextConfig {
   LABEL_SLEEP_UTIL_BAG_GE("FRONT_LOGIN", "LABEL-SLEEP-UTIL-BAG", "Schlafsack", "GE"),
 
   // Specials
-  LABEL_SPECIAL_MASSAGE_NAME_EN("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_NAME", "Massage", "EN"),
-  LABEL_SPECIAL_MASSAGE_NAME_GE("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_NAME", "Massage", "GE"),
-  LABEL_SPECIAL_MASSAGE_DESC_EN("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_DESC", "Massage Description", "EN"),
-  LABEL_SPECIAL_MASSAGE_DESC_GE("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_DESC", "Massage Beschreibung", "GE"),
+  LABEL_SPECIAL_MASSAGE_NAME_EN("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_NAME", "Massage Relaaax", "EN"),
+  LABEL_SPECIAL_MASSAGE_NAME_GE("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_NAME", "Massage Relaaax", "GE"),
+  LABEL_SPECIAL_MASSAGE_DESC_EN(
+    "FRONT_LOGIN"
+    , "LABEL_SPECIAL_MASSAGE_DESC"
+    , "Relaaax offers a Californian massage (also Ayurvedic foot massage) to promote one's own body awareness, to release tension and thus to make the body more mobile. By clicking on the checkbox you will receive further information about this offer (no obligations).", "EN"),
+  LABEL_SPECIAL_MASSAGE_DESC_GE(
+    "FRONT_LOGIN"
+    , "LABEL_SPECIAL_MASSAGE_DESC"
+    , "Die Praxis Relaaax bietet eine kalifornische Massage (auch ayurvedische Fussmassage) an um das eigene Körperbewusstsein zu fördern, Verspannungen zu lösen und dadurch den Körper beweglicher zu machen. Mit Anlicken der Checkbox erhälst du unverbindlich weitere Informationen zu diesem Angebot.", "GE"),
 
   // VOLUNTEERING / DONATION / SCHOLARSHIP
   LABEL_DONATION_EN("FRONT_LOGIN", "LABEL_DONATION", "Donation", "EN"),

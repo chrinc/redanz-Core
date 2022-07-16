@@ -3,15 +3,10 @@ package ch.redanz.redanzCore.model.registration.config;
 import ch.redanz.redanzCore.model.profile.config.UserConfig;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.registration.entities.DonationRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.service.DiscountRegistrationService;
-import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.config.*;
-import ch.redanz.redanzCore.model.workshop.entities.Discount;
-import ch.redanz.redanzCore.model.workshop.entities.Food;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -19,7 +14,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +28,8 @@ public enum RegistrationConfig {
     TrackConfig.FUN_TRACK,
     DanceRoleConfig.FOLLOWER,
     null,
-    null
+    null,
+    90
   ),
   WILLIAM_REGISTRATION(
     UserConfig.WILLIAM_USER,
@@ -46,7 +41,8 @@ public enum RegistrationConfig {
     List.of(
       Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_FRIDAY_EVENING),
       Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_SATURDAY_LUNCH)
-    )
+    ),
+    100
   ),
   ARLYNE_REGISTRATION(
     UserConfig.ARLYNE_USER,
@@ -57,28 +53,35 @@ public enum RegistrationConfig {
     List.of(DiscountConfig.STUDENT),
     List.of(
       Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_FRIDAY_EVENING)
-    )
+    ),
+    120
   ),
-  NAOMI_REGISTRATION(UserConfig.NAOMI_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, null, null),
-  ESTHER_REGISTRATION(UserConfig.ESTHER_USER, EventConfig.EVENT2022, BundleConfig.PARTYPASS, null, null, null, null),
+  NAOMI_REGISTRATION(UserConfig.NAOMI_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, null, null, 11),
+  ESTHER_REGISTRATION(UserConfig.ESTHER_USER, EventConfig.EVENT2022, BundleConfig.PARTYPASS, null, null, null, null, 0),
   EDDIE_REGISTRATION(
     UserConfig.EDDIE_USER
     ,EventConfig.EVENT2022
     ,BundleConfig.LEVELPASS
     ,TrackConfig.LINDY_ADVANCED
     ,DanceRoleConfig.FOLLOWER
-    ,List.of(DiscountConfig.STUDENT
-    ,DiscountConfig.ABROAD
-  ), null),
+    ,List.of(
+      DiscountConfig.STUDENT
+     ,DiscountConfig.ABROAD)
+    ,null
+  , 50
+  ),
   OLIVER_REGISTRATION(
     UserConfig.OLIVER_USER
-    ,EventConfig.EVENT2022
-    ,BundleConfig.FULLPASS
-    ,TrackConfig.FUN_TRACK
-    ,DanceRoleConfig.LEADER
-    ,List.of(DiscountConfig.STUDENT
-    ,DiscountConfig.ABROAD
-  ), null),
+    , EventConfig.EVENT2022
+    , BundleConfig.FULLPASS
+    , TrackConfig.FUN_TRACK
+    , DanceRoleConfig.LEADER
+    , List.of(
+    DiscountConfig.STUDENT
+    , DiscountConfig.ABROAD
+  ), null
+    , 20
+  ),
   HARRY_REGISTRATION(
     UserConfig.HARRY_USER
     ,EventConfig.EVENT2022
@@ -87,10 +90,15 @@ public enum RegistrationConfig {
     ,DanceRoleConfig.FOLLOWER
     ,List.of(DiscountConfig.STUDENT
     ,DiscountConfig.ABROAD
-  ), null),
-  BILLY_REGISTRATION(UserConfig.BILLY_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, List.of(DiscountConfig.STUDENT, DiscountConfig.ABROAD), null),
-  FRANKY_REGISTRATION(UserConfig.FRANKY_USER, EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.LEADER, null, null),
-  CLAUDIA_REGISTRATION(UserConfig.CLAUDIA_USER, EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.SWITCH, null, null);
+  ), null
+  , 0
+  ),
+
+  BILLY_REGISTRATION(UserConfig.BILLY_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, List.of(DiscountConfig.STUDENT, DiscountConfig.ABROAD), null, 
+  0
+  ),
+  FRANKY_REGISTRATION(UserConfig.FRANKY_USER, EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.LEADER, null, null, 20),
+  CLAUDIA_REGISTRATION(UserConfig.CLAUDIA_USER, EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.SWITCH, null, null, 160);
 
   private final UserConfig userConfig;
   private final EventConfig eventConfig;
@@ -99,6 +107,7 @@ public enum RegistrationConfig {
   private final DanceRoleConfig danceRoleConfig;
   private final List<DiscountConfig> discountConfigList;
   private final List<Map<FoodConfig, SlotConfig>> foodSlotConfigList;
+  private final double donationAmount;
 
   public static void setup(
     PersonService personService,
@@ -113,7 +122,8 @@ public enum RegistrationConfig {
     DiscountRegistrationService discountRegistrationService,
     FoodService foodService,
     SlotService slotService,
-    FoodRegistrationService foodRegistrationService
+    FoodRegistrationService foodRegistrationService,
+    DonationRegistrationService donationRegistrationService
   ) {
 
     for (RegistrationConfig registrationConfig : RegistrationConfig.values()) {
@@ -159,6 +169,14 @@ public enum RegistrationConfig {
           });
       }
 
+      if (registrationConfig.donationAmount > 0) {
+        donationRegistrationService.saveDonationRegistration(
+          new DonationRegistration(
+            newRegistration,
+            registrationConfig.donationAmount
+          )
+        );
+      }
       setupEmailRegistration(registrationEmailService, newRegistration);
     }
   }

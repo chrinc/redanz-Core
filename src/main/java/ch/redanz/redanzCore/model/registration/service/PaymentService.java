@@ -102,10 +102,12 @@ public class PaymentService {
     if (donationRegistrationRepo.findByRegistration(registration) != null) {
       int donationAmount = (int) donationRegistrationRepo.findByRegistration(registration).getAmount();
       totalAmount.addAndGet(donationAmount);
+      log.info("inc, donationAmount: {}", donationAmount);
+      log.info("inc, String.valueOf(donationAmount): {}", String.valueOf(donationAmount));
       donation.add(
         List.of(
           OutTextConfig.LABEL_DONATION_EN.getOutTextKey(),
-          String.valueOf(donation)
+          String.valueOf(donationAmount)
         )
       );
     }
@@ -114,7 +116,7 @@ public class PaymentService {
     // @Todo: Set Early Bird Constants
     if (registrationService.findAllByCurrentEventAndWorkflowStatus(
       workflowStatusService.getDone()
-    ).size() < 50) {
+    ).size() < 30) {
       int earlyBirdDiscount = (int) discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount();
       totalAmount.addAndGet(earlyBirdDiscount * (-1));
       discounts.add(

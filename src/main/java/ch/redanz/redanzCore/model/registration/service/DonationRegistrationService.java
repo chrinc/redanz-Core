@@ -18,8 +18,15 @@ public class DonationRegistrationService {
   private final DonationRegistrationRepo donationRegistrationRepo;
   private final ScholarshipRegistrationRepo scholarshipRegistrationRepo;
 
+  public void saveScholarshipRegistration(ScholarshipRegistration scholarshipRegistration) {
+    scholarshipRegistrationRepo.save(scholarshipRegistration);
+  }
+  public void saveDonationRegistration(DonationRegistration donationRegistration) {
+    donationRegistrationRepo.save(donationRegistration);
+  }
+
   public void saveScholarishpRegistration(Registration registration, JsonArray scholarshipRegistration) {
-    scholarshipRegistrationRepo.save(
+    saveScholarshipRegistration(
       new ScholarshipRegistration(
         registration,
         scholarshipRegistration.get(0).getAsJsonObject().get("intro").getAsString()
@@ -28,7 +35,7 @@ public class DonationRegistrationService {
   }
 
   public void saveDonationRegistration(Registration registration, JsonArray donationRegistration) {
-    donationRegistrationRepo.save(
+    saveDonationRegistration(
       new DonationRegistration(
         registration,
         donationRegistration.get(0).getAsJsonObject().get("amount").getAsInt()

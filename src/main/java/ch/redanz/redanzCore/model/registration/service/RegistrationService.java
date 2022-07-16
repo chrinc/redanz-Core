@@ -356,9 +356,11 @@ public class RegistrationService {
       );
 
       // Scholarship Registration
+        log.info("donationRegistrationService.getDonationRegistration(registration): {}", donationRegistrationService.getDonationRegistration(registration));
       registrationResponse.setDonationRegistration(
         donationRegistrationService.getDonationRegistration(registration)
       );
+        log.info("registrationResponse: {}", registrationResponse);
 
       // Discounts
       registrationResponse.setDiscountRegistrations(

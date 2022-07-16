@@ -29,8 +29,8 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RestController
 //@CrossOrigin(
 //  origins = {
+//    "http://localhost.ch/4200"
 //    "https://redanz.ch"
-//    ,"http://localhost.ch/4200"
 //    ,"http://redanz.ch"
 //    ,"https://register.stirit.ch"
 //    ,"http://register.stirit.ch"
