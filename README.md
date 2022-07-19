@@ -51,15 +51,13 @@ Necessary tools for testing and development
  #### on Server
  - Create SSH key for git-repository
      - ``ssh-keygen -t ed25519 -C [email@address]``
-     - ``touch ~/ssh/config``
-         - `AddKeysToAgend yes`
-         - `ÌdentityFile ~/.ssh/id_ed25519`
+     - ``touch ~/.ssh``
      - `cat ~.ssh/id_ed25519`
      - Copy the Key to SSH Keys on github.com
- - Clone the repository to the server: 
-     `git fetch origin`
-     `git status`
-     `git pull`
+     - Clone the repository to the server: 
+         `git fetch origin`
+         `git status`
+         `git pull`
  - JAVA_HOME: ``export JAVA_HOME = /usr/lib/jvm/java-11-openjdk-amd64``
  - SNAPSHOT: ``export SNAPSHOT=[currentSnapshot]``
  - Find Folder: ``cd /usr/local/redanz/redanzCore``

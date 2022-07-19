@@ -7,15 +7,13 @@ import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRe
 import ch.redanz.redanzCore.model.registration.repository.DonationRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
-import ch.redanz.redanzCore.model.workshop.entities.Food;
+import ch.redanz.redanzCore.model.workshop.config.BundleConfig;
 import ch.redanz.redanzCore.model.workshop.config.DiscountConfig;
 import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.Food;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.service.DiscountService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.FoodService;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.model.workshop.service.*;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -43,8 +41,9 @@ public class PaymentService {
   private final PersonService personService;
   private final UserService userService;
   private final EventService eventService;
-  private final  RegistrationEmailService registrationEmailService;
+  private final RegistrationEmailService registrationEmailService;
   private final SlotService slotService;
+  private final BundleService bundleService;
 
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
@@ -114,9 +113,12 @@ public class PaymentService {
 
     // discounts
     // @Todo: Set Early Bird Constants
-    if (registrationService.findAllByCurrentEventAndWorkflowStatus(
-      workflowStatusService.getDone()
-    ).size() < 30) {
+    if (
+      registration.getBundle() != bundleService.findByName(BundleConfig.PARTYPASS.getName())
+        && registrationService.findAllByCurrentEventAndWorkflowStatus(
+        workflowStatusService.getDone()
+      ).size() < 30
+    ) {
       int earlyBirdDiscount = (int) discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount();
       totalAmount.addAndGet(earlyBirdDiscount * (-1));
       discounts.add(
@@ -125,8 +127,6 @@ public class PaymentService {
           String.valueOf(earlyBirdDiscount)
         )
       );
-
-
     }
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
       int discount = (int) discountRegistration.getDiscount().getDiscount();
