@@ -19,6 +19,8 @@ import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.TrackService;
+import ch.redanz.redanzCore.service.log.ErrorLogService;
+import ch.redanz.redanzCore.service.log.ErrorLogType;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
@@ -52,6 +54,7 @@ public class RegistrationService {
   private final DiscountRegistrationService discountRegistrationService;
   private final RegistrationEmailService registrationEmailService;
   private final SpecialRegistrationService specialRegistrationService;
+  private final ErrorLogService errorLogService;
 
   public void update(Registration registration) {
     registrationRepo.save(registration);
@@ -199,7 +202,6 @@ public class RegistrationService {
     log.info("inc@submitRegistration, request: {}", request);
     // ignore if user already has a registration
 
-
     if (findByParticipantAndEvent(
       personService.findByUser(userService.findByUserId(userId)),
       eventService.getCurrentEvent()
@@ -217,6 +219,7 @@ public class RegistrationService {
     try {
       saveNewRegistration(registrationRequest, userId);
     } catch (Exception exception) {
+      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for userId: " + userId + ", request: " + request);
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
     }
 
@@ -234,7 +237,7 @@ public class RegistrationService {
         discountRegistrationService.saveDiscountRegistration(registration, request.get("discountRegistration").getAsJsonArray());
       }
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_ACCOMMODATION_EN.getOutTextKey());
+      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Food Registration for userId: " + userId + ", request: " + request);
     }
 
     try {
@@ -242,7 +245,7 @@ public class RegistrationService {
         specialRegistrationService.saveSpecialRegistration(registration, request.get("specialRegistration").getAsJsonArray());
       }
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_ACCOMMODATION_EN.getOutTextKey());
+      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Accommodation for userId: " + userId + ", request: " + request);
     }
 
     try {
@@ -253,7 +256,7 @@ public class RegistrationService {
         hostingService.saveHosteeRegistration(registration, request.get("hosteeRegistration").getAsJsonArray());
       }
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_ACCOMMODATION_EN.getOutTextKey());
+      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Hosting Registration for userId: " + userId + ", request: " + request);
     }
 
     try {
@@ -264,7 +267,7 @@ public class RegistrationService {
         donationRegistrationService.saveScholarishpRegistration(registration, request.get("scholarshipRegistration").getAsJsonArray());
       }
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_VOLUNTEERING_EN.getOutTextKey());
+      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Volunteering Registration for userId: " + userId + ", request: " + request);
     }
 
     try {
@@ -272,7 +275,7 @@ public class RegistrationService {
         donationRegistrationService.saveDonationRegistration(registration, request.get("donationRegistration").getAsJsonArray());
       }
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_DONATION_EN.getOutTextKey());
+      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Donation Registration for userId: " + userId + ", request: " + request);
     }
 
     try {
@@ -283,11 +286,8 @@ public class RegistrationService {
       registrationMatchingService.setRegistrationMatching(registration, registrationRequest);
       registrationEmailService.sendRegistrationSubmittedEmail(registration);
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_WORKFLOW_EN.getOutTextKey());
+      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Update Workflow Status for userId: " + userId + ", request: " + request);
     }
-
-
-
   }
   public Registration getRegistration(Long userId, Event event) {
     return registrationRepo.findByParticipantAndEvent(

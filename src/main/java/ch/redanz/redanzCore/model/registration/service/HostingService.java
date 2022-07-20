@@ -23,7 +23,6 @@ public class HostingService {
   private final HostRegistrationRepo hostRegistrationRepo;
   private final HosteeSleepUtilsRegistrationRepo hosteeSleepUtilsRegistrationRepo;
   private final HostSleepUtilRegistrationRepo hostSleepUtilRegistrationRepo;
-
   private final HosteeSlotRegistrationRepo hosteeSlotRegistrationRepo;
   private final HostSlotRegistraitionRepo hostSlotRegistrationRepo;
   private final SleepUtilService sleepUtilService;
@@ -85,8 +84,6 @@ public class HostingService {
     return sleepUtils.get() == null ? "" : sleepUtils.toString();
   }
 
-
-
   public void saveHosteeRegistration(Registration registration, JsonArray hosteeRegistration) {
     JsonObject slotsJson = hosteeRegistration.get(0).getAsJsonObject();
     JsonObject isShareRoomsJson = hosteeRegistration.get(1).getAsJsonObject();
@@ -94,18 +91,16 @@ public class HostingService {
     JsonObject isSharedBedJson = hosteeRegistration.get(3).getAsJsonObject();
     JsonObject sleepUtilsJson = hosteeRegistration.get(4).getAsJsonObject();
     JsonObject hosteeCommentJson = hosteeRegistration.get(5).getAsJsonObject();
-
     // host registration
     hosteeRegistrationRepo.save(
       new HosteeRegistration(
         registration,
         !isShareRoomsJson.get("isShareRooms").isJsonNull() && isShareRoomsJson.get("isShareRooms").getAsBoolean(),
-        nameRoomMateJson.get("nameRoomMate").isJsonNull() ? null : nameRoomMateJson.get("nameRoomMate").getAsString(),
+        nameRoomMateJson.get("nameRoomMate") == null ? null : nameRoomMateJson.get("nameRoomMate").getAsString(),
         !isSharedBedJson.get("isSharedBed").isJsonNull() && isSharedBedJson.get("isSharedBed").getAsBoolean(),
         hosteeCommentJson.get("hosteeComment") == null ? null : hosteeCommentJson.get("hosteeComment").getAsString()
       )
     );
-
     // hostee sleep util registration
     if (!sleepUtilsJson.get("sleepUtils").isJsonNull()) {
       sleepUtilsJson.get("sleepUtils").getAsJsonArray().forEach(sleepUtil -> {
@@ -139,7 +134,6 @@ public class HostingService {
     JsonObject personCountJson = hostRegistration.get(1).getAsJsonObject();
     JsonObject sleepUtilsJson = hostRegistration.get(2).getAsJsonObject();
     JsonObject hostCommentJson = hostRegistration.get(3).getAsJsonObject();
-
     // host registration
     hostRegistrationRepo.save(
       new HostRegistration(
@@ -160,8 +154,7 @@ public class HostingService {
               sleepUtil.getAsJsonObject().get("count").getAsInt()
             )
           );
-        }
-        ;
+        };
       });
     }
 

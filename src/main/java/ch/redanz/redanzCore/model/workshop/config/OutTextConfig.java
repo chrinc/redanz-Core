@@ -84,11 +84,11 @@ public enum OutTextConfig {
   LABEL_SPECIAL_MASSAGE_DESC_EN(
     "FRONT_LOGIN"
     , "LABEL_SPECIAL_MASSAGE_DESC"
-    , "Relaaax offers a Californian massage (also Ayurvedic foot massage) to promote one's own body awareness, to release tension and thus to make the body more mobile. By clicking on the checkbox you will receive further information about this offer (no obligations).", "EN"),
+    , "The Relaax practice will offer foot, neck and full body massages on site. If you would like to receive more information about this without obligation, click the checkbox.", "EN"),
   LABEL_SPECIAL_MASSAGE_DESC_GE(
     "FRONT_LOGIN"
     , "LABEL_SPECIAL_MASSAGE_DESC"
-    , "Die Praxis Relaaax bietet eine kalifornische Massage (auch ayurvedische Fussmassage) an um das eigene Körperbewusstsein zu fördern, Verspannungen zu lösen und dadurch den Körper beweglicher zu machen. Mit Anlicken der Checkbox erhälst du unverbindlich weitere Informationen zu diesem Angebot.", "GE"),
+    , "Die Praxis Relaax wird vor Ort Fuss-, Nacken- und Ganzkörpermassagen anbieten. Falls du unverbindlich mehr Informationen darüber erhalten möchtest, klicke die Checkbox an.", "GE"),
 
   // VOLUNTEERING / DONATION / SCHOLARSHIP
   LABEL_DONATION_EN("FRONT_LOGIN", "LABEL_DONATION", "Donation", "EN"),
@@ -101,12 +101,16 @@ public enum OutTextConfig {
   LABEL_DISCOUNT_STUDENT_GE("FRONT_LOGIN", "LABEL_DISCOUNT_STUDENT", "Student", "GE"),
   LABEL_DISCOUNT_ABROAD_EN("FRONT_LOGIN", "LABEL_DISCOUNT_ABROAD", "Travel from abroad", "EN"),
   LABEL_DISCOUNT_ABROAD_GE("FRONT_LOGIN", "LABEL_DISCOUNT_ABROAD", "Anreise vom Ausland", "GE"),
+  LABEL_DISCOUNT_LINDYANDMORE_EN("FRONT_LOGIN", "LABEL_DISCOUNT_LINDYANDMORE", "Lindy and More", "EN"),
+  LABEL_DISCOUNT_LINDYANDMORE_GE("FRONT_LOGIN", "LABEL_DISCOUNT_LINDYANDMORE", "Lindy and More", "GE"),
   LABEL_DISCOUNT_EARLY_BIRD_DESC_EN("FRONT_LOGIN", "LABEL_DISCOUNT_EARLY_BIRD_DESC", "Early Bird", "EN"),
   LABEL_DISCOUNT_EARLY_BIRD_DESC_GE("FRONT_LOGIN", "LABEL_DISCOUNT_EARLY_BIRD_DESC", "Early Bird", "GE"),
   LABEL_DISCOUNT_STUDENT_DESC_EN("FRONT_LOGIN", "LABEL_DISCOUNT_STUDENT_DESC", "Are you student?", "EN"),
   LABEL_DISCOUNT_STUDENT_DESC_GE("FRONT_LOGIN", "LABEL_DISCOUNT_STUDENT_DESC", "Bist du Student?", "GE"),
   LABEL_DISCOUNT_ABROAD_DESC_EN("FRONT_LOGIN", "LABEL_DISCOUNT_ABROAD_DESC", "Are you travelling from abroad?", "EN"),
   LABEL_DISCOUNT_ABROAD_DESC_GE("FRONT_LOGIN", "LABEL_DISCOUNT_ABROAD_DESC", "Reist du vom Ausland an?", "GE"),
+  LABEL_DISCOUNT_LINDYANDMORE_DESC_EN("FRONT_LOGIN", "LABEL_DISCOUNT_LINDYANDMORE_DESC", "Are you member of Lindy and More?", "EN"),
+  LABEL_DISCOUNT_LINDYANDMORE_DESC_GE("FRONT_LOGIN", "LABEL_DISCOUNT_LINDYANDMORE_DESC", "Bist du Mitglied von Lindy and More?", "GE"),
 
   // profile
   LABEL_EMAIL_CONFIRMED_EN("FRONT_BASE", "LABEL_EMAIL_CONFIRMED", "Thank you. Your email address has been confirmed.", "EN"),
@@ -194,10 +198,10 @@ public enum OutTextConfig {
   LABEL_EMAIL_RELEASED_SUBJECT_GE("EMAIL", "LABEL_EMAIL_RELEASED_SUBJECT", "Anmeldebestätigung", "GE"),
 
   // DONE
-  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "We have received your payment and confirm your participation at Stirit 2022. We are looking forward to welcoming you in November!", "EN"),
-  LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Wir haben deine Zahlung erhalten und bestätigen deine Teilnahme am Stirit 2022. Wir freuen uns sehr, dich im November begrüssen zu dürfen!", "GE"),
+  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "We have received your payment and confirm your participation at Stir it! 2022. We are looking forward to welcoming you in November!", "EN"),
+  LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Wir haben deine Zahlung erhalten und bestätigen deine Teilnahme am Stir it! 2022. Wir freuen uns sehr, dich im November begrüssen zu dürfen!", "GE"),
   LABEL_EMAIL_DONE_BASE_EN("EMAIL", "LABEL_EMAIL_DONE_BASE", "We will provide you with more information regarding bands, party, work shop schedules, etc shortly before the festival.", "EN"),
-  LABEL_EMAIL_DONE_BASE_GE("EMAIL", "LABEL_EMAIL_DONE_BASE", "Weitere Informationen zu Bands, Party, Zeiten für die Workshops, etc. werden wir die kurz vor dem Festival versenden.", "GE"),
+  LABEL_EMAIL_DONE_BASE_GE("EMAIL", "LABEL_EMAIL_DONE_BASE", "Weitere Informationen zu Bands, Party, Zeiten für die Workshops, etc. werden wir dir kurz vor dem Festival zusenden.", "GE"),
   LABEL_EMAIL_DONE_SUBJECT_EN("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Booking Confirmation", "EN"),
   LABEL_EMAIL_DONE_SUBJECT_GE("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Buchungsbestätigung", "GE"),
 
