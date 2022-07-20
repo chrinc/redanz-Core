@@ -20,4 +20,5 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     int countAllByWorkflowStatusAndEvent(WorkflowStatus workflowStatus, Event event);
     int countAllByBundleAndWorkflowStatusAndEvent(Bundle bundle, WorkflowStatus workflowStatus, Event event);
     int countAllByTrackAndWorkflowStatusAndEvent(Track track, WorkflowStatus workflowStatus, Event event);
+    int countAllByEvent(Event event);
 }

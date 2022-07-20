@@ -22,6 +22,10 @@ public class WorkflowStatusService {
     return workflowStatusRepo.findByName(name);
   }
 
+  public WorkflowStatus findById(Long workflowStatusId) {
+    return workflowStatusRepo.findByWorkflowStatusId(workflowStatusId);
+  }
+
   public WorkflowStatus getSubmitted() {
     return findByWorkflowStatusName(WorkflowStatusConfig.SUBMITTED.getName());
   }

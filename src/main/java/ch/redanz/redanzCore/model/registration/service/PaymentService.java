@@ -84,15 +84,13 @@ public class PaymentService {
     );
 
     // food
-    foodRegistrationRepo.findAllByFoodRegistrationIdRegistrationId(registration.getRegistrationId()).forEach(foodRegistration -> {
-      Food food = foodService.findByFoodId(foodRegistration.getFoodRegistrationId().getFoodId());
-      Slot slot = slotService.findBySlotId(foodRegistration.getFoodRegistrationId().getSlotId());
-      totalAmount.addAndGet((int) food.getPrice());
+    foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
+      totalAmount.addAndGet((int) foodRegistration.getFood().getPrice());
       foodSlots.add(
         List.of(
-          food.getName(),
-          slot.getName(),
-          String.valueOf((int) food.getPrice())
+          foodRegistration.getFood().getName(),
+          foodRegistration.getSlot().getName(),
+          String.valueOf((int) foodRegistration.getFood().getPrice())
         )
       );
     });
@@ -112,22 +110,21 @@ public class PaymentService {
     }
 
     // discounts
-    // @Todo: Set Early Bird Constants
-    if (
-      registration.getBundle() != bundleService.findByName(BundleConfig.PARTYPASS.getName())
-        && registrationService.findAllByCurrentEventAndWorkflowStatus(
-        workflowStatusService.getDone()
-      ).size() < 30
-    ) {
-      int earlyBirdDiscount = (int) discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount();
-      totalAmount.addAndGet(earlyBirdDiscount * (-1));
-      discounts.add(
-        List.of(
-          DiscountConfig.EARLY_BIRD.getName(),
-          String.valueOf(earlyBirdDiscount)
-        )
-      );
-    }
+//    if (
+//      registration.getBundle() != bundleService.findByName(BundleConfig.PARTYPASS.getName())
+//        && registrationService.findAllByCurrentEventAndWorkflowStatus(
+//        workflowStatusService.getDone()
+//      ).size() < DiscountConfig.EARLY_BIRD.getCapacity()
+//    ) {
+//      int earlyBirdDiscount = (int) discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount();
+//      totalAmount.addAndGet(earlyBirdDiscount * (-1));
+//      discounts.add(
+//        List.of(
+//          DiscountConfig.EARLY_BIRD.getName(),
+//          String.valueOf(earlyBirdDiscount)
+//        )
+//      );
+//    }
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
       int discount = (int) discountRegistration.getDiscount().getDiscount();
       totalAmount.addAndGet(discount * (-1));

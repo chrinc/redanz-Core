@@ -24,15 +24,17 @@ public class Discount implements Serializable {
   private Long discountId;
   private String name;
   private double discount;
+  private Integer capacity;
   private String description;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "discount")
   @JsonIgnore
   private List<TrackDiscount> trackDiscounts = new ArrayList<>();
 
-  public Discount(String name, double discount, String description) {
+  public Discount(String name, double discount, String description, Integer capacity) {
     this.name = name;
     this.discount = discount;
     this.description = description;
+    this.capacity = capacity;
   }
 }

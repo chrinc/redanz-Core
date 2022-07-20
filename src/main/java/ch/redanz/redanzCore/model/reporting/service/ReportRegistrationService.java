@@ -8,6 +8,7 @@ import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseRegistration;
+import ch.redanz.redanzCore.model.reporting.response.ResponseRegistrationDetails;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public class ReportRegistrationService {
   private final WorkflowTransitionService workflowTransitionService;
   private final WorkflowStatusService workflowStatusService;
 
+  public List<ResponseRegistrationDetails> getRegistrationDetailsReport() {
+    return getRegistrationsDetails(workflowStatusService.findAll());
+  }
   public List<ResponseRegistration> getAllRegistrationsReport() {
     return getRegistrations(workflowStatusService.findAll());
   }
@@ -107,6 +111,34 @@ public class ReportRegistrationService {
       ;
     });
     return registrations;
+  }
+
+  private List<ResponseRegistrationDetails> getRegistrationsDetails(List<WorkflowStatus> workflowStatusList) {
+    List<ResponseRegistrationDetails> registrationDetails = new ArrayList<>();
+
+    registrationService.findAllCurrentEvent().forEach(registration -> {
+      RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
+      WorkflowStatus workflowStatus = workflowStatusService.findById(registration.getWorkflowStatus().getWorkflowStatusId());
+      boolean hasPartner = registrationMatching != null && registrationMatching.getRegistration2() != null;
+      if (workflowStatusList.contains(workflowStatus)) {
+        registrationDetails.add(
+          new ResponseRegistrationDetails(
+            registration.getParticipant().getUser().getUserId(),
+            registration.getRegistrationId(),
+            registration.getParticipant().getFirstName(),
+            registration.getParticipant().getLastName(),
+            registration.getParticipant().getUser().getEmail(),
+            registration.getBundle().getName(),
+            registration.getTrack() == null ? null : registration.getTrack().getName(),
+            registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
+            workflowStatus.getName(),
+            registrationMatching == null ? null: registrationMatching.getPartnerEmail(),
+            hasPartner ? registrationMatching.getRegistration2().getRegistrationId() : null
+          )
+        );
+      }
+    });
+    return registrationDetails;
   }
 
   private WorkflowStatus getLowestWorkflowStatus(List<WorkflowStatus> workflowStatusList) {

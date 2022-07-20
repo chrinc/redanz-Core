@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Track;
 import ch.redanz.redanzCore.model.workshop.entities.TrackDanceRole;
 import ch.redanz.redanzCore.model.workshop.entities.TrackDiscount;
@@ -8,6 +9,8 @@ import ch.redanz.redanzCore.model.workshop.repository.TrackDiscountRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TrackRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +32,9 @@ public class TrackService {
     trackDiscountRepo.save(trackDiscount);
   }
 
+  public List<Track> getAll(){
+    return trackRepo.findAll();
+  }
 
   public Track findByTrackId(Long trackId) {
     return trackRepo.findByTrackId(trackId);

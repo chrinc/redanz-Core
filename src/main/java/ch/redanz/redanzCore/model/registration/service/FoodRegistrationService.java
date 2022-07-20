@@ -1,11 +1,11 @@
 package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
-import ch.redanz.redanzCore.model.registration.entities.FoodRegistrationId;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Food;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import com.google.gson.JsonArray;
@@ -22,15 +22,15 @@ public class FoodRegistrationService {
   private final FoodRegistrationRepo foodRegistrationRepo;
   private final FoodService foodService;
   private final SlotService slotService;
+  private final WorkflowStatusService workflowStatusService;
+  private final EventService eventService;
 
   public void save(Registration registration, Food food, Slot slot) {
     foodRegistrationRepo.save(
       new FoodRegistration(
-        new FoodRegistrationId(
-          registration.getRegistrationId(),
-          food.getFoodId(),
-          slot.getSlotId()
-        )
+        registration,
+        food,
+        slot
       )
     );
   }
@@ -46,7 +46,17 @@ public class FoodRegistrationService {
     });
   }
 
+  public int countFoodReleasedAndDone(Food food) {
+    return foodRegistrationRepo.countAllByFoodAndRegistrationWorkflowStatusAndRegistrationEvent(
+      food, workflowStatusService.getConfirming(), eventService.getCurrentEvent()
+    )
+      +
+      foodRegistrationRepo.countAllByFoodAndRegistrationWorkflowStatusAndRegistrationEvent(
+       food, workflowStatusService.getDone(), eventService.getCurrentEvent()
+      );
+  }
+
   public List<FoodRegistration> getAllByRegistration(Registration registration) {
-    return foodRegistrationRepo.findAllByFoodRegistrationIdRegistrationId(registration.getRegistrationId());
+    return foodRegistrationRepo.findAllByRegistration(registration);
   }
 }

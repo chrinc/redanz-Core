@@ -29,10 +29,9 @@ public class EODReminderJob {
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
 
-  //  @Scheduled(cron = "${cron.matching.scheduler.value}")
-//  @Scheduled(cron = "0 47 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/15 * * * *")
+  @Scheduled(cron = "${cron.matching.scheduler.value.reminder}")
   public void runReminderJob() {
+    log.info("Job: runReminder");
     registrationService.getAllConfirmingRegistrations().forEach(registration -> {
       LocalDateTime releasedAt = registration.getWorkflowStatusDate();
       LocalDateTime deadline = LocalDateTime.now().minusDays(

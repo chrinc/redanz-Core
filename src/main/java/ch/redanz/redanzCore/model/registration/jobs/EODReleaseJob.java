@@ -35,9 +35,10 @@ public class EODReleaseJob {
   @Autowired
   Configuration mailConfig;
 
-  //  @Scheduled(cron = "${cron.matching.scheduler.value}")
 //  @Scheduled(cron = "0 50 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/2 * * * *")
+//  @Scheduled(cron = "0 0/2 * * * *")
+
+    @Scheduled(cron = "${cron.matching.scheduler.value.release}")
   public void runRelease() {
     registrationService.getAllSubmittedRegistrations().forEach(registration -> {
       log.info("Job: runRelease");

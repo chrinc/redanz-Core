@@ -56,7 +56,7 @@ public class EventController {
 
   @GetMapping(path = "/accommodation/all")
   public AccommodationResponse getAccommodationSlots() {
-    return accommodationService.getAll();
+    return accommodationService.getResponse();
   }
 
   @GetMapping(path = "/special/all")

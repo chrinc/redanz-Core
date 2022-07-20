@@ -22,13 +22,33 @@ Necessary tools for testing and development
   - ``mysql -u root -p incIsRoot``
   - ``use redanz``
     - `init sql inserts with source (pwd shows path to folder) eg: ` source /Users/Chrine/Documents/GitHub/redAnz-Core/redanzCore/src/main/resources/init_sql_countries.sql
-    - `on ubuntu: ` source /usr/local/redanz/redanzCore/redanz-Core/src/main/resources/init_sql_countries.sql
+    - `on ubuntu: ` source /usr/local/redanz/redanz-core/src/main/resources/init_sql_countries.sql
 - Save mysql db:
-  - export: ``mysqldump -u root -p redanz > /usr/local/redanz/redanzCore/data/[YYMMDD]_redanz_backup.sql``
+  - install mysql: `https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04`
+  - export: ``mysqldump -u root -p redanz > /usr/local/redanz/data/prod/[YYMMDD]_redanz_backup.sql``
   - copy with sftp-client to kdrive
   - import: ``mysql -u root -p redanz_backup < /Users/inc/kDrive/030_associations_communities/020_lindyhop/003_Stirit/2211_stirit/2211_registration/data/220708_redanz_backup.sql``
-  - import: ``mysql -u root -p redanz < /usr/local/redanz/redanzCore/data/[YYMMDD]_redanz_backup.sql``
-    ``
+  - import: ``mysql -u root -p redanz < /usr/local/redanz/data/prod/[YYMMDD]_redanz_backup.sql``
+  - optimize mysqldb on Server (file: sudo vim /etc/mysql/my.cnf)
+  - `[mysqld]
+     performance_schema = OFF
+     symbolic-links = 0
+     skip-external-locking
+     key_buffer_size = 32k
+     max_allowed_packet = 4M
+     table_open_cache = 8
+     sort_buffer_size = 128K
+     read_buffer_size = 512K
+     read_rnd_buffer_size = 512K
+     net_buffer_length = 4K
+     thread_stack = 480K
+     innodb_file_per_table
+     max_connections = 100
+     max_user_connections = 50
+     wait_timeout = 50
+     interactive_timeout = 50
+     long_query_time = 5`
+
   - check submissions: `
     select 
       reg.registration_id id
@@ -62,13 +82,15 @@ Necessary tools for testing and development
  - SNAPSHOT: ``export SNAPSHOT=[currentSnapshot]``
  - Find Folder: ``cd /usr/local/redanz/redanzCore``
  - screen: 
-   - `Ctrl + A and then Ctrl + D` to leave the session
-   - `screen -r`
+   - create new screen: `screen -dmS redanz.spring`
+   - list all screens: `screen -list`
+   - attach to a screen: `screen -r redanz.spring`
+   - detach `Ctrl + A Ctrl + D`
  - Start Spring on Server:
 -- clean inst all:
 `mvn clean install`
 --spring.profiles.active=prod --redanz.master.password=
-``java -jar $snapshot --spring.profiles.active=prod --email.host.password=$pass``
+``java -jar $snapshot --spring.profiles.active=prod --redanz.master.password=$pass``
 `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
 
  - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)

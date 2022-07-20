@@ -31,9 +31,11 @@ public class EODMatchingJob {
   private Map<RegistrationMatching, RegistrationMatching> matchingPairs;
 
   //  @Scheduled(cron = "${cron.matching.scheduler.value}")
+  @Scheduled(cron = "${cron.matching.scheduler.value.matching}")
 //  @Scheduled(cron = "0 47 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/2 * * * *")
+//  @Scheduled(cron = "0 0/2 * * * *")
   public void runMatching() {
+    log.info("Job: runMatching");
     doMatching(registrationMatchingService.findRegistrationMatchingByRegistration2IsNull());
   }
 

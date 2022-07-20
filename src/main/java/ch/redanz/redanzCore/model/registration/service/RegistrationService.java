@@ -117,6 +117,11 @@ public class RegistrationService {
     return workflowStatusService.findAll();
   }
 
+  public int countAll() {
+    return registrationRepo.countAllByEvent(
+      eventService.getCurrentEvent()
+    );
+  }
   public int countReleasedAndDone() {
     return registrationRepo.countAllByWorkflowStatusAndEvent(
       workflowStatusService.getConfirming(), eventService.getCurrentEvent()
@@ -224,6 +229,7 @@ public class RegistrationService {
       if (request.get("foodRegistration") != null && !request.get("foodRegistration").getAsJsonArray().isEmpty()) {
         foodRegistrationService.saveFoodRegistration(registration, request.get("foodRegistration").getAsJsonArray());
       }
+      discountRegistrationService.saveEarlyBird(registration, countAll());
       if (request.get("discountRegistration") != null && !request.get("discountRegistration").getAsJsonArray().isEmpty()) {
         discountRegistrationService.saveDiscountRegistration(registration, request.get("discountRegistration").getAsJsonArray());
       }
@@ -337,12 +343,12 @@ public class RegistrationService {
 
       // Host Registration
       registrationResponse.setHostRegistration(
-        hostingService.getHostRegistrations(registration)
+        hostingService.getHostRegistration(registration)
       );
 
       // Hostee Registration
       registrationResponse.setHosteeRegistration(
-        hostingService.getHosteeRegistrations(registration)
+        hostingService.getHosteeRegistration(registration)
       );
 
       // Volunteer Registration

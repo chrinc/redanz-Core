@@ -1,7 +1,9 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.*;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SleepUtilService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import com.google.gson.JsonArray;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @AllArgsConstructor
@@ -22,9 +25,67 @@ public class HostingService {
   private final HostSleepUtilRegistrationRepo hostSleepUtilRegistrationRepo;
 
   private final HosteeSlotRegistrationRepo hosteeSlotRegistrationRepo;
-  private final HostSlotRegistraitionRepo hostSlotRegistraitionRepo;
+  private final HostSlotRegistraitionRepo hostSlotRegistrationRepo;
   private final SleepUtilService sleepUtilService;
   private final SlotService slotService;
+
+  private final OutTextService outTextService;
+
+  public String getSlots(HostRegistration hostRegistration, Language language) {
+    AtomicReference<String> slots = new AtomicReference<>();
+    hostSlotRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(slot ->{
+      String slotOutText = outTextService.getOutTextByKeyAndLangKey(slot.getSlot().getName(), language.getLanguageKey()).getOutText();
+      if (slots.get() == null) {
+        slots.set(slotOutText);
+      } else {
+        slots.set(slots.get() + ", " + slotOutText);
+      }
+    });
+    return slots.get() == null ? "" : slots.toString();
+  }
+  public String getSlots(HosteeRegistration hosteeRegistration, Language language) {
+    AtomicReference<String> slots = new AtomicReference<>();
+    hosteeSlotRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(slot ->{
+      String slotOutText = outTextService.getOutTextByKeyAndLangKey(slot.getSlot().getName(), language.getLanguageKey()).getOutText();
+      if (slots.get() == null) {
+        slots.set(slotOutText);
+      } else {
+        slots.set(slots.get() + ", " + slotOutText);
+      }
+    });
+    return slots.get() == null ? "" : slots.toString();
+  }
+
+  public String getUtils(HostRegistration hostRegistration, Language language) {
+    AtomicReference<String> sleepUtils = new AtomicReference<>();
+    hostSleepUtilRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(sleepUtilRegistration ->{
+      String sleepUtilOutText =
+        outTextService.getOutTextByKeyAndLangKey(sleepUtilRegistration.getSleepUtil().getName(), language.getLanguageKey()).getOutText()
+          + ": " + sleepUtilRegistration.getSleepUtilCount()
+        ;
+      if (sleepUtils.get() == null) {
+        sleepUtils.set(sleepUtilOutText) ;
+      } else {
+        sleepUtils.set(sleepUtils.get() + ", " + sleepUtilOutText);
+      }
+    });
+    return sleepUtils.get() == null ? "" : sleepUtils.toString();
+  }
+
+  public String getUtils(HosteeRegistration hosteeRegistration, Language language) {
+    AtomicReference<String> sleepUtils = new AtomicReference<>();
+    hosteeSleepUtilsRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(sleepUtilRegistration ->{
+      String sleepUtilOutText = outTextService.getOutTextByKeyAndLangKey(sleepUtilRegistration.getSleepUtil().getName(), language.getLanguageKey()).getOutText();
+      if (sleepUtils.get() == null) {
+        sleepUtils.set(sleepUtilOutText);
+      } else {
+        sleepUtils.set(sleepUtils.get() + ", " + sleepUtilOutText);
+      }
+    });
+    return sleepUtils.get() == null ? "" : sleepUtils.toString();
+  }
+
+
 
   public void saveHosteeRegistration(Registration registration, JsonArray hosteeRegistration) {
     JsonObject slotsJson = hosteeRegistration.get(0).getAsJsonObject();
@@ -107,7 +168,7 @@ public class HostingService {
     // host slot registration
     if (slotsJson.get("slots") != null) {
       slotsJson.get("slots").getAsJsonArray().forEach(slot -> {
-        hostSlotRegistraitionRepo.save(
+        hostSlotRegistrationRepo.save(
           new HostSlotRegistration(
             hostRegistrationRepo.findAllByRegistration(registration),
             slotService.findBySlotId(slot.getAsJsonObject().get("slotId").getAsLong())
@@ -116,8 +177,15 @@ public class HostingService {
       });
     }
   }
+  public List<HostRegistration> getAllHostRegistrations(){
+    return hostRegistrationRepo.findAll();
+  }
 
-  public Map<String, List<Object>> getHosteeRegistrations(Registration registration) {
+  public List<HosteeRegistration> getAllHosteeRegistrations(){
+    return hosteeRegistrationRepo.findAll();
+  }
+
+  public Map<String, List<Object>> getHosteeRegistration(Registration registration) {
     Map<String, List<Object>> hosteeRegistrationMap = new HashMap<>();
 
     HosteeRegistration hosteeRegistration = hosteeRegistrationRepo.findByRegistration(registration);
@@ -141,7 +209,7 @@ public class HostingService {
     return hosteeRegistrationMap;
   }
 
-  public Map<String, List<Object>> getHostRegistrations(Registration registration) {
+  public Map<String, List<Object>> getHostRegistration(Registration registration) {
     Map<String, List<Object>> hostRegistrationMap = new HashMap<>();
 
     HostRegistration hostRegistration = hostRegistrationRepo.findAllByRegistration(registration);
@@ -159,7 +227,7 @@ public class HostingService {
 
     hostRegistrationMap.put(
       "hostSlotRegistration"
-      , Collections.singletonList(hostSlotRegistraitionRepo.findAllByHostRegistration(hostRegistration))
+      , Collections.singletonList(hostSlotRegistrationRepo.findAllByHostRegistration(hostRegistration))
     );
 
     return hostRegistrationMap;

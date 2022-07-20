@@ -7,15 +7,20 @@ import ch.redanz.redanzCore.model.workshop.repository.TrackBundleRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class BundleService {
     private final BundleRepo bundleRepo;
     private final TrackBundleRepo trackBundleRepo;
+
+    public List<Bundle> getAll(){
+        return bundleRepo.findAll();
+    }
     public void save(Bundle bundle) {
         bundleRepo.save(bundle);
     }
-
     public void save(BundleTrack bundleTrack) {
         trackBundleRepo.save(bundleTrack);
     }

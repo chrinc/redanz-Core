@@ -76,6 +76,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                );
           }
 
+          // only organizers to run jobs
+          if (request.getServletPath().startsWith("/core-api/app/jobs")) {
+             authorities.stream().filter(auth -> auth.getAuthority().equals(UserRole.ORGANIZER.name()))
+               .findAny()
+               .orElseThrow(
+                 () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
+               );
+          }
+
           UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(username, null, authorities);
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);

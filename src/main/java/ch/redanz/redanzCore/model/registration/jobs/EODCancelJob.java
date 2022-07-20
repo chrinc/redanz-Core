@@ -34,10 +34,10 @@ public class EODCancelJob {
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
   private final WorkflowStatusService workflowStatusService;
-  //  @Scheduled(cron = "${cron.matching.scheduler.value}")
-//  @Scheduled(cron = "0 47 15 * * MON-SUN")
-  @Scheduled(cron = "0 0/15 * * * *")
+
+  @Scheduled(cron = "${cron.matching.scheduler.value.cancel}")
   public void runCancelJob() {
+    log.info("Job: runCancel");
     registrationService.getAllConfirmingRegistrations().forEach(registration -> {
       RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
       LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate();
