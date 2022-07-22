@@ -47,9 +47,9 @@ public enum OutTextConfig {
   LABEL_SLOT_SUNDAY_NIGHT_GE("FRONT_LOGIN", "LABEL-SLOT-SUNDAY-NIGHT", "Sonntagnacht (auf Montag)", "GE"),
 
   // Food
-  LABEL_FOOD_VEGGIE_ASIAN_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-VEGGIE-ASIAN-DESC", "Sandwich, Früchte, Getränk & Snack", "EN"),
-  LABEL_FOOD_VEGGIE_ASIAN_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-VEGGIE-ASIAN-DESC", "Sandwich, Fruits, Drinks & Snack", "GE"),
-  LABEL_FOOD_SOUP_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-SOUP-DESC", "Soupe and extras", "EN"),
+  LABEL_FOOD_VEGGIE_ASIAN_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-VEGGIE-ASIAN-DESC", "Sandwich, Fruits, Drinks & Snack", "EN"),
+  LABEL_FOOD_VEGGIE_ASIAN_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-VEGGIE-ASIAN-DESC", "Sandwich, Früchte, Getränk & Snack", "GE"),
+  LABEL_FOOD_SOUP_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-SOUP-DESC", "Soup and extras", "EN"),
   LABEL_FOOD_SOUP_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-SOUP-DESC", "Suppe und Extras", "GE"),
   LABEL_FOOD_VEDA_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-VEDA-DESC", "Healthy, organic, vegan", "EN"),
   LABEL_FOOD_VEDA_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-VEDA-DESC", "Gesund, biologisch, vegan", "GE"),
@@ -57,13 +57,13 @@ public enum OutTextConfig {
   LABEL_FOOD_VEDA_NAME_GE("FRONT_LOGIN", "LABEL-FOOD-VEDA-NAME", "Gesund, biologisch, vegan", "GE"),
 
   // Bundles
-  LABEL_FULLPASS_DESC_EN("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN classes, 3 additional free choice classes, 3 Parties (Fri/Sat/Sun)", "EN"),
+  LABEL_FULLPASS_DESC_EN("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN classes, 3 additional free choice classes, 3 parties (Fri/Sat/Sun)", "EN"),
   LABEL_FULLPASS_DESC_GE("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN-Klassen, 3 zusätzliche Klassen (freie Wahl), 3 Parties (Fr/Sa/So)", "GE"),
-  LABEL_PARTYPASS_DESC_EN("FRONT_LOGIN", "LABEL-PARTYPASS-DESC", "3 Parties (Fri/Sat/Sun)", "EN"),
+  LABEL_PARTYPASS_DESC_EN("FRONT_LOGIN", "LABEL-PARTYPASS-DESC", "3 parties (Fri/Sat/Sun)", "EN"),
   LABEL_PARTYPASS_DESC_GE("FRONT_LOGIN", "LABEL-PARTYPASS-DESC", "3 Parties (Fr/Sa/So)", "GE"),
-  LABEL_HALFPASS_DESC_EN("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN classes, 3 Parties (Fri/Sat/Sun)", "EN"),
+  LABEL_HALFPASS_DESC_EN("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN classes, 3 parties (Fri/Sat/Sun)", "EN"),
   LABEL_HALFPASS_DESC_GE("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN-Klassen, 3 Parties (Fr/Sa/So)", "GE"),
-  LABEL_LEVELPASS_DESC_EN("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN classes, 3 level classes, 3 Parties (Fri/Sat/Sun)", "EN"),
+  LABEL_LEVELPASS_DESC_EN("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN classes, 3 level classes, 3 parties (Fri/Sat/Sun)", "EN"),
   LABEL_LEVELPASS_DESC_GE("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN-Klassen, 3 Level-Klassen, 3 Parties (Fr/Sa/So)", "GE"),
 
   // Sleep Utils
@@ -161,7 +161,7 @@ public enum OutTextConfig {
   LABEL_EMAIL_CONFIRM_EMAIL_BASE_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Vielen Dank für deine Anmeldung. Bitte klicke auf den Link unten, um dein Profil zu aktivieren.", "GE"),
   LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW", "Activate Now", "EN"),
   LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW", "Hier aktivieren", "GE"),
-  LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The Link will expire in 15 minutes", "EN"),
+  LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The link will expire in 15 minutes", "EN"),
   LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "Der Link verfällt in 15 Minuten", "GE"),
   LABEL_EMAIL_CONFIRM_SUBJECT_EN("EMAIL", "LABEL_EMAIL_CONFIRM_SUBJECT", "Email Confirmation", "EN"),
   LABEL_EMAIL_CONFIRM_SUBJECT_GE("EMAIL", "LABEL_EMAIL_CONFIRM_SUBJECT", "Email Bestätigung", "GE"),
