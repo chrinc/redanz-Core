@@ -1,7 +1,5 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
-import ch.redanz.redanzCore.model.profile.entities.Language;
-import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
 import ch.redanz.redanzCore.model.workshop.repository.SlotRepo;
@@ -9,10 +7,7 @@ import ch.redanz.redanzCore.model.workshop.repository.TypeSlotRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -59,7 +54,6 @@ public class SlotService {
         foodSlot.add(typeSlot.getSlot());
         foodSlots.add(foodSlot);
       });
-
     return foodSlots;
   }
 
@@ -75,12 +69,11 @@ public class SlotService {
   }
 
   private List<Slot> getAllSlots(String type) {
-
     List<Slot> slots = new ArrayList<>();
     typeSlotRepo.findAllByType(type).forEach(
       typeSlot -> slots.add(typeSlot.getSlot())
     );
+    slots.sort(Comparator.comparing(Slot::getSlotId));
     return slots;
-
   }
 }

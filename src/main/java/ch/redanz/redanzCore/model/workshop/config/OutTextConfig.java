@@ -29,7 +29,7 @@ public enum OutTextConfig {
   LABEL_SLOT_FRIDAY_MORNING_GE("FRONT_LOGIN", "LABEL-SLOT-FRIDAY-MORNING", "Freitagvormittag", "GE"),
   LABEL_SLOT_FRIDAY_AFTERNOON_EN("FRONT_LOGIN", "LABEL-SLOT-FRIDAY-AFTERNOON", "Friday afternoon", "EN"),
   LABEL_SLOT_FRIDAY_AFTERNOON_GE("FRONT_LOGIN", "LABEL-SLOT-FRIDAY-AFTERNOON", "Freitagnachmittag", "GE"),
-  LABEL_SLOT_FRIDAY_EVENING_EN("FRONT_LOGIN", "LABEL-SLOT-FRIDAY-EVENING", "Freitag evening", "EN"),
+  LABEL_SLOT_FRIDAY_EVENING_EN("FRONT_LOGIN", "LABEL-SLOT-FRIDAY-EVENING", "Friday evening", "EN"),
   LABEL_SLOT_FRIDAY_EVENING_GE("FRONT_LOGIN", "LABEL-SLOT-FRIDAY-EVENING", "Freitagabend", "GE"),
   LABEL_SLOT_FRIDAY_EN("FRONT_LOGIN", "LABEL-SLOT-FRIDAY", "Friday", "EN"),
   LABEL_SLOT_FRIDAY_GE("FRONT_LOGIN", "LABEL-SLOT-FRIDAY", "Freitag", "GE"),
@@ -206,7 +206,7 @@ public enum OutTextConfig {
   LABEL_EMAIL_DONE_SUBJECT_GE("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Buchungsbestätigung", "GE"),
 
   // REMINDER
-  LABEL_EMAIL_REMINDER_HEADER_EN("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "You have registred for Stir it! 2022.", "EN"),
+  LABEL_EMAIL_REMINDER_HEADER_EN("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "You have registered for Stir it! 2022.", "EN"),
   LABEL_EMAIL_REMINDER_HEADER_GE("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "Du hast dich für Stir it! 2022 angemeldet.", "GE"),
   LABEL_EMAIL_REMINDER_BASE01_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "The payment needs to be completed within 14 days days after the registration confirmation. This time period has expired.", "EN"),
   LABEL_EMAIL_REMINDER_BASE01_GE("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "Die Zahlung muss innerhalb von 14 Tagen nach der Anmeldebestätigung erfolgt sein. Diese Frist ist abgelaufen.", "GE"),
