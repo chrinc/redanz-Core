@@ -25,7 +25,8 @@ public class ReportPersonService {
           person.getStreet(),
           person.getPostalCode(),
           person.getCity(),
-          person.getUser().getEmail()
+          person.getUser().getEmail(),
+          person.getUser().getUserRole().toString()
         )
       );
     });

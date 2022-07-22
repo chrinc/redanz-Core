@@ -51,14 +51,12 @@ public class EODReleaseJob {
             if (registrationMatchingService.findByRegistration1(registration).isPresent()) {
               Registration partnerRegistration = registrationMatchingService.findByRegistration1(registration).get().getRegistration2();
               releaseToConfirming(partnerRegistration);
-              log.info("send email to: {}", partnerRegistration.getParticipant().getFirstName());
               registrationEmailService.sendEmailConfirmation(partnerRegistration , registrationEmailService.findByRegistration(partnerRegistration));
               releasedRegistrations.add(partnerRegistration);
             }
 
             // release registration
             releaseToConfirming(registration);
-            log.info("send email to: {}", registration.getParticipant().getFirstName());
             registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration));
             releasedRegistrations.add(registration);
           } catch (IOException | TemplateException e) {

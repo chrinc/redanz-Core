@@ -19,14 +19,13 @@
             ${header}
         </p>
         <p>
-            ${base01} <br>
+            ${base01}
+        </p>
+        <p>
             ${base02}
         </p>
         <p>
-            ${base03}
-        </p>
-        <p>
-            ${details} <a href=${link}>${account}.</a>
+            ${base03} ${details} <a href=${link}>${account}.</a>
         </p>
         <p>${see_you}</p>
         ${regards} <br>

@@ -16,4 +16,5 @@ public class ResponsePerson {
   private String postalCode;
   private String city;
   private String email;
+  private String role;
 }

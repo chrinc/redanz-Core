@@ -7,12 +7,8 @@ import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRe
 import ch.redanz.redanzCore.model.registration.repository.DonationRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
-import ch.redanz.redanzCore.model.workshop.config.BundleConfig;
-import ch.redanz.redanzCore.model.workshop.config.DiscountConfig;
 import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
-import ch.redanz.redanzCore.model.workshop.entities.Food;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
@@ -129,23 +125,28 @@ public class PaymentService {
       );
   }
   public void onPaymentReceived(Long userId) throws IOException, TemplateException {
+    Registration registration = registrationService.findByParticipantAndEvent(
+      personService.findByUser(userService.findByUserId(userId)),
+      eventService.findByName(EventConfig.EVENT2022.getName())
+    ).get();
+
     workflowTransitionService.setWorkflowStatus(
-      registrationService.findByParticipantAndEvent(
-        personService.findByUser(userService.findByUserId(userId)),
-        eventService.findByName(EventConfig.EVENT2022.getName())
-      ).get(),
+      registration,
       workflowStatusService.getDone()
     );
-    registrationEmailService.sendEmailBookingConfirmation(personService.findByUser(userService.findByUserId(userId)));
+    registrationEmailService.sendEmailBookingConfirmation(
+      personService.findByUser(userService.findByUserId(userId)),
+      registrationEmailService.findByRegistration(registration)
+    );
     registrationService.updateSoldOut();
   }
   public void onPaymentConfirmed(JsonObject request) throws IOException, TemplateException {
     JsonObject transaction = request.get("transaction").getAsJsonObject();
-    log.info("inc@onPaymentConfirmed, transaction: {}", transaction);
     Long userId = transaction.get("referenceId").getAsLong();
-    Number amount = transaction.get("invoice").getAsJsonObject().get("amount").getAsNumber();
-    log.info("inc@onPaymentConfirmed, userId: {}", userId);
-    log.info("inc@onPaymentConfirmed, amount: {}", amount);
+
+    //    Number amount = transaction.get("invoice").getAsJsonObject().get("amount").getAsNumber();
+    //    log.info("inc@onPaymentConfirmed, userId: {}", userId);
+    //    log.info("inc@onPaymentConfirmed, amount: {}", amount);
     //    @todo check amount first
     onPaymentReceived(userId);
   }

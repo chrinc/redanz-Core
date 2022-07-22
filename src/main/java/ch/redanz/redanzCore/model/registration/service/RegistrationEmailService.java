@@ -115,7 +115,8 @@ public class RegistrationEmailService {
   }
 
   public void sendEmailBookingConfirmation(
-    Person person
+    Person person,
+    RegistrationEmail registrationEmail
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("firstName", person.getFirstName());
@@ -165,6 +166,8 @@ public class RegistrationEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
     );
+    registrationEmail.setDoneSentDate(LocalDateTime.now());
+    update(registrationEmail);
   }
 
   public void sendReminderEmail(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
