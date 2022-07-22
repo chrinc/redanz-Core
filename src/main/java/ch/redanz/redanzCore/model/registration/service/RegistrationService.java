@@ -64,8 +64,7 @@ public class RegistrationService {
 
     // Event
     Event currentEvent = eventService.getCurrentEvent();
-
-    if (countReleasedAndDone() >= currentEvent.getCapacity()) {
+    if (countDone() >= currentEvent.getCapacity()) {
       if (!currentEvent.isSoldOut()) {
         currentEvent.setSoldOut(true);
         eventService.save(currentEvent);
@@ -80,7 +79,7 @@ public class RegistrationService {
     // Bundle
     currentEvent.getEventBundles().forEach(eventBundle -> {
       Bundle bundle = eventBundle.getBundle();
-      if (countBundlesReleasedAndDone(bundle) >= bundle.getCapacity()) {
+      if (countBundlesDone(bundle) >= bundle.getCapacity()) {
         if (!bundle.isSoldOut()) {
           bundle.setSoldOut(true);
           bundleService.save(bundle);
@@ -96,7 +95,7 @@ public class RegistrationService {
       if (!bundle.getBundleTracks().isEmpty()) {
         bundle.getBundleTracks().forEach(bundleTrack -> {
           Track track = bundleTrack.getTrack();
-          if (countTracksReleasedAndDone(track) >= track.getCapacity()) {
+          if (countTracksDone(track) >= track.getCapacity()) {
             if (!track.isSoldOut()) {
               track.setSoldOut(true);
               trackService.save(track);
@@ -125,38 +124,83 @@ public class RegistrationService {
       eventService.getCurrentEvent()
     );
   }
-  public int countReleasedAndDone() {
+  public int countSubmittedConfirmingAndDone() {
+    return countSubmitted() + countConfirming() + countDone();
+  }
+  public int countConfirmingAndDone() {
+    return countConfirming() + countDone();
+  }
+  public int countSubmitted() {
+    return registrationRepo.countAllByWorkflowStatusAndEvent(
+      workflowStatusService.getSubmitted(), eventService.getCurrentEvent()
+    );
+  }
+  public int countConfirming() {
     return registrationRepo.countAllByWorkflowStatusAndEvent(
       workflowStatusService.getConfirming(), eventService.getCurrentEvent()
-    )
-      +
-      registrationRepo.countAllByWorkflowStatusAndEvent(
+    );
+  }
+  public int countDone() {
+    return registrationRepo.countAllByWorkflowStatusAndEvent(
       workflowStatusService.getDone(), eventService.getCurrentEvent()
     );
   }
 
-  public int countBundlesReleasedAndDone(Bundle bundle) {
+  private int countBundlesSubmitted(Bundle bundle) {
+    return
+      registrationRepo.countAllByBundleAndWorkflowStatusAndEvent(
+        bundle, workflowStatusService.getSubmitted(), eventService.getCurrentEvent()
+      );
+  }
+  private int countBundlesConfirming(Bundle bundle) {
     return
       registrationRepo.countAllByBundleAndWorkflowStatusAndEvent(
         bundle, workflowStatusService.getConfirming(), eventService.getCurrentEvent()
-      )
-        +
-        registrationRepo.countAllByBundleAndWorkflowStatusAndEvent(
-          bundle, workflowStatusService.getDone(), eventService.getCurrentEvent()
-        );
+      );
   }
-  public int countTracksReleasedAndDone(Track track) {
+  public int countBundlesDone(Bundle bundle) {
+    return
+      registrationRepo.countAllByBundleAndWorkflowStatusAndEvent(
+        bundle, workflowStatusService.getDone(), eventService.getCurrentEvent()
+      );
+  }
+  public int countBundlesConfirmingAndDone(Bundle bundle) {
+    return countBundlesConfirming(bundle) + countBundlesDone(bundle);
+  }
+  public int countBundlesSubmittedConfirmingAndDone(Bundle bundle) {
+    return countBundlesConfirming(bundle) + countBundlesDone(bundle) + countBundlesSubmitted(bundle);
+  }
+  private int countTracksConfirming(Track track) {
     if (track == null) return 0;
-
     return
       registrationRepo.countAllByTrackAndWorkflowStatusAndEvent(
         track, workflowStatusService.getConfirming(), eventService.getCurrentEvent()
-      )
-        +
-        registrationRepo.countAllByTrackAndWorkflowStatusAndEvent(
-          track, workflowStatusService.getDone(), eventService.getCurrentEvent()
-        );
+      );
   }
+  private int countTracksSubmitted(Track track) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndWorkflowStatusAndEvent(
+        track, workflowStatusService.getSubmitted(), eventService.getCurrentEvent()
+      );
+  }
+  public int countTracksDone(Track track) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndWorkflowStatusAndEvent(
+        track, workflowStatusService.getDone(), eventService.getCurrentEvent()
+      );
+  }
+  public int countTracksConfirmingAndDone(Track track) {
+    if (track == null) return 0;
+    return countTracksDone(track) + countTracksConfirming(track);
+  }
+
+  public int countTracksSubmittedConfirmingAndDone(Track track) {
+    if (track == null) return 0;
+    return countTracksDone(track) + countTracksConfirming(track) + countTracksSubmitted(track);
+  }
+
   public Optional<Registration> findByParticipantAndEvent(Person participant, Event event) {
     return registrationRepo.findByParticipantAndEvent(participant, event);
   }

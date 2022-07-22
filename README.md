@@ -78,8 +78,8 @@ Necessary tools for testing and development
          `git fetch origin`
          `git status`
          `git pull`
- - JAVA_HOME: ``export JAVA_HOME = /usr/lib/jvm/java-11-openjdk-amd64``
- - SNAPSHOT: ``export SNAPSHOT=[currentSnapshot]``
+ - JAVA_HOME: ``JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64``
+ - SNAPSHOT: ``SNAPSHOT=[currentSnapshot]``
  - Find Folder: ``cd /usr/local/redanz/redanzCore``
  - screen: 
    - create new screen: `screen -dmS redanz.spring`

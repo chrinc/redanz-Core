@@ -25,7 +25,7 @@
             ${details} <a href=${link}> ${account}.</a>
         </p>
         <p>${see_you}</p>
-        ${regards} </br>
+        ${regards} <br>
         ${team}
     </div>
 </div>

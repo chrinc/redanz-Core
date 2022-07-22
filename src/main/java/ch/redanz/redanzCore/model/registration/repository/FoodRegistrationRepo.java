@@ -5,6 +5,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Food;
+import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,5 +15,9 @@ List<FoodRegistration> findAllByRegistration(Registration registration);
 
 int countAllByFoodAndRegistrationWorkflowStatusAndRegistrationEvent(
   Food food, WorkflowStatus workflowStatus, Event event
+);
+
+int countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+  Food food, Slot slot, WorkflowStatus workflowStatus, Event event
 );
 }

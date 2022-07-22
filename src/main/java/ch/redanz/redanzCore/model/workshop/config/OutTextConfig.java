@@ -84,11 +84,11 @@ public enum OutTextConfig {
   LABEL_SPECIAL_MASSAGE_DESC_EN(
     "FRONT_LOGIN"
     , "LABEL_SPECIAL_MASSAGE_DESC"
-    , "The Relaax practice will offer foot, neck and full body massages on site. If you would like to receive more information about this without obligation, click the checkbox.", "EN"),
+    , "I am interested in booking a relaxing Ayurvedic or Californian foot massage including foot bath or a Californian neck massage (25 minutes at a special price of CHF 45.-) at Praxis Relaaax and to receive more information about it. (The definite registration and time coordination is done by Relaaax)", "EN"),
   LABEL_SPECIAL_MASSAGE_DESC_GE(
     "FRONT_LOGIN"
     , "LABEL_SPECIAL_MASSAGE_DESC"
-    , "Die Praxis Relaax wird vor Ort Fuss-, Nacken- und Ganzkörpermassagen anbieten. Falls du unverbindlich mehr Informationen darüber erhalten möchtest, klicke die Checkbox an.", "GE"),
+    , "Ich interessiere mich dafür, bei Praxis Relaaax eine entspannende ayurvedische oder kalifornische Fussmassage inklusive Fussbad oder eine kalifornische Nackenmassage (25 Minuten zum Spezialpreis von CHF 45.-) zu buchen und darüber mehr Informationen zu erhalten. (Die definitive Anmeldung und zeitliche Koordination läuft über Relaaax)", "GE"),
 
   // VOLUNTEERING / DONATION / SCHOLARSHIP
   LABEL_DONATION_EN("FRONT_LOGIN", "LABEL_DONATION", "Donation", "EN"),
@@ -157,21 +157,21 @@ public enum OutTextConfig {
   // EMAIL
 
   // CONFIRM EMAIL
-  LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Thank you for registering. Please click on the below link to activate your account.", "EN"),
+  LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Thank you for registering. Please click on the link below to activate your account.", "EN"),
   LABEL_EMAIL_CONFIRM_EMAIL_BASE_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Vielen Dank für deine Anmeldung. Bitte klicke auf den Link unten, um dein Profil zu aktivieren.", "GE"),
   LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW", "Activate Now", "EN"),
   LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW", "Hier aktivieren", "GE"),
-  LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The Link will expire in 15 minutes.", "EN"),
+  LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The Link will expire in 15 minutes", "EN"),
   LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "Der Link verfällt in 15 Minuten", "GE"),
   LABEL_EMAIL_CONFIRM_SUBJECT_EN("EMAIL", "LABEL_EMAIL_CONFIRM_SUBJECT", "Email Confirmation", "EN"),
   LABEL_EMAIL_CONFIRM_SUBJECT_GE("EMAIL", "LABEL_EMAIL_CONFIRM_SUBJECT", "Email Bestätigung", "GE"),
 
   // CONFIRM EMAIL
-  LABEL_EMAIL_RESET_PASSWORD_BASE_EN("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_BASE", "Please click on the below link to reset your password.", "EN"),
+  LABEL_EMAIL_RESET_PASSWORD_BASE_EN("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_BASE", "Please click on the link below to reset your password.", "EN"),
   LABEL_EMAIL_RESET_PASSWORD_BASE_GE("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_BASE", "Bitte klicke auf den Link unten, um deinen Passwort zurückzusetzen.", "GE"),
   LABEL_EMAIL_PASSWORD_RESET_NOW_EN("EMAIL", "LABEL_EMAIL_PASSWORD_RESET_NOW", "Reset Now", "EN"),
   LABEL_EMAIL_PASSWORD_RESET_NOW_GE("EMAIL", "LABEL_EMAIL_PASSWORD_RESET_NOW", "Hier zurücksetzen", "GE"),
-  LABEL_EMAIL_RESET_PASSWORD_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The Link will expire in 15 minutes.", "EN"),
+  LABEL_EMAIL_RESET_PASSWORD_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The Link will expire in 15 minutes", "EN"),
   LABEL_EMAIL_RESET_PASSWORD_LINK_EXPIRES_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "Der Link verfällt in 15 Minuten", "GE"),
   LABEL_EMAIL_RESET_PASSWORD_SUBJECT_EN("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_SUBJECT", "Reset Password", "EN"),
   LABEL_EMAIL_RESET_PASSWORD_SUBJECT_GE("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_SUBJECT", "Passwort zurücksetzen", "GE"),
@@ -200,7 +200,7 @@ public enum OutTextConfig {
   // DONE
   LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "We have received your payment and confirm your participation at Stir it! 2022. We are looking forward to welcoming you in November!", "EN"),
   LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Wir haben deine Zahlung erhalten und bestätigen deine Teilnahme am Stir it! 2022. Wir freuen uns sehr, dich im November begrüssen zu dürfen!", "GE"),
-  LABEL_EMAIL_DONE_BASE_EN("EMAIL", "LABEL_EMAIL_DONE_BASE", "We will provide you with more information regarding bands, party, work shop schedules, etc shortly before the festival.", "EN"),
+  LABEL_EMAIL_DONE_BASE_EN("EMAIL", "LABEL_EMAIL_DONE_BASE", "We will provide you with more information regarding bands, party, work shop schedules, etc. shortly before the festival.", "EN"),
   LABEL_EMAIL_DONE_BASE_GE("EMAIL", "LABEL_EMAIL_DONE_BASE", "Weitere Informationen zu Bands, Party, Zeiten für die Workshops, etc. werden wir dir kurz vor dem Festival zusenden.", "GE"),
   LABEL_EMAIL_DONE_SUBJECT_EN("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Booking Confirmation", "EN"),
   LABEL_EMAIL_DONE_SUBJECT_GE("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Buchungsbestätigung", "GE"),

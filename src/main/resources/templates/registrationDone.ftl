@@ -22,7 +22,7 @@
             ${base}
         </p>
         <p>${see_you}</p>
-        ${regards}</br>
+        ${regards}<br>
         ${team}
     </div>
 </div>

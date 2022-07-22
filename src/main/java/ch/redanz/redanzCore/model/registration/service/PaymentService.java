@@ -108,23 +108,6 @@ public class PaymentService {
         )
       );
     }
-
-    // discounts
-//    if (
-//      registration.getBundle() != bundleService.findByName(BundleConfig.PARTYPASS.getName())
-//        && registrationService.findAllByCurrentEventAndWorkflowStatus(
-//        workflowStatusService.getDone()
-//      ).size() < DiscountConfig.EARLY_BIRD.getCapacity()
-//    ) {
-//      int earlyBirdDiscount = (int) discountService.findByName(DiscountConfig.EARLY_BIRD.getName()).getDiscount();
-//      totalAmount.addAndGet(earlyBirdDiscount * (-1));
-//      discounts.add(
-//        List.of(
-//          DiscountConfig.EARLY_BIRD.getName(),
-//          String.valueOf(earlyBirdDiscount)
-//        )
-//      );
-//    }
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
       int discount = (int) discountRegistration.getDiscount().getDiscount();
       totalAmount.addAndGet(discount * (-1));
@@ -154,6 +137,7 @@ public class PaymentService {
       workflowStatusService.getDone()
     );
     registrationEmailService.sendEmailBookingConfirmation(personService.findByUser(userService.findByUserId(userId)));
+    registrationService.updateSoldOut();
   }
   public void onPaymentConfirmed(JsonObject request) throws IOException, TemplateException {
     JsonObject transaction = request.get("transaction").getAsJsonObject();

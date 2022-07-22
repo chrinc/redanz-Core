@@ -1,11 +1,11 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
-import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
+import ch.redanz.redanzCore.model.profile.config.PersonConfig;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
 import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,33 +27,44 @@ import java.util.Map;
 public class EODMatchingJob {
 
   private final RegistrationMatchingService registrationMatchingService;
-  private final WorkflowTransitionService workflowTransitionService;
   private Map<RegistrationMatching, RegistrationMatching> matchingPairs;
+  private final WorkflowStatusService workflowStatusService;
+  private final RegistrationService registrationService;
 
-  //  @Scheduled(cron = "${cron.matching.scheduler.value}")
+  //  @Scheduled(cron = "0 47 15 * * MON-SUN")
+  //  @Scheduled(cron = "0 0/2 * * * *")
   @Scheduled(cron = "${cron.matching.scheduler.value.matching}")
-//  @Scheduled(cron = "0 47 15 * * MON-SUN")
-//  @Scheduled(cron = "0 0/2 * * * *")
   public void runMatching() {
     log.info("Job: runMatching");
+    registrationService.updateSoldOut();
     doMatching(registrationMatchingService.findRegistrationMatchingByRegistration2IsNull());
   }
 
   private void doMatching(List<RegistrationMatching> registrationMatchings) {
     matchingPairs = new HashMap<>();
 
+    registrationMatchings.forEach(
+      baseMatcher -> {
+        boolean baseMatcherHasPartnerEmail = baseMatcher.getPartnerEmail() != null;
+        Registration baseMatcherRegistration1 = baseMatcher.getRegistration1();
 
-    registrationMatchings.forEach(baseMatcher -> {
-      boolean baseMatcherHasPartnerEmail = baseMatcher.getPartnerEmail() != null;
-      Registration baseMatcherRegistration1 = baseMatcher.getRegistration1();
+        registrationMatchings.forEach(lookupMatcher -> {
+          boolean lookupMatcherHasPartnerEmail = lookupMatcher.getPartnerEmail() != null;
 
-      registrationMatchings.forEach(lookupMatcher -> {
-        boolean lookupMatcherHasPartnerEmail = lookupMatcher.getPartnerEmail() != null;
+          // lookup partner by email
+          if (
+            // exclude self comparison
+            !baseMatcher.equals(lookupMatcher) &&
 
-        // lookup partner by email
-        if (
-          // exclude self comparison
-          !baseMatcher.equals(lookupMatcher) &&
+            // prevent double entries (R1xR2, R2xR1)
+            !matchingPairs.containsKey(lookupMatcher) && !matchingPairs.containsValue(baseMatcher) &&
+            !matchingPairs.containsKey(baseMatcher) && !matchingPairs.containsValue(lookupMatcher) &&
+
+            // check registration match
+            registrationIsMatch(baseMatcherRegistration1, lookupMatcher.getRegistration1()) &&
+
+            // check workflow
+            workflowIsMatch(baseMatcherRegistration1, lookupMatcher.getRegistration1()) &&
 
             // both registrations applied with a partner
             (
@@ -64,48 +75,20 @@ public class EODMatchingJob {
 
                 // otherwise none of the registrations can have a PartnerEmail
                 !baseMatcherHasPartnerEmail && !lookupMatcherHasPartnerEmail
-            ) &&
+            )
 
-            // check registration match
-            registrationIsMatch(baseMatcherRegistration1, lookupMatcher.getRegistration1()) &&
+          ) {
+            matchingPairs.put(baseMatcher, lookupMatcher);
 
-            // check workflow
-            workflowIsMatch(baseMatcherRegistration1, lookupMatcher.getRegistration1()) &&
-
-            // prevent double entries (R1xR2, R2xR1)
-            !matchingPairs.containsKey(lookupMatcher)
-        ) {
-          matchingPairs.put(baseMatcher, lookupMatcher);
-        }
+          }
+        });
       });
-    });
 
     onFoundMatch();
   }
 
   private void onFoundMatch() {
     matchingPairs.forEach((baseMatching, lookupMatching) -> {
-      log.info("inc, matched: {}", baseMatching.getRegistration1().getParticipant().getFirstName()
-        + " matched with " + lookupMatching.getRegistration1().getParticipant().getFirstName()
-      );
-
-      log.info("inc, bundle 1: {}", baseMatching.getRegistration1().getBundle().getName()
-        + " matches bundle 2: " + lookupMatching.getRegistration1().getBundle().getName()
-      );
-
-      log.info("inc, partner Email 1: {}", baseMatching.getPartnerEmail()
-        + " matches partner Email 2: " + lookupMatching.getPartnerEmail()
-      );
-
-      if (baseMatching.getRegistration1().getTrack() != null) {
-        log.info("inc, track 1: {}", baseMatching.getRegistration1().getTrack().getName()
-          + " matches track 2: " + lookupMatching.getRegistration1().getTrack().getName()
-        );
-        log.info("inc, partner dance role 1: {}", baseMatching.getRegistration1().getDanceRole().getName()
-          + " matches partner dance role 2: " + lookupMatching.getRegistration1().getDanceRole().getName()
-        );
-      }
-
 
       // update registration_matching
       baseMatching.setRegistration2(lookupMatching.getRegistration1());
@@ -124,11 +107,9 @@ public class EODMatchingJob {
   }
 
   private boolean workflowIsMatch(Registration baseRegistration, Registration lookupRegistration) {
-    WorkflowTransition baseWorkflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(baseRegistration);
-    WorkflowTransition lookupWorkflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(lookupRegistration);
     return (
-      baseWorkflowTransition.getWorkflowStatus().getName().equals(WorkflowStatusConfig.SUBMITTED.getName()) &&
-        lookupWorkflowTransition.getWorkflowStatus().getName().equals(WorkflowStatusConfig.SUBMITTED.getName())
+      baseRegistration.getWorkflowStatus().getWorkflowStatusId().equals(workflowStatusService.getSubmitted().getWorkflowStatusId())
+        && lookupRegistration.getWorkflowStatus().getWorkflowStatusId().equals(workflowStatusService.getSubmitted().getWorkflowStatusId())
     );
   }
 
@@ -137,7 +118,9 @@ public class EODMatchingJob {
       (
         // check bundles
         baseRegistration.getBundle().equals(lookupRegistration.getBundle()) &&
+          !baseRegistration.getBundle().isSoldOut() &&
           baseRegistration.getTrack().equals(lookupRegistration.getTrack()) &&
+          !baseRegistration.getTrack().isSoldOut() &&
           (
             // check dance roles
             !baseRegistration.getDanceRole().equals(lookupRegistration.getDanceRole())

@@ -1,5 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
 import ch.redanz.redanzCore.model.workshop.repository.SlotRepo;
@@ -20,6 +22,7 @@ public class SlotService {
   TypeSlotRepo typeSlotRepo;
   FoodService foodService;
   SlotRepo slotRepo;
+  OutTextService outTextService;
   public void save(Slot slot) {
     slotRepo.save(slot);
   }
@@ -41,6 +44,19 @@ public class SlotService {
         foodSlot.put("food", foodService.findByFoodId(typeSlot.getTypeObjectId()));
         foodSlot.put("slot", typeSlot.getSlot());
 
+        foodSlots.add(foodSlot);
+      });
+
+    return foodSlots;
+  }
+  public List<List<Object>> getFoodSlotsPairs() {
+    List<List<Object>> foodSlots = new ArrayList<>();
+
+    typeSlotRepo.findAllByType("food").forEach(
+      typeSlot -> {
+        List<Object> foodSlot = new ArrayList<>();
+        foodSlot.add(foodService.findByFoodId(typeSlot.getTypeObjectId()));
+        foodSlot.add(typeSlot.getSlot());
         foodSlots.add(foodSlot);
       });
 

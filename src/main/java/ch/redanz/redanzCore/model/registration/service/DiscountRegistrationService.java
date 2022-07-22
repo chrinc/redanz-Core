@@ -57,14 +57,25 @@ public class DiscountRegistrationService {
     return discountRegistrationRepo.findAllByRegistration(registration);
   }
 
-
-  public int countDiscountReleasedAndDone(Discount discount) {
+  public int countDiscountSubmitted(Discount discount){
+    return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
+      discount, workflowStatusService.getSubmitted(), eventService.getCurrentEvent()
+    );
+  }
+  public int countDiscountConfirming(Discount discount){
     return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
       discount, workflowStatusService.getConfirming(), eventService.getCurrentEvent()
-    )
-      +
-      discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
-        discount, workflowStatusService.getDone(), eventService.getCurrentEvent()
-      );
+    );
+  }
+  public int countDiscountDone(Discount discount){
+    return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
+      discount, workflowStatusService.getDone(), eventService.getCurrentEvent()
+    );
+  }
+  public int countDiscountSubmittedConfirmingAndDone(Discount discount) {
+    return countDiscountConfirming(discount) + countDiscountDone(discount) + countDiscountSubmitted(discount);
+  }
+  public int countDiscountConfirmingAndDone(Discount discount) {
+    return countDiscountConfirming(discount) + countDiscountDone(discount);
   }
 }

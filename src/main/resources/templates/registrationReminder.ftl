@@ -19,7 +19,7 @@
             ${header}
         </p>
         <p>
-            ${base01} </br>
+            ${base01} <br>
             ${base02}
         </p>
         <p>
@@ -29,7 +29,7 @@
             ${details} <a href=${link}>${account}.</a>
         </p>
         <p>${see_you}</p>
-        ${regards} </br>
+        ${regards} <br>
         ${team}
     </div>
 </div>

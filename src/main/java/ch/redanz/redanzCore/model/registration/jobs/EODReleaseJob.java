@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
@@ -10,13 +9,13 @@ import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -31,6 +30,7 @@ public class EODReleaseJob {
   private final OutTextService outTextService;
   private final EventService eventService;
   private final RegistrationEmailService registrationEmailService;
+  private List<Registration> releasedRegistrations;
 
   @Autowired
   Configuration mailConfig;
@@ -38,22 +38,36 @@ public class EODReleaseJob {
 //  @Scheduled(cron = "0 50 15 * * MON-SUN")
 //  @Scheduled(cron = "0 0/2 * * * *")
 
-    @Scheduled(cron = "${cron.matching.scheduler.value.release}")
+  @Scheduled(cron = "${cron.matching.scheduler.value.release}")
   public void runRelease() {
-    registrationService.getAllSubmittedRegistrations().forEach(registration -> {
       log.info("Job: runRelease");
+      registrationService.getAllSubmittedRegistrations().forEach(registration -> {
+//        List<Registration> releasedRegistrations = new ArrayList<>();
 
-      RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-      if (isRelease(registration)) {
-        releaseToConfirming(registration);
-        try {
-          registrationEmailService.sendEmailConfirmation(registration, registrationEmail);
-        } catch (IOException | TemplateException e) {
-          e.printStackTrace();
+        if (isRelease(registration) && !releasedRegistrations.contains(registration)) {
+          try {
+
+            // release partner first
+            if (registrationMatchingService.findByRegistration1(registration).isPresent()) {
+              Registration partnerRegistration = registrationMatchingService.findByRegistration1(registration).get().getRegistration2();
+              releaseToConfirming(partnerRegistration);
+              log.info("send email to: {}", partnerRegistration.getParticipant().getFirstName());
+              registrationEmailService.sendEmailConfirmation(partnerRegistration , registrationEmailService.findByRegistration(partnerRegistration));
+              releasedRegistrations.add(partnerRegistration);
+            }
+
+            // release registration
+            releaseToConfirming(registration);
+            log.info("send email to: {}", registration.getParticipant().getFirstName());
+            registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration));
+            releasedRegistrations.add(registration);
+          } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+          }
         }
-      }
-    });
-  }
+      });
+      registrationService.updateSoldOut();
+    }
 
   private boolean isRelease(Registration registration) {
     return
@@ -70,11 +84,11 @@ public class EODReleaseJob {
   private boolean isCapacityOK (Registration registration) {
 
     return
-      registrationService.countReleasedAndDone() < eventService.getCurrentEvent().getCapacity() &&
-      registrationService.countBundlesReleasedAndDone(
+      registrationService.countConfirmingAndDone() < eventService.getCurrentEvent().getCapacity() &&
+      registrationService.countBundlesConfirmingAndDone(
         registration.getBundle()
       ) < registration.getBundle().getCapacity() &&
-      registrationService.countTracksReleasedAndDone(
+      registrationService.countTracksConfirmingAndDone(
         registration.getTrack()
       ) < (registration.getTrack() == null ? 99 : registration.getTrack().getCapacity())
     ;

@@ -13,21 +13,21 @@
     </div>
 </div>
 <div style="width:100%;background:#ececec;text-align:left;font-family: Arial,serif;">
-    <div style="padding:15px;">
+    <div style="padding:15px;color:#0b0c0c">
         <h3>Hi ${firstName}</h3>
         <p>
             ${base}
         </p>
         <blockquote
-                style="Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px">
-            <p style="Margin:0 0 20px 0;font-size:16px;line-height:25px;color:#0b0c0c">
+                style="Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:18px;line-height:25px">
+            <p style="Margin:0 0 20px 0;font-size:18px;line-height:25px;color:#0b0c0c">
                 <a href=${link}>${activate_now}</a>
             </p>
         </blockquote>
 
         ${expires}.
         <p>${see_you}</p>
-        ${regards} </br>
+        ${regards}<br>
         ${team}
     </div>
 </div>

@@ -56,6 +56,29 @@ public class FoodRegistrationService {
       );
   }
 
+  public int countFoodSlotSubmitted(Food food, Slot slot){
+    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      food, slot, workflowStatusService.getSubmitted(), eventService.getCurrentEvent()
+    );
+  }
+  public int countFoodSlotConfirming(Food food, Slot slot){
+    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      food, slot, workflowStatusService.getConfirming(), eventService.getCurrentEvent()
+    );
+  }
+  public int countFoodSlotDone(Food food, Slot slot){
+    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      food, slot, workflowStatusService.getDone(), eventService.getCurrentEvent()
+    );
+  }
+  public int countFoodSlotConfirmingAndDone(Food food, Slot slot) {
+    return countFoodSlotConfirming(food, slot) + countFoodSlotDone(food, slot);
+  }
+
+  public int countFoodSlotSubmittedReleasedAndDone(Food food, Slot slot) {
+    return countFoodSlotSubmitted(food, slot) + countFoodSlotConfirming(food, slot) + countFoodSlotDone(food, slot);
+  }
+
   public List<FoodRegistration> getAllByRegistration(Registration registration) {
     return foodRegistrationRepo.findAllByRegistration(registration);
   }

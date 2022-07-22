@@ -37,7 +37,11 @@ public enum RegistrationConfig {
     BundleConfig.HALFPASS,
     TrackConfig.FUN_TRACK,
     DanceRoleConfig.FOLLOWER,
-    List.of(DiscountConfig.STUDENT, DiscountConfig.ABROAD, DiscountConfig.EARLY_BIRD),
+    List.of(
+      DiscountConfig.STUDENT,
+      DiscountConfig.ABROAD,
+      DiscountConfig.EARLY_BIRD
+    ),
     List.of(
       Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_FRIDAY_EVENING),
       Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_SATURDAY_LUNCH)
@@ -56,14 +60,31 @@ public enum RegistrationConfig {
     ),
     120
   ),
-  NAOMI_REGISTRATION(UserConfig.NAOMI_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, List.of(DiscountConfig.EARLY_BIRD), null, 11),
-  ESTHER_REGISTRATION(UserConfig.ESTHER_USER, EventConfig.EVENT2022, BundleConfig.PARTYPASS, null, null, null, null, 0),
+  NAOMI_REGISTRATION(
+    UserConfig.NAOMI_USER,
+    EventConfig.EVENT2022,
+    BundleConfig.LEVELPASS,
+    TrackConfig.LINDY_INTERMEDIATE,
+    DanceRoleConfig.SWITCH,
+    List.of(DiscountConfig.EARLY_BIRD),
+    null,
+    11
+  ),
+  ESTHER_REGISTRATION(UserConfig.ESTHER_USER,
+    EventConfig.EVENT2022,
+    BundleConfig.PARTYPASS,
+    null,
+    null,
+    null,
+    null,
+    0
+  ),
   EDDIE_REGISTRATION(
     UserConfig.EDDIE_USER
     ,EventConfig.EVENT2022
     ,BundleConfig.LEVELPASS
     ,TrackConfig.LINDY_ADVANCED
-    ,DanceRoleConfig.FOLLOWER
+    ,DanceRoleConfig.SWITCH
     ,List.of(
       DiscountConfig.EARLY_BIRD
      ,DiscountConfig.STUDENT
@@ -74,9 +95,9 @@ public enum RegistrationConfig {
   OLIVER_REGISTRATION(
     UserConfig.OLIVER_USER
     , EventConfig.EVENT2022
-    , BundleConfig.FULLPASS
-    , TrackConfig.FUN_TRACK
-    , DanceRoleConfig.LEADER
+    , BundleConfig.LEVELPASS
+    , TrackConfig.LINDY_ADVANCED
+    , DanceRoleConfig.FOLLOWER
     , List.of(
     DiscountConfig.STUDENT
     ,DiscountConfig.EARLY_BIRD
@@ -87,9 +108,9 @@ public enum RegistrationConfig {
   HARRY_REGISTRATION(
     UserConfig.HARRY_USER
     ,EventConfig.EVENT2022
-    ,BundleConfig.FULLPASS
-    ,TrackConfig.FUN_TRACK
-    ,DanceRoleConfig.FOLLOWER
+    ,BundleConfig.LEVELPASS
+    ,TrackConfig.LINDY_ADVANCED
+    ,DanceRoleConfig.SWITCH
     ,List.of(DiscountConfig.STUDENT
     ,DiscountConfig.ABROAD
     ,DiscountConfig.EARLY_BIRD
@@ -97,13 +118,41 @@ public enum RegistrationConfig {
   , 0
   ),
 
-  BILLY_REGISTRATION(UserConfig.BILLY_USER, EventConfig.EVENT2022, BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE, DanceRoleConfig.SWITCH, List.of(DiscountConfig.STUDENT, DiscountConfig.ABROAD
-    ,DiscountConfig.EARLY_BIRD), null,
-  0
+  BILLY_REGISTRATION(UserConfig.BILLY_USER,
+    EventConfig.EVENT2022,
+    BundleConfig.LEVELPASS,
+    TrackConfig.LINDY_INTERMEDIATE,
+    DanceRoleConfig.SWITCH,
+    List.of(
+      DiscountConfig.STUDENT,
+      DiscountConfig.ABROAD,
+      DiscountConfig.EARLY_BIRD
+    ),
+    null,
+    0
   ),
-  FRANKY_REGISTRATION(UserConfig.FRANKY_USER, EventConfig.EVENT2022, BundleConfig.FULLPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.LEADER,
-    List.of(DiscountConfig.EARLY_BIRD), null, 20),
-  CLAUDIA_REGISTRATION(UserConfig.CLAUDIA_USER, EventConfig.EVENT2022, BundleConfig.HALFPASS, TrackConfig.FUN_TRACK, DanceRoleConfig.SWITCH, List.of(DiscountConfig.EARLY_BIRD), null, 160);
+  FRANKY_REGISTRATION(
+    UserConfig.FRANKY_USER,
+    EventConfig.EVENT2022,
+    BundleConfig.FULLPASS,
+    TrackConfig.FUN_TRACK,
+    DanceRoleConfig.LEADER,
+    List.of(
+      DiscountConfig.EARLY_BIRD
+    ),
+    null,
+    20),
+  CLAUDIA_REGISTRATION(
+    UserConfig.CLAUDIA_USER,
+    EventConfig.EVENT2022,
+    BundleConfig.HALFPASS,
+    TrackConfig.FUN_TRACK,
+    DanceRoleConfig.SWITCH,
+    List.of(
+      DiscountConfig.EARLY_BIRD
+    ), null,
+    160
+  );
 
   private final UserConfig userConfig;
   private final EventConfig eventConfig;
@@ -153,12 +202,10 @@ public enum RegistrationConfig {
 
       if (registrationConfig.discountConfigList != null) {
         registrationConfig.discountConfigList.forEach(
-          discountConfig -> {
-            discountRegistrationService.save(
-              newRegistration
-              , discountService.findByName(discountConfig.getName())
-            );
-          });
+          discountConfig -> discountRegistrationService.save(
+            newRegistration,
+            discountService.findByName(discountConfig.getName())
+          ));
       }
 
       if (registrationConfig.foodSlotConfigList != null) {

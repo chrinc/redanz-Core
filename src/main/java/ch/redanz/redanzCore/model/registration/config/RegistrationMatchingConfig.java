@@ -16,16 +16,16 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Slf4j
 public enum RegistrationMatchingConfig {
-  FRANKY_REGISTRATION ( UserConfig.FRANKY_USER.getEmail()  ,"norma_user@gmail.com", EventConfig.EVENT2022),
   NORMA_REGISTRATION  ( UserConfig.NORMA_USER.getEmail()   ,"franky_user@gmail.com", EventConfig.EVENT2022),
-  EDDIE_REGISTRATION  ( UserConfig.EDDIE_USER.getEmail()   ,null , EventConfig.EVENT2022),
-  ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER.getEmail()  ,null , EventConfig.EVENT2022),
-  BILLY_REGISTRATION  ( UserConfig.BILLY_USER.getEmail()   ,"naomi_user@gmail.com" , EventConfig.EVENT2022),
-  NAOMI_REGISTRATION  ( UserConfig.NAOMI_USER.getEmail()   ,"billy_user@gmail.com" , EventConfig.EVENT2022),
   WILLIAM_REGISTRATION( UserConfig.WILLIAM_USER.getEmail() ,null , EventConfig.EVENT2022),
-  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER.getEmail() ,null,  EventConfig.EVENT2022),
-  OLIVER_REGISTRATION( UserConfig.OLIVER_USER.getEmail() ,null , EventConfig.EVENT2022),
-  HARRY_REGISTRATION( UserConfig.HARRY_USER.getEmail() ,"zeus522@gmail.com",  EventConfig.EVENT2022);
+  ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER.getEmail()  ,null , EventConfig.EVENT2022),
+  NAOMI_REGISTRATION  ( UserConfig.NAOMI_USER.getEmail()   ,"billy_user@gmail.com" , EventConfig.EVENT2022),
+  EDDIE_REGISTRATION  ( UserConfig.EDDIE_USER.getEmail()   ,null , EventConfig.EVENT2022),
+  OLIVER_REGISTRATION ( UserConfig.OLIVER_USER.getEmail()  ,null , EventConfig.EVENT2022),
+  HARRY_REGISTRATION  ( UserConfig.HARRY_USER.getEmail()   ,null,  EventConfig.EVENT2022),
+  BILLY_REGISTRATION  ( UserConfig.BILLY_USER.getEmail()   ,"naomi_user@gmail.com" , EventConfig.EVENT2022),
+  FRANKY_REGISTRATION ( UserConfig.FRANKY_USER.getEmail()  ,"norma_user@gmail.com", EventConfig.EVENT2022),
+  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER.getEmail() ,null,  EventConfig.EVENT2022);
 
   private final String user1Email;
   private final String partnerEmail;
