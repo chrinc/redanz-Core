@@ -97,7 +97,7 @@ public class HostingService {
         registration,
         !isShareRoomsJson.get("isShareRooms").isJsonNull() && isShareRoomsJson.get("isShareRooms").getAsBoolean(),
         nameRoomMateJson.get("nameRoomMate") == null ? null : nameRoomMateJson.get("nameRoomMate").getAsString(),
-        !isSharedBedJson.get("isSharedBed").isJsonNull() && isSharedBedJson.get("isSharedBed").getAsBoolean(),
+        isSharedBedJson.get("isSharedBed") != null && !isSharedBedJson.get("isSharedBed").isJsonNull() && isSharedBedJson.get("isSharedBed").getAsBoolean(),
         hosteeCommentJson.get("hosteeComment") == null ? null : hosteeCommentJson.get("hosteeComment").getAsString()
       )
     );

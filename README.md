@@ -30,6 +30,7 @@ Necessary tools for testing and development
   - copy with sftp-client to kdrive
   - import: ``mysql -u root -p redanz_backup < /Users/inc/kDrive/030_associations_communities/020_lindyhop/003_Stirit/2211_stirit/2211_registration/data/220708_redanz_backup.sql``
   - import: ``mysql -u root -p redanz < /usr/local/redanz/data/prod/[YYMMDD]_redanz_backup.sql``
+  - import: ``mysql -u root -p redanz < Users/inc/Documents/redanz/stirit/data/220724_005_redanz_backup.sql``
   - optimize mysqldb on Server (file: sudo vim /etc/mysql/my.cnf)
   - `[mysqld]
      performance_schema = OFF
@@ -69,6 +70,13 @@ Necessary tools for testing and development
       left join registration_matching rm on rm.registration_1_id = reg.registration_id
     order by current_workflow_Status_id desc
     ;`
+- Scholarship: `select reg.registration_id, pers.first_name, pers.last_name, user.email, sreg.intro from registration
+  reg inner join scholarship_registration sreg on sreg.registration_id = reg.registration_id 
+  inner join person pers on pers.person_id = reg.participant_id inner join user on user.user_id = pers.user_id;`
+- Donation: `select reg.registration_id, dreg.amount, pers.first_name, pers.last_name, user.email from registration
+  reg inner join donation_registration dreg on dreg.registration_id = reg.registration_id
+  inner join person pers on pers.person_id = reg.participant_id inner join user on user.user_id = pers.user_id;`
+  
  #### on Server
  - Create SSH key for git-repository
      - ``ssh-keygen -t ed25519 -C [email@address]``
