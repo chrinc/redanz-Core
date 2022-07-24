@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -144,10 +145,9 @@ public class PaymentService {
     JsonObject transaction = request.get("transaction").getAsJsonObject();
     Long userId = transaction.get("referenceId").getAsLong();
 
-    //    Number amount = transaction.get("invoice").getAsJsonObject().get("amount").getAsNumber();
-    //    log.info("inc@onPaymentConfirmed, userId: {}", userId);
-    //    log.info("inc@onPaymentConfirmed, amount: {}", amount);
     //    @todo check amount first
-    onPaymentReceived(userId);
+    if (Objects.equals(transaction.get("status").getAsString(), "confirmed")) {
+      onPaymentReceived(userId);
+    }
   }
 }
