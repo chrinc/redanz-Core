@@ -30,7 +30,7 @@ Necessary tools for testing and development
   - copy with sftp-client to kdrive
   - import: ``mysql -u root -p redanz_backup < /Users/inc/kDrive/030_associations_communities/020_lindyhop/003_Stirit/2211_stirit/2211_registration/data/220708_redanz_backup.sql``
   - import: ``mysql -u root -p redanz < /usr/local/redanz/data/prod/[YYMMDD]_redanz_backup.sql``
-  - import: ``mysql -u root -p redanz < Users/inc/Documents/redanz/stirit/data/220724_005_redanz_backup.sql``
+  - import: ``mysql -u root -p redanz < /Users/inc/Documents/redanz/stirit/data/220724_005_redanz_backup.sql``
   - optimize mysqldb on Server (file: sudo vim /etc/mysql/my.cnf)
   - `[mysqld]
      performance_schema = OFF
