@@ -51,6 +51,7 @@ public class EmailService {
     props.put("mail.smtp.host", emailSmtpHost); // SMTP
     props.put("mail.smtp.socketFactory.class",
       "javax.net.ssl.SSLSocketFactory"); // SSL Factory Class
+    props.put("mail.smtp.socketFactory.port", 465);
     props.put("mail.smtp.port", emailSmtpPort); // SMTP Port
     props.put("mail.smtp.auth", "true"); //Enabling SMTP Authentication
     props.put("mail.smtp.starttls.enable", "true"); //SMTP Port

@@ -57,6 +57,8 @@ public class RegistrationEmailService {
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         registration.getParticipant().getPersonLang().getLanguageKey();
 
+    model.put("headerLink",  environment.getProperty("email.header.link"));
+
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_SUBMITTED_HEADER_EN.getOutTextKey(),
@@ -127,6 +129,8 @@ public class RegistrationEmailService {
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         person.getPersonLang().getLanguageKey();
 
+    model.put("headerLink",  environment.getProperty("email.header.link"));
+
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_HEADER_EN.getOutTextKey(),
@@ -180,6 +184,8 @@ public class RegistrationEmailService {
       registration.getParticipant().getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         registration.getParticipant().getPersonLang().getLanguageKey();
+
+    model.put("headerLink",  environment.getProperty("email.header.link"));
 
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
@@ -261,6 +267,8 @@ public class RegistrationEmailService {
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         registration.getParticipant().getPersonLang().getLanguageKey();
 
+    model.put("headerLink",  environment.getProperty("email.header.link"));
+
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_HEADER_EN.getOutTextKey(),
@@ -315,6 +323,8 @@ public class RegistrationEmailService {
     model.put("link", environment.getProperty("link.login"));
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationReleased.ftl");
+
+    model.put("headerLink",  environment.getProperty("email.header.link"));
 
     String languageKey =
       registration.getParticipant().getPersonLang() == null ?

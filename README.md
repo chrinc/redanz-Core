@@ -69,6 +69,13 @@ Necessary tools for testing and development
       left join registration_matching rm on rm.registration_1_id = reg.registration_id
     order by current_workflow_Status_id desc
     ;`
+- Scholarship: `select reg.registration_id, pers.first_name, pers.last_name, user.email, sreg.intro from registration
+  reg inner join scholarship_registration sreg on sreg.registration_id = reg.registration_id 
+  inner join person pers on pers.person_id = reg.participant_id inner join user on user.user_id = pers.user_id;`
+- Donation: `select reg.registration_id, dreg.amount, pers.first_name, pers.last_name, user.email from registration
+  reg inner join donation_registration dreg on dreg.registration_id = reg.registration_id
+  inner join person pers on pers.person_id = reg.participant_id inner join user on user.user_id = pers.user_id;`
+  
  #### on Server
  - Create SSH key for git-repository
      - ``ssh-keygen -t ed25519 -C [email@address]``
