@@ -11,10 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum TrackConfig {
-  LINDY_ADVANCED("Exploring FUNdamentals", "", 80, true, DanceLevel.ADVANCED),
-  LINDY_INTERMEDIATE("Expanding FUNdamentals", "", 80, true, DanceLevel.INTERMEDIATE),
-  LINDY_BEGINNER("Building FUNdamentals", "", 80, true, DanceLevel.BEGINNER),
-  FUN_TRACK("FUN Track", "", 999, true, null);
+  LINDY_ADVANCED("Advanced", "", 80, true, DanceLevel.ADVANCED),
+  LINDY_INTERMEDIATE("Intermediate", "", 80, true, DanceLevel.INTERMEDIATE),
+  LINDY_BEGINNER("Beginners", "", 80, true, DanceLevel.BEGINNER),
+  FUN_TRACK("Fun Track", "", 200, true, null);
 
   private final String name;
   private final String description;
