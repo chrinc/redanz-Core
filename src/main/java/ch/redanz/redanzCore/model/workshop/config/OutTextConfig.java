@@ -79,6 +79,17 @@ public enum OutTextConfig {
   LABEL_SLEEP_UTIL_BAG_GE("FRONT_LOGIN", "LABEL-SLEEP-UTIL-BAG", "Schlafsack", "GE"),
 
   // Specials
+  LABEL_SPECIAL_WHISKEY_NAME_EN("FRONT_LOGIN", "LABEL_WHISKEY_MASSAGE_NAME", "Whiskey Tasting", "EN"),
+  LABEL_SPECIAL_WHISKEY_NAME_GE("FRONT_LOGIN", "LABEL_WHISKEY_MASSAGE_NAME", "Whiskey-Degustation", "GE"),
+  LABEL_SPECIAL_WHISKEY_DESC_EN(
+    "FRONT_LOGIN"
+    , "LABEL_SPECIAL_WHISKEY_DESC"
+    , "I am interested in booking whiskey tasting during der workshop", "EN"),
+  LABEL_SPECIAL_WHISKEY_DESC_GE(
+    "FRONT_LOGIN"
+    , "LABEL_SPECIAL_WHISKEY_DESC"
+    , "Ich interessiere mich für eine Whiskey-Degustation während des Workshops.", "GE"),
+
   LABEL_SPECIAL_MASSAGE_NAME_EN("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_NAME", "Massage Relaaax", "EN"),
   LABEL_SPECIAL_MASSAGE_NAME_GE("FRONT_LOGIN", "LABEL_SPECIAL_MASSAGE_NAME", "Massage Relaaax", "GE"),
   LABEL_SPECIAL_MASSAGE_DESC_EN(
@@ -227,14 +238,14 @@ public enum OutTextConfig {
 
 
   // GENERIC
-  LABEL_EMAIL_ACCOUNT_EN("EMAIL", "LABEL_EMAIL_ACCOUNT", "Redanz account", "EN"),
-  LABEL_EMAIL_ACCOUNT_GE("EMAIL", "LABEL_EMAIL_ACCOUNT", "Redanz Profil", "GE"),
+  LABEL_EMAIL_ACCOUNT_EN("EMAIL", "LABEL_EMAIL_ACCOUNT", "redAnz account", "EN"),
+  LABEL_EMAIL_ACCOUNT_GE("EMAIL", "LABEL_EMAIL_ACCOUNT", "redAnz Profil", "GE"),
   LABEL_EMAIL_SEE_YOU_EN("EMAIL", "LABEL_EMAIL_SEE_YOU", "See you soon", "EN"),
   LABEL_EMAIL_SEE_YOU_GE("EMAIL", "LABEL_EMAIL_SEE_YOU", "Bis bald", "GE"),
   LABEL_EMAIL_REGARDS_EN("EMAIL", "LABEL_EMAIL_REGARDS", "Best regards", "EN"),
   LABEL_EMAIL_REGARDS_GE("EMAIL", "LABEL_EMAIL_REGARDS", "Beste Grüsse", "GE"),
-  LABEL_EMAIL_TEAM_EN("EMAIL", "LABEL_EMAIL_TEAM", "Your redanz Team", "EN"),
-  LABEL_EMAIL_TEAM_GE("EMAIL", "LABEL_EMAIL_TEAM", "Dein redanz Team", "GE");
+  LABEL_EMAIL_TEAM_EN("EMAIL", "LABEL_EMAIL_TEAM", "Your redAnz Team", "EN"),
+  LABEL_EMAIL_TEAM_GE("EMAIL", "LABEL_EMAIL_TEAM", "Dein redAnz Team", "GE");
 
   private final String type;
   private final String outTextKey;

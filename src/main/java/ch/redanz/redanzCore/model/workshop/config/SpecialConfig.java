@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum SpecialConfig {
-  SPECIAL_MASSAGE(OutTextConfig.LABEL_SPECIAL_MASSAGE_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_SPECIAL_MASSAGE_DESC_EN.getOutTextKey());
+  SPECIAL_WHISKEY_TASTING(OutTextConfig.LABEL_SPECIAL_WHISKEY_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_SPECIAL_WHISKEY_DESC_EN.getOutTextKey());
 
   private final String name;
   private final String description;
