@@ -9,6 +9,7 @@ import ch.redanz.redanzCore.model.registration.entities.VolunteerRegistration;
 import ch.redanz.redanzCore.model.registration.entities.VolunteerSlotRegistration;
 import ch.redanz.redanzCore.model.registration.repository.VolunteerRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.VolunteerSlotRegistrationRepo;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import com.google.gson.JsonArray;
@@ -30,10 +31,15 @@ public class VolunteerService {
   private final PersonService personService;
   private final LanguageService languageService;
   private final OutTextService outTextService;
+  private final EventService eventService;
 
 
   public List<VolunteerRegistration> getAll() {
     return volunteerRegistrationRepo.findAll();
+  }
+
+  public List<VolunteerRegistration> getAllCurrentEvent() {
+    return volunteerRegistrationRepo.findAllByRegistrationEvent(eventService.getCurrentEvent());
   }
 
   public String getSlots(VolunteerRegistration volunteerRegistration, Language language) {

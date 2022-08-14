@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.registration.service;
 import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.*;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SleepUtilService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
@@ -27,6 +28,7 @@ public class HostingService {
   private final HostSlotRegistraitionRepo hostSlotRegistrationRepo;
   private final SleepUtilService sleepUtilService;
   private final SlotService slotService;
+  private final EventService eventService;
 
   private final OutTextService outTextService;
 
@@ -176,6 +178,16 @@ public class HostingService {
 
   public List<HosteeRegistration> getAllHosteeRegistrations(){
     return hosteeRegistrationRepo.findAll();
+  }
+
+  public List<HostRegistration> getAllHostRegistrationsCurrentEvent(){
+
+    return hostRegistrationRepo.findAllByRegistrationEvent(eventService.getCurrentEvent());
+  }
+
+  public List<HosteeRegistration> getAllHosteeRegistrationsCurrentEvent(){
+
+    return hosteeRegistrationRepo.findAllByRegistrationEvent(eventService.getCurrentEvent());
   }
 
   public Map<String, List<Object>> getHosteeRegistration(Registration registration) {

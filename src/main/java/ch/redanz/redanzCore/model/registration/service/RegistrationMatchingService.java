@@ -6,7 +6,6 @@ import ch.redanz.redanzCore.model.registration.repository.RegistrationMatchingRe
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
