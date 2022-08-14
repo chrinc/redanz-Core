@@ -20,7 +20,7 @@ public class ReportVolunteerService {
   private final OutTextService outTextService;
   public List<ResponseVolunteer> getVolunteerReport(Language language) {
     List<ResponseVolunteer> volunteers = new ArrayList<>();
-    volunteerService.getAll().forEach(volunteerRegistration -> {
+    volunteerService.getAllCurrentEvent().forEach(volunteerRegistration -> {
       Registration registration = volunteerRegistration.getRegistration();
       volunteers.add(
         new ResponseVolunteer(

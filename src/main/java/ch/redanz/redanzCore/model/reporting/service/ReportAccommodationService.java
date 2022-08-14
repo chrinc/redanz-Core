@@ -23,7 +23,7 @@ public class ReportAccommodationService {
   private final HostingService hostingService;
   public List<ResponseAccommodation> getAccommodationReport(Language language) {
     List<ResponseAccommodation> accommodations = new ArrayList<>();
-    hostingService.getAllHostRegistrations().forEach(hostRegistration -> {
+    hostingService.getAllHostRegistrationsCurrentEvent().forEach(hostRegistration -> {
       Registration registration = hostRegistration.getRegistration();
       accommodations.add(
         new ResponseAccommodation(
@@ -41,7 +41,7 @@ public class ReportAccommodationService {
         )
       );
     });
-    hostingService.getAllHosteeRegistrations().forEach(hosteeRegistration -> {
+    hostingService.getAllHosteeRegistrationsCurrentEvent().forEach(hosteeRegistration -> {
       Registration registration = hosteeRegistration.getRegistration();
       accommodations.add(
         new ResponseAccommodation(
