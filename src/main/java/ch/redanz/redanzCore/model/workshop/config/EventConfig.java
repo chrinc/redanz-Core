@@ -8,7 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum EventConfig {
-  EVENT2022("Stir it! 2022", 320, "Weekend Dance Workshop");
+  EVENT2022("Stir it! 2022", 320, "Weekend Dance Workshop"),
+  EVENT2022_ARV("Stir it! 2022 ARV", 999, "Weekend Dance Workshop Archive");
 
   private final String name;
   private final Integer capacity;

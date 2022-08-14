@@ -3,10 +3,7 @@ package ch.redanz.redanzCore.model.registration.service;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
+import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
@@ -203,6 +200,27 @@ public class RegistrationService {
 
   public Optional<Registration> findByParticipantAndEvent(Person participant, Event event) {
     return registrationRepo.findByParticipantAndEvent(participant, event);
+  }
+
+  public void onCancel(Registration registration) throws TemplateException, IOException {
+    workflowTransitionService.setWorkflowStatus(
+      registration,
+      workflowStatusService.getCancelled()
+    );
+    updateSoldOut();
+  }
+
+  public void onManualRelease(Registration registration) throws TemplateException, IOException {
+    releaseToConfirming(registration);
+    registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration));
+  }
+
+  public void releaseToConfirming(Registration registration) {
+    workflowTransitionService.setWorkflowStatus(
+      registration,
+      workflowStatusService.getConfirming()
+    );
+    updateSoldOut();
   }
 
   public List<Registration> findAllByCurrentEvent() {

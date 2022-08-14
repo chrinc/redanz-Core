@@ -67,6 +67,39 @@ public class RegistrationController {
     }
   }
 
+  @GetMapping(path = "/manual-release")
+  @Transactional
+  public void manualRelease(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      registrationService.onManualRelease(
+        registrationService.getRegistration(
+          userId,
+          eventService.getCurrentEvent()
+        )
+      );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+  @GetMapping(path = "/manual-cancel")
+  @Transactional
+  public void manualCancel(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      registrationService.onCancel(
+        registrationService.getRegistration(
+          userId,
+          eventService.getCurrentEvent()
+        )
+      );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
   @PostMapping(path = "/submit")
   @Transactional
   public void register(

@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public enum FoodConfig {
   FOOD_VEDA(OutTextConfig.LABEL_FOOD_VEDA_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FOOD_VEDA_DESC_EN.getOutTextKey(), 20);
-//  FOOD_SOUP("Soup", OutTextConfig.LABEL_FOOD_SOUP_DESC_EN.getOutTextKey(), 20);
 
   private final String name;
   private final String description;

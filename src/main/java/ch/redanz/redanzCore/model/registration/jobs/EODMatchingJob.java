@@ -37,7 +37,7 @@ public class EODMatchingJob {
   public void runMatching() {
     log.info("Job: runMatching");
     registrationService.updateSoldOut();
-    doMatching(registrationMatchingService.findRegistrationMatchingByRegistration2IsNull());
+    doMatching(registrationMatchingService.findRegistration2ISNullSubmittedCurrent());
   }
 
   private void doMatching(List<RegistrationMatching> registrationMatchings) {

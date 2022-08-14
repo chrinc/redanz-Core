@@ -45,6 +45,7 @@ public class EODReleaseJob {
 //        List<Registration> releasedRegistrations = new ArrayList<>();
 
         if (isRelease(registration) && !releasedRegistrations.contains(registration)) {
+          log.info("registration firstName: {}", registration.getParticipant().getFirstName());
           try {
 
             // release partner first
@@ -80,7 +81,6 @@ public class EODReleaseJob {
     } else return true;
   }
   private boolean isCapacityOK (Registration registration) {
-
     return
       registrationService.countConfirmingAndDone() < eventService.getCurrentEvent().getCapacity() &&
       registrationService.countBundlesConfirmingAndDone(
@@ -93,10 +93,6 @@ public class EODReleaseJob {
   }
 
   private void releaseToConfirming(Registration registration) {
-    workflowTransitionService.setWorkflowStatus(
-      registration,
-      workflowStatusService.getConfirming()
-    );
-    registrationService.updateSoldOut();
+    registrationService.releaseToConfirming(registration);
   }
 }
