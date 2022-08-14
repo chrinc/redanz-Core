@@ -80,7 +80,6 @@ public class EODReleaseJob {
     } else return true;
   }
   private boolean isCapacityOK (Registration registration) {
-
     return
       registrationService.countConfirmingAndDone() < eventService.getCurrentEvent().getCapacity() &&
       registrationService.countBundlesConfirmingAndDone(
@@ -93,10 +92,6 @@ public class EODReleaseJob {
   }
 
   private void releaseToConfirming(Registration registration) {
-    workflowTransitionService.setWorkflowStatus(
-      registration,
-      workflowStatusService.getConfirming()
-    );
-    registrationService.updateSoldOut();
+    registrationService.releaseToConfirming(registration);
   }
 }

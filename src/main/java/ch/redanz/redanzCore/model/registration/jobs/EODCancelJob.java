@@ -46,12 +46,8 @@ public class EODCancelJob {
       );
       if (reminderSentDate != null && reminderSentDate.isBefore(deadline)) {
         try {
-          workflowTransitionService.setWorkflowStatus(
-            registration,
-            workflowStatusService.getCancelled()
-          );
-          registrationEmailService.sendCancellationEmail(registration, registrationEmail);
-          registrationService.updateSoldOut();
+          registrationService.onCancel(registration);
+          registrationEmailService.sendCancellationEmail(registration, registrationEmailService.findByRegistration(registration));
         } catch (IOException | TemplateException e) {
           throw new RuntimeException(e);
         }
