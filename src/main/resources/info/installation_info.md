@@ -94,11 +94,12 @@ Necessary tools for testing and development
    - list all screens: `screen -list`
    - attach to a screen: `screen -r redanz.spring`
    - detach `Ctrl + A Ctrl + D`
+   - attach to already attached screen `screen -rd redanz.sql`
  - Start Spring on Server:
 -- clean inst all:
 `mvn clean install`
 --spring.profiles.active=prod --redanz.master.password=
 ``java -jar $snapshot --spring.profiles.active=prod --redanz.master.password=$pass``
 `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
-
+ - Renew Certificate: `certbot renew`
  - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
