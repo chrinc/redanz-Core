@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseVolunteer;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +19,9 @@ import java.util.List;
 public class ReportVolunteerService {
   private final VolunteerService volunteerService;
   private final OutTextService outTextService;
-  public List<ResponseVolunteer> getVolunteerReport(Language language) {
+  public List<ResponseVolunteer> getVolunteerReport(Language language, Event event) {
     List<ResponseVolunteer> volunteers = new ArrayList<>();
-    volunteerService.getAllCurrentEvent().forEach(volunteerRegistration -> {
+    volunteerService.getAllByEvent(event).forEach(volunteerRegistration -> {
       Registration registration = volunteerRegistration.getRegistration();
       volunteers.add(
         new ResponseVolunteer(

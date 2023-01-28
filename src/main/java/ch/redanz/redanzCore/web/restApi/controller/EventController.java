@@ -1,15 +1,20 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
+import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
+import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
 import ch.redanz.redanzCore.model.workshop.service.*;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -32,9 +37,31 @@ public class EventController {
     return eventService.getAllEvents();
   }
 
+  @GetMapping(path = "/byId")
+  @Transactional
+  public Event getUserActiveRegistration(
+    @RequestParam("eventId") Long eventId
+  ) {
+    try {
+      return eventService.getById(eventId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
   @GetMapping(path = "/current")
   public Event getCurrentEvent() {
     return eventService.getCurrentEvent();
+  }
+
+  @GetMapping(path = "/active")
+  public List<Event> getActivEvents() {
+    return eventService.getActiveEvents();
+  }
+
+  @GetMapping(path = "/inactive")
+  public List<Event> getInactiveEvents() {
+    return eventService.getInactiveEvents();
   }
 
   @GetMapping(path = "/out-text/all")

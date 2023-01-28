@@ -6,6 +6,7 @@ import ch.redanz.redanzCore.model.registration.repository.RegistrationMatchingRe
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class RegistrationMatchingService {
 
@@ -48,6 +50,46 @@ public class RegistrationMatchingService {
         registrationMatching.setPartnerEmail(String.valueOf(request.getPartnerEmail()));
       }
       save(registrationMatching);
+    }
+  }
+
+  void cleanupMatchingRequest(Registration registration, boolean totalCleanup) {
+    if (registrationMatchingRepo.findByRegistration1(registration).isPresent()) {
+
+      if (totalCleanup) {
+        registrationMatchingRepo.deleteAllByRegistration1(registration);
+      } else {
+        RegistrationMatching registration1Matching = registrationMatchingRepo.findByRegistration1(registration).get();
+        registration1Matching.setRegistration2(null);
+        registration1Matching.setPartnerEmail(null);
+        save(registration1Matching);
+
+      }
+    }
+
+    if (registrationMatchingRepo.findByRegistration2(registration).isPresent()) {
+      RegistrationMatching registration2Matching = registrationMatchingRepo.findByRegistration2(registration).get();
+      registration2Matching.setRegistration2(null);
+//      registration2Matching.setPartnerEmail(null);
+      save(registration2Matching);
+    }
+  }
+
+  public void updateMatchingRequest(Registration registration, RegistrationRequest request) {
+    if (request.getTrackId() != null && registration.getTrack().getPartnerRequired()) {
+      RegistrationMatching registrationMatching
+        = registrationMatchingRepo.findByRegistration1(registration).isPresent() ?
+          registrationMatchingRepo.findByRegistration1(registration).get() :
+          new RegistrationMatching(registration);
+
+      if (request.getPartnerEmail() != null) {
+        registrationMatching.setPartnerEmail(String.valueOf(request.getPartnerEmail()));
+        save(registrationMatching);
+      } else {
+        cleanupMatchingRequest(registration, false);
+      }
+    } else {
+      cleanupMatchingRequest(registration, true);
     }
   }
 

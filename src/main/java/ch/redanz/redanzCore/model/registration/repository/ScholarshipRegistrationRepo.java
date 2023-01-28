@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ScholarshipRegistrationRepo extends JpaRepository<ScholarshipRegistration, Long> {
   ScholarshipRegistration findByRegistration(Registration registration);
+  void deleteAllByRegistration(Registration registration);
 }

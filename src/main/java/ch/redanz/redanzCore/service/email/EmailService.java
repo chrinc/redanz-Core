@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.service.email;
 
 import ch.redanz.redanzCore.model.profile.config.UserConfig;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,8 @@ public class EmailService {
   private static String emailDebug;
   private static String emailHostName;
   private static boolean sendEmail;
+  private static boolean sendToTestEmail;
+  private static String testEmail;
 
   @Autowired
   public EmailService(
@@ -34,7 +37,9 @@ public class EmailService {
     @Value("${email.debug}") String emailDebug,
     @Value("${email.host.name}") String emailHostName,
     @Value("${email.smtp.port}") String emailSmtpPort,
-    @Value("${email.send}") boolean sendEmail
+    @Value("${email.send}") boolean sendEmail,
+    @Value("${email.sendToTestMail}") boolean sendToTestMailEmail,
+    @Value("${email.testEmail}") String testEmail
   ) {
     this.hostEmail = hostEmail;
     this.hostPassword = hostPassword;
@@ -43,6 +48,8 @@ public class EmailService {
     this.emailDebug = emailDebug;
     this.emailSmtpPort = emailSmtpPort;
     this.sendEmail = sendEmail;
+    this.sendToTestEmail = sendToTestMailEmail;
+    this.testEmail = testEmail;
   }
 
   @Bean("devSession")
@@ -80,9 +87,18 @@ public class EmailService {
         UserConfig.values()).anyMatch(
         userConfig -> Objects.equals(userConfig.getEmail(), toEmail)
       );
+
       msg.setRecipients(
-        Message.RecipientType.TO, InternetAddress.parse(toEmail, false)
+        Message.RecipientType.TO, InternetAddress.parse(
+          (sendToTestEmail) ? testEmail : toEmail
+          , false)
       );
+      log.info("send email, emailIsConfig: " + emailIsConfig);
+      log.info("send email, sendEmail: " + sendEmail);
+      log.info("send email, msg: " + msg);
+      log.info("send email, toEmail: " + toEmail);
+      log.info("send email, sendToTestEmail: " + sendToTestEmail);
+      log.info("send email, testEmail: " + testEmail);
       if (!emailIsConfig && sendEmail) Transport.send(msg);
     } catch (Exception e) {
       e.printStackTrace();

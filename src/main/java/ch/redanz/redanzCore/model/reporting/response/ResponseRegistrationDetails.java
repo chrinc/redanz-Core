@@ -21,4 +21,5 @@ public class ResponseRegistrationDetails {
   private String workflowStatus;
   private String partnerEmail;
   private Long partnerRegistrationId;
+  private Long eventId;
 }

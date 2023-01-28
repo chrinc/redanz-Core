@@ -82,7 +82,7 @@ public class EODReleaseJob {
   }
   private boolean isCapacityOK (Registration registration) {
     return
-      registrationService.countConfirmingAndDone() < eventService.getCurrentEvent().getCapacity() &&
+      registrationService.countConfirmingAndDoneByEvent(eventService.getCurrentEvent()) < eventService.getCurrentEvent().getCapacity() &&
       registrationService.countBundlesConfirmingAndDone(
         registration.getBundle()
       ) < registration.getBundle().getCapacity() &&

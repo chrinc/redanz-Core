@@ -3,7 +3,10 @@ package ch.redanz.redanzCore.model.registration.service;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.entities.*;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +65,7 @@ public class RegistrationService {
 
     // Event
     Event currentEvent = eventService.getCurrentEvent();
-    if (countDone() >= currentEvent.getCapacity()) {
+    if (countDoneByEvent(currentEvent) >= currentEvent.getCapacity()) {
       if (!currentEvent.isSoldOut()) {
         currentEvent.setSoldOut(true);
         eventService.save(currentEvent);
@@ -112,6 +116,10 @@ public class RegistrationService {
     return registrationRepo.findAllByEvent(eventService.getCurrentEvent());
   }
 
+  public List<Registration> findAllByEvent(Event event) {
+    return registrationRepo.findAllByEvent(event);
+  }
+
   public List<WorkflowStatus> getWorkflowStatusList() {
     return workflowStatusService.findAll();
   }
@@ -121,25 +129,25 @@ public class RegistrationService {
       eventService.getCurrentEvent()
     );
   }
-  public int countSubmittedConfirmingAndDone() {
-    return countSubmitted() + countConfirming() + countDone();
+  public int countSubmittedConfirmingAndDoneByEvent(Event event) {
+    return countSubmittedByEvent(event) + countConfirmingByEvent(event) + countDoneByEvent(event);
   }
-  public int countConfirmingAndDone() {
-    return countConfirming() + countDone();
+  public int countConfirmingAndDoneByEvent(Event event) {
+    return countConfirmingByEvent(event) + countDoneByEvent(event);
   }
-  public int countSubmitted() {
+  public int countSubmittedByEvent(Event event) {
     return registrationRepo.countAllByWorkflowStatusAndEvent(
-      workflowStatusService.getSubmitted(), eventService.getCurrentEvent()
+      workflowStatusService.getSubmitted(), event
     );
   }
-  public int countConfirming() {
+  public int countConfirmingByEvent(Event event) {
     return registrationRepo.countAllByWorkflowStatusAndEvent(
-      workflowStatusService.getConfirming(), eventService.getCurrentEvent()
+      workflowStatusService.getConfirming(), event
     );
   }
-  public int countDone() {
+  public int countDoneByEvent(Event event) {
     return registrationRepo.countAllByWorkflowStatusAndEvent(
-      workflowStatusService.getDone(), eventService.getCurrentEvent()
+      workflowStatusService.getDone(), event
     );
   }
 
@@ -223,26 +231,9 @@ public class RegistrationService {
     updateSoldOut();
   }
 
-  public List<Registration> findAllByCurrentEvent() {
-    return registrationRepo.findAllByEvent(eventService.getCurrentEvent());
-  }
-
-  public List<Registration> findAllByCurrentEventAndWorkflowStatus(WorkflowStatus workflowStatus) {
-    return registrationRepo.findAllByWorkflowStatusAndEvent(
-      workflowStatus,
-      eventService.getCurrentEvent()
-    );
-  }
-
   public List<Registration> getAllConfirmingRegistrations() {
     return getAllByWorkflowStatus(
       workflowStatusService.getConfirming()
-    );
-  }
-
-  public List<Registration> getAllDoneRegistrations() {
-    return getAllByWorkflowStatus(
-      workflowStatusService.getDone()
     );
   }
 
@@ -260,102 +251,163 @@ public class RegistrationService {
   }
 
   @Transactional
-  public void submitRegistration(Long userId, JsonObject request) throws IOException, TemplateException {
-    log.info("inc@submitRegistration, request: {}", request);
+  public void updateRegistrationRequest(Long userId, JsonObject request) throws IOException, TemplateException {
+    log.info("inc@updateRegistration, userId: {}", userId);
+    log.info("inc@updateRegistration, request: {}", request);
+    boolean isNewRegistration = false;
     // ignore if user already has a registration
-
-    if (findByParticipantAndEvent(
-      personService.findByUser(userService.findByUserId(userId)),
-      eventService.getCurrentEvent()
-    ).isPresent()) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_DUPLICATE_EN.getOutTextKey());
-    }
-
+    Registration registration;
     RegistrationRequest registrationRequest = new RegistrationRequest(
-      request.get("eventId").getAsLong(),
+      request.get("event").getAsJsonObject().get("eventId").getAsLong(),
       request.get("bundleId").getAsLong(),
       request.get("trackId").isJsonNull() ? null : request.get("trackId").getAsLong(),
       (request.get("danceRoleId") == null || request.get("danceRoleId").isJsonNull()) ? null : request.get("danceRoleId").getAsLong(),
       (request.get("partnerEmail") == null || request.get("partnerEmail").isJsonNull()) ? null : request.get("partnerEmail").getAsString()
     );
-    try {
-      saveNewRegistration(registrationRequest, userId);
-    } catch (Exception exception) {
-      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for userId: " + userId + ", request: " + request);
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
-    }
 
-    Registration registration = findByParticipantAndEvent(
+    log.info("inc@updateRegistration, after registrationRequest");
+    if (findByParticipantAndEvent(
       personService.findByUser(userService.findByUserId(userId)),
       eventService.getCurrentEvent()
-    ).get();
+    ).isPresent())
 
-    try {
-      if (request.get("foodRegistration") != null && !request.get("foodRegistration").getAsJsonArray().isEmpty()) {
-        foodRegistrationService.saveFoodRegistration(registration, request.get("foodRegistration").getAsJsonArray());
+    // update Registration
+    {
+      registration = findByParticipantAndEvent(
+        personService.findByUser(userService.findByUserId(userId)),
+        eventService.getCurrentEvent()
+      ).get();
+      updateRegistration(registration, registrationRequest, userId);
+    }
+
+    // new Registration
+    else {
+      try {
+        isNewRegistration = true;
+        saveNewRegistration(registrationRequest, userId);
+      } catch (Exception exception) {
+        errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for userId: " + userId + ", request: " + request);
+        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
       }
+      registration = findByParticipantAndEvent(
+        personService.findByUser(userService.findByUserId(userId)),
+        eventService.getCurrentEvent()
+      ).get();
       discountRegistrationService.saveEarlyBird(registration, countAll());
-      if (request.get("discountRegistration") != null && !request.get("discountRegistration").getAsJsonArray().isEmpty()) {
-        discountRegistrationService.saveDiscountRegistration(registration, request.get("discountRegistration").getAsJsonArray());
-      }
-    } catch (Exception exception) {
-      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Food Registration for userId: " + userId + ", request: " + request);
     }
 
-    try {
-      if (request.get("specialRegistration") != null && !request.get("specialRegistration").getAsJsonArray().isEmpty()) {
-        specialRegistrationService.saveSpecialRegistration(registration, request.get("specialRegistration").getAsJsonArray());
+    log.info("inc@updateRegistration, bfr food");
+    foodRegistrationService.updateFoodRegistrationRequest(registration, request);
+    log.info("inc@updateRegistration, bfr discount");
+    discountRegistrationService.updateDiscountRegistrationRequest(registration, request);
+    log.info("inc@updateRegistration, bfr special Reg");
+    specialRegistrationService.updateSpecialRegistrationRequest(registration, request);
+    log.info("inc@updateRegistration, bfr Host");
+    hostingService.updateHostRegistrationRequest(registration, request);
+    log.info("inc@updateRegistration, bfr Hostee");
+    hostingService.updateHosteeRegistrationRequest(registration, request);
+    log.info("inc@updateRegistration, bfr Volunteer");
+    volunteerService.updateVolunteerRequest(registration, request);
+    log.info("inc@updateRegistration, bfr Scholarship");
+    donationRegistrationService.updateScholarshipRequest(registration, request);
+    log.info("inc@updateRegistration, bfr Donation");
+    donationRegistrationService.updateDonationRequest(registration, request);
+    log.info("inc@updateRegistration, bfr Matching");
+    registrationMatchingService.updateMatchingRequest(registration, registrationRequest);
+
+    log.info("inc@updateRegistration, isNewRegistration: " + isNewRegistration);
+    if (isNewRegistration) {
+      try {
+        workflowTransitionService.setWorkflowStatus(
+          registration
+          ,workflowStatusService.getSubmitted()
+        );
+        registrationEmailService.sendRegistrationSubmittedEmail(registration);
+      } catch (Exception exception) {
+        errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Update Workflow Status for userId: " + userId + ", request: " + request);
       }
-    } catch (Exception exception) {
-      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Accommodation for userId: " + userId + ", request: " + request);
     }
 
-    try {
-      if (request.get("hosteeRegistration") != null && !request.get("hostRegistration").getAsJsonArray().isEmpty()) {
-        hostingService.saveHostRegistration(registration, request.get("hostRegistration").getAsJsonArray());
-      }
-      if (request.get("hosteeRegistration") != null && !request.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
-        hostingService.saveHosteeRegistration(registration, request.get("hosteeRegistration").getAsJsonArray());
-      }
-    } catch (Exception exception) {
-      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Hosting Registration for userId: " + userId + ", request: " + request);
-    }
-
-    try {
-      if (request.get("volunteerRegistration") != null && !request.get("volunteerRegistration").isJsonNull()) {
-        volunteerService.saveVolunteerRegistration(registration, request.get("volunteerRegistration").getAsJsonObject());
-      }
-      if (request.get("scholarshipRegistration") != null && !request.get("scholarshipRegistration").isJsonNull()) {
-        donationRegistrationService.saveScholarishpRegistration(registration, request.get("scholarshipRegistration").getAsJsonArray());
-      }
-    } catch (Exception exception) {
-      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Volunteering Registration for userId: " + userId + ", request: " + request);
-    }
-
-    try {
-      if (request.get("donationRegistration") != null && !request.get("donationRegistration").isJsonNull()) {
-        donationRegistrationService.saveDonationRegistration(registration, request.get("donationRegistration").getAsJsonArray());
-      }
-    } catch (Exception exception) {
-      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Donation Registration for userId: " + userId + ", request: " + request);
-    }
-
-    try {
-      workflowTransitionService.setWorkflowStatus(
-        registration
-        , workflowStatusService.getSubmitted()
-      );
-      registrationMatchingService.setRegistrationMatching(registration, registrationRequest);
-      registrationEmailService.sendRegistrationSubmittedEmail(registration);
-    } catch (Exception exception) {
-      errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Update Workflow Status for userId: " + userId + ", request: " + request);
-    }
   }
+
   public Registration getRegistration(Long userId, Event event) {
     return registrationRepo.findByParticipantAndEvent(
       personService.findByUser(userService.findByUserId(userId)),
       event
     ).get();
+  }
+  public RegistrationResponse getRegistrationResponse(Registration registration) {
+    RegistrationResponse registrationResponse = new RegistrationResponse(
+      registration.getRegistrationId(),
+      registration.getParticipant().getUser().getUserId(),
+      registration.getEvent(),
+      registration.getBundle().getBundleId()
+    );
+
+    registrationResponse.setEvent(registration.getEvent());
+    registrationResponse.setRegistrationId(registration.getRegistrationId());
+    registrationResponse.setBundleId(registration.getBundle().getBundleId());
+
+    // track
+    if (registration.getTrack() != null) {
+      registrationResponse.setTrackId(registration.getTrack().getTrackId());
+    }
+
+    // dance role
+    if (registration.getDanceRole() != null) {
+      registrationResponse.setDanceRoleId(registration.getDanceRole().getDanceRoleId());
+    }
+
+    // partner Email
+    RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
+    if (registrationMatching != null) {
+      registrationResponse.setPartnerEmail(registrationMatching.getPartnerEmail());
+    }
+
+    // workflow Status
+    WorkflowTransition workflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
+    registrationResponse.setWorkflowStatus(workflowTransition.getWorkflowStatus());
+
+    // Food Registration
+    registrationResponse.setFoodRegistrations(
+      foodRegistrationService.getAllByRegistration(registration)
+    );
+
+    // Host Registration
+    registrationResponse.setHostRegistration(
+      hostingService.getHostRegistration(registration)
+    );
+
+    // Hostee Registration
+    registrationResponse.setHosteeRegistration(
+      hostingService.getHosteeRegistration(registration)
+    );
+
+    // Volunteer Registration
+    registrationResponse.setVolunteerRegistration(
+      volunteerService.getVolunteerRegistration(registration)
+    );
+
+    // Scholarship Registration
+    registrationResponse.setScholarshipRegistration(
+      donationRegistrationService.getScholarshipRegistration(registration)
+    );
+
+    // Scholarship Registration
+    registrationResponse.setDonationRegistration(
+      donationRegistrationService.getDonationRegistration(registration)
+    );
+
+    // Discounts
+    registrationResponse.setDiscountRegistrations(
+      discountRegistrationService.findAllByRegistration(registration)
+    );
+
+    // Specials
+    registrationResponse.setSpecialRegistrations(
+      specialRegistrationService.findAllByRegistration(registration)
+    );
+    return registrationResponse;
   }
 
   public RegistrationResponse getRegistrationResponse(Long userId, Long eventId) {
@@ -364,84 +416,61 @@ public class RegistrationService {
         personService.findByUser(userService.findByUserId(userId)),
         eventService.findByEventId(eventId)
       );
-
     if (registrationOptional.isPresent()) {
       Registration registration = registrationOptional.get();
-      RegistrationResponse registrationResponse = new RegistrationResponse(
-        registration.getRegistrationId(),
-        registration.getParticipant().getUser().getUserId(),
-        registration.getEvent().getEventId(),
-        registration.getBundle().getBundleId()
-      );
-
-      registrationResponse.setEventId(registration.getEvent().getEventId());
-      registrationResponse.setRegistrationId(registration.getRegistrationId());
-      registrationResponse.setBundleId(registration.getBundle().getBundleId());
-
-      // track
-      if (registration.getTrack() != null) {
-        registrationResponse.setTrackId(registration.getTrack().getTrackId());
-      }
-
-      // dance role
-      if (registration.getDanceRole() != null) {
-        registrationResponse.setDanceRoleId(registration.getDanceRole().getDanceRoleId());
-      }
-
-      // partner Email
-      RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
-      if (registrationMatching != null) {
-        registrationResponse.setPartnerEmail(registrationMatching.getPartnerEmail());
-      }
-
-      // workflow Status
-      WorkflowTransition workflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
-      registrationResponse.setWorkflowStatus(workflowTransition.getWorkflowStatus());
-
-      // Food Registration
-      registrationResponse.setFoodRegistrations(
-        foodRegistrationService.getAllByRegistration(registration)
-      );
-
-      // Host Registration
-      registrationResponse.setHostRegistration(
-        hostingService.getHostRegistration(registration)
-      );
-
-      // Hostee Registration
-      registrationResponse.setHosteeRegistration(
-        hostingService.getHosteeRegistration(registration)
-      );
-
-      // Volunteer Registration
-      registrationResponse.setVolunteerRegistration(
-        volunteerService.getVolunteerRegistration(registration)
-      );
-
-      // Scholarship Registration
-      registrationResponse.setScholarshipRegistration(
-        donationRegistrationService.getScholarshipRegistration(registration)
-      );
-
-      // Scholarship Registration
-        log.info("donationRegistrationService.getDonationRegistration(registration): {}", donationRegistrationService.getDonationRegistration(registration));
-      registrationResponse.setDonationRegistration(
-        donationRegistrationService.getDonationRegistration(registration)
-      );
-        log.info("registrationResponse: {}", registrationResponse);
-
-      // Discounts
-      registrationResponse.setDiscountRegistrations(
-        discountRegistrationService.findAllByRegistration(registration)
-      );
-
-      // Specials
-      registrationResponse.setSpecialRegistrations(
-        specialRegistrationService.findAllByRegistration(registration)
-      );
-      return registrationResponse;
+      return getRegistrationResponse(registration);
+    } else {
+      return null;
     }
-    return null;
+  }
+
+  public List<RegistrationResponse> getAllUserRegistrationResponses(Long userId) {
+    List<RegistrationResponse> registrationResponses = new ArrayList<>();
+    List<Registration> registrations =
+      registrationRepo.findAllByParticipant(
+        personService.findByUser(userService.findByUserId(userId))
+      );
+
+    if (registrations != null) {
+      registrations.forEach(registration -> {
+        registrationResponses.add(getRegistrationResponse(registration));
+      });
+    }
+    return registrationResponses;
+  }
+
+  public List<RegistrationResponse> getUserActiveRegistrationResponses(Long userId) {
+    List<RegistrationResponse> registrationResponses = new ArrayList<>();
+    List<Registration> registrations =
+      registrationRepo.findAllByParticipantAndEventArchivedAndEventActive(
+        personService.findByUser(userService.findByUserId(userId))
+    ,false
+    ,true
+      );
+
+    if (registrations != null) {
+      registrations.forEach(registration -> {
+        registrationResponses.add(getRegistrationResponse(registration));
+      });
+    }
+    return registrationResponses;
+  }
+
+  public List<RegistrationResponse> getUserInactiveRegistrationResponses(Long userId) {
+    List<RegistrationResponse> registrationResponses = new ArrayList<>();
+    List<Registration> registrations =
+      registrationRepo.findAllByParticipantAndEventArchivedAndEventActive(
+        personService.findByUser(userService.findByUserId(userId))
+        ,false
+        ,false
+      );
+
+    if (registrations != null) {
+      registrations.forEach(registration -> {
+        registrationResponses.add(getRegistrationResponse(registration));
+      });
+    }
+    return registrationResponses;
   }
 
   private void saveNewRegistration(RegistrationRequest request, Long userId) {
@@ -457,5 +486,14 @@ public class RegistrationService {
       newRegistration.setDanceRole(danceRoleService.findByDanceRoleId(request.getDanceRoleId()));
     }
     update(newRegistration);
+  }
+
+  private void updateRegistration(Registration registration, RegistrationRequest request, Long userId) {
+    registration.setEvent(eventService.findByEventId(request.getEventId()));
+    registration.setBundle(bundleService.findByBundleId(request.getBundleId()));
+    registration.setParticipant(personService.findByUser(userService.findByUserId(userId)));
+    registration.setTrack(trackService.findByTrackId(request.getTrackId()));
+    registration.setDanceRole(danceRoleService.findByDanceRoleId(request.getDanceRoleId()));
+    update(registration);
   }
 }
