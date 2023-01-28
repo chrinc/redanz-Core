@@ -32,7 +32,6 @@ public class EventDiscount implements Serializable {
 
   public EventDiscount() {
   }
-
   public EventDiscount(Discount discount, Event event) {
     this.discount = discount;
     this.event = event;
