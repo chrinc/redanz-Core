@@ -32,7 +32,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   public void run(String... args) {
     /*
       @todo later: implement controller and run via rest-call
-                    for now, we initiate when starting teh server
+                    for now, we initiate when starting the server
                     for the first time
     */
     if (eventService.findAll().isEmpty()) {
@@ -52,7 +52,9 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       SleepUtilConfig.setup(sleepUtilService);
       DiscountConfig.setup(discountService);
       TrackDiscountConfig.setup(trackService, discountService);
+      EventTypeSlotConfig.setup(slotService, eventService);
       SpecialConfig.setup(specialService);
+      EventDiscountConfig.setup(discountService, eventService);
     }
   }
 }

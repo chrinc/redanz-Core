@@ -1,7 +1,10 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.EventTypeSlot;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
+import ch.redanz.redanzCore.model.workshop.repository.EventTypeSlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.SlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TypeSlotRepo;
 import lombok.AllArgsConstructor;
@@ -13,10 +16,10 @@ import java.util.*;
 @AllArgsConstructor
 @Slf4j
 public class SlotService {
-
   TypeSlotRepo typeSlotRepo;
   FoodService foodService;
   SlotRepo slotRepo;
+  EventTypeSlotRepo eventTypeSlotRepo;
   OutTextService outTextService;
   public void save(Slot slot) {
     slotRepo.save(slot);
@@ -44,19 +47,20 @@ public class SlotService {
 
     return foodSlots;
   }
-  public List<List<Object>> getFoodSlotsPairs() {
+  public List<List<Object>> getFoodSlotsPairsByEvent(Event event) {
     List<List<Object>> foodSlots = new ArrayList<>();
-
-    typeSlotRepo.findAllByType("food").forEach(
-      typeSlot -> {
+    List<EventTypeSlot> eventTypeSlots;
+    eventTypeSlots = eventTypeSlotRepo.findAllByEvent(event);
+    eventTypeSlots.forEach(eventTypeSlot -> {
+      if (eventTypeSlot.getTypeSlot().getType() == "food") {
         List<Object> foodSlot = new ArrayList<>();
-        foodSlot.add(foodService.findByFoodId(typeSlot.getTypeObjectId()));
-        foodSlot.add(typeSlot.getSlot());
+        foodSlot.add(foodService.findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
+        foodSlot.add(eventTypeSlot.getTypeSlot().getSlot());
         foodSlots.add(foodSlot);
-      });
+      }
+    });
     return foodSlots;
   }
-
   public List<Slot> getAllAccommodationSlots() {
     return getAllSlots("accommodation");
   }
@@ -66,6 +70,14 @@ public class SlotService {
   }
   public Slot findByName(String name) {
     return slotRepo.findByName(name);
+  }
+
+  public TypeSlot findByTypeAndSlotName(String type, String slot) {
+    return typeSlotRepo.findByTypeAndSlot(
+      type,
+      slotRepo.findByName(slot)
+    );
+
   }
 
   private List<Slot> getAllSlots(String type) {

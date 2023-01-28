@@ -57,18 +57,10 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
       eventService, registrationService, personService, userService, registrationMatchingService
     );
 
-
     WorkflowTransitionConfig.setup(
       eventService, registrationService, personService, userService, workflowStatusService, WorkflowStatusConfig.SUBMITTED,
       workflowTransitionService
     );
-    // run EOD Scheduler first time
-//    Thread.sleep(1000);
-//    eodMatchingJob.runMatching();
-//    eodReleaseJob.runRelease();
-//    Thread.sleep(1000);
-//    WorkflowTransitionConfig.setup(
-//      eventService, registrationService, personService, userService, workflowStatusService, WorkflowStatusConfig.DONE, workflowTransitionService
-//    );
+
   }
 }

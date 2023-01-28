@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import lombok.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class RegistrationResponse {
   private Long registrationId;
   private Long userId;
-  private Long eventId;
+  private Event event;
   private Long bundleId;
   private Long trackId;
   private Long danceRoleId;
@@ -32,10 +33,10 @@ public class RegistrationResponse {
   private List<DiscountRegistration> discountRegistrations;
   private List<SpecialRegistration> specialRegistrations;
 
-  public RegistrationResponse(Long registrationId, Long userId, Long eventId, Long bundleId) {
+  public RegistrationResponse(Long registrationId, Long userId, Event event, Long bundleId) {
     this.registrationId = registrationId;
     this.userId = userId;
-    this.eventId = eventId;
+    this.event = event;
     this.bundleId = bundleId;
   }
 }

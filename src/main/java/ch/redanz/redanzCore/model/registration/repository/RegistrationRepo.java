@@ -16,6 +16,8 @@ import java.util.Optional;
 public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     Optional<Registration> findByParticipantAndEvent(Person participant, Event event);
     List<Registration> findAllByEvent(Event event);
+    List<Registration> findAllByParticipantAndEventArchivedAndEventActive(Person participant, Boolean archived, Boolean active);
+    List<Registration> findAllByParticipant(Person person);
     List<Registration> findAllByWorkflowStatusAndEvent(WorkflowStatus workflowStatus, Event event);
     int countAllByWorkflowStatusAndEvent(WorkflowStatus workflowStatus, Event event);
     int countAllByBundleAndWorkflowStatusAndEvent(Bundle bundle, WorkflowStatus workflowStatus, Event event);

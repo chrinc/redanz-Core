@@ -3,17 +3,22 @@ package ch.redanz.redanzCore.model.registration.service;
 import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Food;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.service.log.ErrorLogType;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @AllArgsConstructor
@@ -35,48 +40,85 @@ public class FoodRegistrationService {
     );
   }
 
-  public void saveFoodRegistration(Registration registration, JsonArray foodRegistration) {
-    JsonArray foodSlotsJson = foodRegistration.get(0).getAsJsonObject().get("food").getAsJsonArray();
-    foodSlotsJson.forEach(foodSlot -> {
-      save(
-        registration,
-        foodService.findByFoodId(foodSlot.getAsJsonObject().get("food").getAsJsonObject().get("foodId").getAsLong()),
-        slotService.findBySlotId(foodSlot.getAsJsonObject().get("slot").getAsJsonObject().get("slotId").getAsLong())
-      );
+  public List<FoodRegistration> foodRegistrations(Registration registration, JsonObject foodRegistrationRequest) {
+    List<FoodRegistration> foodRegistrations = new ArrayList<>();
+
+    if (foodRegistrationRequest.get("foodRegistration") != null
+      && !foodRegistrationRequest.get("foodRegistration").getAsJsonArray().isEmpty()) {
+      JsonArray foodSlotsJson = foodRegistrationRequest.get("foodRegistration")
+        .getAsJsonArray().get(0)
+        .getAsJsonObject().get("food")
+        .getAsJsonArray();
+
+      foodSlotsJson.forEach(foodSlot -> {
+        foodRegistrations.add(
+          new FoodRegistration(
+            registration,
+            foodService.findByFoodId(foodSlot.getAsJsonObject().get("food").getAsJsonObject().get("foodId").getAsLong()),
+            slotService.findBySlotId(foodSlot.getAsJsonObject().get("slot").getAsJsonObject().get("slotId").getAsLong())
+          )
+        );
+      });
+    }
+    return foodRegistrations;
+  }
+
+  public int countFoodSlotSubmittedByEvent(Food food, Slot slot, Event event){
+    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      food, slot, workflowStatusService.getSubmitted(), event
+    );
+  }
+  public int countFoodSlotConfirmingByEvent(Food food, Slot slot, Event event){
+    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      food, slot, workflowStatusService.getConfirming(), event
+    );
+  }
+  public int countFoodSlotDoneByEvent(Food food, Slot slot, Event event){
+    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      food, slot, workflowStatusService.getDone(), event
+    );
+  }
+  public int countFoodSlotConfirmingAndDoneByEvent(Food food, Slot slot, Event event) {
+    return countFoodSlotConfirmingByEvent(food, slot, event) + countFoodSlotDoneByEvent(food, slot, event);
+  }
+
+  public int countFoodSlotSubmittedReleasedAndDoneByEvent(Food food, Slot slot, Event event) {
+    return countFoodSlotSubmittedByEvent(food, slot, event) + countFoodSlotConfirmingByEvent(food, slot, event) + countFoodSlotDoneByEvent(food, slot, event);
+  }
+
+  private boolean hasFoodRegistration(List<FoodRegistration> foodRegistrations, Food food, Slot slot) {
+    AtomicBoolean hasFoodRegistration = new AtomicBoolean(false);
+    foodRegistrations.forEach(foodRegistration -> {
+      if (foodRegistration.getFood() == food && foodRegistration.getSlot() == slot) {
+        hasFoodRegistration.set(true);
+      }
     });
+
+    return hasFoodRegistration.get();
   }
 
-  public int countFoodReleasedAndDone(Food food) {
-    return foodRegistrationRepo.countAllByFoodAndRegistrationWorkflowStatusAndRegistrationEvent(
-      food, workflowStatusService.getConfirming(), eventService.getCurrentEvent()
-    )
-      +
-      foodRegistrationRepo.countAllByFoodAndRegistrationWorkflowStatusAndRegistrationEvent(
-       food, workflowStatusService.getDone(), eventService.getCurrentEvent()
-      );
-  }
+  public void updateFoodRegistrationRequest(Registration registration, JsonObject request) {
+    List<FoodRegistration> requestFoodRegistrations = foodRegistrations(registration, request);
+    List<FoodRegistration> foodRegistrations = foodRegistrationRepo.findAllByRegistration(registration);
 
-  public int countFoodSlotSubmitted(Food food, Slot slot){
-    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-      food, slot, workflowStatusService.getSubmitted(), eventService.getCurrentEvent()
-    );
-  }
-  public int countFoodSlotConfirming(Food food, Slot slot){
-    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-      food, slot, workflowStatusService.getConfirming(), eventService.getCurrentEvent()
-    );
-  }
-  public int countFoodSlotDone(Food food, Slot slot){
-    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-      food, slot, workflowStatusService.getDone(), eventService.getCurrentEvent()
-    );
-  }
-  public int countFoodSlotConfirmingAndDone(Food food, Slot slot) {
-    return countFoodSlotConfirming(food, slot) + countFoodSlotDone(food, slot);
-  }
+    // delete in current if not in request
+    foodRegistrations.forEach(foodRegistration -> {
+      log.info("foodRegistrations: " + foodRegistration.getFood().getName());
 
-  public int countFoodSlotSubmittedReleasedAndDone(Food food, Slot slot) {
-    return countFoodSlotSubmitted(food, slot) + countFoodSlotConfirming(food, slot) + countFoodSlotDone(food, slot);
+      log.info("foodRegistrations, is in other list?: " + hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
+      if (!hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
+        foodRegistrationRepo.deleteAllByRegistrationAndFoodAndSlot(registration, foodRegistration.getFood(), foodRegistration.getSlot());
+      }
+    });
+
+    // add new from request
+    requestFoodRegistrations.forEach(foodRegistration -> {
+      log.info("requestFoodRegistrations: " + foodRegistration.getFood().getName());
+      log.info("requestFoodRegistrations, is in other list?: " + hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
+      if (!hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
+        save(registration, foodRegistration.getFood(), foodRegistration.getSlot());
+      }
+    });
   }
 
   public List<FoodRegistration> getAllByRegistration(Registration registration) {

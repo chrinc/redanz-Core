@@ -17,7 +17,7 @@ public interface RegistrationMatchingRepo extends JpaRepository<RegistrationMatc
   Optional<RegistrationMatching> findByRegistration2(Registration registration2);
 
   boolean existsByRegistration2(Registration registration2);
-
+  void deleteAllByRegistration1(Registration registration);
   List<RegistrationMatching> findRegistrationMatchingByRegistration2IsNull();
 
   List<RegistrationMatching> findRegistrationMatchingByRegistration2IsNullAndRegistration1WorkflowStatusAndRegistration1Event(WorkflowStatus workflowStatus, Event event);

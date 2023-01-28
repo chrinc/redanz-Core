@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.web.restApi.controller;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.reporting.response.*;
 import ch.redanz.redanzCore.model.reporting.service.*;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ public class ReportController {
   private final ReportAccommodationService reportAccommodationService;
   private final ReportStatsService reportStatsService;
   private final LanguageService languageService;
+  private final EventService eventService;
 
   @GetMapping(path = "/person/all")
   public List<ResponsePerson> getAllPersonsReport() {
@@ -57,33 +59,43 @@ public class ReportController {
   }
 
   @GetMapping(path = "/registration/details")
-  public List<ResponseRegistrationDetails> getRegistrationDetailsReport() {
-    return reportRegistrationService.getRegistrationDetailsReport();
+  public List<ResponseRegistrationDetails> getRegistrationDetailsReport(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return reportRegistrationService.getRegistrationDetailsReport(
+      eventService.findByEventId(eventId)
+    );
   }
 
   @GetMapping(path = "/volunteer/all")
   public List<ResponseVolunteer> getVolunteerReport(
-    @RequestParam("languageKey") String languageKey
+    @RequestParam("languageKey") String languageKey,
+    @RequestParam("eventId") Long eventId
   ) {
     return reportVolunteerService.getVolunteerReport(
-      languageService.findLanguageByLanguageKey(languageKey.toUpperCase())
+      languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
+      eventService.findByEventId(eventId)
     );
   }
   @GetMapping(path = "/accommodation/all")
   public List<ResponseAccommodation> getAccommodationReport(
-    @RequestParam("languageKey") String languageKey
+    @RequestParam("languageKey") String languageKey,
+    @RequestParam("eventId") Long eventId
   ) {
     return reportAccommodationService.getAccommodationReport(
-      languageService.findLanguageByLanguageKey(languageKey.toUpperCase())
+      languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
+      eventService.findByEventId(eventId)
     );
   }
 
   @GetMapping(path = "/stats")
   public List<ResponseStats> getStatsReport(
-    @RequestParam("languageKey") String languageKey
+    @RequestParam("languageKey") String languageKey,
+    @RequestParam("eventId") Long eventId
   ) {
     return reportStatsService.getStatsReport(
-      languageService.findLanguageByLanguageKey(languageKey.toUpperCase())
+      languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
+      eventService.findByEventId(eventId)
     );
   }
 }

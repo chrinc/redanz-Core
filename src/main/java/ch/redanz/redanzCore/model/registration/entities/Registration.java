@@ -44,11 +44,6 @@ public class Registration implements Serializable {
   @JoinColumn(name="track_id")
   private Track track;
 
-//  @JoinColumns({
-//    @JoinColumn(name="workflow_status_id", referencedColumnName="workflow_status_id", insertable = true, updatable = true),
-//    @JoinColumn(name="registration_id", referencedColumnName="registration_id", insertable = true, updatable = true)
-//  })
-
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="current_workflow_status_id")
   private WorkflowStatus workflowStatus;

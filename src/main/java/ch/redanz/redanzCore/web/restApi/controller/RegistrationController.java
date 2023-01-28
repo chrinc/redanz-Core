@@ -45,6 +45,43 @@ public class RegistrationController {
     }
   }
 
+  @GetMapping(path = "/AllUserRegistrations")
+  @Transactional
+  public List<RegistrationResponse> getAllUserRegistration(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return registrationService.getAllUserRegistrationResponses(userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/UserActiveRegistrations")
+  @Transactional
+  public List<RegistrationResponse> getUserActiveRegistration(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return registrationService.getUserActiveRegistrationResponses(userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+
+  @GetMapping(path = "/UserInactiveRegistrations")
+  @Transactional
+  public List<RegistrationResponse> getInactiveUserRegistration(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return registrationService.getUserInactiveRegistrationResponses(userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
   @GetMapping(path = "/manual-match")
   @Transactional
   public void manualMatch(
@@ -100,14 +137,14 @@ public class RegistrationController {
     }
   }
 
-  @PostMapping(path = "/submit")
+  @PostMapping(path = "/update")
   @Transactional
-  public void register(
+  public void update(
     @RequestParam("userId") Long userId,
     @RequestBody String jsonObject
   ) {
     try {
-      registrationService.submitRegistration(
+      registrationService.updateRegistrationRequest(
         userId,
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );

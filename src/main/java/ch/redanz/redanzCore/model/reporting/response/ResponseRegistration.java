@@ -21,4 +21,5 @@ public class ResponseRegistration {
   private String partnerFirstName;
   private String partnerLastName;
   private String partnerDanceRole;
+  private Long eventId;
 }

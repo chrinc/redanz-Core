@@ -32,7 +32,6 @@ public class WorkflowTransition implements Serializable {
   @ManyToOne
   @MapsId("registrationId")
   @JsonIgnore
-
   @JoinColumn(name="registration_id")
   private Registration registration;
 

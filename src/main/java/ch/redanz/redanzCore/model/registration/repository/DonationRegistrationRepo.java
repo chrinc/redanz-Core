@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DonationRegistrationRepo extends JpaRepository<DonationRegistration, Long> {
   DonationRegistration findByRegistration(Registration registration);
+  void deleteAllByRegistration(Registration registration);
 }
