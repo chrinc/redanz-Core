@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(700)
-@Profile("dev || test")
+@Profile("dev")
 public class ProfileTestConfigRunner implements CommandLineRunner {
   private final UserService userService;
   private final CountryService countryService;

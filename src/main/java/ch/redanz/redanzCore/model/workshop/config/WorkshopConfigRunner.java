@@ -7,6 +7,7 @@ import ch.redanz.redanzCore.model.workshop.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(200)
+@Profile("dev")
 public class WorkshopConfigRunner implements CommandLineRunner {
   private final BundleService bundleService;
   private final TrackService trackService;

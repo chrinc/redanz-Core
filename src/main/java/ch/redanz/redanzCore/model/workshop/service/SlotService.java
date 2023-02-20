@@ -35,7 +35,6 @@ public class SlotService {
 
   public List<Object> getAllFoodSlots() {
     List<Object> foodSlots = new ArrayList<>();
-
     typeSlotRepo.findAllByType("food").forEach(
       typeSlot -> {
         HashMap<String, Object> foodSlot = new HashMap<>();
@@ -52,7 +51,7 @@ public class SlotService {
     List<EventTypeSlot> eventTypeSlots;
     eventTypeSlots = eventTypeSlotRepo.findAllByEvent(event);
     eventTypeSlots.forEach(eventTypeSlot -> {
-      if (eventTypeSlot.getTypeSlot().getType() == "food") {
+      if (eventTypeSlot.getTypeSlot().getType().equals("food")) {
         List<Object> foodSlot = new ArrayList<>();
         foodSlot.add(foodService.findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
         foodSlot.add(eventTypeSlot.getTypeSlot().getSlot());

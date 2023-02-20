@@ -32,6 +32,8 @@ public class ReportStatsService {
 
   public List<ResponseStats> getStatsReport(Language language, Event event) {
     List<ResponseStats> stats = new ArrayList<>();
+    log.info("event EventId:" + event.getEventId());
+
     bundleService.getAllByEvent(event).forEach(bundle -> {
       stats.add(
         new ResponseStats(
@@ -69,7 +71,6 @@ public class ReportStatsService {
        ,event.getCapacity()
       )
     );
-
     slotService.getFoodSlotsPairsByEvent(event).forEach(foodSlot -> {
       Food food = (Food) foodSlot.get(0);
       Slot slot = (Slot) foodSlot.get(1);

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -31,6 +32,58 @@ public class EventController {
   private final OutTextService outTextService;
   private final AccommodationService accommodationService;
   private final SpecialService specialService;
+
+  @GetMapping(path = "/schema/event")
+  public List<Map<String, String>> getEventSchema() {
+    return eventService.getEventSchema();
+  }
+
+  @GetMapping(path = "/data/event")
+  public List<Map<String, String>> getEventData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.getEventsData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+  }
+
+  @GetMapping(path = "/data/event/all")
+  public List<Map<String, String>> getAllEventData() {
+    return eventService.getEventsData(eventService.getAllEvents());
+  }
+
+  @GetMapping(path = "/schema/bundle")
+  public List<Map<String, String>> getBundleSchema() {
+    return eventService.getBundleSchema();
+  }
+
+  @GetMapping(path = "/data/bundle")
+  public List<Map<String, String>> getBundleData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.getBundlesData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+  }
+
+  @GetMapping(path = "/data/bundle/all")
+  public List<Map<String, String>> getAllBundleData() {
+    return eventService.getBundlesData(eventService.getAllEvents());
+  }
+
+  @GetMapping(path = "/schema/track")
+  public List<Map<String, String>> getTrackSchema() {
+    return eventService.getTrackSchema();
+  }
+
+  @GetMapping(path = "/data/track")
+  public List<Map<String, String>> getTrackData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.getTracksData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+  }
+
+  @GetMapping(path = "/data/track/all")
+  public List<Map<String, String>> getAllTrackData() {
+    return eventService.getTracksData(eventService.getAllEvents());
+  }
+
 
   @GetMapping(path = "/all")
   public List<Event> getAllEvents() {
