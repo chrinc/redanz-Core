@@ -14,7 +14,8 @@ public enum WorkflowStatusConfig {
     SUBMITTED("Submitted", OutTextConfig.LABEL_WORKFLOW_SUBMITTED_EN.getOutTextKey()),
     CONFIRMING("Confirming", OutTextConfig.LABEL_WORKFLOW_CONFIRMING_EN.getOutTextKey()),
     DONE("Done", OutTextConfig.LABEL_WORKFLOW_DONE_EN.getOutTextKey()),
-    CANCELLED("Cancelled", OutTextConfig.LABEL_WORKFLOW_CANCELLED_EN.getOutTextKey());
+    CANCELLED("Cancelled", OutTextConfig.LABEL_WORKFLOW_CANCELLED_EN.getOutTextKey()),
+    DELETED("Deleted", OutTextConfig.LABEL_WORKFLOW_DELETED_EN.getOutTextKey());
 
     private final String name;
     private final String label;

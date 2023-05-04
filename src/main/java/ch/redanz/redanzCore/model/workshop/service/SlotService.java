@@ -29,22 +29,25 @@ public class SlotService {
     typeSlotRepo.save(typeSlot);
   }
 
-  public List<Slot> getAllVolunteerSlots() {
-    return getAllSlots("volunteer");
+  public List<Slot> getAllVolunteerSlots(Event event) {
+    return getAllSlots("volunteer", event);
   }
 
-  public List<Object> getAllFoodSlots() {
+  public List<Object> getFoodSlots(Event event) {
     List<Object> foodSlots = new ArrayList<>();
     typeSlotRepo.findAllByType("food").forEach(
       typeSlot -> {
         HashMap<String, Object> foodSlot = new HashMap<>();
         foodSlot.put("food", foodService.findByFoodId(typeSlot.getTypeObjectId()));
         foodSlot.put("slot", typeSlot.getSlot());
-
-        foodSlots.add(foodSlot);
+        if (eventHasTypeSlot(event, typeSlot)) {
+          foodSlots.add(foodSlot);
+        }
       });
-
     return foodSlots;
+  }
+  public boolean eventHasTypeSlot(Event event, TypeSlot typeSlot) {
+    return eventTypeSlotRepo.findAllByEventAndTypeSlot(event, typeSlot).isPresent();
   }
   public List<List<Object>> getFoodSlotsPairsByEvent(Event event) {
     List<List<Object>> foodSlots = new ArrayList<>();
@@ -60,29 +63,30 @@ public class SlotService {
     });
     return foodSlots;
   }
-  public List<Slot> getAllAccommodationSlots() {
-    return getAllSlots("accommodation");
+  public List<Slot> getAccommodationSlots(Event event) {
+    return getAllSlots("accommodation", event);
   }
-
   public Slot findBySlotId(Long slotId) {
     return slotRepo.findBySlotId(slotId);
   }
   public Slot findByName(String name) {
     return slotRepo.findByName(name);
   }
-
   public TypeSlot findByTypeAndSlotName(String type, String slot) {
     return typeSlotRepo.findByTypeAndSlot(
       type,
       slotRepo.findByName(slot)
     );
-
   }
 
-  private List<Slot> getAllSlots(String type) {
+  private List<Slot> getAllSlots(String type, Event event) {
     List<Slot> slots = new ArrayList<>();
     typeSlotRepo.findAllByType(type).forEach(
-      typeSlot -> slots.add(typeSlot.getSlot())
+      typeSlot -> {
+        if (eventHasTypeSlot(event, typeSlot)) {
+          slots.add(typeSlot.getSlot());
+        }
+      }
     );
     slots.sort(Comparator.comparing(Slot::getSlotId));
     return slots;

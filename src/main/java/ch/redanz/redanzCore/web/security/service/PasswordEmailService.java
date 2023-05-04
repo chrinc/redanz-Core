@@ -5,6 +5,7 @@ import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
@@ -28,6 +29,7 @@ public class PasswordEmailService {
   private final OutTextService outTextService;
   private final LanguageService languageService;
   private final PersonService personService;
+  private final BaseParService baseParService;
   @Autowired
   Environment environment;
 
@@ -93,6 +95,7 @@ public class PasswordEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      ,baseParService.testMailOnly()
     );
   }
 }

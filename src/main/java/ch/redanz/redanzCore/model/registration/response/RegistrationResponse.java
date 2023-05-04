@@ -1,9 +1,6 @@
 package ch.redanz.redanzCore.model.registration.response;
 
-import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
-import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
-import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
+import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import lombok.*;
 
@@ -23,7 +20,7 @@ public class RegistrationResponse {
   private Long trackId;
   private Long danceRoleId;
   private String partnerEmail;
-  private WorkflowStatus WorkflowStatus;
+  private WorkflowStatus workflowStatus;
   private List<FoodRegistration> foodRegistrations;
   private Map<String, List<Object>> hostRegistration;
   private Map<String, List<Object>> hosteeRegistration;
@@ -32,11 +29,17 @@ public class RegistrationResponse {
   private Map<String, String> donationRegistration;
   private List<DiscountRegistration> discountRegistrations;
   private List<SpecialRegistration> specialRegistrations;
+  private List<PrivateClassRegistration> privateClassRegistrations;
 
   public RegistrationResponse(Long registrationId, Long userId, Event event, Long bundleId) {
     this.registrationId = registrationId;
     this.userId = userId;
     this.event = event;
     this.bundleId = bundleId;
+  }
+  public RegistrationResponse(Long userId, Event event) {
+    this.userId = userId;
+    this.event = event;
+//    this.workflowStatus = workflowStatus;
   }
 }

@@ -25,6 +25,20 @@ public class Event implements Serializable {
   @Column(name = "event_id")
   private Long eventId;
 
+  @ManyToMany
+  @JoinTable(
+    name = "event_special",
+    joinColumns = @JoinColumn(name = "event_id"),
+    inverseJoinColumns = @JoinColumn(name = "special_id"))
+  private List<Special> specials;
+
+  @ManyToMany
+  @JoinTable(
+    name = "event_private_class",
+    joinColumns = @JoinColumn(name = "event_id"),
+    inverseJoinColumns = @JoinColumn(name = "private_class_id"))
+  private List<PrivateClass> privateClasses;
+
   private String name;
   private Integer capacity;
 

@@ -30,6 +30,7 @@ public class RegistrationEmailService {
   private final RegistrationEmailRepo registrationEmailRepo;
   private final OutTextService outTextService;
   private final LanguageService languageService;
+  private final BaseParService baseParService;
   @Autowired
   Environment environment;
 
@@ -108,6 +109,7 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      ,baseParService.testMailOnly()
     );
     update(
       new RegistrationEmail(registration, LocalDateTime.now())
@@ -165,6 +167,7 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      ,baseParService.testMailOnly()
     );
     registrationEmail.setDoneSentDate(LocalDateTime.now());
     update(registrationEmail);
@@ -244,6 +247,7 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      ,baseParService.testMailOnly()
     );
 
     registrationEmail.setReminderSentDate(LocalDateTime.now());
@@ -305,6 +309,7 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      ,baseParService.testMailOnly()
     );
     registrationEmail.setCancelledSentDate(LocalDateTime.now());
     update(registrationEmail);
@@ -373,6 +378,7 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      ,baseParService.testMailOnly()
     );
 
     registrationEmail.setReleasedSentDate(LocalDateTime.now());

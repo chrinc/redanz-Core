@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface TrackBundleRepo extends JpaRepository<BundleTrack, BundleTrackId> {
 
-  List<BundleTrack> findDistinctByBundleIn(List<Bundle> bundles);
+  List<BundleTrack> findAllByBundle(Bundle bundle);
 }

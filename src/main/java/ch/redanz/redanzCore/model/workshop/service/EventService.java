@@ -32,7 +32,7 @@ public class EventService {
     return eventRepo.findAllByArchived(false);
   }
   public Event getCurrentEvent() {
-    return eventRepo.findByName(EventConfig.EVENT2022.getName());
+    return eventRepo.findDistinctFirstByActive(true);
   }
   public Event getById(Long eventId) {
     return eventRepo.findByEventId(eventId);

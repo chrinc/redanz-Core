@@ -128,7 +128,7 @@ public class PaymentService {
   public void onPaymentReceived(Long userId) throws IOException, TemplateException {
     Registration registration = registrationService.findByParticipantAndEvent(
       personService.findByUser(userService.findByUserId(userId)),
-      eventService.findByName(EventConfig.EVENT2022.getName())
+      eventService.getCurrentEvent()
     ).get();
 
     workflowTransitionService.setWorkflowStatus(

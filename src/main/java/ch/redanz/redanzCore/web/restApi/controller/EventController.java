@@ -1,9 +1,9 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
-import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
@@ -32,6 +32,8 @@ public class EventController {
   private final OutTextService outTextService;
   private final AccommodationService accommodationService;
   private final SpecialService specialService;
+  private final BundleService bundleService;
+  private final PrivateClassService privateClassService;
 
   @GetMapping(path = "/schema/event")
   public List<Map<String, String>> getEventSchema() {
@@ -131,7 +133,7 @@ public class EventController {
 
   @GetMapping(path = "/volunteer/slot/all")
   public List<Slot> getAllVolunteerSlots() {
-    return slotService.getAllVolunteerSlots();
+    return slotService.getAllVolunteerSlots(eventService.getCurrentEvent());
   }
 
   @GetMapping(path = "/accommodation/all")
@@ -140,7 +142,25 @@ public class EventController {
   }
 
   @GetMapping(path = "/special/all")
-  public List<Special> getSpecials() {
-    return specialService.findAll();
+  public List<Special> getSpecials(
+    @RequestParam("bundleId") Long bundleId
+  ) {
+    log.info("inc@special/all, bundleId: " + bundleId);
+    if (bundleId == null) {
+      return specialService.findByEventOrBundle(eventService.getCurrentEvent(), null);
+    } else {
+      return specialService.findByEventOrBundle(eventService.getCurrentEvent(), bundleService.findByBundleId(bundleId));
+    }
+  }
+  @GetMapping(path = "/privateClasses/all")
+  public List<PrivateClass> getPrivateClasses(
+    @RequestParam("bundleId") Long bundleId
+  ) {
+    log.info("inc@privateClasses/all, bundleId: " + bundleId);
+    if (bundleId == null) {
+      return privateClassService.findByEvent(eventService.getCurrentEvent());
+    } else {
+      return privateClassService.findByEventAndBundle(eventService.getCurrentEvent(), bundleService.findByBundleId(bundleId));
+    }
   }
 }

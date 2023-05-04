@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.service.email;
 
 import ch.redanz.redanzCore.model.profile.config.UserConfig;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,7 +71,7 @@ public class EmailService {
     return Session.getDefaultInstance(props, auth);
   }
 
-  public static void sendEmail(Session session, String toEmail, String subject, String body) {
+  public static void sendEmail(Session session, String toEmail, String subject, String body, Boolean baseParTestMailOnly) {
     try {
       MimeMessage msg = new MimeMessage(session);
       msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
@@ -90,7 +90,7 @@ public class EmailService {
 
       msg.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(
-          (sendToTestEmail) ? testEmail : toEmail
+          (sendToTestEmail || baseParTestMailOnly) ? testEmail : toEmail
           , false)
       );
       log.info("send email, emailIsConfig: " + emailIsConfig);
@@ -98,6 +98,7 @@ public class EmailService {
       log.info("send email, msg: " + msg);
       log.info("send email, toEmail: " + toEmail);
       log.info("send email, sendToTestEmail: " + sendToTestEmail);
+      log.info("send email, baseParTestMailOnly: " + baseParTestMailOnly);
       log.info("send email, testEmail: " + testEmail);
       if (!emailIsConfig && sendEmail) Transport.send(msg);
     } catch (Exception e) {

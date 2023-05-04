@@ -52,6 +52,10 @@ public class TrackService {
     return tracks;
   }
 
+  public boolean bundleHasTrack(Bundle bundle) {
+    return !trackBundleRepo.findAllByBundle(bundle).isEmpty();
+  }
+
   public Track findByTrackId(Long trackId) {
     return trackRepo.findByTrackId(trackId);
   }

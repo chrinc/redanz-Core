@@ -1,11 +1,10 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
-import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
+import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -27,7 +26,9 @@ public class RegistrationController {
   private final RegistrationService registrationService;
   private final WorkflowStatusService workflowStatusService;
   private final RegistrationMatchingService registrationMatchingService;
+  private final RegistrationReleaseService registrationReleaseService;
   private final EventService eventService;
+  private final BaseParService baseParService;
 
   @Autowired
   Configuration mailConfig;
@@ -137,6 +138,23 @@ public class RegistrationController {
     }
   }
 
+  @GetMapping(path = "/manual-delete")
+  @Transactional
+  public void manualDelete(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      registrationService.onDelete(
+        registrationService.getRegistration(
+          userId,
+          eventService.getCurrentEvent()
+        )
+      );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
   @PostMapping(path = "/update")
   @Transactional
   public void update(
@@ -144,10 +162,26 @@ public class RegistrationController {
     @RequestBody String jsonObject
   ) {
     try {
-      registrationService.updateRegistrationRequest(
+      registrationService.updateSoldOut();
+      // update
+      Registration registration = registrationService.updateRegistrationRequest(
         userId,
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
+
+      // match
+      if (baseParService.doAutoMatch()) {
+        registrationService.updateSoldOut();
+        registrationMatchingService.doMatching(registration);
+      }
+
+      // release
+      if (baseParService.doAutoRelease()) {
+        registrationService.updateSoldOut();
+        registrationReleaseService.doRelease(registration);
+        registrationService.updateSoldOut();
+      }
+
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -157,11 +191,7 @@ public class RegistrationController {
 
   @GetMapping(path = "/workflow/status/all")
   public List<WorkflowStatus> getWorkflowStatusList() {
-    List<WorkflowStatus> workflowStatusList = registrationService.getWorkflowStatusList();
-    workflowStatusList.remove(
-      workflowStatusService.getCancelled()
-    );
-    return workflowStatusList;
+    return workflowStatusService.findAllPublic();
   }
 
   @GetMapping(path = "/confirming/reminder")

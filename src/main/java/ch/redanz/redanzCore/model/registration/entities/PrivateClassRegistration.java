@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.model.registration.entities;
 
-import ch.redanz.redanzCore.model.workshop.entities.Food;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
+
+import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,12 +15,12 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "food_registration")
-public class FoodRegistration {
+@Table(name = "private_class_registration")
+public class PrivateClassRegistration {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "food_registration_id")
-  private Long foodRegistrationId;
+  @Column(name = "private_class_registration_id")
+  private Long privateClassRegistrationId;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "registration_id")
@@ -28,16 +28,11 @@ public class FoodRegistration {
   private Registration registration;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "food_id")
-  private Food food;
+  @JoinColumn(name = "private_class_id")
+  private PrivateClass privateClass;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "slot_id")
-  private Slot slot;
-
-  public FoodRegistration(Registration registration, Food food, Slot slot) {
+  public PrivateClassRegistration(Registration registration, PrivateClass privateClass) {
     this.registration = registration;
-    this.food = food;
-    this.slot = slot;
+    this.privateClass = privateClass;
   }
 }

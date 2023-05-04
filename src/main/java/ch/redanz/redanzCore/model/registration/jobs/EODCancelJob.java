@@ -5,7 +5,6 @@ import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +29,8 @@ public class EODCancelJob {
   @Autowired
   private Environment environment;
 
-  private final WorkflowTransitionService workflowTransitionService;
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
-  private final WorkflowStatusService workflowStatusService;
 
   @Scheduled(cron = "${cron.matching.scheduler.value.cancel}")
   public void runCancelJob() {

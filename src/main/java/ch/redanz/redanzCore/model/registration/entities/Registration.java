@@ -58,6 +58,8 @@ public class Registration implements Serializable {
   @OneToMany(cascade=CascadeType.ALL, mappedBy = "registration")
   private List<WorkflowTransition> transitionList;
 
+  private Boolean active;
+
   @ManyToMany(cascade=CascadeType.ALL)
   @JoinTable(
     name="discount_registration",
@@ -70,6 +72,7 @@ public class Registration implements Serializable {
     this.event = event;
     this.bundle = bundle;
     this.participant = participant;
+    this.active = true;
   }
 
   public Registration(Person participant, Event event, Bundle bundle, Track track, DanceRole danceRole) {
@@ -78,6 +81,7 @@ public class Registration implements Serializable {
     this.bundle = bundle;
     this.track = track;
     this.danceRole = danceRole;
+    this.active = true;
   }
 
   public Registration () {}

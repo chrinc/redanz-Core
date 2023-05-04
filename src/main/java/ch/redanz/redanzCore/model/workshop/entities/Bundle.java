@@ -25,10 +25,18 @@ public class Bundle implements Serializable {
   @Column(name = "bundle_id")
   private Long bundleId;
 
+  @ManyToMany
+  @JoinTable(
+    name = "bundle_special",
+    joinColumns = @JoinColumn(name = "bundle_id"),
+    inverseJoinColumns = @JoinColumn(name = "special_id"))
+  private List<Special> specials;
+
   private String name;
   private double price;
   private String description;
   private Integer capacity;
+  private Boolean simpleTicket;
 
   @Column(name = "sold_out")
   private boolean soldOut;

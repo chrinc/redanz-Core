@@ -9,4 +9,5 @@ import java.util.List;
 public interface TypeSlotRepo extends JpaRepository<TypeSlot, Long> {
   List<TypeSlot> findAllByType(String type);
   TypeSlot findByTypeAndSlot(String type, Slot slot);
+
 }

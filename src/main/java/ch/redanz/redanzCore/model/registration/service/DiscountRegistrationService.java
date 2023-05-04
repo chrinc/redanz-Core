@@ -10,6 +10,7 @@ import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.service.TrackService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class DiscountRegistrationService {
   private final DiscountRegistrationRepo discountRegistrationRepo;
   private final DiscountService discountService;
   private final WorkflowStatusService workflowStatusService;
+  private final TrackService trackService;
   private final EventService eventService;
   private final BundleService bundleService;
 
@@ -39,7 +41,8 @@ public class DiscountRegistrationService {
     );
   }
   public void saveEarlyBird(Registration registration, int currentRegistrationCount) {
-    if (registration.getBundle() != bundleService.findByName(BundleConfig.PARTYPASS.getName())
+    log.info("inc@save early bird, bundleHasTrack: " + trackService.bundleHasTrack(registration.getBundle()));
+    if (trackService.bundleHasTrack(registration.getBundle())
       && currentRegistrationCount < DiscountConfig.EARLY_BIRD.getCapacity()
       && !discountRegistrationRepo.findAllByRegistrationAndDiscount(registration, discountService.findByName(DiscountConfig.EARLY_BIRD.getName())).isPresent()
     )
