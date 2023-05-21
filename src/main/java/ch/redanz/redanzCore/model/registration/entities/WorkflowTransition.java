@@ -21,16 +21,21 @@ public class WorkflowTransition implements Serializable {
 //  @Transient
 //  private RegistrationRepo registrationRepo;
 
-  @EmbeddedId
-  private final WorkflowTransitionId workflowTransitionId = new WorkflowTransitionId();
+//  @EmbeddedId
+//  private final WorkflowTransitionId workflowTransitionId = new WorkflowTransitionId();
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "workflow_transition_id")
+  private Long workflowTransitionId;
 
   @ManyToOne
-  @MapsId("workflowStatusId")
+//  @MapsId("workflowStatusId")
   @JoinColumn(name="workflow_status_id")
   private WorkflowStatus workflowStatus;
 
   @ManyToOne
-  @MapsId("registrationId")
+//  @MapsId("registrationId")
   @JsonIgnore
   @JoinColumn(name="registration_id")
   private Registration registration;
@@ -38,13 +43,18 @@ public class WorkflowTransition implements Serializable {
   @Column(name="transition_timestamp")
   private LocalDateTime transitionTimestamp;
 
-//  public WorkflowTransition(RegistrationRepo registrationRepo, WorkflowStatus workflowStatus, Registration registration, LocalDateTime transitionTimestamp) {
-//    this.registrationRepo = registrationRepo;
-//    this.workflowStatus = workflowStatus;
-//    this.registration = registration;
-//    this.transitionTimestamp = transitionTimestamp;
-////    updateRegistration();
-//  }
+
+
+  public WorkflowTransition(
+    WorkflowStatus workflowStatus
+    , Registration registration
+    , LocalDateTime transitionTimestamp
+  ) {
+    this.workflowStatus = workflowStatus;
+    this.registration = registration;
+    this.transitionTimestamp = transitionTimestamp;
+//    updateRegistration();
+  }
 
 //  private void updateRegistration() {
 //    Registration updateRegistration = this.registration;

@@ -51,7 +51,7 @@ public class SpecialRegistrationService {
   public List<SpecialRegistration> specialRegistrations(Registration registration, JsonObject specialRegistrationRequest) {
     List<SpecialRegistration> specialRegistrations = new ArrayList<>();
 
-    log.info("inc@specialRegistrations");
+    // log.info("inc@specialRegistrations");
     if (specialRegistrationRequest.get("specialRegistrations") != null
       && !specialRegistrationRequest.get("specialRegistrations").isJsonNull()
       && !specialRegistrationRequest.get("specialRegistrations").getAsJsonArray().isEmpty()) {
@@ -68,12 +68,12 @@ public class SpecialRegistrationService {
         );
       });
     }
-    log.info("special Reg return: " + specialRegistrations);
+    // log.info("special Reg return: " + specialRegistrations);
     return specialRegistrations;
   }
 
   public List<PrivateClassRegistration> privateClassRegistration(Registration registration, JsonObject privateClassRegistrationRequest) {
-    log.info("inc@privateClassRegistration");
+    // log.info("inc@privateClassRegistration");
     List<PrivateClassRegistration> privateClassRegistrations = new ArrayList<>();
     if (privateClassRegistrationRequest.get("privateClassRegistrations") != null
       && !privateClassRegistrationRequest.get("privateClassRegistrations").isJsonNull()
@@ -83,10 +83,10 @@ public class SpecialRegistrationService {
         .get("privateClassRegistrations")
         .getAsJsonArray();
 
-      log.info("inc@bfr privateClassRequests:");
-      log.info("inc@bfr privateClassRequests:" + privateClassRequests);
+      // log.info("inc@bfr privateClassRequests:");
+      // log.info("inc@bfr privateClassRequests:" + privateClassRequests);
       privateClassRequests.forEach(privateClassRequest -> {
-        log.info("inc@bfr privateClassId:" + privateClassRequest.getAsJsonObject().get("privateClassId").getAsLong());
+        // log.info("inc@bfr privateClassId:" + privateClassRequest.getAsJsonObject().get("privateClassId").getAsLong());
         privateClassRegistrations.add(
           new PrivateClassRegistration(
             registration,
@@ -95,7 +95,7 @@ public class SpecialRegistrationService {
         );
       });
     }
-    log.info("inc@bfr return");
+    // log.info("inc@bfr return");
     return privateClassRegistrations;
   }
 
@@ -165,7 +165,7 @@ public class SpecialRegistrationService {
   public void updatePrivateClassRequest(Registration registration, JsonObject request) {
     List<PrivateClassRegistration> requestPrivateClassRegistrations = privateClassRegistration(registration, request);
     List<PrivateClassRegistration> privateClassRegistrations = privateClassRegistrationRepo.findAllByRegistration(registration);
-    log.info(String.valueOf(privateClassRegistrations.size()));
+    // log.info(String.valueOf(privateClassRegistrations.size()));
 
     // delete in current if not in request
     privateClassRegistrations.forEach(privateClassRegistration -> {

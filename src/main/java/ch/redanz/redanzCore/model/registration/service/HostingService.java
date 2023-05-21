@@ -64,10 +64,10 @@ public class HostingService {
   }
 
   public JsonArray hostRegistrationArray(JsonObject hostRegistrationRequest) {
-    log.info("hostRegistrationArray ");
+    // log.info("hostRegistrationArray ");
     JsonElement hostRegistration = hostRegistrationRequest.get("hostRegistration");
-    log.info("hostRegistration: " + hostRegistration);
-    log.info("jsonArrey: " + hostRegistration.getAsJsonArray());
+    // log.info("hostRegistration: " + hostRegistration);
+    // log.info("jsonArrey: " + hostRegistration.getAsJsonArray());
 
     if (hostRegistration != null
       && !hostRegistration.getAsJsonArray().isEmpty()) {
@@ -79,7 +79,7 @@ public class HostingService {
 
   public void updateHostRegistrationRequest(Registration registration, JsonObject request) {
     JsonArray hostRegistrationArray = hostRegistrationArray(request);
-    log.info("hostRegistrationArray: " + hostRegistrationArray);
+    // log.info("hostRegistrationArray: " + hostRegistrationArray);
     if (hostRegistrationArray != null) {
 
       // update existing
@@ -380,7 +380,7 @@ public class HostingService {
   public List<HosteeSleepUtilRegistration> hosteeSleepUtilRegistrations (Registration registration, JsonArray hosteeRegistration) {
     List<HosteeSleepUtilRegistration> hosteeSleepUtilRegistrations = new ArrayList<>();
     JsonObject sleepUtilsJson = hosteeRegistration.get(4).getAsJsonObject();
-    log.info("sleepUtilsJson: " + sleepUtilsJson);
+    // log.info("sleepUtilsJson: " + sleepUtilsJson);
     // host sleep util registration
     if (sleepUtilsJson.get("sleepUtils") != null) {
       sleepUtilsJson.get("sleepUtils").getAsJsonArray().forEach(sleepUtil -> {
@@ -414,10 +414,10 @@ public class HostingService {
     List<HosteeSleepUtilRegistration> requestHosteeSleepUtilRegistrations = hosteeSleepUtilRegistrations(registration, hosteeRegistration);
     HosteeRegistration existingHosteeRegistration = hosteeRegistrationRepo.findByRegistration(registration);
     List<HosteeSleepUtilRegistration> hosteeSleepUtilRegistrations = hosteeSleepUtilsRegistrationRepo.findAllByHosteeRegistration(existingHosteeRegistration);
-    log.info("hosteeSleepUtilRegistrations: " + hosteeSleepUtilRegistrations);
-    log.info("requestHosteeSleepUtilRegistrations: " + requestHosteeSleepUtilRegistrations);
-    log.info("hosteeSleepUtilRegistrations size: " + hosteeSleepUtilRegistrations.size());
-    log.info("requestHosteeSleepUtilRegistrations size: " + requestHosteeSleepUtilRegistrations.size());
+    // log.info("hosteeSleepUtilRegistrations: " + hosteeSleepUtilRegistrations);
+    // log.info("requestHosteeSleepUtilRegistrations: " + requestHosteeSleepUtilRegistrations);
+    // log.info("hosteeSleepUtilRegistrations size: " + hosteeSleepUtilRegistrations.size());
+    // log.info("requestHosteeSleepUtilRegistrations size: " + requestHosteeSleepUtilRegistrations.size());
     // delete in current if not in request
     hosteeSleepUtilRegistrations.forEach(hosteeSleepUtilRegistration -> {
       if (
@@ -443,19 +443,19 @@ public class HostingService {
 
     HosteeRegistration existingHosteeRegistration = hosteeRegistrationRepo.findByRegistration(registration);
 
-    log.info("get attributes");
+    // log.info("get attributes");
     boolean isShareRooms = !isShareRoomsJson.get("isShareRooms").isJsonNull() && isShareRoomsJson.get("isShareRooms").getAsBoolean();
-    log.info("isShareRooms: " + isShareRooms);
+    // log.info("isShareRooms: " + isShareRooms);
     String nameRoomMate =
       nameRoomMateJson.get("nameRoomMate") == null  || nameRoomMateJson.get("nameRoomMate").isJsonNull() ?
         null : nameRoomMateJson.get("nameRoomMate").getAsString();
-    log.info("nameRoomMate: " + nameRoomMate);
+    // log.info("nameRoomMate: " + nameRoomMate);
     boolean isSharedBed =  isSharedBedJson.get("isSharedBed") != null && !isSharedBedJson.get("isSharedBed").isJsonNull() && isSharedBedJson.get("isSharedBed").getAsBoolean();
-    log.info("isSharedBed: " + isSharedBed);
+    // log.info("isSharedBed: " + isSharedBed);
     String hosteeComment = hosteeCommentJson.get("hosteeComment") == null
       || hosteeCommentJson.get("hosteeComment").isJsonNull() ?
       null : hosteeCommentJson.get("hosteeComment").getAsString();
-    log.info("hosteeComment: " + hosteeComment);
+    // log.info("hosteeComment: " + hosteeComment);
     if (existingHosteeRegistration != null) {
 
       // update existing registration
@@ -492,7 +492,7 @@ public class HostingService {
   }
 
   public JsonArray hosteeRegistrationArray(JsonObject hosteeRegistrationRequest) {
-    log.info("hosteeRegistrationRequest: " + hosteeRegistrationRequest);
+    // log.info("hosteeRegistrationRequest: " + hosteeRegistrationRequest);
     if (hosteeRegistrationRequest.get("hosteeRegistration") != null
       && !hosteeRegistrationRequest.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
       return hosteeRegistrationRequest
@@ -504,17 +504,17 @@ public class HostingService {
 
   public void updateHosteeRegistrationRequest(Registration registration, JsonObject request) {
     JsonArray hosteeRegistrationArray = hosteeRegistrationArray(request);
-    log.info("hosteeRegistrationArray: " + hosteeRegistrationArray);
+    // log.info("hosteeRegistrationArray: " + hosteeRegistrationArray);
 
     if (hosteeRegistrationArray != null) {
 
       // update existing
       updateHosteeRegistration(registration, hosteeRegistrationArray);
-      log.info("updateHosteeRegistration done");
+      // log.info("updateHosteeRegistration done");
       updateHosteeSleepUtilRegistration(registration, hosteeRegistrationArray);
-      log.info("updateHosteeSleepUtilRegistration done");
+      // log.info("updateHosteeSleepUtilRegistration done");
       updateHosteeSlotRegistration(registration, hosteeRegistrationArray);
-      log.info("updateHosteeSlotRegistration done");
+      // log.info("updateHosteeSlotRegistration done");
 
     } else {
 

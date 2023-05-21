@@ -63,27 +63,33 @@ public class FoodRegistrationService {
     return foodRegistrations;
   }
 
-  public int countFoodSlotSubmittedByEvent(Food food, Slot slot, Event event){
+  public int countFoodSlotSubmitted(Food food, Slot slot, Event event){
     return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
       food, slot, workflowStatusService.getSubmitted(), event
     );
   }
-  public int countFoodSlotConfirmingByEvent(Food food, Slot slot, Event event){
+  public int countFoodSlotConfirming(Food food, Slot slot, Event event){
     return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
       food, slot, workflowStatusService.getConfirming(), event
     );
   }
-  public int countFoodSlotDoneByEvent(Food food, Slot slot, Event event){
+  public int countFoodSlotDone(Food food, Slot slot, Event event){
+    // log.info("inc@countFoodSlotDone,  food: " + food.getName());
+    // log.info("inc@countFoodSlotDone,  slot: " + slot.getName());
+    // log.info("inc@countFoodSlotDone,  event: " + event.getName());
+    // log.info("inc@countFoodSlotDone,  count: " + foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+    //   food, slot, workflowStatusService.getDone(), event
+    // ));
     return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
       food, slot, workflowStatusService.getDone(), event
     );
   }
-  public int countFoodSlotConfirmingAndDoneByEvent(Food food, Slot slot, Event event) {
-    return countFoodSlotConfirmingByEvent(food, slot, event) + countFoodSlotDoneByEvent(food, slot, event);
+  public int countFoodSlotConfirmingAndDone(Food food, Slot slot, Event event) {
+    return countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
   }
 
-  public int countFoodSlotSubmittedReleasedAndDoneByEvent(Food food, Slot slot, Event event) {
-    return countFoodSlotSubmittedByEvent(food, slot, event) + countFoodSlotConfirmingByEvent(food, slot, event) + countFoodSlotDoneByEvent(food, slot, event);
+  public int countFoodSlotSubmittedReleasedAndDone(Food food, Slot slot, Event event) {
+    return countFoodSlotSubmitted(food, slot, event) + countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
   }
 
   private boolean hasFoodRegistration(List<FoodRegistration> foodRegistrations, Food food, Slot slot) {
@@ -103,9 +109,9 @@ public class FoodRegistrationService {
 
     // delete in current if not in request
     foodRegistrations.forEach(foodRegistration -> {
-      log.info("foodRegistrations: " + foodRegistration.getFood().getName());
+      // log.info("foodRegistrations: " + foodRegistration.getFood().getName());
 
-      log.info("foodRegistrations, is in other list?: " + hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
+      // log.info("foodRegistrations, is in other list?: " + hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
       if (!hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
         foodRegistrationRepo.deleteAllByRegistrationAndFoodAndSlot(registration, foodRegistration.getFood(), foodRegistration.getSlot());
       }
@@ -113,8 +119,8 @@ public class FoodRegistrationService {
 
     // add new from request
     requestFoodRegistrations.forEach(foodRegistration -> {
-      log.info("requestFoodRegistrations: " + foodRegistration.getFood().getName());
-      log.info("requestFoodRegistrations, is in other list?: " + hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
+      // log.info("requestFoodRegistrations: " + foodRegistration.getFood().getName());
+      // log.info("requestFoodRegistrations, is in other list?: " + hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
       if (!hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
         save(registration, foodRegistration.getFood(), foodRegistration.getSlot());
       }

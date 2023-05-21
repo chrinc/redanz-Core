@@ -26,6 +26,7 @@ public class ReportController {
   private final ReportStatsService reportStatsService;
   private final LanguageService languageService;
   private final EventService eventService;
+  private final ReportDonationService reportDonationService;
 
   @GetMapping(path = "/person/all")
   public List<ResponsePerson> getAllPersonsReport() {
@@ -87,14 +88,24 @@ public class ReportController {
       eventService.findByEventId(eventId)
     );
   }
+  @GetMapping(path = "/donation/all")
+  public List<ResponseDonation> getDonationReport(
+    @RequestParam("languageKey") String languageKey,
+    @RequestParam("eventId") Long eventId
+  ) {
+    return reportDonationService.getDonationReport(
+      languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
+      eventService.findByEventId(eventId)
+    );
+  }
 
   @GetMapping(path = "/stats")
   public List<ResponseStats> getStatsReport(
     @RequestParam("languageKey") String languageKey,
     @RequestParam("eventId") Long eventId
   ) {
-    log.info("/stats, eventId: " + eventId);
-    log.info("/stats, languageKey: " + languageKey);
+    // log.info("/stats, eventId: " + eventId);
+    // log.info("/stats, languageKey: " + languageKey);
     return reportStatsService.getStatsReport(
       languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
       eventService.findByEventId(eventId)

@@ -41,7 +41,7 @@ public class DiscountRegistrationService {
     );
   }
   public void saveEarlyBird(Registration registration, int currentRegistrationCount) {
-    log.info("inc@save early bird, bundleHasTrack: " + trackService.bundleHasTrack(registration.getBundle()));
+    // log.info("inc@save early bird, bundleHasTrack: " + trackService.bundleHasTrack(registration.getBundle()));
     if (trackService.bundleHasTrack(registration.getBundle())
       && currentRegistrationCount < DiscountConfig.EARLY_BIRD.getCapacity()
       && !discountRegistrationRepo.findAllByRegistrationAndDiscount(registration, discountService.findByName(DiscountConfig.EARLY_BIRD.getName())).isPresent()

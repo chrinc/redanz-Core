@@ -3,10 +3,7 @@ package ch.redanz.redanzCore.model.reporting.service;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
-import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
+import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.reporting.response.ResponseRegistration;
 import ch.redanz.redanzCore.model.reporting.response.ResponseRegistrationDetails;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
@@ -28,7 +25,7 @@ public class ReportRegistrationService {
   private final RegistrationMatchingService registrationMatchingService;
   private final WorkflowTransitionService workflowTransitionService;
   private final WorkflowStatusService workflowStatusService;
-  private final EventService eventService;
+  private final PaymentService paymentService;
 
   public List<ResponseRegistrationDetails> getRegistrationDetailsReport(Event event) {
     return getRegistrationsDetails(
@@ -141,7 +138,9 @@ public class ReportRegistrationService {
             workflowStatus.getName(),
             registrationMatching == null ? null: registrationMatching.getPartnerEmail(),
             hasPartner ? registrationMatching.getRegistration2().getRegistrationId() : null,
-            registration.getEvent().getEventId()
+            registration.getEvent().getEventId(),
+            paymentService.amountDue(registration),
+            paymentService.totalAmount(registration)
           )
         );
       }

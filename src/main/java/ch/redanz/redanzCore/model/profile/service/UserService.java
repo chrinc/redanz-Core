@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.profile.service;
 
 import ch.redanz.redanzCore.model.profile.entities.User;
+import ch.redanz.redanzCore.model.profile.repository.TestUserRepo;
 import ch.redanz.redanzCore.model.profile.repository.UserRepo;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.web.security.ConfirmationToken;
@@ -30,6 +31,7 @@ public class UserService implements UserDetailsService {
   private final UserRepo userRepo;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ConfirmationTokenService confirmationTokenService;
+  private final TestUserRepo testUserRepo;
 
   @Autowired
   private Environment environment;
@@ -39,7 +41,7 @@ public class UserService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepo.findByEmail(email);
-    log.info("inc load User by username");
+    // log.info("inc load User by username");
     if (user == null) {
       throw new UsernameNotFoundException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
     }
@@ -54,9 +56,12 @@ public class UserService implements UserDetailsService {
         user.getAuthorities()
       );
     } catch(UsernameNotFoundException usernameNotFoundException) {
-      log.info("inc here?");
       throw new UsernameNotFoundException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
     }
+  }
+
+  public boolean userIsTester(User user) {
+    return testUserRepo.existsByEmailIgnoreCase(user.getEmail().replace(".", ""));
   }
 
   public void save(User user) {

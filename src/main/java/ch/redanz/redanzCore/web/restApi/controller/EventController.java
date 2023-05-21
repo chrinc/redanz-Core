@@ -145,7 +145,7 @@ public class EventController {
   public List<Special> getSpecials(
     @RequestParam("bundleId") Long bundleId
   ) {
-    log.info("inc@special/all, bundleId: " + bundleId);
+    // log.info("inc@special/all, bundleId: " + bundleId);
     if (bundleId == null) {
       return specialService.findByEventOrBundle(eventService.getCurrentEvent(), null);
     } else {
@@ -154,13 +154,14 @@ public class EventController {
   }
   @GetMapping(path = "/privateClasses/all")
   public List<PrivateClass> getPrivateClasses(
-    @RequestParam("bundleId") Long bundleId
+    @RequestParam("bundleId") Long bundleId,
+    @RequestParam("eventId") Long eventId
   ) {
-    log.info("inc@privateClasses/all, bundleId: " + bundleId);
+    // log.info("inc@privateClasses/all, bundleId: " + bundleId);
     if (bundleId == null) {
-      return privateClassService.findByEvent(eventService.getCurrentEvent());
+      return privateClassService.findByEvent(eventService.findByEventId(eventId));
     } else {
-      return privateClassService.findByEventAndBundle(eventService.getCurrentEvent(), bundleService.findByBundleId(bundleId));
+      return privateClassService.findByEventAndBundle(eventService.findByEventId(eventId), bundleService.findByBundleId(bundleId));
     }
   }
 }

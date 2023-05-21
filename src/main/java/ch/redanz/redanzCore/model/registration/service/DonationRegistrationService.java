@@ -6,6 +6,7 @@ import ch.redanz.redanzCore.model.registration.entities.ScholarshipRegistration;
 import ch.redanz.redanzCore.model.registration.entities.VolunteerRegistration;
 import ch.redanz.redanzCore.model.registration.repository.DonationRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.ScholarshipRegistrationRepo;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -27,6 +29,13 @@ public class DonationRegistrationService {
     donationRegistrationRepo.save(donationRegistration);
   }
 
+  public List<DonationRegistration> allDonationRegistrations(Event event) {
+    return donationRegistrationRepo.findAllByRegistrationEvent(event);
+  }
+
+  public List<ScholarshipRegistration> allScholarshipRegistrations(Event event) {
+    return scholarshipRegistrationRepo.findAllByRegistrationEvent(event);
+  }
   public Map<String, String> getScholarshipRegistration(Registration registration) {
     Map<String, String> scholarshipRegistrationMap = new HashMap<>();
     ScholarshipRegistration scholarshipRegistration = scholarshipRegistrationRepo.findByRegistration(registration);
@@ -90,9 +99,9 @@ public class DonationRegistrationService {
   }
 
   public void updateDonationRequest(Registration registration, JsonObject request) {
-    log.info("request" + request);
+    // .info("request" + request);
     JsonArray donationRegistrationArray = donationRegistrationArray(request);
-    log.info("donationRegistrationArray" + donationRegistrationArray);
+    // log.info("donationRegistrationArray" + donationRegistrationArray);
     if (donationRegistrationArray != null) {
 
       // update existing
@@ -138,9 +147,9 @@ public class DonationRegistrationService {
   }
 
   public void updateScholarshipRequest(Registration registration, JsonObject request) {
-    log.info("request" + request);
+    // log.info("request" + request);
     JsonArray scholarshipRegistrationArray = scholarshipRegistrationArray(request);
-    log.info("scholarshipRegistrationArray" + scholarshipRegistrationArray);
+    // log.info("scholarshipRegistrationArray" + scholarshipRegistrationArray);
     if (scholarshipRegistrationArray != null) {
 
       // update existing

@@ -1,5 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.repository.PrivateClassRegistrationRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
@@ -18,15 +21,13 @@ import java.util.Map;
 @Slf4j
 public class PrivateClassService {
   private final PrivateClassRepo privateClassRepo;
+  private final PrivateClassRegistrationRepo privateClassRegistrationRepo;
 
   public void save(PrivateClass privateClass) {
     privateClassRepo.save(privateClass);
   }
 
   public List<PrivateClass> findByEvent(Event event) {
-    privateClassRepo.findAllByEvent(event).forEach(privateClass -> {
-      log.info("Event privateClass name: " + privateClass.getName());
-    });
     return privateClassRepo.findAllByEvent(event);
   }
 
@@ -34,6 +35,13 @@ public class PrivateClassService {
     if (bundle.getSimpleTicket()) {return new ArrayList<>();}
     else { return findByEvent(event);}
   }
+
+  public List<PrivateClassRegistration> findAllByRegistrations(Registration registration) {
+    return privateClassRegistrationRepo.findAllByRegistration(registration);
+  }
+
+
+
 
 
   public PrivateClass findByPrivateClassId(Long privateClassId) {

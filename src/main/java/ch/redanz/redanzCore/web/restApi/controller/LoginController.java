@@ -13,6 +13,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ import java.util.Map;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 //@CrossOrigin(
@@ -47,11 +49,22 @@ public class LoginController {
   private final UserService userService;
   private final ProfileService profileService;
 
-  @GetMapping(path = "/user_id")
-  public Long getUserId(
+  @GetMapping(path = "/user-id")
+  public Long userId(
     @RequestParam("email") String email
   ) {
     return userService.getUser(email).getUserId();
+  }
+
+  @GetMapping(path = "/user-is-tester")
+  public boolean userIsTester(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return userService.userIsTester(userService.findByUserId(userId));
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 
   @GetMapping(path = "/check-server")

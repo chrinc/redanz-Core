@@ -7,6 +7,7 @@ import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingServi
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -30,13 +31,14 @@ public class EODMatchingJob {
   private final RegistrationMatchingService registrationMatchingService;
   private Map<RegistrationMatching, RegistrationMatching> matchingPairs;
   private final RegistrationService registrationService;
+  private final EventService eventService;
 
   //  @Scheduled(cron = "0 47 15 * * MON-SUN")
   //  @Scheduled(cron = "0 0/2 * * * *")
   @Scheduled(cron = "${cron.matching.scheduler.value.matching}")
   public void runMatching() {
     log.info("Job: runMatching");
-    registrationService.updateSoldOut();
+    registrationService.updateSoldOut(eventService.getCurrentEvent());
     doMatching(registrationMatchingService.findRegistration2ISNullSubmittedCurrent());
   }
 

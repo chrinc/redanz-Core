@@ -20,14 +20,10 @@ public class SpecialService {
   }
 
   public List<Special> findByEvent(Event event) {
-    specialRepo.findAllByEvent(event).forEach(special -> {
-      log.info("Event special name: " + special.getName());
-    });
-    return specialRepo.findAllByEvent(event);
+    return specialRepo.findAllByEvent(event).orElse(null);
   }
   public List<Special> findByBundle(Bundle bundle) {
-
-    return specialRepo.findAllByBundle(bundle);
+    return specialRepo.findAllByBundle(bundle).orElse(null);
   }
 
   public List<Special> findByEventOrBundle(Event event, Bundle bundle) {

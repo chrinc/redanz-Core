@@ -121,11 +121,11 @@ public class VolunteerService {
     List<VolunteerSlotRegistration> requestVolunteerSlotRegistrations = volunteerSlotRegistrations(registration, volunteerRegistration);
     VolunteerRegistration existingVolunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
     List<VolunteerSlotRegistration> volunteerSlotRegistrations = volunteerSlotRegistrationRepo.findAllByVolunteerRegistration(existingVolunteerRegistration);
-      log.info("volunteerRegistration: " + volunteerRegistration);
+      // log.info("volunteerRegistration: " + volunteerRegistration);
 
     // delete in current if not in request
     volunteerSlotRegistrations.forEach(volunteerSlotRegistration -> {
-      log.info("requestvolunteerSlotRegistration: " + volunteerSlotRegistration);
+      // log.info("requestvolunteerSlotRegistration: " + volunteerSlotRegistration);
       if (!hasVolunteerSlotRegistration(requestVolunteerSlotRegistrations, volunteerSlotRegistration.getSlot())){
         volunteerSlotRegistrationRepo.deleteAllByVolunteerRegistrationAndSlot(existingVolunteerRegistration, volunteerSlotRegistration.getSlot());
       }

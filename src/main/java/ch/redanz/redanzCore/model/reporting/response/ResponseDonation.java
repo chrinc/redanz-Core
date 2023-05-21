@@ -9,19 +9,12 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class ResponseRegistrationDetails {
-  private Long userId;
+public class ResponseDonation {
   private Long registrationId;
   private String firstName;
   private String lastName;
-  private String email;
-  private String bundle;
-  private String track;
-  private String danceRole;
+  private String type;
+  private Double amount;
+  private String intro;
   private String workflowStatus;
-  private String partnerEmail;
-  private Long partnerRegistrationId;
-  private Long eventId;
-  private Long amountDue;
-  private Long totalAmount;
 }

@@ -52,7 +52,7 @@ public class RegistrationEmailService {
     model.put("link", environment.getProperty("link.login"));
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationSubmitted.ftl");
-    log.info("send email?");
+    // log.info("send email?");
     String languageKey =
       registration.getParticipant().getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :

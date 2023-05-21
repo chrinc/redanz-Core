@@ -151,8 +151,8 @@ public class RegistrationMatchingService {
   }
   private boolean isEmailMatch(RegistrationMatching baseMatcher, RegistrationMatching lookupMatcher) {
     return (
-      baseMatcher.getPartnerEmail().equals(lookupMatcher.getRegistration1().getParticipant().getUser().getEmail()) &&
-        lookupMatcher.getPartnerEmail().equals(baseMatcher.getRegistration1().getParticipant().getUser().getEmail())
+      baseMatcher.getPartnerEmail().equalsIgnoreCase(lookupMatcher.getRegistration1().getParticipant().getUser().getEmail()) &&
+        lookupMatcher.getPartnerEmail().equalsIgnoreCase(baseMatcher.getRegistration1().getParticipant().getUser().getEmail())
     );
   }
 

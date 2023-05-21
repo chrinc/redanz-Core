@@ -17,13 +17,14 @@ public class RegistrationReleaseService {
   private final RegistrationService registrationService;
   private final EventService eventService;
   private final RegistrationEmailService registrationEmailService;
+  private final WorkflowStatusService workflowStatusService;
 
   public void doRelease(Registration registration){
     if (
          isRelease(registration)
      //  && !releasedRegistrations.contains(registration)
     ) {
-      log.info("registration firstName: {}", registration.getParticipant().getFirstName());
+      // log.info("registration firstName: {}", registration.getParticipant().getFirstName());
       try {
 
         // release partner first
@@ -51,6 +52,7 @@ public class RegistrationReleaseService {
 
   private boolean isRelease(Registration registration) {
     return
+      registration.getWorkflowStatus().equals(workflowStatusService.getSubmitted()) &&
       isMatchingOK(registration) &&
         isCapacityOK(registration)
       ;
@@ -64,13 +66,14 @@ public class RegistrationReleaseService {
 
   private boolean isCapacityOK (Registration registration) {
     return
-      registrationService.countConfirmingAndDoneByEvent(
-        eventService.getCurrentEvent()) < eventService.getCurrentEvent().getCapacity() &&
+      registrationService.countConfirmingAndDone(
+        eventService.getCurrentEvent()
+      ) < eventService.getCurrentEvent().getCapacity() &&
         registrationService.countBundlesConfirmingAndDone(
-          registration.getBundle()
+          registration.getBundle(), registration.getEvent()
         ) < registration.getBundle().getCapacity() &&
         registrationService.countTracksConfirmingAndDone(
-          registration.getTrack()
+          registration.getTrack(), registration.getEvent()
         ) < (registration.getTrack() == null ? 99 : registration.getTrack().getCapacity())
       ;
   }

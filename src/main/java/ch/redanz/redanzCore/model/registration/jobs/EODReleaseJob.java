@@ -25,6 +25,7 @@ import java.util.List;
 public class EODReleaseJob {
   private final RegistrationService registrationService;
   private final RegistrationReleaseService registrationReleaseService;
+  private final EventService eventService;
 
   @Autowired
   Configuration mailConfig;
@@ -34,11 +35,10 @@ public class EODReleaseJob {
 
   @Scheduled(cron = "${cron.matching.scheduler.value.release}")
   public void runRelease() {
-
       log.info("Job: runRelease");
       registrationService.getAllSubmittedRegistrations().forEach(registration -> {
         registrationReleaseService.doRelease(registration);
       });
-      registrationService.updateSoldOut();
+      registrationService.updateSoldOut(eventService.getCurrentEvent());
     }
 }

@@ -86,23 +86,23 @@ public class EventService {
     return Track.schema();
   }
   public List<Map<String, String>> getTracksData(List<Event> eventList){
-    log.info("inc@getTracksData, getTracksData");
+    // log.info("inc@getTracksData, getTracksData");
     List<Map<String, String>> tracksData = new ArrayList<>();
     eventList.forEach(event -> {
       event.getEventBundles().forEach(eventBundle -> {
-        log.info("inc@getTracksData, bundleName: " + eventBundle.getBundle().getName());
+        // log.info("inc@getTracksData, bundleName: " + eventBundle.getBundle().getName());
         eventBundle.getBundle().getBundleTracks().forEach(
 
           bundleTrack -> {
-            log.info("inc@getTracksData, trackName: " + bundleTrack.getTrack().getName());
+            // log.info("inc@getTracksData, trackName: " + bundleTrack.getTrack().getName());
             Map<String, String> trackData = bundleTrack.getTrack().dataMap();
-            log.info("inc@getTracksData, trackData.size 1: " + trackData.size());
+            // log.info("inc@getTracksData, trackData.size 1: " + trackData.size());
             trackData.put("eventId", Long.toString(event.getEventId()));
-            log.info("inc@getTracksData, trackData.size 2: " + trackData.size());
+            // log.info("inc@getTracksData, trackData.size 2: " + trackData.size());
             trackData.put("bundleId", Long.toString(eventBundle.getBundle().getBundleId()));
-            log.info("inc@getTracksData, trackData.size 3: " + trackData.size());
+            // log.info("inc@getTracksData, trackData.size 3: " + trackData.size());
             tracksData.add(trackData);
-            log.info("inc@getTracksData, tracksData.size: " + tracksData.size());
+            // log.info("inc@getTracksData, tracksData.size: " + tracksData.size());
           });
       });
     });
