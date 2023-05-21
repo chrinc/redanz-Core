@@ -227,7 +227,8 @@ public class PaymentService {
       // Email confirmation
       registrationEmailService.sendEmailBookingConfirmation(
         registration.getParticipant(),
-        registrationEmailService.findByRegistration(registration)
+        registrationEmailService.findByRegistration(registration),
+        registration
       );
 
       // Update SoldOut stats

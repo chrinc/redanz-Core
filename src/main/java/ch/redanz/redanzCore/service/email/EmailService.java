@@ -71,7 +71,14 @@ public class EmailService {
     return Session.getDefaultInstance(props, auth);
   }
 
-  public static void sendEmail(Session session, String toEmail, String subject, String body, Boolean baseParTestMailOnly) {
+  public static void sendEmail(
+    Session session,
+    String toEmail,
+    String subject,
+    String body,
+    Boolean baseParTestMailOnly,
+    Boolean eventInactive
+  ) {
     try {
       MimeMessage msg = new MimeMessage(session);
       msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
@@ -90,7 +97,7 @@ public class EmailService {
 
       msg.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(
-          (sendToTestEmail || baseParTestMailOnly) ? testEmail : toEmail
+          (sendToTestEmail || baseParTestMailOnly || eventInactive) ? testEmail : toEmail
           , false)
       );
       log.info("send email, emailIsConfig: " + emailIsConfig);
@@ -99,6 +106,7 @@ public class EmailService {
       log.info("send email, toEmail: " + toEmail);
       log.info("send email, sendToTestEmail: " + sendToTestEmail);
       log.info("send email, baseParTestMailOnly: " + baseParTestMailOnly);
+      log.info("send email, eventInactive: " + eventInactive);
       log.info("send email, testEmail: " + testEmail);
       if (!emailIsConfig && sendEmail) Transport.send(msg);
     } catch (Exception e) {

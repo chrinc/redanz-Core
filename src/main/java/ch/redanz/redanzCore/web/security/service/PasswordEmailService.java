@@ -96,6 +96,7 @@ public class PasswordEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,false
     );
   }
 }

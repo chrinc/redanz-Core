@@ -110,6 +110,7 @@ public class RegistrationEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,!registration.getEvent().isActive()
     );
     update(
       new RegistrationEmail(registration, LocalDateTime.now())
@@ -118,7 +119,8 @@ public class RegistrationEmailService {
 
   public void sendEmailBookingConfirmation(
     Person person,
-    RegistrationEmail registrationEmail
+    RegistrationEmail registrationEmail,
+    Registration registration
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("firstName", person.getFirstName());
@@ -168,6 +170,7 @@ public class RegistrationEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,!registration.getEvent().isActive()
     );
     registrationEmail.setDoneSentDate(LocalDateTime.now());
     update(registrationEmail);
@@ -248,6 +251,7 @@ public class RegistrationEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,!registration.getEvent().isActive()
     );
 
     registrationEmail.setReminderSentDate(LocalDateTime.now());
@@ -310,6 +314,7 @@ public class RegistrationEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,!registration.getEvent().isActive()
     );
     registrationEmail.setCancelledSentDate(LocalDateTime.now());
     update(registrationEmail);
@@ -379,6 +384,7 @@ public class RegistrationEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,!registration.getEvent().isActive()
     );
 
     registrationEmail.setReleasedSentDate(LocalDateTime.now());

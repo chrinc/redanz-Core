@@ -77,6 +77,7 @@ public class ProfileService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,false
     );
   }
 }
