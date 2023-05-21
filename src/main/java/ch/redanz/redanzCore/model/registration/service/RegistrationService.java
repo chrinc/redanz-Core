@@ -63,7 +63,6 @@ public class RegistrationService {
   public void updateSoldOut(Event event){
 
     // Event
-    log.info("inc@updateSoldOut");
     if (countDone(event) >= event.getCapacity()) {
       if (!event.isSoldOut()) {
         event.setSoldOut(true);
@@ -75,8 +74,6 @@ public class RegistrationService {
         eventService.save(event);
       }
     }
-
-    log.info("inc@updateSoldOut, after Event");
 
     // Bundle
     event.getEventBundles().forEach(eventBundle -> {
@@ -93,17 +90,13 @@ public class RegistrationService {
         }
       }
 
-      log.info("bfr after bundle");
-
       specialService.findByEventOrBundle(event, bundle).forEach(special -> {
-        log.info("special: " + special.getName());
         specialRegistrationService.soldOut(
           special
          ,specialRegistrationService.countSpecialRegistrations(special) >= special.getCapacity()
         );
       });
 
-      log.info("inc@updateSoldOut, after specials");
       // Tracks
       if (!bundle.getBundleTracks().isEmpty()) {
         bundle.getBundleTracks().forEach(bundleTrack -> {
@@ -122,8 +115,6 @@ public class RegistrationService {
         });
       }
     });
-    log.info("inc@updateSoldOut, after Track");
-
 
     // Private Class
     privateClassService.findByEvent(event).forEach(privateClass -> {
@@ -132,8 +123,6 @@ public class RegistrationService {
           ,specialRegistrationService.countPrivateClassRegistrations(privateClass) >= privateClass.getCapacity()
         );
     });
-
-    log.info("inc@updateSoldOut, after Privates");
   }
 
   public List<Registration> findAllCurrentEvent() {
@@ -250,17 +239,13 @@ public class RegistrationService {
   }
 
   public void onDelete(Registration registration) throws TemplateException, IOException {
-    log.info("on delete regId: " + registration.getRegistrationId());
     registration.setActive(false);
     update(registration);
-    log.info("after update " );
     workflowTransitionService.setWorkflowStatus(
       registration,
       workflowStatusService.getDeleted()
     );
-    log.info("after after set wfs ");
     updateSoldOut(registration.getEvent());
-    log.info("after update sold out");
   }
 
   public void onManualRelease(Registration registration) throws TemplateException, IOException {
@@ -363,9 +348,7 @@ public class RegistrationService {
     donationRegistrationService.updateScholarshipRequest(registration, request);
     // log.info("inc@updateRegistration, bfr Donation");
     donationRegistrationService.updateDonationRequest(registration, request);
-    log.info("inc@updateRegistration, bfr Matching");
     registrationMatchingService.updateMatchingRequest(registration, registrationRequest);
-    log.info("inc@updateRegistration, isNewRegistration: " + isNewRegistration);
     if (isNewRegistration) {
       try {
         workflowTransitionService.setWorkflowStatus(
