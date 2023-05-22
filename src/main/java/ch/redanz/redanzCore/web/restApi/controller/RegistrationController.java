@@ -182,10 +182,13 @@ public class RegistrationController {
     try {
       Event event = eventService.findByEventId(eventId);
       registrationService.updateSoldOut(event);
+
       // update
       Registration registration = registrationService.updateRegistrationRequest(
         userId,
+        event,
         JsonParser.parseString(jsonObject).getAsJsonObject()
+
       );
 
       // match

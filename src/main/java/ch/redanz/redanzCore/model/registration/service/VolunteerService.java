@@ -42,7 +42,7 @@ public class VolunteerService {
   }
 
   public List<VolunteerRegistration> getAllByEvent(Event event) {
-    return volunteerRegistrationRepo.findAllByRegistrationEvent(event);
+    return volunteerRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
   }
 
 
@@ -142,10 +142,7 @@ public class VolunteerService {
   public void updateVolunteerRegistration(Registration registration, JsonObject volunteerRegistration) {
     String intro = volunteerRegistration.get("intro").isJsonNull() ? null : volunteerRegistration.get("intro").getAsString();
     String mobile = volunteerRegistration.get("mobile").isJsonNull() ? null : volunteerRegistration.get("mobile").getAsString();
-    log.info("inc@updateVolunteerRegistration, intro: " + intro);
-    log.info("inc@updateVolunteerRegistration, mobile: " + mobile);
     VolunteerRegistration existingVolunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
-    log.info("inc@updateVolunteerRegistration, existingVolunteerRegistration: " + existingVolunteerRegistration);
 
     if (existingVolunteerRegistration != null) {
 
@@ -178,7 +175,6 @@ public class VolunteerService {
   }
 
   public JsonObject volunteerRegistrationObject(JsonObject volunteerRegistrationRequest) {
-    log.info("volunteerRegistrationRequest: " + volunteerRegistrationRequest);
     JsonElement volunteerRegistration = volunteerRegistrationRequest.get("volunteerRegistration");
     if (volunteerRegistration != null && !volunteerRegistration.isJsonNull()) {
       return volunteerRegistration.getAsJsonObject();
@@ -188,15 +184,12 @@ public class VolunteerService {
 
   public void updateVolunteerRequest(Registration registration, JsonObject request) {
     JsonObject volunteerRegistrationObject = volunteerRegistrationObject(request);
-    log.info("volunteerRegistrationObject: " + volunteerRegistrationObject);
 
     if (volunteerRegistrationObject != null) {
 
       // update existing
       updateVolunteerRegistration(registration, volunteerRegistrationObject);
-      log.info("updateVolunteerRegistration done");
       updateVolunteerSlotRegistration(registration, volunteerRegistrationObject);
-      log.info("updateVolunteerSlotRegistration done");
 
     } else {
 

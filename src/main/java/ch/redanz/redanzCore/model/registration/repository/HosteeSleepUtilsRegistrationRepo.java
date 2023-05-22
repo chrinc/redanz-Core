@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface HosteeSleepUtilsRegistrationRepo extends JpaRepository<HosteeSleepUtilRegistration, Long> {
   List<HosteeSleepUtilRegistration> findAllByHosteeRegistration(HosteeRegistration hosteeRegistration);
-  HosteeSleepUtilRegistration findAllByHosteeRegistrationAndSleepUtil(HosteeRegistration hosteeRegistration, SleepUtil sleepUtil);
   void deleteAllByHosteeRegistrationAndSleepUtil(HosteeRegistration hosteeRegistration, SleepUtil sleepUtil);
   void deleteAllByHosteeRegistration(HosteeRegistration hosteeRegistration);
 }

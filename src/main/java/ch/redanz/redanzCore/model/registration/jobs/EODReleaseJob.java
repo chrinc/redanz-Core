@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.registration.jobs;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.*;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import freemarker.template.Configuration;
@@ -36,9 +37,11 @@ public class EODReleaseJob {
   @Scheduled(cron = "${cron.matching.scheduler.value.release}")
   public void runRelease() {
       log.info("Job: runRelease");
-      registrationService.getAllSubmittedRegistrations().forEach(registration -> {
+      Event currentEvent = eventService.getCurrentEvent();
+
+      registrationService.getAllSubmittedRegistrations(currentEvent).forEach(registration -> {
         registrationReleaseService.doRelease(registration);
       });
-      registrationService.updateSoldOut(eventService.getCurrentEvent());
+      registrationService.updateSoldOut(currentEvent);
     }
 }

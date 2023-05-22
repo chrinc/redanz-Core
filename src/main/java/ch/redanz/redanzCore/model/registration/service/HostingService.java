@@ -273,10 +273,10 @@ public class HostingService {
   }
 
   public List<HostRegistration> getAllHostRegistrationsByEvent(Event event){
-    return hostRegistrationRepo.findAllByRegistrationEvent(event);
+    return hostRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
   }
   public List<HosteeRegistration> getAllHosteeRegistrationsByEvent(Event event){
-    return hosteeRegistrationRepo.findAllByRegistrationEvent(event);
+    return hosteeRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
   }
 
   public Map<String, List<Object>> getHosteeRegistration(Registration registration) {

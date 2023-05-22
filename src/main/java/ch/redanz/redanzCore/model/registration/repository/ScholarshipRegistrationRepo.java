@@ -10,5 +10,5 @@ import java.util.List;
 public interface ScholarshipRegistrationRepo extends JpaRepository<ScholarshipRegistration, Long> {
   ScholarshipRegistration findByRegistration(Registration registration);
   void deleteAllByRegistration(Registration registration);
-  List<ScholarshipRegistration> findAllByRegistrationEvent(Event event);
+  List<ScholarshipRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, boolean active);
 }

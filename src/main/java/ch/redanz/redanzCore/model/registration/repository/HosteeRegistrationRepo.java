@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface HosteeRegistrationRepo extends JpaRepository<HosteeRegistration, Long> {
   HosteeRegistration findByRegistration(Registration registration);
-  List<HosteeRegistration> findAllByRegistrationEvent(Event event);
+  List<HosteeRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, boolean active);
   void deleteAllByRegistration(Registration registration);
 
 }

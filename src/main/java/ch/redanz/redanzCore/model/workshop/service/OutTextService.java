@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.workshop.service;
 import ch.redanz.redanzCore.model.workshop.entities.OutText;
 import ch.redanz.redanzCore.model.workshop.repository.OutTextRepo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class OutTextService {
   private final OutTextRepo outTextRepo;
   public void save(OutText outText) {
@@ -33,5 +35,4 @@ public class OutTextService {
 
     return outTextMap;
   }
-
 }

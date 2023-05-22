@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.web.security.config;
 
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.auth0.jwt.JWT;
@@ -32,6 +33,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @AllArgsConstructor
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
   private final UserService userService;
+  private final RegistrationService registrationService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -59,15 +61,25 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
           // only allow retrieve own user data
           Long requestUserId = request.getParameter("userId") == null ? null : Long.valueOf(request.getParameter("userId"));
-          if (requestUserId != null && !Objects.equals(userService.getUser(username).getUserId(), requestUserId)) {
+          Long requestRegistrationId = request.getParameter("registrationId") == null ? null : Long.valueOf(request.getParameter("registrationId"));
+
+          if (
+            (
+               requestUserId != null && !Objects.equals(userService.getUser(username).getUserId(), requestUserId))
+            || (
+              requestRegistrationId != null && !Objects.equals(
+                userService.getUser(username).getUserId(),
+                registrationService.findByRegistrationId(requestRegistrationId).getParticipant().getUser().getUserId()
+              )
+            )
+          ) {
             authorities.stream().filter(auth -> auth.getAuthority().equals(UserRole.ORGANIZER.name()))
               .findAny()
               .orElseThrow(
                 () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
               );
           }
-
-          // only organizers are authorized to retreive report data
+          // only organizers are authorized to retrieve report data
           if (request.getServletPath().startsWith("/core-api/app/report")) {
              authorities.stream().filter(auth -> auth.getAuthority().equals(UserRole.ORGANIZER.name()))
                .findAny()
@@ -84,15 +96,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                  () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
                );
           }
-
           UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(username, null, authorities);
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);
           filterChain.doFilter(request, response);
         } catch (Exception exception) {
+          log.info(exception.getMessage());
+          log.info(exception.toString());
           response.setHeader("error", exception.getMessage());
           response.setStatus(FORBIDDEN.value());
-//          response.sendError(FORBIDDEN.value());
           Map<String, String> error = new HashMap<>();
           error.put("error_message", exception.getMessage());
           response.setContentType(MediaType.APPLICATION_JSON_VALUE);

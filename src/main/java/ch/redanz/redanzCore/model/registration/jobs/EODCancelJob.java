@@ -5,6 +5,8 @@ import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +33,14 @@ public class EODCancelJob {
 
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
+  private final EventService eventService;
 
   @Scheduled(cron = "${cron.matching.scheduler.value.cancel}")
   public void runCancelJob() {
     log.info("Job: runCancel");
-    registrationService.getAllConfirmingRegistrations().forEach(registration -> {
+    Event currentEvent = eventService.getCurrentEvent();
+
+    registrationService.getAllConfirmingRegistrations(currentEvent).forEach(registration -> {
       RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
       LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate();
       LocalDateTime deadline = LocalDateTime.now().minusDays(

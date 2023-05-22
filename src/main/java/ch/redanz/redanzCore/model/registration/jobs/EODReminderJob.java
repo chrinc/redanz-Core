@@ -1,8 +1,11 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +31,14 @@ public class EODReminderJob {
   private Environment environment;
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
+  private final EventService eventService;
 
   @Scheduled(cron = "${cron.matching.scheduler.value.reminder}")
   public void runReminderJob() {
     log.info("Job: runReminder");
-    registrationService.getAllConfirmingRegistrations().forEach(registration -> {
+    Event currentEvent = eventService.getCurrentEvent();
+
+    registrationService.getAllConfirmingRegistrations(currentEvent).forEach(registration -> {
       LocalDateTime releasedAt = registration.getWorkflowStatusDate();
       LocalDateTime deadline = LocalDateTime.now().minusDays(
         Long.parseLong(Objects.requireNonNull(environment.getProperty("registration.reminder.after.days")))

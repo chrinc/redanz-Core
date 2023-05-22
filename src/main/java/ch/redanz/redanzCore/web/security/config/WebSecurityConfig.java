@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.web.security.config;
 
 import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,7 @@ import java.util.List;
 @Slf4j
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final UserService userService;
+  private final RegistrationService registrationService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
   @Override
@@ -40,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.cors();
     http.csrf().disable();
     http.addFilter(customAuthenticationFilter);
-    http.addFilterBefore(new CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(new CustomAuthorizationFilter(userService, registrationService), UsernamePasswordAuthenticationFilter.class);
     http.formLogin().failureHandler(authenticationFailureHandler());
   }
 

@@ -30,11 +30,11 @@ public class DonationRegistrationService {
   }
 
   public List<DonationRegistration> allDonationRegistrations(Event event) {
-    return donationRegistrationRepo.findAllByRegistrationEvent(event);
+    return donationRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
   }
 
   public List<ScholarshipRegistration> allScholarshipRegistrations(Event event) {
-    return scholarshipRegistrationRepo.findAllByRegistrationEvent(event);
+    return scholarshipRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
   }
   public Map<String, String> getScholarshipRegistration(Registration registration) {
     Map<String, String> scholarshipRegistrationMap = new HashMap<>();

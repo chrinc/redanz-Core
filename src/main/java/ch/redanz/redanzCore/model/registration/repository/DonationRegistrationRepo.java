@@ -10,5 +10,5 @@ import java.util.List;
 public interface DonationRegistrationRepo extends JpaRepository<DonationRegistration, Long> {
   DonationRegistration findByRegistration(Registration registration);
   void deleteAllByRegistration(Registration registration);
-  List<DonationRegistration> findAllByRegistrationEvent(Event event);
+  List<DonationRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, boolean active);
 }
