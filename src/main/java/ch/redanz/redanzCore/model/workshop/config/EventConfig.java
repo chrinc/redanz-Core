@@ -22,7 +22,7 @@ public enum EventConfig {
     ,ZonedDateTime.parse("2023-08-01T11:00:00.000+01:00[Europe/Paris]")
   ,true
     ,false
-  ,"Weekend Dance Workshop")
+  ,"Weekend Dance Workshop");
   private final String name;
   private final Integer capacity;
   private final LocalDate dateFrom;

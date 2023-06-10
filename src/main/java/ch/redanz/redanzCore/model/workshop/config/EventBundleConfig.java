@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum EventBundleConfig {
-  EVENT2022_FULL(EventConfig.EVENT2022, BundleConfig.FULLPASS),
-  EVENT2022_HALF(EventConfig.EVENT2022, BundleConfig.HALFPASS),
-  EVENT2022_LEVEL(EventConfig.EVENT2022, BundleConfig.LEVELPASS),
-  EVENT2022_PARTY(EventConfig.EVENT2022, BundleConfig.PARTYPASS);
+  EVENT2022_FULL(EventConfig.EVENT2023, BundleConfig.FULLPASS),
+  EVENT2022_HALF(EventConfig.EVENT2023, BundleConfig.HALFPASS),
+  EVENT2022_LEVEL(EventConfig.EVENT2023, BundleConfig.LEVELPASS),
+  EVENT2022_PARTY(EventConfig.EVENT2023, BundleConfig.PARTYPASS);
 
   private final EventConfig event;
   private final BundleConfig bundle;

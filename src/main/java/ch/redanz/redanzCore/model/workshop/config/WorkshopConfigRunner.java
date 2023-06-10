@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(200)
-@Profile("dev")
+@Profile("dev || test")
 public class WorkshopConfigRunner implements CommandLineRunner {
   private final BundleService bundleService;
   private final TrackService trackService;

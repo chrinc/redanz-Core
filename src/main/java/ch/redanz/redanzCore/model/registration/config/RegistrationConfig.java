@@ -23,7 +23,7 @@ import java.util.Map;
 public enum RegistrationConfig {
   NORMA_REGISTRATION  (
     UserConfig.NORMA_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.FULLPASS,
     TrackConfig.FUN_TRACK,
     DanceRoleConfig.FOLLOWER,
@@ -33,7 +33,7 @@ public enum RegistrationConfig {
   ),
   WILLIAM_REGISTRATION(
     UserConfig.WILLIAM_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.HALFPASS,
     TrackConfig.FUN_TRACK,
     DanceRoleConfig.FOLLOWER,
@@ -50,7 +50,7 @@ public enum RegistrationConfig {
   ),
   ARLYNE_REGISTRATION(
     UserConfig.ARLYNE_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.LEVELPASS,
     TrackConfig.LINDY_ADVANCED,
     DanceRoleConfig.FOLLOWER,
@@ -62,7 +62,7 @@ public enum RegistrationConfig {
   ),
   NAOMI_REGISTRATION(
     UserConfig.NAOMI_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.LEVELPASS,
     TrackConfig.LINDY_INTERMEDIATE,
     DanceRoleConfig.SWITCH,
@@ -71,7 +71,7 @@ public enum RegistrationConfig {
     11
   ),
   ESTHER_REGISTRATION(UserConfig.ESTHER_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.PARTYPASS,
     null,
     null,
@@ -81,7 +81,7 @@ public enum RegistrationConfig {
   ),
   EDDIE_REGISTRATION(
     UserConfig.EDDIE_USER
-    ,EventConfig.EVENT2022
+    ,EventConfig.EVENT2023
     ,BundleConfig.LEVELPASS
     ,TrackConfig.LINDY_ADVANCED
     ,DanceRoleConfig.SWITCH
@@ -94,7 +94,7 @@ public enum RegistrationConfig {
   ),
   OLIVER_REGISTRATION(
     UserConfig.OLIVER_USER
-    , EventConfig.EVENT2022
+    , EventConfig.EVENT2023
     , BundleConfig.LEVELPASS
     , TrackConfig.LINDY_ADVANCED
     , DanceRoleConfig.FOLLOWER
@@ -107,7 +107,7 @@ public enum RegistrationConfig {
   ),
   HARRY_REGISTRATION(
     UserConfig.HARRY_USER
-    ,EventConfig.EVENT2022
+    ,EventConfig.EVENT2023
     ,BundleConfig.LEVELPASS
     ,TrackConfig.LINDY_ADVANCED
     ,DanceRoleConfig.SWITCH
@@ -119,7 +119,7 @@ public enum RegistrationConfig {
   ),
 
   BILLY_REGISTRATION(UserConfig.BILLY_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.LEVELPASS,
     TrackConfig.LINDY_INTERMEDIATE,
     DanceRoleConfig.SWITCH,
@@ -133,7 +133,7 @@ public enum RegistrationConfig {
   ),
   FRANKY_REGISTRATION(
     UserConfig.FRANKY_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.FULLPASS,
     TrackConfig.FUN_TRACK,
     DanceRoleConfig.LEADER,
@@ -144,7 +144,7 @@ public enum RegistrationConfig {
     20),
   CLAUDIA_REGISTRATION(
     UserConfig.CLAUDIA_USER,
-    EventConfig.EVENT2022,
+    EventConfig.EVENT2023,
     BundleConfig.HALFPASS,
     TrackConfig.FUN_TRACK,
     DanceRoleConfig.SWITCH,

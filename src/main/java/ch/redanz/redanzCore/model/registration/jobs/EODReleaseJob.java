@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.registration.jobs;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.*;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import freemarker.template.Configuration;
