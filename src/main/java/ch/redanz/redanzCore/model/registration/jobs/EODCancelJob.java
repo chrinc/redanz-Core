@@ -1,11 +1,9 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
-import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
+import ch.redanz.redanzCore.model.registration.service.*;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,29 +28,33 @@ public class EODCancelJob {
   @Autowired
   private Environment environment;
 
-  private final WorkflowTransitionService workflowTransitionService;
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
-  private final WorkflowStatusService workflowStatusService;
+  private final EventService eventService;
+  private final BaseParService baseParService;
 
   @Scheduled(cron = "${cron.matching.scheduler.value.cancel}")
   public void runCancelJob() {
-    log.info("Job: runCancel");
-    registrationService.getAllConfirmingRegistrations().forEach(registration -> {
-      RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-      LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate();
-      LocalDateTime deadline = LocalDateTime.now().minusDays(
-        Long.parseLong(Objects.requireNonNull(environment.getProperty("registration.cancel.after.days")))
-      );
-      if (reminderSentDate != null && reminderSentDate.isBefore(deadline)) {
-        try {
-          registrationService.onCancel(registration);
-          registrationEmailService.sendCancellationEmail(registration, registrationEmailService.findByRegistration(registration));
-        } catch (IOException | TemplateException e) {
-          throw new RuntimeException(e);
+    if (baseParService.doEODCancel()) {
+      log.info("Job: runCancel");
+      Event currentEvent = eventService.getCurrentEvent();
+
+      registrationService.getAllConfirmingRegistrations(currentEvent).forEach(registration -> {
+        RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
+        LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate();
+        LocalDateTime deadline = LocalDateTime.now().minusDays(
+          Long.parseLong(Objects.requireNonNull(environment.getProperty("registration.cancel.after.days")))
+        );
+        if (reminderSentDate != null && reminderSentDate.isBefore(deadline)) {
+          try {
+            registrationService.onCancel(registration);
+            registrationEmailService.sendCancellationEmail(registration, registrationEmailService.findByRegistration(registration));
+          } catch (IOException | TemplateException e) {
+            throw new RuntimeException(e);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
 }

@@ -13,7 +13,6 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 public class EventBundleId implements Serializable {
-
   private Long bundleId;
   private Long eventId;
 

@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.entities;
 
 
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import javax.persistence.*;
 public class TypeSlot {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "volunteer_slot_id")
+  @Column(name = "type_slot_id")
   private Long typeSlotId;
 
   @JsonIgnore

@@ -1,12 +1,12 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
-import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
+import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonParser;
@@ -27,7 +27,10 @@ public class RegistrationController {
   private final RegistrationService registrationService;
   private final WorkflowStatusService workflowStatusService;
   private final RegistrationMatchingService registrationMatchingService;
+  private final RegistrationReleaseService registrationReleaseService;
   private final EventService eventService;
+  private final BaseParService baseParService;
+  private final WorkflowTransitionService workflowTransitionService;
 
   @Autowired
   Configuration mailConfig;
@@ -45,22 +48,53 @@ public class RegistrationController {
     }
   }
 
+  @GetMapping(path = "/AllUserRegistrations")
+  @Transactional
+  public List<RegistrationResponse> getAllUserRegistration(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return registrationService.getAllUserRegistrationResponses(userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/UserActiveRegistrations")
+  @Transactional
+  public List<RegistrationResponse> getUserActiveRegistration(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return registrationService.getUserActiveRegistrationResponses(userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+
+  @GetMapping(path = "/UserInactiveRegistrations")
+  @Transactional
+  public List<RegistrationResponse> getInactiveUserRegistration(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return registrationService.getUserInactiveRegistrationResponses(userId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
   @GetMapping(path = "/manual-match")
   @Transactional
   public void manualMatch(
-    @RequestParam("userId") Long userId,
-    @RequestParam("user2Id") Long user2Id
+    @RequestParam("registrationId1") Long registrationId1,
+    @RequestParam("registrationId2") Long registrationId2
   ) {
     try {
       registrationMatchingService.doMatch(
-        registrationService.getRegistration(
-          userId,
-          eventService.getCurrentEvent()
-        ),
-        registrationService.getRegistration(
-          user2Id,
-          eventService.getCurrentEvent()
-        )
+        registrationService.findByRegistrationId(registrationId1),
+        registrationService.findByRegistrationId(registrationId2)
       );
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
@@ -70,14 +104,11 @@ public class RegistrationController {
   @GetMapping(path = "/manual-release")
   @Transactional
   public void manualRelease(
-    @RequestParam("userId") Long userId
+    @RequestParam("registrationId") Long registrationId
   ) {
     try {
       registrationService.onManualRelease(
-        registrationService.getRegistration(
-          userId,
-          eventService.getCurrentEvent()
-        )
+        registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
@@ -86,31 +117,93 @@ public class RegistrationController {
   @GetMapping(path = "/manual-cancel")
   @Transactional
   public void manualCancel(
-    @RequestParam("userId") Long userId
+    @RequestParam("registrationId") Long registrationId
   ) {
     try {
       registrationService.onCancel(
-        registrationService.getRegistration(
-          userId,
-          eventService.getCurrentEvent()
-        )
+        registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
 
-  @PostMapping(path = "/submit")
+  @GetMapping(path = "/manual-delete")
   @Transactional
-  public void register(
+  public void manualDelete(
+    @RequestParam("registrationId") Long registrationId
+  ) {
+    try {
+      registrationService.onDelete(
+        registrationService.findByRegistrationId(registrationId)
+      );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/manual-confirming")
+  @Transactional
+  public void manualConfirming(
+    @RequestParam("registrationId") Long registrationId
+  ) {
+    try {
+      workflowTransitionService.setWorkflowStatus(
+        registrationService.findByRegistrationId(registrationId),
+        workflowStatusService.getConfirming()
+      );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/manual-submitted")
+  @Transactional
+  public void manualSubmitted(
+    @RequestParam("registrationId") Long registrationId
+  ) {
+    try {
+      workflowTransitionService.setWorkflowStatus(
+        registrationService.findByRegistrationId(registrationId),
+        workflowStatusService.getSubmitted()
+      );
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/update")
+  @Transactional
+  public void update(
     @RequestParam("userId") Long userId,
+    @RequestParam("eventId") Long eventId,
     @RequestBody String jsonObject
   ) {
     try {
-      registrationService.submitRegistration(
+      Event event = eventService.findByEventId(eventId);
+      registrationService.updateSoldOut(event);
+
+      // update
+      Registration registration = registrationService.updateRegistrationRequest(
         userId,
+        event,
         JsonParser.parseString(jsonObject).getAsJsonObject()
+
       );
+
+      // match
+      if (baseParService.doAutoMatch()) {
+        registrationService.updateSoldOut(event);
+        registrationMatchingService.doMatching(registration);
+      }
+
+      // release
+      if (baseParService.doAutoRelease()) {
+        registrationService.updateSoldOut(event);
+        registrationReleaseService.doRelease(registration);
+        registrationService.updateSoldOut(event);
+      }
+
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -120,11 +213,7 @@ public class RegistrationController {
 
   @GetMapping(path = "/workflow/status/all")
   public List<WorkflowStatus> getWorkflowStatusList() {
-    List<WorkflowStatus> workflowStatusList = registrationService.getWorkflowStatusList();
-    workflowStatusList.remove(
-      workflowStatusService.getCancelled()
-    );
-    return workflowStatusList;
+    return workflowStatusService.findAllPublic();
   }
 
   @GetMapping(path = "/confirming/reminder")

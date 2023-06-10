@@ -1,20 +1,97 @@
-## redAnz Backend Model
-Java Project MAS 2022 ZHAW Informatics<br>
+## **Demo Application Angular**
+
+redAnz Application<br>
 [https://github.com/chrinc/redanz-Core.git]()
 
-#### **Tools**
-Tools used for testing and developement
-- IntelliJ IDEA 2022.1.3 (Ultimate Edition)
-- Postman Version 9.25.1
-- Apache Freemarker
+## RedanzCore
+#### **Bootstrap**
+Necessary tools for testing and development
+- Android Studio (IDE - Powered by IntelliJ)
 
-#### **Spring Boot / JDK / MySQL**
-- Version: 2.6.7
-- JDK Version: 17
-- MySQL: Ver 8.0.30-0ubuntu0.22.04.1 for Linux on x86_64 ((Ubuntu))
+##### What Todo
+- https://start.spring.io/
 
-#### **redAnz Model Containers**
-- Model Container: Business Logics reporting, profile, workshop, registration
-- Service Container: Interface for email & payment handling
-- Web-Container: Frontend REST and Security Handling
-![redAnz_backend_arch](src/main/resources/info/2208_redanz_backend_arch.png)
+- Setup Domain Classes in Project (e.g. registration / )
+- Setup MySQL Configuration (in resources/application.properties)
+- setup [cores](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) 
+- Maildev 
+  - install ``npm install -g maildev``
+  - run ``maildev`` ``or cd /usr/local/bin => ./maildev``
+- Connect to mysql: 
+  - ``export PATH=":/usr/local/mysql/bin"``
+  - ``mysql -u root -p incIsRoot``
+  - ``use redanz``
+    - `init sql inserts with source (pwd shows path to folder) eg: ` source /Users/Chrine/Documents/GitHub/redAnz-Core/redanzCore/src/main/resources/init_sql_countries.sql
+    - `stirit: ` source /usr/local/redanz/redanz-core/src/main/resources/init_sql_countries.sql
+    - `model:` source /usr/local/redanz/redanzCore/redanz-Core/src/main/resources/init_sql_countries.sql
+- Save mysql db:
+  - install mysql: `https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04`
+  - export: ``mysqldump -u root -p redanz > /usr/local/redanz/data/prod/[YYMMDD]_redanz_backup.sql``
+  - copy with sftp-client to kdrive
+  - import: ``mysql -u root -p redanz_backup < /Users/inc/kDrive/030_associations_communities/020_lindyhop/003_Stirit/2211_stirit/2211_registration/data/220708_redanz_backup.sql``
+  - import: ``mysql -u root -p redanz < /usr/local/redanz/data/prod/[YYMMDD]_redanz_backup.sql``
+  - optimize mysqldb on Server (file: sudo vim /etc/mysql/my.cnf)
+  - `[mysqld]
+     performance_schema = OFF
+     symbolic-links = 0
+     skip-external-locking
+     key_buffer_size = 32k
+     max_allowed_packet = 4M
+     table_open_cache = 8
+     sort_buffer_size = 128K
+     read_buffer_size = 512K
+     read_rnd_buffer_size = 512K
+     net_buffer_length = 4K
+     thread_stack = 480K
+     innodb_file_per_table
+     max_connections = 100
+     max_user_connections = 50
+     wait_timeout = 50
+     interactive_timeout = 50
+     long_query_time = 5`
+
+  - check submissions: `
+    select 
+      reg.registration_id id
+     ,first_name
+     ,bu.name bundle
+     ,t.name track
+     ,dr.name dance_role
+     ,wfs.name status
+     ,rm.partner_email
+     ,rm.registration_2_id reg2
+    from registration reg 
+      inner join person per on reg.participant_id = per.person_id 
+      left join track t on t.track_id = reg.track_id 
+      left join dance_role dr on dr.dance_role_id = reg.dance_role_id 
+      inner join bundle bu on bu.bundle_id = reg.bundle_id 
+      left join workflow_status wfs on wfs.workflow_status_id = reg.current_workflow_status_id
+      left join registration_matching rm on rm.registration_1_id = reg.registration_id
+    order by current_workflow_Status_id desc
+    ;`
+ #### on Server
+ - Create SSH key for git-repository
+     - ``ssh-keygen -t ed25519 -C [email@address]``
+     - ``touch ~/.ssh``
+     - `cat ~.ssh/id_ed25519`
+     - Copy the Key to SSH Keys on github.com
+     - Clone the repository to the server: 
+         `git fetch origin`
+         `git status`
+         `git pull`
+ - JAVA_HOME: ``JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64``
+ - SNAPSHOT: ``SNAPSHOT=[currentSnapshot]``
+ - Find Folder: ``cd /usr/local/redanz/redanzCore``
+ - screen: 
+   - create new screen: `screen -dmS redanz.spring`
+   - list all screens: `screen -list`
+   - attach to a screen: `screen -r redanz.spring`
+   - detach `Ctrl + A Ctrl + D`
+ - Start Spring on Server:
+-- clean inst all:
+`mvn clean install`
+--spring.profiles.active=prod --redanz.master.password=
+``java -jar $snapshot --spring.profiles.active=prod --redanz.master.password=$pass``
+`snapshot=[snapshot], pass=[password] => escape with \ before special characters`
+
+ - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)

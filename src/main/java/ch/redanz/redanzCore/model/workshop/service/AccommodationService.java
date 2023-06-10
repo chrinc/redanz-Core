@@ -1,7 +1,5 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
-import ch.redanz.redanzCore.model.registration.entities.HostRegistration;
-import ch.redanz.redanzCore.model.registration.service.HostingService;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,12 +12,13 @@ public class AccommodationService {
 
   private final SlotService slotService;
   private final SleepUtilService sleepUtilService;
+  private final EventService eventService;
 
   public AccommodationResponse getResponse() {
     return new AccommodationResponse(
-      slotService.getAllAccommodationSlots(),
-      slotService.getAllAccommodationSlots(),
-      slotService.getAllFoodSlots(),
+      slotService.getAccommodationSlots(eventService.getCurrentEvent()),
+      slotService.getAccommodationSlots(eventService.getCurrentEvent()),
+      slotService.getFoodSlots(eventService.getCurrentEvent()),
       sleepUtilService.findHostSleepUtils(),
       sleepUtilService.findHosteeSleepUtils()
     );

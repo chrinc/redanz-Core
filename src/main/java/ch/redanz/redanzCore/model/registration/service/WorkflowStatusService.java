@@ -26,12 +26,20 @@ public class WorkflowStatusService {
     return workflowStatusRepo.findByWorkflowStatusId(workflowStatusId);
   }
 
+  public WorkflowStatus getOpen() {
+    return findByWorkflowStatusName(WorkflowStatusConfig.OPEN.getName());
+  }
+
   public WorkflowStatus getSubmitted() {
     return findByWorkflowStatusName(WorkflowStatusConfig.SUBMITTED.getName());
   }
 
   public WorkflowStatus getCancelled() {
     return findByWorkflowStatusName(WorkflowStatusConfig.CANCELLED.getName());
+  }
+
+  public WorkflowStatus getDeleted() {
+    return findByWorkflowStatusName(WorkflowStatusConfig.DELETED.getName());
   }
 
   public WorkflowStatus getDone() {
@@ -51,6 +59,25 @@ public class WorkflowStatusService {
     openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.OPEN.getName()));
     openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.SUBMITTED.getName()));
     openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.CONFIRMING.getName()));
+    return openWorkflowStatusList;
+  }
+
+  public List<WorkflowStatus> findAllPublic() {
+    List<WorkflowStatus> openWorkflowStatusList = new ArrayList<>();
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.OPEN.getName()));
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.SUBMITTED.getName()));
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.CONFIRMING.getName()));
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.DONE.getName()));
+    return openWorkflowStatusList;
+  }
+
+  public List<WorkflowStatus> findAllRegular() {
+    List<WorkflowStatus> openWorkflowStatusList = new ArrayList<>();
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.OPEN.getName()));
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.SUBMITTED.getName()));
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.CONFIRMING.getName()));
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.DONE.getName()));
+    openWorkflowStatusList.add(workflowStatusRepo.findByName(WorkflowStatusConfig.CANCELLED.getName()));
     return openWorkflowStatusList;
   }
 

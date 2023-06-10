@@ -23,14 +23,10 @@ import java.util.List;
 @AllArgsConstructor
 @EnableAsync
 public class EODReleaseJob {
-  private final RegistrationMatchingService registrationMatchingService;
-  private final WorkflowTransitionService workflowTransitionService;
-  private final WorkflowStatusService workflowStatusService;
   private final RegistrationService registrationService;
-  private final OutTextService outTextService;
+  private final RegistrationReleaseService registrationReleaseService;
   private final EventService eventService;
-  private final RegistrationEmailService registrationEmailService;
-  private List<Registration> releasedRegistrations;
+  private final BaseParService baseParService;
 
   @Autowired
   Configuration mailConfig;
@@ -40,58 +36,14 @@ public class EODReleaseJob {
 
   @Scheduled(cron = "${cron.matching.scheduler.value.release}")
   public void runRelease() {
+    if (baseParService.doEODRelease()) {
       log.info("Job: runRelease");
-      registrationService.getAllSubmittedRegistrations().forEach(registration -> {
-//        List<Registration> releasedRegistrations = new ArrayList<>();
+      Event currentEvent = eventService.getCurrentEvent();
 
-        if (isRelease(registration) && !releasedRegistrations.contains(registration)) {
-          try {
-
-            // release partner first
-            if (registrationMatchingService.findByRegistration1(registration).isPresent()) {
-              Registration partnerRegistration = registrationMatchingService.findByRegistration1(registration).get().getRegistration2();
-              releaseToConfirming(partnerRegistration);
-              registrationEmailService.sendEmailConfirmation(partnerRegistration , registrationEmailService.findByRegistration(partnerRegistration));
-              releasedRegistrations.add(partnerRegistration);
-            }
-
-            // release registration
-            releaseToConfirming(registration);
-            registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration));
-            releasedRegistrations.add(registration);
-          } catch (IOException | TemplateException e) {
-            e.printStackTrace();
-          }
-        }
+      registrationService.getAllSubmittedRegistrations(currentEvent).forEach(registration -> {
+        registrationReleaseService.doRelease(registration);
       });
-      registrationService.updateSoldOut();
+      registrationService.updateSoldOut(currentEvent);
     }
-
-  private boolean isRelease(Registration registration) {
-    return
-      isMatchingOK(registration) &&
-      isCapacityOK(registration)
-      ;
-  }
-
-  private boolean isMatchingOK (Registration registration) {
-    if (registrationMatchingService.findByRegistration1(registration).isPresent()) {
-      return registrationMatchingService.findByRegistration1(registration).get().getRegistration2() != null;
-    } else return true;
-  }
-  private boolean isCapacityOK (Registration registration) {
-    return
-      registrationService.countConfirmingAndDone() < eventService.getCurrentEvent().getCapacity() &&
-      registrationService.countBundlesConfirmingAndDone(
-        registration.getBundle()
-      ) < registration.getBundle().getCapacity() &&
-      registrationService.countTracksConfirmingAndDone(
-        registration.getTrack()
-      ) < (registration.getTrack() == null ? 99 : registration.getTrack().getCapacity())
-    ;
-  }
-
-  private void releaseToConfirming(Registration registration) {
-    registrationService.releaseToConfirming(registration);
   }
 }

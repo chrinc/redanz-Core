@@ -5,6 +5,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.HostingService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseAccommodation;
 import ch.redanz.redanzCore.model.reporting.response.ResponseVolunteer;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.AccommodationService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import lombok.AllArgsConstructor;
@@ -21,9 +22,9 @@ public class ReportAccommodationService {
   private final AccommodationService accommodationService;
   private final OutTextService outTextService;
   private final HostingService hostingService;
-  public List<ResponseAccommodation> getAccommodationReport(Language language) {
+  public List<ResponseAccommodation> getAccommodationReport(Language language, Event event) {
     List<ResponseAccommodation> accommodations = new ArrayList<>();
-    hostingService.getAllHostRegistrationsCurrentEvent().forEach(hostRegistration -> {
+    hostingService.getAllHostRegistrationsByEvent(event).forEach(hostRegistration -> {
       Registration registration = hostRegistration.getRegistration();
       accommodations.add(
         new ResponseAccommodation(
@@ -41,7 +42,7 @@ public class ReportAccommodationService {
         )
       );
     });
-    hostingService.getAllHosteeRegistrationsCurrentEvent().forEach(hosteeRegistration -> {
+    hostingService.getAllHosteeRegistrationsByEvent(event).forEach(hosteeRegistration -> {
       Registration registration = hosteeRegistration.getRegistration();
       accommodations.add(
         new ResponseAccommodation(

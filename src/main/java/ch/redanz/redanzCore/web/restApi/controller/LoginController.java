@@ -3,8 +3,12 @@ package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.entities.User;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.ProfileService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.web.security.config.JWTConfig;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -12,46 +16,44 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
-//@CrossOrigin(
-//  origins = {
-//    "http://localhost.ch/4200"
-//    "https://redanz.ch"
-//    ,"http://redanz.ch"
-//    ,"https://register.stirit.ch"
-//    ,"http://register.stirit.ch"
-//    ,"https://stirit.ch"
-//    ,"http://stirit.ch"
-//    ,"http://stirit.redanz.ch"
-//    ,"https://stirit.redanz.ch"
-//  }
-//  , allowedHeaders = "*"
-//
-//)
 @RequestMapping("core-api/login")
 public class LoginController {
   private final UserService userService;
   private final ProfileService profileService;
 
-  @GetMapping(path = "/user_id")
-  public Long getUserId(
+  @GetMapping(path = "/user-id")
+  public Long userId(
     @RequestParam("email") String email
   ) {
     return userService.getUser(email).getUserId();
+  }
+
+  @GetMapping(path = "/user-is-tester")
+  public boolean userIsTester(
+    @RequestParam("userId") Long userId
+  ) {
+    try {
+      return userService.userIsTester(userService.findByUserId(userId));
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 
   @GetMapping(path = "/check-server")

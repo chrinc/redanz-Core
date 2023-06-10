@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.registration.service.PaymentService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
@@ -27,11 +28,13 @@ public class ZahlsPaymentController {
 
   @GetMapping("/payment-intent")
   public PaymentDetailsResponse getPaymentIntent(
-    @RequestParam Long userId
+    @RequestParam("registrationId") Long registrationId
   ) {
     try {
+      // log.info("ing@payment-intent");
+      // log.info("registrationId: " + registrationId);
       return paymentService.getPaymentDetails(
-        registrationService.getRegistration(userId, eventService.getCurrentEvent())
+        registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
@@ -58,10 +61,11 @@ public class ZahlsPaymentController {
   @GetMapping(path = "/manual-pay")
   @Transactional
   public void manualPay(
-    @RequestParam("userId") Long userId
+    @RequestParam("registrationId") Long registrationId
   ) {
     try {
-      paymentService.onPaymentReceived(userId);
+      Registration registration = registrationService.findByRegistrationId(registrationId);
+      paymentService.onPaymentReceived(registration, paymentService.amountDue(registration));
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }

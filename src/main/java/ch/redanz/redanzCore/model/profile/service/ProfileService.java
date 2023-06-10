@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.profile.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
@@ -28,6 +29,7 @@ public class ProfileService {
   private final CountryService countryService;
   private final OutTextService outTextService;
   private final LanguageService languageService;
+  private final BaseParService baseParService;
   Configuration mailConfig;
 
   public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
@@ -76,6 +78,8 @@ public class ProfileService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      ,baseParService.testMailOnly()
+      ,false
     );
   }
 }

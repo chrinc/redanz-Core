@@ -20,7 +20,7 @@ public class FoodRegistration {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "food_registration_id")
-  private Long discountRegistrationId;
+  private Long foodRegistrationId;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "registration_id")

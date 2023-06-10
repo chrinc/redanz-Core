@@ -3,13 +3,12 @@ package ch.redanz.redanzCore.model.reporting.service;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
-import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowTransitionService;
+import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.reporting.response.ResponseRegistration;
 import ch.redanz.redanzCore.model.reporting.response.ResponseRegistrationDetails;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,9 +25,13 @@ public class ReportRegistrationService {
   private final RegistrationMatchingService registrationMatchingService;
   private final WorkflowTransitionService workflowTransitionService;
   private final WorkflowStatusService workflowStatusService;
+  private final PaymentService paymentService;
 
-  public List<ResponseRegistrationDetails> getRegistrationDetailsReport() {
-    return getRegistrationsDetails(workflowStatusService.findAll());
+  public List<ResponseRegistrationDetails> getRegistrationDetailsReport(Event event) {
+    return getRegistrationsDetails(
+      workflowStatusService.findAll(),
+      event
+    );
   }
   public List<ResponseRegistration> getAllRegistrationsReport() {
     return getRegistrations(workflowStatusService.findAll());
@@ -102,7 +105,9 @@ public class ReportRegistrationService {
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getUser().getUserId() : null,
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getFirstName() : null,
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getLastName() : null,
-              hasPartner ? registrationMatching.getRegistration2().getDanceRole().getName() : null
+              hasPartner ? registrationMatching.getRegistration2().getDanceRole().getName() : null,
+              registration.getEvent().getEventId(),
+              registration.getParticipant().getPersonLang().getLanguageKey()
             )
           );
         }
@@ -113,10 +118,10 @@ public class ReportRegistrationService {
     return registrations;
   }
 
-  private List<ResponseRegistrationDetails> getRegistrationsDetails(List<WorkflowStatus> workflowStatusList) {
+  private List<ResponseRegistrationDetails> getRegistrationsDetails(List<WorkflowStatus> workflowStatusList, Event event) {
     List<ResponseRegistrationDetails> registrationDetails = new ArrayList<>();
 
-    registrationService.findAllCurrentEvent().forEach(registration -> {
+    registrationService.findAllByEvent(event).forEach(registration -> {
       RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
       WorkflowStatus workflowStatus = workflowStatusService.findById(registration.getWorkflowStatus().getWorkflowStatusId());
       boolean hasPartner = registrationMatching != null && registrationMatching.getRegistration2() != null;
@@ -133,7 +138,11 @@ public class ReportRegistrationService {
             registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
             workflowStatus.getName(),
             registrationMatching == null ? null: registrationMatching.getPartnerEmail(),
-            hasPartner ? registrationMatching.getRegistration2().getRegistrationId() : null
+            registration.getParticipant().getPersonLang().getLanguageKey(),
+            hasPartner ? registrationMatching.getRegistration2().getRegistrationId() : null,
+            registration.getEvent().getEventId(),
+            paymentService.amountDue(registration),
+            paymentService.totalAmount(registration)
           )
         );
       }

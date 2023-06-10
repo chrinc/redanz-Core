@@ -20,5 +20,9 @@ public class ResponseRegistrationDetails {
   private String danceRole;
   private String workflowStatus;
   private String partnerEmail;
+  private String languageKey;
   private Long partnerRegistrationId;
+  private Long eventId;
+  private Long amountDue;
+  private Long totalAmount;
 }
