@@ -80,10 +80,7 @@ public class ReportStatsService {
       stats.add(
         new ResponseStats(
           "Food"
-          , outTextService.getOutTextByKeyAndLangKey(food.getName(), language.getLanguageKey()).getOutText()
-            + " ("
-            + outTextService.getOutTextByKeyAndLangKey(slot.getName(), language.getLanguageKey()).getOutText()
-            + ")"
+          , outTextService.getOutTextByKeyAndLangKey(slot.getName(), language.getLanguageKey()).getOutText()
           , foodRegistrationService.countFoodSlotSubmittedReleasedAndDone(food, slot, event)
           , foodRegistrationService.countFoodSlotConfirmingAndDone(food, slot, event)
           , foodRegistrationService.countFoodSlotDone(food, slot, event)

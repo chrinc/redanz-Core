@@ -1,6 +1,9 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.entities.User;
+import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
@@ -540,5 +543,55 @@ public class RegistrationService {
     registration.setTrack(trackService.findByTrackId(request.getTrackId()));
     registration.setDanceRole(danceRoleService.findByDanceRoleId(request.getDanceRoleId()));
     update(registration);
+  }
+
+  public List<Registration> findAllByEventStatusLangAndBundle(
+    Event event, WorkflowStatus workflowStatus, Language language, Bundle bundle
+  ) {
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndBundle(
+      true,event, workflowStatus, language, bundle
+    );
+  }
+  public List<Registration> findAllByEventStatusAndLang(
+    Event event, WorkflowStatus workflowStatus, Language language
+  ) {
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLang(
+      true,event, workflowStatus, language
+    );
+  }
+  public List<Registration> findAllByEventStatusAndBundle(
+    Event event, WorkflowStatus workflowStatus, Bundle bundle
+  ) {
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndBundle(
+      true,event, workflowStatus, bundle
+    );
+  }
+  public List<Registration> findAllByEventAndStatus(
+    Event event, WorkflowStatus workflowStatus
+  ) {
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatus(
+      true,event, workflowStatus
+    );
+  }
+  public List<Registration> findAllByEventLangAndBundle(
+    Event event, Language language, Bundle bundle
+  ) {
+    return registrationRepo.findAllByActiveAndEventAndParticipantPersonLangAndBundle(
+      true,event, language, bundle
+    );
+  }
+  public List<Registration> findAllByEventAndLang(
+    Event event, Language language
+  ) {
+    return registrationRepo.findAllByActiveAndEventAndParticipantPersonLang(
+      true,event, language
+    );
+  }
+  public List<Registration> findAllByEventAndBundle(
+    Event event, Bundle bundle
+  ) {
+    return registrationRepo.findAllByActiveAndEventAndBundle(
+      true,event, bundle
+    );
   }
 }

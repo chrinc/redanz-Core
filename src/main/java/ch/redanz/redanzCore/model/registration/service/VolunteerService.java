@@ -10,6 +10,8 @@ import ch.redanz.redanzCore.model.registration.repository.VolunteerSlotRegistrat
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.SleepUtil;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.VolunteerType;
+import ch.redanz.redanzCore.model.workshop.repository.VolunteerTypeRepo;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
@@ -35,6 +37,7 @@ public class VolunteerService {
   private final LanguageService languageService;
   private final OutTextService outTextService;
   private final EventService eventService;
+  private final VolunteerTypeRepo volunteerTypeRepo;
 
 
   public List<VolunteerRegistration> getAll() {
@@ -45,6 +48,13 @@ public class VolunteerService {
     return volunteerRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
   }
 
+  public void saveVolunteerType(VolunteerType volunteerType) {
+    volunteerTypeRepo.save(volunteerType);
+  }
+
+  public List<VolunteerType> getAllVolunteerTypes(Event event) {
+    return volunteerTypeRepo.findAllByEvent(event);
+  }
 
   public String getSlots(VolunteerRegistration volunteerRegistration, Language language) {
     AtomicReference<String> slots = new AtomicReference<>();
@@ -116,6 +126,9 @@ public class VolunteerService {
     }
     return volunteerSlotRegistrations;
   }
+  public VolunteerType findVolunteerTypeById(Long volunteerTypeId) {
+    return volunteerTypeRepo.findByVolunteerTypeId(volunteerTypeId);
+  }
 
   public void updateVolunteerSlotRegistration(Registration registration, JsonObject volunteerRegistration) {
     List<VolunteerSlotRegistration> requestVolunteerSlotRegistrations = volunteerSlotRegistrations(registration, volunteerRegistration);
@@ -140,6 +153,10 @@ public class VolunteerService {
   }
 
   public void updateVolunteerRegistration(Registration registration, JsonObject volunteerRegistration) {
+    log.info("inc@updateVolunteerReg ");
+    log.info(volunteerRegistration.toString());
+    log.info(volunteerRegistration.get("typeId").toString());
+    Long typeId = volunteerRegistration.get("typeId").isJsonNull() ? null : volunteerRegistration.get("typeId").getAsLong();
     String intro = volunteerRegistration.get("intro").isJsonNull() ? null : volunteerRegistration.get("intro").getAsString();
     String mobile = volunteerRegistration.get("mobile").isJsonNull() ? null : volunteerRegistration.get("mobile").getAsString();
     VolunteerRegistration existingVolunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
@@ -152,6 +169,12 @@ public class VolunteerService {
         volunteerRegistrationRepo.save(existingVolunteerRegistration);
       }
 
+      if (existingVolunteerRegistration != null &&
+        existingVolunteerRegistration.getType().getVolunteerTypeId() != typeId) {
+        existingVolunteerRegistration.setType(findVolunteerTypeById(typeId));
+        volunteerRegistrationRepo.save(existingVolunteerRegistration);
+      }
+
       // update mobile
       if (registration.getParticipant().getMobile() != mobile) {
         registration.getParticipant().setMobile(mobile);
@@ -160,11 +183,12 @@ public class VolunteerService {
 
     } else {
 
-      // new host registration
+      // new volunteer registration
       volunteerRegistrationRepo.save(
         new VolunteerRegistration(
           registration,
-          intro
+          intro,
+          findVolunteerTypeById(typeId)
         )
       );
 

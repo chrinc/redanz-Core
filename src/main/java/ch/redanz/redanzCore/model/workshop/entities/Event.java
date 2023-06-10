@@ -39,6 +39,13 @@ public class Event implements Serializable {
     inverseJoinColumns = @JoinColumn(name = "private_class_id"))
   private List<PrivateClass> privateClasses;
 
+  @ManyToMany
+  @JoinTable(
+    name = "event_volunteer_type",
+    joinColumns = @JoinColumn(name = "event_id"),
+    inverseJoinColumns = @JoinColumn(name = "volunteer_type_id"))
+  private List<VolunteerType> volunteerTypes;
+
   private String name;
   private Integer capacity;
 

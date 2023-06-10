@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.registration.jobs;
 import ch.redanz.redanzCore.model.profile.config.PersonConfig;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
@@ -32,14 +33,17 @@ public class EODMatchingJob {
   private Map<RegistrationMatching, RegistrationMatching> matchingPairs;
   private final RegistrationService registrationService;
   private final EventService eventService;
+  private final BaseParService baseParService;
 
   //  @Scheduled(cron = "0 47 15 * * MON-SUN")
   //  @Scheduled(cron = "0 0/2 * * * *")
   @Scheduled(cron = "${cron.matching.scheduler.value.matching}")
   public void runMatching() {
-    log.info("Job: runMatching");
-    registrationService.updateSoldOut(eventService.getCurrentEvent());
-    doMatching(registrationMatchingService.findRegistration2ISNullSubmittedCurrent());
+    if (baseParService.doEODMatching()) {
+      log.info("Job: runMatching");
+      registrationService.updateSoldOut(eventService.getCurrentEvent());
+      doMatching(registrationMatchingService.findRegistration2ISNullSubmittedCurrent());
+    }
   }
 
   private void doMatching(List<RegistrationMatching> registrationMatchings) {

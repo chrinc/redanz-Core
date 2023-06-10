@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
+import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   private final SleepUtilService sleepUtilService;
   private final DiscountService discountService;
   private final SpecialService specialService;
+  private final VolunteerService volunteerService;
 
   @Override
   public void run(String... args) {
@@ -57,6 +59,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       EventTypeSlotConfig.setup(slotService, eventService);
       SpecialConfig.setup(specialService);
       EventDiscountConfig.setup(discountService, eventService);
+      VolunteerTypeConfig.setup(volunteerService);
     }
   }
 }

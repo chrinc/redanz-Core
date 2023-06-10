@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class ProfileController {
   private final PasswordEmailService passwordEmailService;
   private final PasswordResetService passwordResetService;
   private final PersonService personService;
+  private final LanguageService languageService;
 
   @Autowired
   private Environment environment;
@@ -148,6 +150,19 @@ public class ProfileController {
   ) {
     try {
       profileService.updateProfile(userId, personResponse);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/person/lang")
+  @Transactional
+  public void updateLanguage(
+    @RequestParam("userId") Long userId,
+    @RequestParam("languageKey") String languageKey
+  ) {
+    try {
+      personService.findByUser(userService.findByUserId(userId)).setPersonLang(languageService.findLanguageByLanguageKey(languageKey.toUpperCase()));
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }

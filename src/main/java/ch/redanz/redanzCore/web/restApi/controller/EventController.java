@@ -1,11 +1,9 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
+import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.entities.Special;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -34,6 +32,7 @@ public class EventController {
   private final SpecialService specialService;
   private final BundleService bundleService;
   private final PrivateClassService privateClassService;
+  private final VolunteerService volunteerService;
 
   @GetMapping(path = "/schema/event")
   public List<Map<String, String>> getEventSchema() {
@@ -132,8 +131,17 @@ public class EventController {
   }
 
   @GetMapping(path = "/volunteer/slot/all")
-  public List<Slot> getAllVolunteerSlots() {
-    return slotService.getAllVolunteerSlots(eventService.getCurrentEvent());
+  public List<Slot> getAllVolunteerSlots(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return slotService.getAllVolunteerSlots(eventService.findByEventId(eventId));
+  }
+
+  @GetMapping(path = "/volunteer/type/all")
+  public List<VolunteerType> getAllVolunteerTypes(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return volunteerService.getAllVolunteerTypes(eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/accommodation/all")

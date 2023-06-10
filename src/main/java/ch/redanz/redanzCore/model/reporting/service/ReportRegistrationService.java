@@ -106,7 +106,8 @@ public class ReportRegistrationService {
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getFirstName() : null,
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getLastName() : null,
               hasPartner ? registrationMatching.getRegistration2().getDanceRole().getName() : null,
-              registration.getEvent().getEventId()
+              registration.getEvent().getEventId(),
+              registration.getParticipant().getPersonLang().getLanguageKey()
             )
           );
         }
@@ -137,6 +138,7 @@ public class ReportRegistrationService {
             registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
             workflowStatus.getName(),
             registrationMatching == null ? null: registrationMatching.getPartnerEmail(),
+            registration.getParticipant().getPersonLang().getLanguageKey(),
             hasPartner ? registrationMatching.getRegistration2().getRegistrationId() : null,
             registration.getEvent().getEventId(),
             paymentService.amountDue(registration),

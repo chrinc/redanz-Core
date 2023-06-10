@@ -8,6 +8,7 @@ import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
+import com.google.gson.JsonObject;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -20,8 +21,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +31,7 @@ public class RegistrationEmailService {
   private final OutTextService outTextService;
   private final LanguageService languageService;
   private final BaseParService baseParService;
+//  private final RegistrationService registrationService;
   @Autowired
   Environment environment;
 
@@ -389,6 +390,104 @@ public class RegistrationEmailService {
 
     registrationEmail.setReleasedSentDate(LocalDateTime.now());
     update(registrationEmail);
+
+  }
+
+  public void sendGenericEmail(List<Registration> registrationList, JsonObject emailContent) throws IOException, TemplateException {
+    String subject =
+      emailContent.get("subject") != null ?
+        (
+          !emailContent.get("subject").isJsonNull() ?
+          emailContent.get("subject").getAsString() : ""
+        )
+        : "";
+    String content =
+      emailContent.get("content") != null ?
+        (
+          !emailContent.get("content").isJsonNull() ?
+          emailContent.get("content").getAsString() : ""
+        )
+        : "";
+//    Boolean allWithBundle =
+//      emailContent.get("allWithBundle") != null ?
+//        (
+//          !emailContent.get("allWithBundle").isJsonNull() ?
+//            emailContent.get("allWithBundle").getAsBoolean() : false
+//        )
+//        : false;
+//    Boolean allWithLang =
+//      emailContent.get("allWithLang") != null ?
+//        (
+//          !emailContent.get("allWithLang").isJsonNull() ?
+//            emailContent.get("allWithLang").getAsBoolean() : false
+//        )
+//        : false;
+//    Boolean allStatus =
+//      emailContent.get("allStatus") != null ?
+//        (
+//          !emailContent.get("allStatus").isJsonNull() ?
+//            emailContent.get("allStatus").getAsBoolean() : false
+//        )
+//        : false;
+
+    log.info("subject: " + subject);
+    log.info("content: " + content);
+//    log.info("allWithBundle: " + allWithBundle);
+//    log.info("allWithLang: " + allWithLang);
+//    log.info("allStatus: " + allStatus);
+
+    registrationList.forEach(registration -> {
+//    String names = registrations
+//      .stream()
+//      .map(registration -> String.valueOf(registration.getParticipant().getFirstName()))
+//      .collect(Collectors.joining(","));
+    Map<String, Object> model = new HashMap<>();
+    model.put("firstName", registration.getParticipant().getFirstName());
+    model.put("content", content);
+      Template template = null;
+      try {
+        template = mailConfig.getTemplate("generic.ftl");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      String languageKey =
+        registration.getParticipant().getPersonLang() == null ?
+        languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
+          registration.getParticipant().getPersonLang().getLanguageKey();
+
+    model.put("regards",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("team",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+      try {
+        EmailService.sendEmail(
+          EmailService.getSession(),
+          registration.getParticipant().getUser().getEmail(),
+          subject,
+          FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+          ,baseParService.testMailOnly()
+          ,false
+        );
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      } catch (TemplateException e) {
+        throw new RuntimeException(e);
+      }
+
+//      registrationEmail.setReleasedSentDate(LocalDateTime.now());
+//    update(registrationEmail);
+
+    });
   }
 
 }

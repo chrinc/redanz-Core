@@ -27,6 +27,7 @@ public class EODReleaseJob {
   private final RegistrationService registrationService;
   private final RegistrationReleaseService registrationReleaseService;
   private final EventService eventService;
+  private final BaseParService baseParService;
 
   @Autowired
   Configuration mailConfig;
@@ -36,6 +37,7 @@ public class EODReleaseJob {
 
   @Scheduled(cron = "${cron.matching.scheduler.value.release}")
   public void runRelease() {
+    if (baseParService.doEODRelease()) {
       log.info("Job: runRelease");
       Event currentEvent = eventService.getCurrentEvent();
 
@@ -44,4 +46,5 @@ public class EODReleaseJob {
       });
       registrationService.updateSoldOut(currentEvent);
     }
+  }
 }

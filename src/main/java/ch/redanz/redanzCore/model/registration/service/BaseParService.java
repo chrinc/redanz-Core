@@ -28,4 +28,28 @@ public class BaseParService {
     baseParRepo.findAllByBaseParKey("testMailOnly").get().getBoolValue() :
     true; // default: true
   }
+
+  public boolean doEODCancel(){
+    return baseParRepo.findAllByBaseParKey("doEODCancel").isPresent() ?
+    baseParRepo.findAllByBaseParKey("doEODCancel").get().getBoolValue() :
+    true; // default: true
+  }
+
+  public boolean doEODMatching(){
+    return baseParRepo.findAllByBaseParKey("doEODMatching").isPresent() ?
+    baseParRepo.findAllByBaseParKey("doEODMatching").get().getBoolValue() :
+    true; // default: true
+  }
+
+  public boolean doEODRelease(){
+    return baseParRepo.findAllByBaseParKey("doEODRelease").isPresent() ?
+    baseParRepo.findAllByBaseParKey("doEODRelease").get().getBoolValue() :
+    true; // default: true
+  }
+
+  public boolean doEODReminder(){
+    return baseParRepo.findAllByBaseParKey("doEODReminder").isPresent() ?
+    baseParRepo.findAllByBaseParKey("doEODReminder").get().getBoolValue() :
+    true; // default: true
+  }
 }

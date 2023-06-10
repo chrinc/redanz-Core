@@ -22,4 +22,5 @@ public class ResponseRegistration {
   private String partnerLastName;
   private String partnerDanceRole;
   private Long eventId;
+  private String LanguageKey;
 }

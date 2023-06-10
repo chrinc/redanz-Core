@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.registration.jobs;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
@@ -32,26 +33,31 @@ public class EODReminderJob {
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
   private final EventService eventService;
+  private final BaseParService baseParService;
 
   @Scheduled(cron = "${cron.matching.scheduler.value.reminder}")
   public void runReminderJob() {
-    log.info("Job: runReminder");
-    Event currentEvent = eventService.getCurrentEvent();
 
-    registrationService.getAllConfirmingRegistrations(currentEvent).forEach(registration -> {
-      LocalDateTime releasedAt = registration.getWorkflowStatusDate();
-      LocalDateTime deadline = LocalDateTime.now().minusDays(
-        Long.parseLong(Objects.requireNonNull(environment.getProperty("registration.reminder.after.days")))
-      );
+    if (baseParService.doEODReminder()) {
+      log.info("Job: runReminder");
 
-      RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-      if (releasedAt.isBefore(deadline) && registrationEmail.getReminderSentDate() == null) {
-        try {
-          registrationEmailService.sendReminderEmail(registration, registrationEmail);
-        } catch (IOException | TemplateException e) {
-          throw new RuntimeException(e);
+      Event currentEvent = eventService.getCurrentEvent();
+
+      registrationService.getAllConfirmingRegistrations(currentEvent).forEach(registration -> {
+        LocalDateTime releasedAt = registration.getWorkflowStatusDate();
+        LocalDateTime deadline = LocalDateTime.now().minusDays(
+          Long.parseLong(Objects.requireNonNull(environment.getProperty("registration.reminder.after.days")))
+        );
+
+        RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
+        if (releasedAt.isBefore(deadline) && registrationEmail.getReminderSentDate() == null) {
+          try {
+            registrationEmailService.sendReminderEmail(registration, registrationEmail);
+          } catch (IOException | TemplateException e) {
+            throw new RuntimeException(e);
+          }
         }
-      }
-    });
+      });
+    }
   }
 }
