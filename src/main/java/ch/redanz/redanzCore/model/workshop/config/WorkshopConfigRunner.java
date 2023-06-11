@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.workshop.service.*;
@@ -31,6 +32,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
   private final DiscountService discountService;
   private final SpecialService specialService;
   private final VolunteerService volunteerService;
+  private final BaseParService baseParService;
 
   @Override
   public void run(String... args) {
@@ -61,6 +63,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       EventDiscountConfig.setup(discountService, eventService);
       VolunteerTypeConfig.setup(volunteerService);
       EventVolunteerTypeConfig.setup(eventService, volunteerService);
+      BaseParConfig.setup(baseParService);
     }
   }
 }
