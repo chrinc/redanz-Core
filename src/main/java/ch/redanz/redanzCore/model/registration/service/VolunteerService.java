@@ -69,6 +69,10 @@ public class VolunteerService {
     return slots.get() == null ? "" : slots.toString();
   }
 
+  public VolunteerType findTypeByName(String name) {
+    return volunteerTypeRepo.findByName(name);
+  }
+
   public Map<String, List<Object>> getVolunteerRegistration(Registration registration) {
     Map<String, List<Object>> volunteerRegistrationMap = new HashMap<>();
 

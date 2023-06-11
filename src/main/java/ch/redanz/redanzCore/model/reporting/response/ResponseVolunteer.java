@@ -16,6 +16,7 @@ public class ResponseVolunteer {
   private String lastName;
   private String email;
   private String mobile;
+  private String type;
   private String slots;
   private String intro;
   private String workflowStatus;

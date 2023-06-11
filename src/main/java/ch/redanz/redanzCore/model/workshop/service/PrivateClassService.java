@@ -28,7 +28,9 @@ public class PrivateClassService {
   }
 
   public List<PrivateClass> findByEvent(Event event) {
-    return privateClassRepo.findAllByEvent(event);
+    return privateClassRepo.findAllByEvent(event).isPresent() ?
+      privateClassRepo.findAllByEvent(event).get() :
+      null;
   }
 
   public List<PrivateClass> findByEventAndBundle(Event event, Bundle bundle) {
@@ -39,10 +41,6 @@ public class PrivateClassService {
   public List<PrivateClassRegistration> findAllByRegistrations(Registration registration) {
     return privateClassRegistrationRepo.findAllByRegistration(registration);
   }
-
-
-
-
 
   public PrivateClass findByPrivateClassId(Long privateClassId) {
     return privateClassRepo.findByPrivateClassId(privateClassId);

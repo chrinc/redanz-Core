@@ -12,8 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum VolunteerTypeConfig {
-  TWO_HOURS("Two Hours", "Two Hours fro two drinks"),
-  SIX_HOURS("Six Hours", "Six Hours for CHF 100");
+  TWO_HOURS("LABEL-VOL-TYPE-TWO-HOURS-NAME", "LABEL-VOL-TYPE-TWO-HOURS-DESC"),
+  SIX_HOURS("LABEL-VOL-TYPE-SIX-HOURS-NAME", "LABEL-VOL-TYPE-SIX-HOURS-DESC"),
+  NO_PREFS("LABEL-VOL-TYPE-NO-PREF-NAME", "LABEL-VOL-TYPE-NO-PREF-DESC");
 
   private final String name;
   private final String description;
