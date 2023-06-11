@@ -86,7 +86,7 @@ Necessary tools for testing and development
      - Clone the repository to the server: 
          `git fetch origin`
          `git status`
-         `git pull`
+         `git pull origin [branchName]`
  - JAVA_HOME: ``JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64``
  - SNAPSHOT: ``SNAPSHOT=[currentSnapshot]``
  - Find Folder: ``cd /usr/local/redanz/redanzCore``
