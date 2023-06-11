@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface VolunteerTypeRepo  extends JpaRepository<VolunteerType, Long> {
   VolunteerType findByVolunteerTypeId(Long volunteerTypeId);
+  VolunteerType findByName(String name);
 
   @Query("SELECT s FROM Event e JOIN e.volunteerTypes s WHERE e = :event")
   List<VolunteerType> findAllByEvent(@Param("event") Event event);

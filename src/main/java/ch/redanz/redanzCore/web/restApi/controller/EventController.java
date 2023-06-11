@@ -166,10 +166,17 @@ public class EventController {
     @RequestParam("eventId") Long eventId
   ) {
     // log.info("inc@privateClasses/all, bundleId: " + bundleId);
+    List<PrivateClass> privateClasses;
+
     if (bundleId == null) {
-      return privateClassService.findByEvent(eventService.findByEventId(eventId));
+      privateClasses =  privateClassService.findByEvent(eventService.findByEventId(eventId));
     } else {
-      return privateClassService.findByEventAndBundle(eventService.findByEventId(eventId), bundleService.findByBundleId(bundleId));
+      privateClasses =  privateClassService.findByEventAndBundle(eventService.findByEventId(eventId), bundleService.findByBundleId(bundleId));
     }
+
+    log.info(privateClasses.toString());
+    log.info(String.valueOf(privateClasses.size()));
+
+    return privateClasses;
   }
 }

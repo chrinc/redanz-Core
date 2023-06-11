@@ -8,15 +8,16 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum BundleConfig {
-  HALFPASS("Regular Bundle", 250, OutTextConfig.LABEL_HALFPASS_DESC_EN.getOutTextKey(), 40),
-  FULLPASS("Large Bundle", 350, OutTextConfig.LABEL_FULLPASS_DESC_EN.getOutTextKey(), 110),
-  LEVELPASS("Level Bundle", 350, OutTextConfig.LABEL_LEVELPASS_DESC_EN.getOutTextKey(), 110),
-  PARTYPASS("Party Bundle", 90, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 30);
+  HALFPASS("Regular Bundle", 250, OutTextConfig.LABEL_HALFPASS_DESC_EN.getOutTextKey(), 40, false),
+  FULLPASS("Large Bundle", 350, OutTextConfig.LABEL_FULLPASS_DESC_EN.getOutTextKey(), 110, false),
+  LEVELPASS("Level Bundle", 350, OutTextConfig.LABEL_LEVELPASS_DESC_EN.getOutTextKey(), 110, false),
+  PARTYPASS("Party Bundle", 90, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 30, false);
 
   private final String name;
   private final Integer price;
   private final String description;
   private final Integer capacity;
+  private final Boolean simpleTicket;
 
   public static void setup(BundleService bundleService) {
     for (BundleConfig bundleConfig : BundleConfig.values()) {
@@ -25,7 +26,8 @@ public enum BundleConfig {
           bundleConfig.getName(),
           bundleConfig.getPrice(),
           bundleConfig.getDescription(),
-          bundleConfig.getCapacity()
+          bundleConfig.getCapacity(),
+          bundleConfig.getSimpleTicket()
         )
       );
     }

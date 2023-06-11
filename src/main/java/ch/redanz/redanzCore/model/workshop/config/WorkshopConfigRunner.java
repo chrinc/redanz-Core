@@ -60,6 +60,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
       SpecialConfig.setup(specialService);
       EventDiscountConfig.setup(discountService, eventService);
       VolunteerTypeConfig.setup(volunteerService);
+      EventVolunteerTypeConfig.setup(eventService, volunteerService);
     }
   }
 }

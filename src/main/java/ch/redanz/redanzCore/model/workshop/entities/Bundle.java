@@ -52,12 +52,14 @@ public class Bundle implements Serializable {
     String name,
     double price,
     String description,
-    Integer capacity
+    Integer capacity,
+    Boolean simpleTicket
   ) {
     this.name = name;
     this.price = price;
     this.description = description;
     this.capacity = capacity;
+    this.simpleTicket = simpleTicket;
   }
 
   public static List<Map<String, String>> schema() {
@@ -89,6 +91,11 @@ public class Bundle implements Serializable {
           put("label", "Capacity");
         }});
         add(new HashMap<>() {{
+          put("key", "simpleTicket");
+          put("type", "boolean");
+          put("label", "simpleTicket");
+        }});
+        add(new HashMap<>() {{
           put("key", "description");
           put("type", "text");
           put("label", "Description");
@@ -110,6 +117,7 @@ public class Bundle implements Serializable {
         put("price", String.valueOf(price));
         put("capacity", String.valueOf(capacity));
         put("description", description);
+        put("simpleTicket", simpleTicket.toString());
       }
     };
   }

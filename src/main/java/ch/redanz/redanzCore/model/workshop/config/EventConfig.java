@@ -17,12 +17,13 @@ public enum EventConfig {
   EVENT2023(
   "redAnz Workshop"
   , 350
-  , LocalDate.parse("2023-11-17")
-  , LocalDate.parse("2023-11-19")
-    ,ZonedDateTime.parse("2023-08-01T11:00:00.000+01:00[Europe/Paris]")
+  , LocalDate.parse("2023-08-01")
+  , LocalDate.parse("2023-08-10")
+    ,ZonedDateTime.parse("2023-06-01T11:00:00.000+01:00[Europe/Paris]")
   ,true
     ,false
-  ,"Weekend Dance Workshop");
+  ,"Summer Dance Workshop"
+  );
   private final String name;
   private final Integer capacity;
   private final LocalDate dateFrom;
