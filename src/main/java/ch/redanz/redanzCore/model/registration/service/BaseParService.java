@@ -54,6 +54,12 @@ public class BaseParService {
     true; // default: true
   }
 
+  public String testEmail(){
+    return testMailOnly() ?
+      baseParRepo.findAllByBaseParKey("testMailOnly").get().getStringValue() :
+    null; // default: true
+  }
+
   public void save(BasePar basePar) {
     baseParRepo.save(basePar);
   }

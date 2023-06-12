@@ -78,6 +78,7 @@ public class EmailService {
     String subject,
     String body,
     Boolean baseParTestMailOnly,
+    String baseParTestEmail,
     Boolean eventInactive
   ) {
     try {
@@ -98,17 +99,31 @@ public class EmailService {
 
       msg.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(
-          (sendToTestEmail || baseParTestMailOnly || eventInactive) ? testEmail : toEmail
-          , false)
+          (sendToTestEmail || baseParTestMailOnly || eventInactive) ?
+            (baseParTestEmail != null ? baseParTestEmail : testEmail)
+            :
+            toEmail
+          , false
+        )
       );
-      log.info("send email, emailIsConfig: " + emailIsConfig);
-      log.info("send email, sendEmail: " + sendEmail);
-      log.info("send email, msg: " + msg);
-      log.info("send email, toEmail: " + toEmail);
-      log.info("send email, sendToTestEmail: " + sendToTestEmail);
-      log.info("send email, baseParTestMailOnly: " + baseParTestMailOnly);
-      log.info("send email, eventInactive: " + eventInactive);
-      log.info("send email, testEmail: " + testEmail);
+//      log.info("send email, hostEmail: " + hostEmail);
+//      log.info("send email, emailIsConfig: " + emailIsConfig);
+//      log.info("send email, sendEmail: " + sendEmail);
+//      log.info("send email, msg: " + msg);
+//      log.info("send email, toEmail: " + toEmail);
+//      log.info("send email, sendToTestEmail: " + sendToTestEmail);
+//      log.info("send email, baseParTestMailOnly: " + baseParTestMailOnly);
+//      log.info("send email, eventInactive: " + eventInactive);
+//      log.info("send email, testEmail: " + testEmail);
+//      log.info("send email, baseParTestEmail: " + baseParTestEmail);
+      String emailTo =
+        (!emailIsConfig && sendEmail) ?(
+        (sendToTestEmail || baseParTestMailOnly || eventInactive) ?
+        (baseParTestEmail != null ? baseParTestEmail : testEmail)
+          : toEmail
+        ) : "nobody";
+      log.info("send email, send to: "  + emailTo);
+
       if (!emailIsConfig && sendEmail) Transport.send(msg);
     } catch (Exception e) {
       e.printStackTrace();
