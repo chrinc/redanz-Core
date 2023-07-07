@@ -5,10 +5,10 @@ import ch.redanz.redanzCore.model.workshop.entities.OutTextId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface OutTextRepo extends JpaRepository<OutText, OutTextId> {
-  OutText findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(String outTextKey, String languageKey);
-
+  Optional<OutText> findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(String outTextKey, String languageKey);
   List<OutText> findAllByType(String type);
 }

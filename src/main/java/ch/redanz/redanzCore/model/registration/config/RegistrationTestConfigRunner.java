@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(800)
-@Profile("dev")
+@Profile("dev || test ")
 public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final UserService userService;
   private final BundleService bundleService;
@@ -31,8 +31,6 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
 
   private final RegistrationMatchingService registrationMatchingService;
   private final RegistrationEmailService registrationEmailService;
-  private final EODMatchingJob eodMatchingJob;
-  private final EODReleaseJob eodReleaseJob;
   private final RegistrationService registrationService;
   private final WorkflowTransitionService workflowTransitionService;
   private final DiscountService discountService;

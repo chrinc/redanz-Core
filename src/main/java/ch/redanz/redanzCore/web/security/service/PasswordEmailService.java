@@ -44,6 +44,7 @@ public class PasswordEmailService {
     Person person = personService.findByUser(user);
     model.put("link", link);
     model.put("firstName", person.getFirstName());
+    model.put("headerLink",  environment.getProperty("email.header.link"));
     Template template = mailConfig.getTemplate("resetPassword.ftl");
 
     String languageKey =
@@ -96,7 +97,9 @@ public class PasswordEmailService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,baseParService.testEmail()
       ,false
+      ,null
     );
   }
 }

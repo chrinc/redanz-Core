@@ -15,8 +15,9 @@ public class LanguageService {
     languageRepo.save(language);
   }
   public Language findLanguageByLanguageKey(String key) {
-    return languageRepo.findLanguageByLanguageKey(key);
+    return languageRepo.findLanguageByLanguageKey(key).get();
   }
-
-  ;
+  public boolean languageExists(String key) {
+    return languageRepo.findLanguageByLanguageKey(key).isPresent();
+  }
 }

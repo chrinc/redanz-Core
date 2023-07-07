@@ -18,8 +18,12 @@ public class OutTextService {
     outTextRepo.save(outText);
   }
 
+  public boolean outTextExists(String key, String langKey) {
+    return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey).isPresent();
+
+  }
   public OutText getOutTextByKeyAndLangKey(String key, String langKey) {
-    return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey);
+    return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey).get();
   }
 
   public HashMap<String, String> getOutTextByType(List<String> types) {

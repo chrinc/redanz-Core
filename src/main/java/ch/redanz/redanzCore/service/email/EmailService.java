@@ -58,6 +58,7 @@ public class EmailService {
     props.put("mail.smtp.host", emailSmtpHost); // SMTP
     props.put("mail.smtp.socketFactory.class",
       "javax.net.ssl.SSLSocketFactory"); // SSL Factory Class
+    props.put("mail.smtp.socketFactory.port", 465);
     props.put("mail.smtp.port", emailSmtpPort); // SMTP Port
     props.put("mail.smtp.auth", "true"); //Enabling SMTP Authentication
     props.put("mail.smtp.starttls.enable", "true"); //SMTP Port
@@ -77,7 +78,9 @@ public class EmailService {
     String subject,
     String body,
     Boolean baseParTestMailOnly,
-    Boolean eventInactive
+    String baseParTestEmail,
+    Boolean eventInactive,
+    String bccEmail
   ) {
     try {
       MimeMessage msg = new MimeMessage(session);
@@ -95,19 +98,41 @@ public class EmailService {
         userConfig -> Objects.equals(userConfig.getEmail(), toEmail)
       );
 
+      boolean bccIsConfig = Arrays.stream(
+        UserConfig.values()).anyMatch(
+        userConfig -> Objects.equals(userConfig.getEmail(), bccEmail)
+      );
+
       msg.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(
-          (sendToTestEmail || baseParTestMailOnly || eventInactive) ? testEmail : toEmail
-          , false)
+          (sendToTestEmail || baseParTestMailOnly || eventInactive) ?
+            (baseParTestEmail != null ? baseParTestEmail : testEmail)
+            :
+            toEmail
+          , false
+        )
       );
-      log.info("send email, emailIsConfig: " + emailIsConfig);
-      log.info("send email, sendEmail: " + sendEmail);
-      log.info("send email, msg: " + msg);
-      log.info("send email, toEmail: " + toEmail);
-      log.info("send email, sendToTestEmail: " + sendToTestEmail);
-      log.info("send email, baseParTestMailOnly: " + baseParTestMailOnly);
-      log.info("send email, eventInactive: " + eventInactive);
-      log.info("send email, testEmail: " + testEmail);
+
+      // bcc to sender for archive reasons
+
+      if (bccEmail != null) {
+        if (bccIsConfig) {
+          msg.addRecipients(Message.RecipientType.BCC, hostEmail);
+        } else {
+          msg.addRecipients(Message.RecipientType.BCC, bccEmail);
+        }
+      }
+
+      String emailTo =
+        (!emailIsConfig && sendEmail) ?(
+        (sendToTestEmail || baseParTestMailOnly || eventInactive) ?
+        (baseParTestEmail != null ? baseParTestEmail : testEmail)
+          : toEmail
+        ) : "nobody";
+      log.info("send email, send to: "  + emailTo);
+      log.info("bcc: " + bccEmail);
+
+
       if (!emailIsConfig && sendEmail) Transport.send(msg);
     } catch (Exception e) {
       e.printStackTrace();

@@ -16,12 +16,14 @@ public enum LanguageConfig {
 
   public static void setup(LanguageService languageService) {
     for (LanguageConfig languageConfig : LanguageConfig.values()) {
-      languageService.save(
-        new Language(
-          languageConfig.getKey(),
-          languageConfig.getName()
-        )
-      );
+      if (!languageService.languageExists(languageConfig.key)) {
+        languageService.save(
+          new Language(
+            languageConfig.key,
+            languageConfig.name
+          )
+        );
+      }
     }
   }
 }

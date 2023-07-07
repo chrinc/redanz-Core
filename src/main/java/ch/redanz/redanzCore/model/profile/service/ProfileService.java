@@ -32,11 +32,11 @@ public class ProfileService {
   private final BaseParService baseParService;
   Configuration mailConfig;
 
-  public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink) throws IOException, TemplateException {
+  public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
     Person newPerson = new Person(userService.findByUserId(userId), personResponse.getFirstName(), personResponse.getLastName(), personResponse.getStreet(), personResponse.getPostalCode(), personResponse.getCity(), countryService.findCountry(personResponse.getCountryId()), languageService.findLanguageByLanguageKey(personResponse.getLanguage()));
     newPerson.setUpdateTimestamp(LocalDateTime.now());
     personService.addPerson(newPerson);
-    sendRegisteredProfileEmail(newPerson, registrationLink);
+    sendRegisteredProfileEmail(newPerson, registrationLink, headerLink);
   }
 
   public void updateProfile(Long userId, PersonResponse personResponse) {
@@ -55,9 +55,10 @@ public class ProfileService {
     return personService.findByUser(userService.findByUserId(userId));
   }
 
-  public void sendRegisteredProfileEmail(Person person, String registrationLink) throws IOException, TemplateException {
+  public void sendRegisteredProfileEmail(Person person, String registrationLink, String headerLink) throws IOException, TemplateException {
     String languageKey = person.getPersonLang() == null ? languageService.findLanguageByLanguageKey("GE").getLanguageKey() : person.getPersonLang().getLanguageKey();
     Map<String, Object> model = new HashMap<>();
+    model.put("headerLink", headerLink);
     model.put("link", registrationLink);
     model.put("firstName", person.getFirstName());
     model.put("base", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN.getOutTextKey(), languageKey).getOutText());
@@ -77,7 +78,9 @@ public class ProfileService {
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
+      ,baseParService.testEmail()
       ,false
+      ,null
     );
   }
 }
