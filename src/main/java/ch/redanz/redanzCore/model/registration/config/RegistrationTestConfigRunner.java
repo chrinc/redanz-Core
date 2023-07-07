@@ -31,8 +31,6 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
 
   private final RegistrationMatchingService registrationMatchingService;
   private final RegistrationEmailService registrationEmailService;
-  private final EODMatchingJob eodMatchingJob;
-  private final EODReleaseJob eodReleaseJob;
   private final RegistrationService registrationService;
   private final WorkflowTransitionService workflowTransitionService;
   private final DiscountService discountService;

@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
+import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
@@ -31,6 +32,7 @@ public class RegistrationEmailService {
   private final OutTextService outTextService;
   private final LanguageService languageService;
   private final BaseParService baseParService;
+  private final UserService userService;
 //  private final RegistrationService registrationService;
   @Autowired
   Environment environment;
@@ -116,6 +118,7 @@ public class RegistrationEmailService {
       ,baseParService.testMailOnly()
       ,baseParService.testEmail()
       ,!registration.getEvent().isActive()
+      ,null
     );
     update(
       new RegistrationEmail(registration, LocalDateTime.now())
@@ -179,6 +182,7 @@ public class RegistrationEmailService {
       ,baseParService.testMailOnly()
       ,baseParService.testEmail()
       ,!registration.getEvent().isActive()
+      ,null
     );
     registrationEmail.setDoneSentDate(LocalDateTime.now());
     update(registrationEmail);
@@ -263,6 +267,7 @@ public class RegistrationEmailService {
       ,baseParService.testMailOnly()
       ,baseParService.testEmail()
       ,!registration.getEvent().isActive()
+      ,null
     );
 
     registrationEmail.setReminderSentDate(LocalDateTime.now());
@@ -329,6 +334,7 @@ public class RegistrationEmailService {
       ,baseParService.testMailOnly()
       ,baseParService.testEmail()
       ,!registration.getEvent().isActive()
+      ,null
     );
     registrationEmail.setCancelledSentDate(LocalDateTime.now());
     update(registrationEmail);
@@ -402,6 +408,7 @@ public class RegistrationEmailService {
       ,baseParService.testMailOnly()
       ,baseParService.testEmail()
       ,!registration.getEvent().isActive()
+      ,null
     );
 
     registrationEmail.setReleasedSentDate(LocalDateTime.now());
@@ -409,7 +416,7 @@ public class RegistrationEmailService {
 
   }
 
-  public void sendGenericEmail(List<Registration> registrationList, JsonObject emailContent) throws IOException, TemplateException {
+  public void sendGenericEmail(Long senderUser, List<Registration> registrationList, JsonObject emailContent) throws IOException, TemplateException {
     String subject =
       emailContent.get("subject") != null ?
         (
@@ -464,6 +471,7 @@ public class RegistrationEmailService {
           ,baseParService.testMailOnly()
           ,baseParService.testEmail()
           ,false
+          ,userService.findByUserId(senderUser).getEmail()
         );
       } catch (IOException e) {
         throw new RuntimeException(e);

@@ -18,12 +18,6 @@ public class OutText implements Serializable  {
     @EmbeddedId
     private OutTextId outTextId = new OutTextId();
 
-
-//    @ManyToOne
-//    @JsonIgnore
-//    @MapsId("outTextLanguageKey")
-//    @JoinColumn(name="languageKey")
-//    private Language outTextLanguage;
     @Lob
     private String outText;
 

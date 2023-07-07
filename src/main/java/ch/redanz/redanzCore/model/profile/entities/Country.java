@@ -1,6 +1,5 @@
 package ch.redanz.redanzCore.model.profile.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,21 +18,23 @@ import java.util.List;
 public class Country implements Serializable {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
   @Column(name = "sort_name")
   private String sortName;
 
-  @Column(name = "name_ge")
-  private String nameGe;
+  @Column(name = "name")
+  private String name;
 
-  @Column(name = "name_en")
-  private String nameEn;
+  @Column(name = "out_text_key")
+  private String outTextKey;
 
-  @OneToMany
-  @JoinColumn(name = "person_id")
-  @JsonIgnore
-  private List<Person> person;
+  public Country(String sortName, String name, String outTextKey) {
+    this.sortName = sortName;
+    this.name = name;
+    this.outTextKey = outTextKey;
+  }
 }
 
 

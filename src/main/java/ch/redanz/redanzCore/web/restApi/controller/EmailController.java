@@ -27,6 +27,7 @@ public class EmailController {
 
   @GetMapping(path = "/send-generic-email")
   public void sendGenericMail(
+    @RequestParam("senderUserId")  Long senderUserId,
     @RequestParam("registrationId") Long registrationId,
     @RequestParam("emailContent") String emailContent
   ) {
@@ -93,6 +94,7 @@ public class EmailController {
       }
 
       registrationEmailService.sendGenericEmail(
+        senderUserId,
         registrationList,
         jsonEmail
       );
