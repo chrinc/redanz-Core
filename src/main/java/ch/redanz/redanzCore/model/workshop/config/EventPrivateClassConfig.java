@@ -31,7 +31,6 @@ public enum EventPrivateClassConfig {
     for (EventPrivateClassConfig eventPrivateClassConfig : EventPrivateClassConfig.values()) {
       Event myEvent = eventService.findByName(eventPrivateClassConfig.eventConfig.getName());
       PrivateClass privateClass = privateClassService.findByName(eventPrivateClassConfig.privateClassConfig.getName());
-      log.info("private Class" + privateClass.getName());
       if (eventPrivateClassMap.containsKey(myEvent.getEventId())) {
         eventPrivateClassMap.get(myEvent.getEventId()).add(privateClass);
       } else {
@@ -40,7 +39,6 @@ public enum EventPrivateClassConfig {
         eventPrivateClassMap.put(myEvent.getEventId(), myPrivateclasses);
       }
     }
-    log.info("eventPrivateClassMap.size(): " + eventPrivateClassMap.size());
     eventPrivateClassMap.keySet().forEach(eventId -> {
       Event myEvent = eventService.findByEventId(eventId);
       myEvent.setPrivateClasses(eventPrivateClassMap.get(eventId));

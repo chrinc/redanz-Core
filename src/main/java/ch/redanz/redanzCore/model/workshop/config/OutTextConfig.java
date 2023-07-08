@@ -224,16 +224,16 @@ public enum OutTextConfig {
   // SUBMITTED
   LABEL_EMAIL_SUBMITTED_HEADER_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_HEADER", "Thank you for your registration!", "EN"),
   LABEL_EMAIL_SUBMITTED_HEADER_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_HEADER", "Vielen Dank für deine Anmeldung!", "GE"),
-  LABEL_EMAIL_SUBMITTED_BASE_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "We will check your entries and inform you as soon as possible if we can offer you a spot at Stir it! 2022.", "EN"),
-  LABEL_EMAIL_SUBMITTED_BASE_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "Wir prüfen nun deine Eingaben und melden uns baldmöglichst bei dir mit der Info, ob wir dir einen Platz am Stir it! 2022 anbieten können.", "GE"),
+  LABEL_EMAIL_SUBMITTED_BASE_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "We will check your entries and inform you as soon as possible if we can offer you a spot at Stir it! 2023.", "EN"),
+  LABEL_EMAIL_SUBMITTED_BASE_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "Wir prüfen nun deine Eingaben und melden uns baldmöglichst bei dir mit der Info, ob wir dir einen Platz am Stir it! 2023 anbieten können.", "GE"),
   LABEL_EMAIL_SUBMITTED_DETAILS01_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_DETAILS01", "You can find the details of your submission in your", "EN"),
   LABEL_EMAIL_SUBMITTED_DETAILS01_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_DETAILS01", "Du findest die Angaben deiner Anmeldung in deinem", "GE"),
   LABEL_EMAIL_SUBMITTED_SUBJECT_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_SUBJECT", "Registration submitted", "EN"),
   LABEL_EMAIL_SUBMITTED_SUBJECT_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_SUBJECT", "Anmeldung eingereicht", "GE"),
 
   // RELEASED
-  LABEL_EMAIL_RELEASED_HEADER01_EN("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurray - we've got a spot for you at Stir it! 2022", "EN"),
-  LABEL_EMAIL_RELEASED_HEADER01_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurra - wir haben einen Platz für dich beim Stir it! 2022", "GE"),
+  LABEL_EMAIL_RELEASED_HEADER01_EN("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurray - we've got a spot for you at Stir it! 2023", "EN"),
+  LABEL_EMAIL_RELEASED_HEADER01_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurra - wir haben einen Platz für dich beim Stir it! 2023", "GE"),
   LABEL_EMAIL_RELEASED_HEADER02_EN("EMAIL", "LABEL_EMAIL_RELEASED_HEADER02", "As soon as we receive your payment, we will confirm your participation", "EN"),
   LABEL_EMAIL_RELEASED_HEADER02_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER02", "Sobald deine Zahlung bei uns eingegangen ist, können wir deine Teilnahme am Festival fix bestätigen", "GE"),
   LABEL_EMAIL_RELEASED_DETAILS_EN("EMAIL", "LABEL_EMAIL_RELEASED_DETAILS", "Please find the payment details in your ", "EN"),
@@ -242,16 +242,16 @@ public enum OutTextConfig {
   LABEL_EMAIL_RELEASED_SUBJECT_GE("EMAIL", "LABEL_EMAIL_RELEASED_SUBJECT", "Anmeldebestätigung", "GE"),
 
   // DONE
-  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "We have received your payment and confirm your participation at Stir it! 2022. We are looking forward to welcoming you in November!", "EN"),
-  LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Wir haben deine Zahlung erhalten und bestätigen deine Teilnahme am Stir it! 2022. Wir freuen uns sehr, dich im November begrüssen zu dürfen!", "GE"),
+  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "We have received your payment and confirm your participation at Stir it! 2023. We are looking forward to welcoming you in November!", "EN"),
+  LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Wir haben deine Zahlung erhalten und bestätigen deine Teilnahme am Stir it! 2023. Wir freuen uns sehr, dich im November begrüssen zu dürfen!", "GE"),
   LABEL_EMAIL_DONE_BASE_EN("EMAIL", "LABEL_EMAIL_DONE_BASE", "We will provide you with more information regarding bands, party, work shop schedules, etc. shortly before the festival.", "EN"),
   LABEL_EMAIL_DONE_BASE_GE("EMAIL", "LABEL_EMAIL_DONE_BASE", "Weitere Informationen zu Bands, Party, Zeiten für die Workshops, etc. werden wir dir kurz vor dem Festival zusenden.", "GE"),
   LABEL_EMAIL_DONE_SUBJECT_EN("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Booking Confirmation", "EN"),
   LABEL_EMAIL_DONE_SUBJECT_GE("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Buchungsbestätigung", "GE"),
 
   // REMINDER
-  LABEL_EMAIL_REMINDER_HEADER_EN("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "You have registered for Stir it! 2022.", "EN"),
-  LABEL_EMAIL_REMINDER_HEADER_GE("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "Du hast dich für Stir it! 2022 angemeldet.", "GE"),
+  LABEL_EMAIL_REMINDER_HEADER_EN("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "You have registered for Stir it! 2023.", "EN"),
+  LABEL_EMAIL_REMINDER_HEADER_GE("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "Du hast dich für Stir it! 2023 angemeldet.", "GE"),
   LABEL_EMAIL_REMINDER_BASE01_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "The payment needs to be completed within 14 days days after the registration confirmation. This time period has expired.", "EN"),
   LABEL_EMAIL_REMINDER_BASE01_GE("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "Die Zahlung muss innerhalb von 14 Tagen nach der Anmeldebestätigung erfolgt sein. Diese Frist ist abgelaufen.", "GE"),
   LABEL_EMAIL_REMINDER_BASE02_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE02", "We hope that you are still interested in being part of the workshop.", "EN"),

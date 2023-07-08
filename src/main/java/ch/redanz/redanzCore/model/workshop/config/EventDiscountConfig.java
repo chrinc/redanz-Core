@@ -11,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum EventDiscountConfig {
-  EVENT2022_EARLY_BIRD(EventConfig.EVENT2023, DiscountConfig.EARLY_BIRD),
-  EVENT2022_ABROAD(EventConfig.EVENT2023, DiscountConfig.ABROAD),
-  EVENT2022_STUDENT(EventConfig.EVENT2023, DiscountConfig.STUDENT);
+  EVENT2023_EARLY_BIRD(EventConfig.EVENT2023, DiscountConfig.EARLY_BIRD),
+  EVENT2023_ABROAD(EventConfig.EVENT2023, DiscountConfig.ABROAD),
+  EVENT2023_STUDENT(EventConfig.EVENT2023, DiscountConfig.STUDENT);
 
   private final EventConfig eventConfig;
   private final DiscountConfig discountConfig;
