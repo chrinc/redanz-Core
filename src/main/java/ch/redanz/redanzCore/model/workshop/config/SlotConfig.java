@@ -26,11 +26,13 @@ public enum SlotConfig {
 
   public static void setup(SlotService slotService) {
     for (SlotConfig slotConfig : SlotConfig.values()) {
-      slotService.save(
-        new Slot(
-          slotConfig.getName()
-        )
-      );
+      if (!slotService.existsByName(slotConfig.getName())) {
+        slotService.save(
+          new Slot(
+            slotConfig.getName()
+          )
+        );
+      }
     }
   }
 }

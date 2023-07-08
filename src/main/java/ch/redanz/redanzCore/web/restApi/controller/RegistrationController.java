@@ -211,9 +211,6 @@ public class RegistrationController {
     }
   }
 
-
-
-
   @GetMapping(path = "/workflow/status/all")
   public List<WorkflowStatus> getWorkflowStatusList() {
     return workflowStatusService.findAllPublic();

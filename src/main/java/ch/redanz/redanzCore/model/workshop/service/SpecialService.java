@@ -26,6 +26,9 @@ public class SpecialService {
     return specialRepo.findAllByBundle(bundle).orElse(null);
   }
 
+  public boolean existsByName(String name) {
+    return specialRepo.existsByName(name);
+  }
   public List<Special> findByEventOrBundle(Event event, Bundle bundle) {
     List<Special> allSpecials;
     allSpecials = findByEvent(event);

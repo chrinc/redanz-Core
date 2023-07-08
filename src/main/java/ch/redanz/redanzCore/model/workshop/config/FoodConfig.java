@@ -19,13 +19,20 @@ public enum FoodConfig {
   public static void setup(FoodService foodService) {
 
     for (FoodConfig foodConfig : FoodConfig.values()) {
-      foodService.save(
-        new Food(
-          foodConfig.getName(),
-          foodConfig.getPrice(),
-          foodConfig.getDescription()
-        )
-      );
+      if (!foodService.existsByName(foodConfig.getName())) {
+        foodService.save(
+          new Food(
+            foodConfig.getName(),
+            foodConfig.getPrice(),
+            foodConfig.getDescription()
+          )
+        );
+      } else {
+        Food food = foodService.findByName(foodConfig.getName());
+        food.setDescription(foodConfig.description);
+        food.setPrice(foodConfig.price);
+        foodService.save(food);
+      }
     }
   }
 }

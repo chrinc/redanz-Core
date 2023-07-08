@@ -33,6 +33,10 @@ public class Bundle implements Serializable {
   private List<Special> specials;
 
   private String name;
+
+  @Column(name = "internal_id")
+  private String internalId;
+
   private double price;
   private String description;
   private Integer capacity;
@@ -53,13 +57,15 @@ public class Bundle implements Serializable {
     double price,
     String description,
     Integer capacity,
-    Boolean simpleTicket
+    Boolean simpleTicket,
+    String internalId
   ) {
     this.name = name;
     this.price = price;
     this.description = description;
     this.capacity = capacity;
     this.simpleTicket = simpleTicket;
+    this.internalId = internalId;
   }
 
   public static List<Map<String, String>> schema() {
@@ -104,6 +110,11 @@ public class Bundle implements Serializable {
           put("key", "isEdit");
           put("type", "isEdit");
           put("label", "");
+        }});
+        add(new HashMap<>() {{
+          put("key", "internalId");
+          put("type", "internalId");
+          put("label", "Internal ID");
         }});
       }
     };

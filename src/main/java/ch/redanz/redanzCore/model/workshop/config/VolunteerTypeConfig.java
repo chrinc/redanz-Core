@@ -20,14 +20,15 @@ public enum VolunteerTypeConfig {
   private final String description;
 
   public static void setup(VolunteerService volunteerService) {
-
     for (VolunteerTypeConfig volunteerTypeConfig : VolunteerTypeConfig.values()) {
-      volunteerService.saveVolunteerType(
-        new VolunteerType(
-          volunteerTypeConfig.getName(),
-          volunteerTypeConfig.getDescription()
-        )
-      );
+      if (!volunteerService.existsByName(volunteerTypeConfig.getName())) {
+        volunteerService.saveVolunteerType(
+          new VolunteerType(
+            volunteerTypeConfig.getName(),
+            volunteerTypeConfig.getDescription()
+          )
+        );
+      }
     }
   }
 }

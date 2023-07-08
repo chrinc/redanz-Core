@@ -21,7 +21,9 @@ public class WorkflowStatusService {
   public WorkflowStatus findByWorkflowStatusName(String name) {
     return workflowStatusRepo.findByName(name);
   }
-
+  public boolean existsByName(String name) {
+    return workflowStatusRepo.existsByName(name);
+  }
   public WorkflowStatus findById(Long workflowStatusId) {
     return workflowStatusRepo.findByWorkflowStatusId(workflowStatusId);
   }

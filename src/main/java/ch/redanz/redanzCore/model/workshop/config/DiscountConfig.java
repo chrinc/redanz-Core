@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public enum DiscountConfig {
   ABROAD(OutTextConfig.LABEL_DISCOUNT_ABROAD_EN.getOutTextKey()  , OutTextConfig.LABEL_DISCOUNT_ABROAD_DESC_EN.getOutTextKey(), 50, null),
-  LINDYANDMORE(OutTextConfig.LABEL_DISCOUNT_LINDYANDMORE_EN.getOutTextKey()  , OutTextConfig.LABEL_DISCOUNT_LINDYANDMORE_DESC_EN.getOutTextKey(), 15, null),
   STUDENT(OutTextConfig.LABEL_DISCOUNT_STUDENT_EN.getOutTextKey(), OutTextConfig.LABEL_DISCOUNT_STUDENT_DESC_EN.getOutTextKey()    , 30, null),
   EARLY_BIRD(OutTextConfig.LABEL_DISCOUNT_EARLY_BIRD_EN.getOutTextKey(), OutTextConfig.LABEL_DISCOUNT_EARLY_BIRD_DESC_EN.getOutTextKey() , 15, 30);
 
@@ -23,14 +22,23 @@ public enum DiscountConfig {
   public static void setup(DiscountService discountService) {
 
     for (DiscountConfig discountConfig : DiscountConfig.values()) {
-      discountService.save(
-        new Discount(
-          discountConfig.getName(),
-          discountConfig.getDiscount(),
-          discountConfig.getDescription(),
-          discountConfig.getCapacity()
-        )
-      );
+      if (!discountService.existsByName(discountConfig.getName())) {
+        discountService.save(
+          new Discount(
+            discountConfig.getName(),
+            discountConfig.getDiscount(),
+            discountConfig.getDescription(),
+            discountConfig.getCapacity()
+          )
+        );
+      } else {
+        Discount discount = discountService.findByName(discountConfig.getName());
+        discount.setCapacity(discountConfig.capacity);
+        discount.setDescription(discountConfig.description);
+        discount.setDiscount(discountConfig.discount);
+        discountService.save(discount);
+
+      }
     }
   }
 }

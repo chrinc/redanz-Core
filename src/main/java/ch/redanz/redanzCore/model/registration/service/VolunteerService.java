@@ -39,7 +39,9 @@ public class VolunteerService {
   private final EventService eventService;
   private final VolunteerTypeRepo volunteerTypeRepo;
 
-
+  public boolean existsByName(String name) {
+    return volunteerTypeRepo.existsByName(name);
+  }
   public List<VolunteerRegistration> getAll() {
     return volunteerRegistrationRepo.findAll();
   }

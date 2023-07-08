@@ -140,7 +140,9 @@ public class ProfileController {
     String link = environment.getProperty("link.confirm.token.prefix")
       + confirmationTokenService.getTokenByUser(userService.findByUserId(userId)
     );
-    profileService.registerProfile(userId, personResponse, link);
+
+    String headerLink = environment.getProperty("email.header.link");
+    profileService.registerProfile(userId, personResponse, link, headerLink);
   }
 
   @PostMapping(path = "/person/update")

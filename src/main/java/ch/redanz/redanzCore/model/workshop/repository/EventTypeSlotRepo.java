@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface EventTypeSlotRepo extends JpaRepository<EventTypeSlot, EventTypeSlotId> {
   List<EventTypeSlot> findAllByEvent(Event event);
   Optional<EventTypeSlot> findAllByEventAndTypeSlot(Event event, TypeSlot typeSlot);
-
+  boolean existsByEventAndTypeSlot(Event event, TypeSlot typeSlot);
 }

@@ -35,20 +35,25 @@ public enum TypeSlotConfig {
       if (typeSlotConfig.getTypeConfig() != null && Objects.equals(typeSlotConfig.getTypeConfig().getClass(), FoodConfig.class)) {
         assert typeSlotConfig.getTypeConfig() instanceof FoodConfig;
         FoodConfig foodConfig = (FoodConfig) typeSlotConfig.getTypeConfig();
-        slotService.save(
-          new TypeSlot(
-            typeSlotConfig.getType(),
-            slotService.findByName(typeSlotConfig.getSlotConfig().getName()),
-            foodService.findByName(foodConfig.getName()).getFoodId()
-          )
-        );
+
+        if (!foodService.existsByName(foodConfig.getName())) {
+          slotService.save(
+            new TypeSlot(
+              typeSlotConfig.getType(),
+              slotService.findByName(typeSlotConfig.getSlotConfig().getName()),
+              foodService.findByName(foodConfig.getName()).getFoodId()
+            )
+          );
+        }
       } else {
-        slotService.save(
-          new TypeSlot(
-            typeSlotConfig.getType(),
-            slotService.findByName(typeSlotConfig.getSlotConfig().getName())
-          )
-        );
+        if (!slotService.existsByName(typeSlotConfig.getSlotConfig().getName())) {
+          slotService.save(
+            new TypeSlot(
+              typeSlotConfig.getType(),
+              slotService.findByName(typeSlotConfig.getSlotConfig().getName())
+            )
+          );
+        }
       }
     }
   }

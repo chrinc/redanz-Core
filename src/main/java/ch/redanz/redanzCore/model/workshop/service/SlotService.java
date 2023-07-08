@@ -24,6 +24,9 @@ public class SlotService {
   public void save(Slot slot) {
     slotRepo.save(slot);
   }
+  public boolean existsByName(String name) {
+    return slotRepo.existsByName(name);
+  }
 
   public void save(TypeSlot typeSlot) {
     typeSlotRepo.save(typeSlot);

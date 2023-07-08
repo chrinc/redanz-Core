@@ -10,4 +10,5 @@ import org.springframework.transaction.annotation.Transactional;
 public interface WorkflowStatusRepo extends JpaRepository<WorkflowStatus, Long> {
     WorkflowStatus findByWorkflowStatusId(Long workflowId);
     WorkflowStatus findByName(String name);
+    boolean existsByName(String name);
 }

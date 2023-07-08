@@ -59,14 +59,32 @@ public enum OutTextConfig {
   LABEL_FOOD_VEDA_NAME_GE("FRONT_LOGIN", "LABEL-FOOD-VEDA-NAME", "Gesund, biologisch, vegan", "GE"),
 
   // Bundles
-  LABEL_FULLPASS_DESC_EN("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN classes, 3 additional free choice classes, 3 parties (Fri/Sat/Sun)", "EN"),
-  LABEL_FULLPASS_DESC_GE("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN-Klassen, 3 zusätzliche Klassen (freie Wahl), 3 Parties (Fr/Sa/So)", "GE"),
-  LABEL_PARTYPASS_DESC_EN("FRONT_LOGIN", "LABEL-PARTYPASS-DESC", "3 parties (Fri/Sat/Sun)", "EN"),
-  LABEL_PARTYPASS_DESC_GE("FRONT_LOGIN", "LABEL-PARTYPASS-DESC", "3 Parties (Fr/Sa/So)", "GE"),
-  LABEL_HALFPASS_DESC_EN("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN classes, 3 parties (Fri/Sat/Sun)", "EN"),
-  LABEL_HALFPASS_DESC_GE("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN-Klassen, 3 Parties (Fr/Sa/So)", "GE"),
-  LABEL_LEVELPASS_DESC_EN("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN classes, 3 level classes, 3 parties (Fri/Sat/Sun)", "EN"),
-  LABEL_LEVELPASS_DESC_GE("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN-Klassen, 3 Level-Klassen, 3 Parties (Fr/Sa/So)", "GE"),
+  LABEL_FULLPASS_DESC_EN("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN classes, 3 additional free choice classes, 3 parties (FRI/SAT/SUN)", "EN"),
+  LABEL_FULLPASS_DESC_GE("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN-Klassen, 3 zusätzliche Klassen (freie Wahl), 3 Parties (FR/SA/SO)", "GE"),
+  LABEL_PARTYPASS_DESC_EN("FRONT_LOGIN", "LABEL-PARTYPASS-DESC", "3 parties (FRI/SAT/SUN)", "EN"),
+  LABEL_PARTYPASS_DESC_GE("FRONT_LOGIN", "LABEL-PARTYPASS-DESC", "3 Parties (FR/SA/SO)", "GE"),
+  LABEL_HALFPASS_DESC_EN("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN classes, 3 parties (FRI/SAT/SUN)", "EN"),
+  LABEL_HALFPASS_DESC_GE("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN-Klassen, 3 Parties (FR/SA/SO)", "GE"),
+  LABEL_LEVELPASS_DESC_EN("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN classes, 3 level classes, 3 parties (FRI/SAT/SUN)", "EN"),
+  LABEL_LEVELPASS_DESC_GE("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN-Klassen, 3 Level-Klassen, 3 Parties (FR/SA/SO)", "GE"),
+  LABEL_EXTRAFUN_DESC_EN("FRONT_LOGIN", "LABEL-EXTRA-FUN-DESC", "6 Free-Choice Classes (SAT/SUN), 3 Parties (FRI/SAT/SUN)", "EN"),
+  LABEL_EXTRAFUN_DESC_GE("FRONT_LOGIN", "LABEL-EXTRA-FUN-DESC", "6 Free-Choice Klassen (SA/SO), 3 Parties (FR/SA/SO)", "GE"),
+  LABEL_FUN_DESC_EN("FRONT_LOGIN", "LABEL-FUN-DESC", "4 Free-Choice Classes (SAT/SUN), 3 Parties (FRI/SAT/SUN)", "EN"),
+  LABEL_FUN_DESC_GE("FRONT_LOGIN", "LABEL-FUN-DESC", "4 Free-Choice Klassen (SA/SO), 3 Parties (FR/SA/SO)", "GE"),
+  LABEL_PARTY_SUN_DESC_EN("FRONT_LOGIN", "LABEL-PARTY-SUN-DESC", "1 Party (SUN)", "EN"),
+  LABEL_PARTY_SUN_DESC_GE("FRONT_LOGIN", "LABEL-PARTY-SUN-DESC", "1 Party (SO)", "GE"),
+  LABEL_FRIDAY_PACKAGE_DESC_EN("FRONT_LOGIN", "LABEL-FRIDAY-PACKAGE-DESC", "1 Solo Jazz Trio Class (FRI), 1 Party (FRI)", "EN"),
+  LABEL_FRIDAY_PACKAGE_DESC_GE("FRONT_LOGIN", "LABEL-FRIDAY-PACKAGE-DESC", "1 Solo Jazz Trio Klasse (FR), 1 Party (FR)", "GE"),
+
+  // CLASSES
+  LABEL_PRIVATE_ELZE_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop or Solo Jazz with Elze (1 couple, 1 follower, 1 leader or 3-4 followers)", "EN"),
+  LABEL_PRIVATE_ELZE_DESC_GE("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop oder Solo Jazz mit Elze (1 Tanzpaar, 1 Follower, 1 Leader oder 3-4 Followers)", "GE"),
+  LABEL_PRIVATE_SONJA_HECTOR_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-SONJA_HECTOR-DESC", "Lindy Hop with Sonja and Hector (1 couple)", "EN"),
+  LABEL_PRIVATE_SONJA_HECTOR_GE("FRONT_LOGIN", "LABEL-PRIVATE-SONJA_HECTOR-DESC", "Lindy Hop mit Sonja and Hector (1 Tanzpaar)", "GE"),
+  LABEL_PRIVATE_BARA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz or Tap with Bara", "EN"),
+  LABEL_PRIVATE_BARA_GE("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz oder Tap mit Bara", "GE"),
+  LABEL_PRIVATE_CLAUDIA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop or Solo Jazz with Caludia (1 Couple or Solo)", "EN"),
+  LABEL_PRIVATE_CLAUDIA_GE("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop oder Solo Jazz mit Caludia (1 Tanzpaar oder Solo)", "GE"),
 
   // Sleep Utils
   LABEL_SLEEP_UTIL_MATTRESS_DOUBLE_EN("FRONT_LOGIN", "LABEL-SLEEP-UTIL-MATTRESS-DOUBLE", "Double Mattress", "EN"),
@@ -91,6 +109,18 @@ public enum OutTextConfig {
     "FRONT_LOGIN"
     , "LABEL_SPECIAL_MASSAGE_DESC"
     , "Ich interessiere mich dafür, bei Praxis Relaaax eine entspannende ayurvedische oder kalifornische Fussmassage inklusive Fussbad oder eine kalifornische Nackenmassage (25 Minuten zum Spezialpreis von CHF 45.-) zu buchen und darüber mehr Informationen zu erhalten. (Die definitive Anmeldung und zeitliche Koordination läuft über Relaaax)", "GE"),
+  LABEL_FRI_SPECIAL_NAME_EN("FRONT_LOGIN", "LABEL-FRIDAY-SPECIAL-NAME", "Friday Special", "EN"),
+  LABEL_FRI_SPECIAL_NAME_GE("FRONT_LOGIN", "LABEL-FRIDAY-SPECIAL-NAME", "Friday Special", "GE"),
+  LABEL_FRI_SPECIAL_DESC_EN(
+    "FRONT_LOGIN"
+    , "LABEL-FRI-SPECIAL-DESC"
+    , "1 Special class", "EN"),
+  LABEL_FRI_SPECIAL_DESC_GE(
+    "FRONT_LOGIN"
+    , "LABEL-FRI-SPECIAL-DESC"
+    , "1 Spezial-Klasse", "GE"),
+
+
 
   // VOLUNTEERING / DONATION / SCHOLARSHIP
   LABEL_DONATION_EN("FRONT_LOGIN", "LABEL_DONATION", "Donation", "EN"),

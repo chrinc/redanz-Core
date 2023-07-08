@@ -22,6 +22,9 @@ public class DanceRole {
   private String name;
   private String description;
 
+  @Column(name = "internal_id")
+  private String internalId;
+
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "danceRole")
   @JsonIgnore
@@ -30,9 +33,10 @@ public class DanceRole {
   public DanceRole() {
   }
 
-  public DanceRole(String name, String description) {
+  public DanceRole(String name, String description, String internalId) {
     this.name = name;
     this.description = description;
+    this.internalId = internalId;
   }
 }
 

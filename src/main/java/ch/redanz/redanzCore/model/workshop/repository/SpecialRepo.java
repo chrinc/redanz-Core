@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface SpecialRepo extends JpaRepository<Special, Long> {
   Special findByName(String name);
   Special findBySpecialId(Long name);
+  boolean existsByName(String name);
 
   @Query("SELECT s FROM Event e JOIN e.specials s WHERE e = :event")
   Optional<List<Special>> findAllByEvent(@Param("event") Event event);

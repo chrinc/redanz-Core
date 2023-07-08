@@ -9,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum EventBundleConfig {
-  EVENT2022_FULL(EventConfig.EVENT2022, BundleConfig.FULLPASS),
-  EVENT2022_HALF(EventConfig.EVENT2022, BundleConfig.HALFPASS),
-  EVENT2022_LEVEL(EventConfig.EVENT2022, BundleConfig.LEVELPASS),
-  EVENT2022_PARTY(EventConfig.EVENT2022, BundleConfig.PARTYPASS);
+  EVENT2023_EXTRA_FUN(EventConfig.EVENT2023, BundleConfig.EXTRA_FUN_PASS),
+  EVENT2023_FUN(EventConfig.EVENT2023, BundleConfig.FUN_PASS),
+  EVENT2023_PARTY(EventConfig.EVENT2023, BundleConfig.PARTYPASS),
+  EVENT2023_FRI_SPECIAL(EventConfig.EVENT2023, BundleConfig.FRIDAY_SPECIAL),
+  EVENT2023_SUN_PARTY(EventConfig.EVENT2023, BundleConfig.PARTY_SUN)
+  ;
 
   private final EventConfig event;
   private final BundleConfig bundle;
@@ -25,12 +27,14 @@ public enum EventBundleConfig {
   public static void setup(BundleService bundleService, EventService eventService) {
 
     for (EventBundleConfig eventBundleConfig : EventBundleConfig.values()) {
-      eventService.save(
-        new EventBundle(
-          bundleService.findByName(eventBundleConfig.getBundle().getName()),
-          eventService.findByName(eventBundleConfig.getEvent().getName())
-        )
-      );
+      if (!eventService.eventBundleExists(eventService.findByName(eventBundleConfig.getEvent().getName()), bundleService.findByName(eventBundleConfig.getBundle().getName()))) {
+        eventService.save(
+          new EventBundle(
+            bundleService.findByName(eventBundleConfig.getBundle().getName()),
+            eventService.findByName(eventBundleConfig.getEvent().getName())
+          )
+        );
+      }
     }
   }
 }

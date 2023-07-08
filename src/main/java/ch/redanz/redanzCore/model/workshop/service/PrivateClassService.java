@@ -22,7 +22,12 @@ import java.util.Map;
 public class PrivateClassService {
   private final PrivateClassRepo privateClassRepo;
   private final PrivateClassRegistrationRepo privateClassRegistrationRepo;
-
+  public boolean existsByName(String name) {
+    return privateClassRepo.existsByName(name);
+  }
+  public PrivateClass findByName(String name) {
+    return privateClassRepo.findByName(name);
+  }
   public void save(PrivateClass privateClass) {
     privateClassRepo.save(privateClass);
   }

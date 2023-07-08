@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface BaseParRepo  extends JpaRepository<BasePar, Long> {
   Optional<BasePar> findAllByBaseParKey(String baseParKey);
+  boolean existsByBaseParKey(String baseParKey);
+  BasePar findByBaseParKey(String baseParKey);
 }

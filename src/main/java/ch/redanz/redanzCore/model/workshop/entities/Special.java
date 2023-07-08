@@ -27,10 +27,11 @@ public class Special implements Serializable {
   public Special() {
   }
 
-  public Special(String name, String description, Double price) {
+  public Special(String name, String description, Double price, Integer capacity) {
     this.name = name;
     this.description = description;
     this.price = price;
+    this.capacity = capacity;
   }
   public Special(String name, String description) {
     this.name = name;

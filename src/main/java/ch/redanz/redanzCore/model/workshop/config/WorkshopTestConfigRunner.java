@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(200)
-@Profile("dev || test")
+@Profile("rdev || dev")
 public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final BundleService bundleService;
   private final TrackService trackService;
@@ -35,6 +35,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final VolunteerService volunteerService;
   private final BaseParService baseParService;
   private final CountryService countryService;
+  private final PrivateClassService privateClassService;
 
   @Override
   public void run(String... args) {
@@ -62,6 +63,8 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       EventVolunteerTypeConfig.setup(eventService, volunteerService);
       BaseParConfig.setup(baseParService);
       CountryConfig.setup(countryService, languageService);
+
+      PrivateClassConfig.setup(privateClassService);
     }
   }
 }

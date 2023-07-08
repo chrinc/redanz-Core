@@ -22,6 +22,12 @@ public class EventService {
   public void save(Event event) {
     eventRepo.save(event);
   }
+  public boolean eventBundleExists(Event event, Bundle bundle) {
+    return bundleEventRepo.existsByEventAndBundle(event, bundle);
+  }
+  public boolean existsEventSlotType(Event event, TypeSlot typeSlot) {
+    return eventTypeSlotRepo.existsByEventAndTypeSlot(event, typeSlot);
+  }
   public void save(EventBundle eventBundle) {
     bundleEventRepo.save(eventBundle);
   }
@@ -52,7 +58,9 @@ public class EventService {
   public List<Event> findAll() {
     return eventRepo.findAll();
   }
-
+  public boolean existsByName(String name) {
+    return eventRepo.existsByName(name);
+  }
   public List<Map<String, String>> getEventSchema(){
     return Event.schema();
   }

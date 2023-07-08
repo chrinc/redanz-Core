@@ -9,11 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum BundleTrackConfig {
-  LEVEL_ADVANCED(BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED),
-  LEVEL_INTERMEDIATE(BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE),
-  LEVEL_BEGINNER(BundleConfig.LEVELPASS, TrackConfig.LINDY_BEGINNER),
-  FULL_FUN_TRACK(BundleConfig.FULLPASS, TrackConfig.FUN_TRACK),
-  HALF_FUN_TRACK(BundleConfig.HALFPASS, TrackConfig.FUN_TRACK);
+//  LEVEL_ADVANCED(BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED),
+//  LEVEL_INTERMEDIATE(BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE),
+//  LEVEL_BEGINNER(BundleConfig.LEVELPASS, TrackConfig.LINDY_BEGINNER),
+  EXTRA_FUN_TRACK(BundleConfig.EXTRA_FUN_PASS, TrackConfig.FUN_FREE_CHOICE),
+  FUN_TRACK(BundleConfig.FUN_PASS, TrackConfig.FUN_FREE_CHOICE);
 
   private final BundleConfig bundle;
   private final TrackConfig track;
@@ -25,12 +25,15 @@ public enum BundleTrackConfig {
 
   public static void setup(BundleService bundleService, TrackService trackService) {
     for (BundleTrackConfig bundleTrackConfig : BundleTrackConfig.values()) {
-      bundleService.save(
-        new BundleTrack(
-          trackService.findByName(bundleTrackConfig.getTrack().getName()),
-          bundleService.findByName(bundleTrackConfig.getBundle().getName())
-        )
-      );
+      if (!bundleService.bundleTrackExists(bundleService.findByInternalId(bundleTrackConfig.getBundle().getInternalId()), trackService.findByInternalId(bundleTrackConfig.getTrack().getInternalId())))
+      {
+        bundleService.save(
+          new BundleTrack(
+            trackService.findByInternalId(bundleTrackConfig.getTrack().getInternalId()),
+            bundleService.findByInternalId(bundleTrackConfig.getBundle().getInternalId())
+          )
+        );
+      }
     }
   }
 }

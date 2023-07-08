@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.registration.entities.BasePar;
 import ch.redanz.redanzCore.model.registration.repository.BaseParRepo;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,13 @@ public class BaseParService {
       false; // default: false
   }
 
+  public BasePar findByKey(String key) {
+    return baseParRepo.findByBaseParKey(key);
+  }
+
+  public boolean existsByKey(String key) {
+    return  baseParRepo.existsByBaseParKey(key);
+  }
   public boolean doAutoRelease(){
     return baseParRepo.findAllByBaseParKey("doAutoRelease").isPresent() ?
     baseParRepo.findAllByBaseParKey("doAutoRelease").get().getBoolValue() :
@@ -51,5 +59,15 @@ public class BaseParService {
     return baseParRepo.findAllByBaseParKey("doEODReminder").isPresent() ?
     baseParRepo.findAllByBaseParKey("doEODReminder").get().getBoolValue() :
     true; // default: true
+  }
+
+  public String testEmail(){
+    return testMailOnly() ?
+      baseParRepo.findAllByBaseParKey("testMailOnly").get().getStringValue() :
+    null; // default: true
+  }
+
+  public void save(BasePar basePar) {
+    baseParRepo.save(basePar);
   }
 }

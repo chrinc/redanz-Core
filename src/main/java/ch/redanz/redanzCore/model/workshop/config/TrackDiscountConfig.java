@@ -11,33 +11,36 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum TrackDiscountConfig {
-  DISCOUNT_FUN_ABROAD(TrackConfig.FUN_TRACK, DiscountConfig.ABROAD),
-  DISCOUNT_FUN_STUDENT(TrackConfig.FUN_TRACK, DiscountConfig.STUDENT),
-  DISCOUNT_FUN_LINDYANDMORE(TrackConfig.FUN_TRACK, DiscountConfig.LINDYANDMORE),
+  DISCOUNT_FUN_ABROAD(TrackConfig.FUN_FREE_CHOICE, DiscountConfig.ABROAD),
+  DISCOUNT_FUN_STUDENT(TrackConfig.FUN_FREE_CHOICE, DiscountConfig.STUDENT)
 
-  DISCOUNT_LINDY_ADVANCED_ABROAD(TrackConfig.LINDY_ADVANCED, DiscountConfig.ABROAD),
-  DISCOUNT_LINDY_ADVANCED_STUDENT(TrackConfig.LINDY_ADVANCED, DiscountConfig.STUDENT),
-  DISCOUNT_LINDY_ADVANCED_LINDYANDMORE(TrackConfig.LINDY_ADVANCED, DiscountConfig.LINDYANDMORE),
-
-  DISCOUNT_LINDY_INTERMEDIATE_ABROAD(TrackConfig.LINDY_INTERMEDIATE, DiscountConfig.ABROAD),
-  DISCOUNT_LINDY_INTERMEDIATE_STUDENT(TrackConfig.LINDY_INTERMEDIATE, DiscountConfig.STUDENT),
-  DISCOUNT_LINDY_INTERMEDIATE_LINDYANDMORE(TrackConfig.LINDY_INTERMEDIATE, DiscountConfig.LINDYANDMORE),
-
-  DISCOUNT_LINDY_BEGINNER_ABROAD(TrackConfig.LINDY_BEGINNER, DiscountConfig.ABROAD),
-  DISCOUNT_LINDY_BEGINNER_STUDENT(TrackConfig.LINDY_BEGINNER, DiscountConfig.STUDENT),
-  DISCOUNT_LINDY_BEGINNER_LINDYANDMORE(TrackConfig.LINDY_BEGINNER, DiscountConfig.LINDYANDMORE);
-
+//  DISCOUNT_LINDY_ADVANCED_ABROAD(TrackConfig.LINDY_ADVANCED, DiscountConfig.ABROAD),
+//  DISCOUNT_LINDY_ADVANCED_STUDENT(TrackConfig.LINDY_ADVANCED, DiscountConfig.STUDENT),
+//
+//  DISCOUNT_LINDY_INTERMEDIATE_ABROAD(TrackConfig.LINDY_INTERMEDIATE, DiscountConfig.ABROAD),
+//  DISCOUNT_LINDY_INTERMEDIATE_STUDENT(TrackConfig.LINDY_INTERMEDIATE, DiscountConfig.STUDENT),
+//
+//  DISCOUNT_LINDY_BEGINNER_ABROAD(TrackConfig.LINDY_BEGINNER, DiscountConfig.ABROAD),
+//  DISCOUNT_LINDY_BEGINNER_STUDENT(TrackConfig.LINDY_BEGINNER, DiscountConfig.STUDENT);
+;
   private final TrackConfig trackConfig;
   private final DiscountConfig discountConfig;
 
   public static void setup(TrackService trackService, DiscountService discountService) {
     for (TrackDiscountConfig trackDiscountConfig : TrackDiscountConfig.values()) {
-      trackService.save(
-        new TrackDiscount(
-          discountService.findByName(trackDiscountConfig.getDiscountConfig().getName()),
-          trackService.findByName(trackDiscountConfig.getTrackConfig().getName())
-        )
-      );
+      if (
+        !trackService.trackDiscountExists(
+          trackService.findByInternalId(trackDiscountConfig.trackConfig.getInternalId())
+          ,discountService.findByName(trackDiscountConfig.discountConfig.getName())
+          )
+      ) {
+        trackService.save(
+          new TrackDiscount(
+            discountService.findByName(trackDiscountConfig.getDiscountConfig().getName()),
+            trackService.findByName(trackDiscountConfig.getTrackConfig().getName())
+          )
+        );
+      }
     }
   }
 }

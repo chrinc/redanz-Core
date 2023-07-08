@@ -5,7 +5,6 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.repository.PrivateClassRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.SpecialRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
 import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
@@ -51,21 +50,30 @@ public class SpecialRegistrationService {
   public List<SpecialRegistration> specialRegistrations(Registration registration, JsonObject specialRegistrationRequest) {
     List<SpecialRegistration> specialRegistrations = new ArrayList<>();
 
+    // log.info(specialRegistrationRequest.toString());
+
     // log.info("inc@specialRegistrations");
     if (specialRegistrationRequest.get("specialRegistrations") != null
       && !specialRegistrationRequest.get("specialRegistrations").isJsonNull()
-      && !specialRegistrationRequest.get("specialRegistrations").getAsJsonArray().isEmpty()) {
+      && !specialRegistrationRequest.get("specialRegistrations").getAsJsonArray().isEmpty()
+    )
+    {
+
       JsonArray specialRequests = specialRegistrationRequest
         .get("specialRegistrations")
         .getAsJsonArray();
-
+      // log.info(specialRegistrationRequest.get("specialRegistrations").toString());
       specialRequests.forEach(specialRequest -> {
-        specialRegistrations.add(
-          new SpecialRegistration(
-            registration,
-            specialService.findBySpecialId(specialRequest.getAsJsonObject().get("specialId").getAsLong())
-          )
-        );
+        if (specialRequest.getAsJsonObject().get("checked") != null
+          && specialRequest.getAsJsonObject().get("checked").getAsBoolean()
+        ) {
+          specialRegistrations.add(
+            new SpecialRegistration(
+              registration,
+              specialService.findBySpecialId(specialRequest.getAsJsonObject().get("specialId").getAsLong())
+            )
+          );
+        }
       });
     }
     // log.info("special Reg return: " + specialRegistrations);
@@ -102,7 +110,8 @@ public class SpecialRegistrationService {
   private boolean hasSpecialRegistration(List<SpecialRegistration> specialRegistrations, Special special) {
     AtomicBoolean hasSpecialRegistration = new AtomicBoolean(false);
     specialRegistrations.forEach(specialRegistration -> {
-      if (specialRegistration.getSpecialId() == special) {
+      if (
+        specialRegistration.getSpecialId() == special) {
         hasSpecialRegistration.set(true);
       }
     });
@@ -147,6 +156,8 @@ public class SpecialRegistrationService {
     List<SpecialRegistration> requestSpecialRegistrations = specialRegistrations(registration, request);
     List<SpecialRegistration> specialRegistrations = specialRegistrationRepo.findAllByRegistration(registration);
 
+    // log.info("requestSpecialRegistrations: " + requestSpecialRegistrations.size());
+    // log.info("specialRegistrations: " + specialRegistrations.size());
     // delete in current if not in request
     specialRegistrations.forEach(specialRegistration -> {
       if (!hasSpecialRegistration(requestSpecialRegistrations, specialRegistration.getSpecialId())){
