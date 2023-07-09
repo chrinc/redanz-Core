@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.service.DiscountRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseStats;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
@@ -29,6 +30,8 @@ public class ReportStatsService {
   private final FoodRegistrationService foodRegistrationService;
   private final DiscountService discountService;
   private final DiscountRegistrationService discountRegistrationService;
+  private final SpecialService specialService;
+  private final SpecialRegistrationService specialRegistrationService;
 
   public List<ResponseStats> getStatsReport(Language language, Event event) {
     List<ResponseStats> stats = new ArrayList<>();
@@ -47,7 +50,6 @@ public class ReportStatsService {
       );
     });
     // log.info("bundles: " );
-
     trackService.getAllByEvent(event).forEach(track -> {
       stats.add(
         new ResponseStats(
@@ -57,6 +59,19 @@ public class ReportStatsService {
          ,registrationService.countTracksConfirmingAndDone(track, event)
          ,registrationService.countTracksDone(track, event)
          ,track.getCapacity()
+        )
+      );
+    });
+
+    specialService.findByEvent(event).forEach(special -> {
+      stats.add(
+        new ResponseStats(
+          "Special"
+          ,outTextService.getOutTextByKeyAndLangKey(special.getName(), language.getLanguageKey()).getOutText()
+         ,specialRegistrationService.countSpecialRegistrations(special, event)
+         ,specialRegistrationService.countSpecialsConfirmingAndDone(special, event)
+         ,specialRegistrationService.countSpecialsDone(special, event)
+         ,special.getCapacity()
         )
       );
     });

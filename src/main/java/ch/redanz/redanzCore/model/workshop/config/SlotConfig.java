@@ -18,7 +18,9 @@ public enum SlotConfig {
   SLOT_SATURDAY        (OutTextConfig.LABEL_SLOT_SATURDAY_EN        .getOutTextKey()),
   SLOT_SATURDAY_LUNCH  (OutTextConfig.LABEL_SLOT_SATURDAY_LUNCH_EN  .getOutTextKey()),
   SLOT_SUNDAY          (OutTextConfig.LABEL_SLOT_SUNDAY_EN          .getOutTextKey()),
+
   SLOT_SUNDAY_EVENING  (OutTextConfig.LABEL_SLOT_SUNDAY_EVENING_EN  .getOutTextKey()),
+  SLOT_SUNDAY_AFTERNOON  (OutTextConfig.LABEL_SLOT_SUNDAY_AFTERNOON_EN  .getOutTextKey()),
   SLOT_SUNDAY_EVENING_AFTER_PARTY  (OutTextConfig.LABEL_SLOT_SUNDAY_EVENING_AFTER_PARTY_EN  .getOutTextKey()),
   SLOT_SUNDAY_NIGHT    (OutTextConfig.LABEL_SLOT_SUNDAY_NIGHT_EN    .getOutTextKey());
 

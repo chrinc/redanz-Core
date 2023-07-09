@@ -61,7 +61,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
     SleepUtilConfig.setup(sleepUtilService);
     DiscountConfig.setup(discountService);
     TrackDiscountConfig.setup(trackService, discountService);
-    EventTypeSlotConfig.setup(slotService, eventService);
+    EventTypeSlotConfig.setup(slotService, eventService, foodService);
     SpecialConfig.setup(specialService);
 
     EventDiscountConfig.setup(discountService, eventService);
@@ -71,5 +71,6 @@ public class WorkshopConfigRunner implements CommandLineRunner {
 
     PrivateClassConfig.setup(privateClassService);
     EventPrivateClassConfig.setup(privateClassService, eventService);
+    EventSpecialsConfig.setup(specialService, eventService);
   }
 }

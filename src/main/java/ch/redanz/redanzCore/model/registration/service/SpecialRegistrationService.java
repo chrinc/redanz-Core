@@ -1,12 +1,17 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.repository.PrivateClassRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.SpecialRegistrationRepo;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
 import ch.redanz.redanzCore.model.workshop.entities.Special;
+import ch.redanz.redanzCore.model.workshop.entities.Track;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
 import ch.redanz.redanzCore.model.workshop.service.SpecialService;
 import com.google.gson.JsonArray;
@@ -17,7 +22,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -28,6 +36,7 @@ public class SpecialRegistrationService {
   private final PrivateClassRegistrationRepo privateClassRegistrationRepo;
   private final PrivateClassService privateClassService;
   private final WorkflowStatusService workflowStatusService;
+  private final OutTextService outTextService;
 
   public void save(Registration registration, Special special) {
     specialRegistrationRepo.save(
@@ -36,6 +45,30 @@ public class SpecialRegistrationService {
         special
       )
     );
+  }
+
+  public String getReportSpecials(Registration registration, Language language) {
+    AtomicReference<String> specials = new AtomicReference<>();
+    specialRegistrationRepo.findAllByRegistration(registration).forEach(specialsRegistration -> {
+      String specialOutText = outTextService.getOutTextByKeyAndLangKey(specialsRegistration.getSpecialId().getName(), language.getLanguageKey()).getOutText();
+      if (specials.get() == null)
+        specials.set(specialOutText);
+      else {
+        specials.set(specials.get() + ", " + specialOutText);
+      }
+    });
+    return specials.get() == null ? "" : specials.toString();
+  }
+
+  public Set<Registration> getRegistrationsByEvent(Event event) {
+    List<SpecialRegistration> foodRegistrations = specialRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
+
+    Set<Registration> registrations = foodRegistrations.stream()
+      .map(SpecialRegistration::getRegistration)
+      .filter(Registration::getActive)
+      .collect(Collectors.toSet());
+
+    return registrations;
   }
 
   public void save(Registration registration, PrivateClass privateClass) {
@@ -129,11 +162,26 @@ public class SpecialRegistrationService {
     return hasPrivateClassRegistration.get();
   }
 
-  public int countSpecialRegistrations(Special special) {
+
+  public int countSpecialsDone(Special special, Event event) {
+    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getDone(), event);
+  }
+  public int countSpecialsSubmitted(Special special, Event event) {
+    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getSubmitted(), event);
+  }
+  public int countSpecialsConfirming(Special special, Event event) {
+    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getConfirming(), event);
+  }
+  public int countSpecialRegistrations(Special special, Event event) {
     return
-         specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatus(special, workflowStatusService.getSubmitted())
-       + specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatus(special, workflowStatusService.getConfirming())
-       + specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatus(special, workflowStatusService.getDone());
+         countSpecialsSubmitted(special, event)
+       + countSpecialsConfirming(special, event)
+       + countSpecialsDone(special, event);
+  }
+  public int countSpecialsConfirmingAndDone(Special special, Event event) {
+    return
+       + countSpecialsConfirming(special, event)
+       + countSpecialsDone(special, event);
   }
 
   public int countPrivateClassRegistrations(PrivateClass privateClass) {

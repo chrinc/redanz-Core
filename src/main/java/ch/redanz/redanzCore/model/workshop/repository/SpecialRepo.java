@@ -9,16 +9,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface SpecialRepo extends JpaRepository<Special, Long> {
   Special findByName(String name);
   Special findBySpecialId(Long name);
   boolean existsByName(String name);
 
+
   @Query("SELECT s FROM Event e JOIN e.specials s WHERE e = :event")
-  Optional<List<Special>> findAllByEvent(@Param("event") Event event);
+  Optional<Set<Special>> findAllByEvent(@Param("event") Event event);
 
   @Query("SELECT s FROM Bundle b JOIN b.specials s WHERE b = :bundle")
-  Optional<List<Special>> findAllByBundle(@Param("bundle") Bundle bundle);
+  Optional<Set<Special>> findAllByBundle(@Param("bundle") Bundle bundle);
 
 }

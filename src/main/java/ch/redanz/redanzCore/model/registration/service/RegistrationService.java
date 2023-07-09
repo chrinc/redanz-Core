@@ -17,6 +17,7 @@ import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.entities.Track;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
@@ -26,6 +27,7 @@ import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.web.authentication.preauth.x509.SubjectDnX509PrincipalExtractor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +98,7 @@ public class RegistrationService {
       specialService.findByEventOrBundle(event, bundle).forEach(special -> {
         specialRegistrationService.soldOut(
           special
-         ,specialRegistrationService.countSpecialRegistrations(special) >= special.getCapacity()
+         ,specialRegistrationService.countSpecialRegistrations(special, event) >= special.getCapacity()
         );
       });
 
@@ -229,9 +231,6 @@ public class RegistrationService {
     // log.info("inc@findByParticipantAndEvent");
     return registrationRepo.findByParticipantAndEventAndActive(participant, event, true);
   }
-//  public Optional<Registration> findByParticipantAndEventRegular(Person participant, Event event) {
-//    return registrationRepo.findByParticipantAndEventAndWorkflowStatusContaining(participant, event, workflowStatusService.findAllRegular());
-//  }
 
   public void onCancel(Registration registration) throws TemplateException, IOException {
     workflowTransitionService.setWorkflowStatus(

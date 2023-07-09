@@ -27,11 +27,23 @@ public class ReportController {
   private final LanguageService languageService;
   private final EventService eventService;
   private final ReportDonationService reportDonationService;
+  private final ReportSpecialsService reportSpecialsService;
 
   @GetMapping(path = "/person/all")
   public List<ResponsePerson> getAllPersonsReport() {
 
     return reportPersonService.getAllPersonsReport();
+  }
+
+  @GetMapping(path = "/person/registrations")
+  public List<ResponsePersonRegistrations> getPersonRegistrations(
+    @RequestParam("languageKey") String languageKey,
+    @RequestParam("eventId") Long eventId
+  ) {
+    return reportPersonService.getPersonResponseReport(
+      languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
+      eventService.findByEventId(eventId)
+    );
   }
 
   @GetMapping(path = "/registration/all")
@@ -78,6 +90,18 @@ public class ReportController {
       eventService.findByEventId(eventId)
     );
   }
+
+  @GetMapping(path = "/special/all")
+  public List<ResponseSpecials> getSpecialsReport(
+    @RequestParam("languageKey") String languageKey,
+    @RequestParam("eventId") Long eventId
+  ) {
+    return reportSpecialsService.getSpecialsReport(
+      languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
+      eventService.findByEventId(eventId)
+    );
+  }
+
   @GetMapping(path = "/accommodation/all")
   public List<ResponseAccommodation> getAccommodationReport(
     @RequestParam("languageKey") String languageKey,

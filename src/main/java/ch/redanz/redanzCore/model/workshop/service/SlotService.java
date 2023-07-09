@@ -1,9 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.EventTypeSlot;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventTypeSlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.SlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TypeSlotRepo;
@@ -23,6 +20,23 @@ public class SlotService {
   OutTextService outTextService;
   public void save(Slot slot) {
     slotRepo.save(slot);
+  }
+
+  public boolean foodSlotExists(
+    Slot slot, Food food
+  ) {
+    log.info("foodSlotExists, food: " + food.getName() + ", slot: " + slot.getName() +": " + Boolean.toString(typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot("food", food.getFoodId(), slot)));
+    return  typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot("food", food.getFoodId(), slot);
+  }
+
+  public TypeSlot findByTypeObjectIdAndSlot(
+    String type
+    ,Long typeObjectId
+    ,Slot slot
+  ) {
+    return typeSlotRepo.findByTypeAndTypeObjectIdAndSlot(
+      type,typeObjectId, slot
+    );
   }
   public boolean existsByName(String name) {
     return slotRepo.existsByName(name);
