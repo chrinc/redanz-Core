@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -16,11 +17,11 @@ import java.util.Locale;
 @Getter
 @AllArgsConstructor
 public enum BundleConfig {
-  EXTRA_FUN_PASS("Extra FUN Pass", 330, OutTextConfig.LABEL_EXTRAFUN_DESC_EN.getOutTextKey(), 120, false, "extra_fun_pass"),
-  FUN_PASS("FUN Pass", 250, OutTextConfig.LABEL_FUN_DESC_EN.getOutTextKey(), 90, false, "fun_pass"),
-  PARTYPASS("Party Pass", 100, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 50, false, "party_pass"),
-  PARTY_SUN("Sunday Party Ticket", 40, OutTextConfig.LABEL_PARTY_SUN_DESC_EN.getOutTextKey(), 30, true, "party_sunday"),
-  FRIDAY_SPECIAL("Friday Special", 90, OutTextConfig.LABEL_FRIDAY_PACKAGE_DESC_EN.getOutTextKey(), 20, true, "friday_special")
+  EXTRA_FUN_PASS("Extra FUN Pass", 330, OutTextConfig.LABEL_EXTRAFUN_DESC_EN.getOutTextKey(), 120, false, "extra_fun_pass", 1),
+  FUN_PASS("FUN Pass", 250, OutTextConfig.LABEL_FUN_DESC_EN.getOutTextKey(), 90, false, "fun_pass", 2),
+  PARTYPASS("Party Pass", 100, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 50, false, "party_pass", 4),
+  PARTY_SUN("Sunday Party Ticket", 40, OutTextConfig.LABEL_PARTY_SUN_DESC_EN.getOutTextKey(), 30, true, "party_sunday",5),
+  FRIDAY_SPECIAL("Friday Special", 90, OutTextConfig.LABEL_FRIDAY_PACKAGE_DESC_EN.getOutTextKey(), 20, false, "friday_special",3 )
   ;
 
   private final String name;
@@ -29,6 +30,7 @@ public enum BundleConfig {
   private final Integer capacity;
   private final Boolean simpleTicket;
   private final String internalId;
+  private final Integer seqNr;
 
   public static void setup(BundleService bundleService) {
     for (BundleConfig bundleConfig : BundleConfig.values()) {
@@ -41,7 +43,8 @@ public enum BundleConfig {
             bundleConfig.getDescription(),
             bundleConfig.getCapacity(),
             bundleConfig.getSimpleTicket(),
-            bundleConfig.getInternalId()
+            bundleConfig.getInternalId(),
+            bundleConfig.getSeqNr()
           )
         );
       } else {
@@ -51,6 +54,7 @@ public enum BundleConfig {
         bundle.setPrice(bundleConfig.getPrice());
         bundle.setSimpleTicket(bundleConfig.simpleTicket);
         bundle.setInternalId(bundleConfig.internalId);
+        bundle.setSeqNr(bundleConfig.seqNr);
         bundleService.save(bundle);
       }
     }

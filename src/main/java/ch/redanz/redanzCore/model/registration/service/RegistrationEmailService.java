@@ -72,7 +72,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_SUBMITTED_BASE_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("details",
       outTextService.getOutTextByKeyAndLangKey(
@@ -84,7 +84,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
 
     model.put("see_you",
@@ -103,7 +103,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
@@ -143,7 +143,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("base",
       outTextService.getOutTextByKeyAndLangKey(
@@ -167,7 +167,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
@@ -203,7 +203,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("base01",
       outTextService.getOutTextByKeyAndLangKey(
@@ -234,7 +234,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
@@ -252,7 +252,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
@@ -289,7 +289,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("base01",
       outTextService.getOutTextByKeyAndLangKey(
@@ -319,7 +319,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
@@ -355,7 +355,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_HEADER01_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("header02",
       outTextService.getOutTextByKeyAndLangKey(
@@ -373,7 +373,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
 
     model.put("see_you",
@@ -392,7 +392,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
 
     EmailService.sendEmail(
@@ -457,7 +457,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
 
       try {

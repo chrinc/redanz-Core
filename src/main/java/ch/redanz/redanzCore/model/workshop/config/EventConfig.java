@@ -19,7 +19,7 @@ public enum EventConfig {
   , 350
   , LocalDate.parse("2023-11-17")
   , LocalDate.parse("2023-11-19")
-    ,ZonedDateTime.parse("2023-07-19T10:00:00.000+01:00[Europe/Paris]")
+    ,ZonedDateTime.parse("2023-07-29T11:00:00.000+01:00[Europe/Paris]")
   ,true
     ,false
   ,"Weekend Dance Workshop"

@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum SpecialConfig {
-  SPECIAL_FRI_SPECIAL(OutTextConfig.LABEL_FRI_SPECIAL_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FRI_SPECIAL_DESC_EN.getOutTextKey(), 40, 60);
+  SPECIAL_FRI_SPECIAL(OutTextConfig.LABEL_FRI_SPECIAL_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FRI_SPECIAL_DESC_EN.getOutTextKey(), 20, 60);
 
   private final String name;
   private final String description;

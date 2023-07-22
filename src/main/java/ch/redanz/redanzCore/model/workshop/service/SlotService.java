@@ -50,17 +50,29 @@ public class SlotService {
     return getAllSlots("volunteer", event);
   }
 
+  public class EventTypeSlotComparator implements Comparator<EventTypeSlot> {
+    @Override
+    public int compare(EventTypeSlot eventTypeSlot1, EventTypeSlot eventTypeSlot2) {
+      return Integer.compare(eventTypeSlot1.getSeqNr(), eventTypeSlot2.getSeqNr());
+    }
+  }
   public List<Object> getFoodSlots(Event event) {
     List<Object> foodSlots = new ArrayList<>();
-    typeSlotRepo.findAllByType("food").forEach(
-      typeSlot -> {
-        HashMap<String, Object> foodSlot = new HashMap<>();
-        foodSlot.put("food", foodService.findByFoodId(typeSlot.getTypeObjectId()));
-        foodSlot.put("slot", typeSlot.getSlot());
-        if (eventHasTypeSlot(event, typeSlot)) {
-          foodSlots.add(foodSlot);
+    List<EventTypeSlot> eventTypeSlots = new ArrayList<>();
+    eventTypeSlotRepo.findAllByEvent(event).forEach(
+      eventTypeSlot -> {
+        if (typeSlotRepo.findAllByType("food").contains(eventTypeSlot.getTypeSlot())) {
+          eventTypeSlots.add(eventTypeSlot);
         }
-      });
+      }
+    );
+    Collections.sort(eventTypeSlots, new EventTypeSlotComparator());
+    eventTypeSlots.forEach(eventTypeSlot -> {
+      HashMap<String, Object> foodSlot = new HashMap<>();
+      foodSlot.put("food", foodService.findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
+      foodSlot.put("slot", eventTypeSlot.getTypeSlot().getSlot());
+      foodSlots.add(foodSlot);
+    });
     return foodSlots;
   }
   public boolean eventHasTypeSlot(Event event, TypeSlot typeSlot) {

@@ -45,6 +45,9 @@ public class Bundle implements Serializable {
   @Column(name = "sold_out")
   private boolean soldOut;
 
+  @Column(name = "seq_nr")
+  private Integer seqNr;
+
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle")
   @LazyCollection(LazyCollectionOption.FALSE)
   private List<BundleTrack> bundleTracks = new ArrayList<>();
@@ -58,7 +61,8 @@ public class Bundle implements Serializable {
     String description,
     Integer capacity,
     Boolean simpleTicket,
-    String internalId
+    String internalId,
+    Integer seqNr
   ) {
     this.name = name;
     this.price = price;
@@ -66,6 +70,7 @@ public class Bundle implements Serializable {
     this.capacity = capacity;
     this.simpleTicket = simpleTicket;
     this.internalId = internalId;
+    this.seqNr = seqNr;
   }
 
   public static List<Map<String, String>> schema() {
@@ -116,6 +121,11 @@ public class Bundle implements Serializable {
           put("type", "internalId");
           put("label", "Internal ID");
         }});
+        add(new HashMap<>() {{
+          put("key", "seqNr");
+          put("type", "seqNr");
+          put("label", "Sequence Number");
+        }});
       }
     };
   }
@@ -129,6 +139,7 @@ public class Bundle implements Serializable {
         put("capacity", String.valueOf(capacity));
         put("description", description);
         put("simpleTicket", simpleTicket.toString());
+        put("seqNr", String.valueOf(seqNr));
       }
     };
   }

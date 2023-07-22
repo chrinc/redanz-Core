@@ -128,6 +128,13 @@ public class RegistrationService {
           ,specialRegistrationService.countPrivateClassRegistrations(privateClass) >= privateClass.getCapacity()
         );
     });
+
+    event.getSpecials().forEach(special -> {
+      specialRegistrationService.soldOut(
+        special,
+        specialRegistrationService.countSpecialRegistrations(special, event) >= special.getCapacity()
+      );
+    });
   }
 
   public List<Registration> findAllCurrentEvent() {

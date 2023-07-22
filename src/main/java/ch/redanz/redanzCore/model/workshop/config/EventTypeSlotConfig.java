@@ -16,22 +16,23 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 public enum EventTypeSlotConfig {
-  EVENT2023_ACCOM_THU(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_THURSDAY, null),
-  EVENT2023_ACCOM_FRI(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_FRIDAY, null),
-  EVENT2023_ACCOM_SAT(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_SATURDAY, null),
-  EVENT2023_ACCOM_SUN(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_SUNDAY, null),
+  EVENT2023_ACCOM_THU(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_THURSDAY, null, 1),
+  EVENT2023_ACCOM_FRI(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_FRIDAY, null, 2),
+  EVENT2023_ACCOM_SAT(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_SATURDAY, null,3),
+  EVENT2023_ACCOM_SUN(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_SUNDAY, null,4 ),
 
-  EVENT2023_FOOD_SAT(EventConfig.EVENT2023, TypeSlotConfig.FOOD_SLOT_SATURDAY, FoodConfig.FOOD_ORIENTAL),
-  EVENT2023_FOOD_SUN(EventConfig.EVENT2023, TypeSlotConfig.FOOD_SLOT_SUNDAY, FoodConfig.FOOD_ORIENTAL),
+  EVENT2023_FOOD_SAT(EventConfig.EVENT2023, TypeSlotConfig.FOOD_SLOT_SATURDAY, FoodConfig.FOOD_ORIENTAL, 1),
+  EVENT2023_FOOD_SUN(EventConfig.EVENT2023, TypeSlotConfig.FOOD_SLOT_SUNDAY, FoodConfig.FOOD_VARIETY, 2),
 
-  EVENT2023_VOLU_FRI_AFTERNOON(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_FRIDAY_AFTERNOON_EN, null),
-  EVENT2023_VOLU_FRI_EVENING(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_FRIDAY_EVENING, null),
-  EVENT2023_VOLU_FRI_MORNING(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_FRIDAY_MORNING, null),
-  EVENT2023_VOLU_SUN_AFTER_PARTY(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_SUNDAY_EVENING_AFTER_PARTY, null);
+  EVENT2023_VOLU_FRI_AFTERNOON(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_FRIDAY_AFTERNOON_EN, null, 1),
+  EVENT2023_VOLU_FRI_EVENING(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_FRIDAY_EVENING, null, 2),
+  EVENT2023_VOLU_FRI_MORNING(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_FRIDAY_MORNING, null,3),
+  EVENT2023_VOLU_SUN_AFTER_PARTY(EventConfig.EVENT2023, TypeSlotConfig.VOLUNTEER_SLOT_SUNDAY_EVENING_AFTER_PARTY, null, 4);
 
   private final EventConfig eventConfig;
   private final TypeSlotConfig typeSlotConfig;
   private final Object typeConfig;
+  private final Integer seqNr;
 
   public static void setup(SlotService slotService, EventService eventService, FoodService foodService) {
     for (EventTypeSlotConfig eventTypeSlotConfig : EventTypeSlotConfig.values()) {
@@ -53,7 +54,8 @@ public enum EventTypeSlotConfig {
           eventService.save(
             new EventTypeSlot(
               typeSlot,
-              event
+              event,
+              eventTypeSlotConfig.seqNr
             )
           );
         }
@@ -68,7 +70,8 @@ public enum EventTypeSlotConfig {
           eventService.save(
             new EventTypeSlot(
               typeSlot,
-              event
+              event,
+              eventTypeSlotConfig.seqNr
             )
           );
         }

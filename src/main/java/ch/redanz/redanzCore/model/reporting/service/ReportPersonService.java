@@ -61,7 +61,7 @@ public class ReportPersonService {
           , registration.getParticipant().getCity()
           , registration.getParticipant().getCountry().getName()
           , registration.getParticipant().getPersonLang().getName()
-          , registration.getDanceRole().getName()
+          , registration.getDanceRole() == null ? null : registration.getDanceRole().getName()
         )
       );
 

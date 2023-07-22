@@ -31,11 +31,17 @@ public class EventTypeSlot implements Serializable {
   @JoinColumn(name = "event_id")
   private Event event;
 
+
+  @Column(name = "seq_nr")
+  private Integer seqNr;
+
+
   public EventTypeSlot() {
   }
 
-  public EventTypeSlot(TypeSlot typeSlot, Event event) {
+  public EventTypeSlot(TypeSlot typeSlot, Event event, Integer seqNr) {
     this.typeSlot = typeSlot;
     this.event = event;
+    this.seqNr = seqNr;
   }
 }
