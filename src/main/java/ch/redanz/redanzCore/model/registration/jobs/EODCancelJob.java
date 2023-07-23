@@ -43,7 +43,7 @@ public class EODCancelJob {
         RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
         LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate();
         LocalDateTime deadline = LocalDateTime.now().minusDays(
-          Long.parseLong(Objects.requireNonNull(environment.getProperty("registration.cancel.after.days")))
+          baseParService.cancelAfterDays()
         );
         if (reminderSentDate != null && reminderSentDate.isBefore(deadline)) {
           try {

@@ -46,7 +46,7 @@ public class EODReminderJob {
       registrationService.getAllConfirmingRegistrations(currentEvent).forEach(registration -> {
         LocalDateTime releasedAt = registration.getWorkflowStatusDate();
         LocalDateTime deadline = LocalDateTime.now().minusDays(
-          Long.parseLong(Objects.requireNonNull(environment.getProperty("registration.reminder.after.days")))
+          baseParService.reminderAfterDays()
         );
 
         RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);

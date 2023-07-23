@@ -16,7 +16,10 @@ public enum BaseParConfig {
   DOEODCANCEL("doEODCancel"  , true, null),
   DOEODMATCHING("doEODMatching"  , true, null),
   DOEODRELEASE("doEODRelease"  , true, null),
-  DOEODREMINDER("doEODReminder"  , true, null);
+  DOEODREMINDER("doEODReminder"  , true, null),
+  REMINDERAFTERDAYS("reminderAfterDays"  , false, "14"),
+  CANCELAFTERDAYS("cancelAfterDays"  , false, "3"),
+  ORGANIZERNAME("organizerName"  , false, "Stir it!");
 
   private final String baseParKey;
   private final boolean boolVal;

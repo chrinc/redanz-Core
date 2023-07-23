@@ -39,30 +39,30 @@ public enum OutTextConfig {
   LABEL_SLOT_SATURDAY_GE("FRONT_LOGIN", "LABEL-SLOT-SATURDAY", "Samstag", "GE"),
   LABEL_SLOT_SATURDAY_LUNCH_EN("FRONT_LOGIN", "LABEL-SLOT-SATURDAY-LUNCH", "Saturday lunch", "EN"),
   LABEL_SLOT_SATURDAY_LUNCH_GE("FRONT_LOGIN", "LABEL-SLOT-SATURDAY-LUNCH", "Samstagmittag", "GE"),
-  LABEL_SLOT_FOOD_SATURDAY_LUNCH_EN("FRONT_LOGIN", "LABEL-FOOD-SLOT-SATURDAY-LUNCH", "Saturday (1:45 pm)", "EN"),
-  LABEL_SLOT_FOOD_SATURDAY_LUNCH_GE("FRONT_LOGIN", "LABEL-FOOD-SLOT-SATURDAY-LUNCH", "Samstag (13:45 Uhr)", "GE"),
+  LABEL_SLOT_FOOD_SATURDAY_LUNCH_EN("FRONT_LOGIN", "LABEL-FOOD-SLOT-SATURDAY-LUNCH", "Saturday 1:45pm", "EN"),
+  LABEL_SLOT_FOOD_SATURDAY_LUNCH_GE("FRONT_LOGIN", "LABEL-FOOD-SLOT-SATURDAY-LUNCH", "Samstag 13:45 Uhr", "GE"),
   LABEL_SLOT_SUNDAY_EN("FRONT_LOGIN", "LABEL-SLOT-SUNDAY", "Sunday", "EN"),
   LABEL_SLOT_SUNDAY_GE("FRONT_LOGIN", "LABEL-SLOT-SUNDAY", "Sonntag", "GE"),
   LABEL_SLOT_SUNDAY_EVENING_EN("FRONT_LOGIN", "LABEL-SLOT-SUNDAY-EVENING", "Sunday evening", "EN"),
   LABEL_SLOT_SUNDAY_EVENING_GE("FRONT_LOGIN", "LABEL-SLOT-SUNDAY-EVENING", "Sonntagabend", "GE"),
   LABEL_SLOT_SUNDAY_EVENING_AFTER_PARTY_EN("FRONT_LOGIN", "LABEL-SLOT-SUNDAY-EVENING-AFTER-PARTY", "Sunday Evening after the party", "EN"),
   LABEL_SLOT_SUNDAY_EVENING_AFTER_PARTY_GE("FRONT_LOGIN", "LABEL-SLOT-SUNDAY-EVENING-AFTER-PARTY", "Sonntagabend nach der Party", "GE"),
-  LABEL_SLOT_FOOD_SUNDAY_AFTERNOON_EN("FRONT_LOGIN", "LABEL-FOOD-SLOT-SUNDAY-AFTERNOON", "Sunday (3:45 pm)", "EN"),
-  LABEL_SLOT_FOOD_SUNDAY_AFTERNOON_GE("FRONT_LOGIN", "LABEL-FOOD-SLOT-SUNDAY-AFTERNOON", "Sonntag (15:45 Uhr)", "GE"),
+  LABEL_SLOT_FOOD_SUNDAY_AFTERNOON_EN("FRONT_LOGIN", "LABEL-FOOD-SLOT-SUNDAY-AFTERNOON", "Sunday 3:45pm", "EN"),
+  LABEL_SLOT_FOOD_SUNDAY_AFTERNOON_GE("FRONT_LOGIN", "LABEL-FOOD-SLOT-SUNDAY-AFTERNOON", "Sonntag 15:45 Uhr", "GE"),
   LABEL_SLOT_SUNDAY_NIGHT_EN("FRONT_LOGIN", "LABEL-SLOT-SUNDAY-NIGHT", "Sunday night (to Monday)", "EN"),
   LABEL_SLOT_SUNDAY_NIGHT_GE("FRONT_LOGIN", "LABEL-SLOT-SUNDAY-NIGHT", "Sonntagnacht (auf Montag)", "GE"),
 
   // Food
   LABEL_FOOD_VEGGIE_ASIAN_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-VEGGIE-ASIAN-DESC", "Sandwich, Fruits, Drinks & Snack", "EN"),
   LABEL_FOOD_VEGGIE_ASIAN_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-VEGGIE-ASIAN-DESC", "Sandwich, Früchte, Getränk & Snack", "GE"),
-  LABEL_FOOD_ORIENTAL_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-DESC", "Oriental buffet, vegan", "EN"),
-  LABEL_FOOD_ORIENTAL_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-DESC", "Orientalisches Buffet, vegan", "GE"),
-  LABEL_FOOD_ORIENTAL_NAME_EN("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-NAME", "Oriental buffet, vegan", "EN"),
-  LABEL_FOOD_ORIENTAL_NAME_GE("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-NAME", "Orientalisches Buffet, vegan", "GE"),
-  LABEL_FOOD_VARIETY_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-VARIETY-DESC", "Autumn delights, vegan", "EN"),
-  LABEL_FOOD_VARIETY_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-VARIETY-DESC", "Herbstgenuss, vegan", "GE"),
-  LABEL_FOOD_VARIETY_NAME_EN("FRONT_LOGIN", "LABEL-FOOD-VARIETY-NAME", "Autumn delights, vegan", "EN"),
-  LABEL_FOOD_VARIETY_NAME_GE("FRONT_LOGIN", "LABEL-FOOD-VARIETY-NAME", "Herbstgenuss, vegan", "GE"),
+  LABEL_FOOD_ORIENTAL_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-DESC", "Oriental buffet, vegetarian/vegan", "EN"),
+  LABEL_FOOD_ORIENTAL_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-DESC", "Orientalisches Buffet, vegetarisch/vegan", "GE"),
+  LABEL_FOOD_ORIENTAL_NAME_EN("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-NAME", "Oriental buffet, vegetarian/vegan", "EN"),
+  LABEL_FOOD_ORIENTAL_NAME_GE("FRONT_LOGIN", "LABEL-FOOD-ORIENTAL-NAME", "Orientalisches Buffet, vegetarisch/vegan", "GE"),
+  LABEL_FOOD_VARIETY_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-VARIETY-DESC", "Autumn delights, vegetarian/vegan", "EN"),
+  LABEL_FOOD_VARIETY_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-VARIETY-DESC", "Herbstgenuss, vegetarisch/vegan", "GE"),
+  LABEL_FOOD_VARIETY_NAME_EN("FRONT_LOGIN", "LABEL-FOOD-VARIETY-NAME", "Autumn delights, vegetarian/vegan", "EN"),
+  LABEL_FOOD_VARIETY_NAME_GE("FRONT_LOGIN", "LABEL-FOOD-VARIETY-NAME", "Herbstgenuss, vegetarisch/vegan", "GE"),
   LABEL_FOOD_SOUP_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-SOUP-DESC", "Soup and extras", "EN"),
   LABEL_FOOD_SOUP_DESC_GE("FRONT_LOGIN", "LABEL-FOOD-SOUP-DESC", "Suppe und Extras", "GE"),
   LABEL_FOOD_VEDA_DESC_EN("FRONT_LOGIN", "LABEL-FOOD-VEDA-DESC", "Healthy, organic, vegan", "EN"),
@@ -89,14 +89,14 @@ public enum OutTextConfig {
   LABEL_FRIDAY_PACKAGE_DESC_GE("FRONT_LOGIN", "LABEL-FRIDAY-PACKAGE-DESC", "1 Solo Jazz Trio Klasse (FR), 1 Party (FR)", "GE"),
 
   // CLASSES
-  LABEL_PRIVATE_ELZE_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop or Solo Jazz with Elze (1 couple, 1 follower, 1 leader or 3-4 followers)", "EN"),
-  LABEL_PRIVATE_ELZE_DESC_GE("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop oder Solo Jazz mit Elze (1 Tanzpaar, 1 Follower, 1 Leader oder 3-4 Followers)", "GE"),
-  LABEL_PRIVATE_SONIA_HECTOR_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop with Sonia and Héctor (1 couple)", "EN"),
-  LABEL_PRIVATE_SONIA_HECTOR_GE("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop mit Sonia und Héctor (1 Tanzpaar)", "GE"),
-  LABEL_PRIVATE_BARA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz or Tap with Bára", "EN"),
-  LABEL_PRIVATE_BARA_GE("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz oder Tap mit Bára", "GE"),
-  LABEL_PRIVATE_CLAUDIA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop or Solo Jazz with Clàudia (1 Couple or Solo)", "EN"),
-  LABEL_PRIVATE_CLAUDIA_GE("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop oder Solo Jazz mit Clàudia (1 Tanzpaar oder Solo)", "GE"),
+  LABEL_PRIVATE_ELZE_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop or Solo Jazz with Elze (1 couple, 1 follower, 1 leader or 3-4 followers) / SAT 6pm-7pm", "EN"),
+  LABEL_PRIVATE_ELZE_DESC_GE("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop oder Solo Jazz mit Elze (1 Tanzpaar, 1 Follower, 1 Leader oder 3-4 Followers) / SA 18.00-19.00 Uhr", "GE"),
+  LABEL_PRIVATE_SONIA_HECTOR_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop with Sonia and Héctor (1 couple) / FRI 5pm-6pm", "EN"),
+  LABEL_PRIVATE_SONIA_HECTOR_GE("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop mit Sonia und Héctor (1 Tanzpaar) / FR 17.00-18.00 Uhr", "GE"),
+  LABEL_PRIVATE_BARA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz or Tap with Bára / SAT 6pm - 7pm", "EN"),
+  LABEL_PRIVATE_BARA_GE("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz oder Tap mit Bára / SA 18.00-19.00 Uhr", "GE"),
+  LABEL_PRIVATE_CLAUDIA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop or Solo Jazz with Clàudia (1 Couple or Solo) / SUN 4pm-5pm", "EN"),
+  LABEL_PRIVATE_CLAUDIA_GE("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop oder Solo Jazz mit Clàudia (1 Tanzpaar oder Solo) / SO 16:00-17:00 Uhr", "GE"),
 
   // Sleep Utils
   LABEL_SLEEP_UTIL_MATTRESS_DOUBLE_EN("FRONT_LOGIN", "LABEL-SLEEP-UTIL-MATTRESS-DOUBLE", "Double Mattress", "EN"),
@@ -126,11 +126,11 @@ public enum OutTextConfig {
   LABEL_FRI_SPECIAL_DESC_EN(
     "FRONT_LOGIN"
     , "LABEL-FRI-SPECIAL-DESC"
-    , "1 Special class", "EN"),
+    , "1 Solo Jazz Trio Class", "EN"),
   LABEL_FRI_SPECIAL_DESC_GE(
     "FRONT_LOGIN"
     , "LABEL-FRI-SPECIAL-DESC"
-    , "1 Spezial-Klasse", "GE"),
+    , "1 Solo Jazz Trio Klasse", "GE"),
 
 
 
@@ -153,7 +153,7 @@ public enum OutTextConfig {
   // discounts
   LABEL_DISCOUNT_EARLY_BIRD_EN("FRONT_LOGIN", "LABEL_DISCOUNT_EARLY_BIRD", "Early Bird", "EN"),
   LABEL_DISCOUNT_EARLY_BIRD_GE("FRONT_LOGIN", "LABEL_DISCOUNT_EARLY_BIRD", "Early Bird", "GE"),
-  LABEL_DISCOUNT_STUDENT_EN("FRONT_LOGIN", "LABEL_DISCOUNT_STUDENT", "student", "EN"),
+  LABEL_DISCOUNT_STUDENT_EN("FRONT_LOGIN", "LABEL_DISCOUNT_STUDENT", "Student", "EN"),
   LABEL_DISCOUNT_STUDENT_GE("FRONT_LOGIN", "LABEL_DISCOUNT_STUDENT", "Student*in", "GE"),
   LABEL_DISCOUNT_ABROAD_EN("FRONT_LOGIN", "LABEL_DISCOUNT_ABROAD", "Travel from abroad", "EN"),
   LABEL_DISCOUNT_ABROAD_GE("FRONT_LOGIN", "LABEL_DISCOUNT_ABROAD", "Anreise vom Ausland", "GE"),
@@ -224,10 +224,10 @@ public enum OutTextConfig {
 
   // CONFIRM EMAIL
   LABEL_EMAIL_RESET_PASSWORD_BASE_EN("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_BASE", "Please click on the link below to reset your password.", "EN"),
-  LABEL_EMAIL_RESET_PASSWORD_BASE_GE("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_BASE", "Bitte klicke auf den Link unten, um deinen Passwort zurückzusetzen.", "GE"),
+  LABEL_EMAIL_RESET_PASSWORD_BASE_GE("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_BASE", "Bitte klicke auf den Link unten, um dein Passwort zurückzusetzen.", "GE"),
   LABEL_EMAIL_PASSWORD_RESET_NOW_EN("EMAIL", "LABEL_EMAIL_PASSWORD_RESET_NOW", "Reset Now", "EN"),
   LABEL_EMAIL_PASSWORD_RESET_NOW_GE("EMAIL", "LABEL_EMAIL_PASSWORD_RESET_NOW", "Hier zurücksetzen", "GE"),
-  LABEL_EMAIL_RESET_PASSWORD_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The Link will expire in 15 minutes", "EN"),
+  LABEL_EMAIL_RESET_PASSWORD_LINK_EXPIRES_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "The link will expire in 15 minutes", "EN"),
   LABEL_EMAIL_RESET_PASSWORD_LINK_EXPIRES_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES", "Der Link verfällt in 15 Minuten", "GE"),
   LABEL_EMAIL_RESET_PASSWORD_SUBJECT_EN("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_SUBJECT", "Reset Password", "EN"),
   LABEL_EMAIL_RESET_PASSWORD_SUBJECT_GE("EMAIL", "LABEL_EMAIL_RESET_PASSWORD_SUBJECT", "Passwort zurücksetzen", "GE"),
@@ -264,20 +264,20 @@ public enum OutTextConfig {
   // REMINDER
   LABEL_EMAIL_REMINDER_HEADER_EN("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "You have registered for {1}.", "EN"),
   LABEL_EMAIL_REMINDER_HEADER_GE("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "Du hast dich für {1} angemeldet.", "GE"),
-  LABEL_EMAIL_REMINDER_BASE01_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "The payment needs to be completed within 14 days days after the registration confirmation. This time period has expired.", "EN"),
-  LABEL_EMAIL_REMINDER_BASE01_GE("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "Die Zahlung muss innerhalb von 14 Tagen nach der Anmeldebestätigung erfolgt sein. Diese Frist ist abgelaufen.", "GE"),
+  LABEL_EMAIL_REMINDER_BASE01_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "The payment needs to be completed within {1} days after the registration confirmation. This time period has expired.", "EN"),
+  LABEL_EMAIL_REMINDER_BASE01_GE("EMAIL", "LABEL_EMAIL_REMINDER_BASE01", "Die Zahlung muss innerhalb von {1} Tagen nach der Anmeldebestätigung erfolgt sein. Diese Frist ist abgelaufen.", "GE"),
   LABEL_EMAIL_REMINDER_BASE02_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE02", "We hope that you are still interested in being part of the workshop.", "EN"),
   LABEL_EMAIL_REMINDER_BASE02_GE("EMAIL", "LABEL_EMAIL_REMINDER_BASE02", "Wir hoffen, dass du immer noch an der Teilnahme am Workshop interessiert bist.", "GE"),
-  LABEL_EMAIL_REMINDER_BASE03_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE03", "We kindly ask you to make the payment within the next three days, otherwise we will cancel your registration.", "EN"),
-  LABEL_EMAIL_REMINDER_BASE03_GE("EMAIL", "LABEL_EMAIL_REMINDER_BASE03", "Wir bitten dich, die Zahlung in den nächsten drei Tagen auszulösen, sonst werden wir deine Anmeldung stornieren.", "GE"),
+  LABEL_EMAIL_REMINDER_BASE03_EN("EMAIL", "LABEL_EMAIL_REMINDER_BASE03", "We kindly ask you to make the payment within the next {1} days, otherwise we will cancel your registration.", "EN"),
+  LABEL_EMAIL_REMINDER_BASE03_GE("EMAIL", "LABEL_EMAIL_REMINDER_BASE03", "Wir bitten dich, die Zahlung in den nächsten {1} Tagen auszulösen, sonst werden wir deine Anmeldung stornieren.", "GE"),
   LABEL_EMAIL_REMINDER_SUBJECT_EN("EMAIL", "LABEL_EMAIL_REMINDER_SUBJECT", "Payment reminder", "EN"),
   LABEL_EMAIL_REMINDER_SUBJECT_GE("EMAIL", "LABEL_EMAIL_REMINDER_SUBJECT", "Zahlungserinnerung", "GE"),
 
   // CANCEL
   LABEL_EMAIL_CANCEL_BASE01_EN("EMAIL", "LABEL_EMAIL_CANCEL_BASE01", "We haven't received your payment yet.", "EN"),
   LABEL_EMAIL_CANCEL_BASE01_GE("EMAIL", "LABEL_EMAIL_CANCEL_BASE01", "Wir haben bisher keine Zahlung von dir erhalten.", "GE"),
-  LABEL_EMAIL_CANCEL_BASE02_EN("EMAIL", "LABEL_EMAIL_CANCEL_BASE02", "The payment needs to be completed within 14 days days after the registration confirmation. Since this time period has expired, your registration was cancelled. If you have made your payment recently or are about to pay, please contact us as soon as possible.", "EN"),
-  LABEL_EMAIL_CANCEL_BASE02_GE("EMAIL", "LABEL_EMAIL_CANCEL_BASE02", "Die Zahlung muss innerhalb von 14 Tagen nach der Anmeldebestätigung erfolgt sein. Da diese Frist abgelaufen ist, wurde deine Buchung storniert. Bitte kontaktiere uns, falls du deine Zahlung kürzlich vorgenommen hast oder falls du gerade dabei bist.", "GE"),
+  LABEL_EMAIL_CANCEL_BASE02_EN("EMAIL", "LABEL_EMAIL_CANCEL_BASE02", "The payment needs to be completed within {1} days after the registration confirmation. Since this time period has expired, your registration was cancelled. If you have made your payment recently or are about to pay, please contact us as soon as possible.", "EN"),
+  LABEL_EMAIL_CANCEL_BASE02_GE("EMAIL", "LABEL_EMAIL_CANCEL_BASE02", "Die Zahlung muss innerhalb von {1} Tagen nach der Anmeldebestätigung erfolgt sein. Da diese Frist abgelaufen ist, wurde deine Buchung storniert. Bitte kontaktiere uns, falls du deine Zahlung kürzlich vorgenommen hast oder falls du gerade dabei bist.", "GE"),
   LABEL_EMAIL_CANCEL_SUBJECT_EN("EMAIL", "LABEL_EMAIL_CANCEL_SUBJECT", "Registration cancelled", "EN"),
   LABEL_EMAIL_CANCEL_SUBJECT_GE("EMAIL", "LABEL_EMAIL_CANCEL_SUBJECT", "Buchung storniert", "GE"),
 

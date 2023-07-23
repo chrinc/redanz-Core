@@ -84,7 +84,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
     model.put("see_you",
@@ -103,7 +103,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
@@ -167,7 +167,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
@@ -209,7 +209,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_BASE01_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
     );
     model.put("base02",
       outTextService.getOutTextByKeyAndLangKey(
@@ -221,7 +221,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_BASE03_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.cancelAfterDays().toString())
     );
 
     model.put("details",
@@ -234,7 +234,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
@@ -252,7 +252,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
@@ -301,7 +301,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_BASE02_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
     );
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
@@ -373,7 +373,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
     model.put("see_you",
@@ -392,7 +392,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
     EmailService.sendEmail(
@@ -457,7 +457,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
       try {

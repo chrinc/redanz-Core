@@ -23,11 +23,11 @@
                 <a href=${link}>${reset_now}</a>
             </p>
         </blockquote>
-
+        </br>
         ${expires}.
-        <p>${see_you}</p>
-        ${regards} <br>
+        <p>${regards} <br>
         ${team}
+        </p>
     </div>
 </div>
 </body>

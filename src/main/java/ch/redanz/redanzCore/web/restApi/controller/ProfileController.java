@@ -72,6 +72,7 @@ public class ProfileController {
   public void resetPasswordRequest(
     @RequestParam("email") String email
   ) {
+    log.info("email: "+ email);
     try {
       User user = userService.getUser(email);
       if (user == null) {
@@ -82,7 +83,10 @@ public class ProfileController {
       }
 
       String token = UUID.randomUUID().toString();
+      log.info("person: "+ personService.findByUser(user));
+      log.info("getFirstName: "+ personService.findByUser(user).getFirstName());
       String languageKey = personService.findByUser(user).getPersonLang().getLanguageKey();
+      log.info("languageKey: "+ languageKey);
       passwordResetService.createPasswordResetTokenForUser(user, token);
       String link = environment.getProperty("link.reset.password.prefix") + "/" + token + "/" + languageKey.toLowerCase();
       passwordEmailService.sendResetPasswordEmail(user, link);

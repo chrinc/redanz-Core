@@ -67,6 +67,20 @@ public class BaseParService {
     null; // default: true
   }
 
+  public String organizerName(){
+    return baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() != null ?
+      baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() : "";
+    // default: ""
+  }
+
+  public Integer cancelAfterDays(){
+    return Integer.parseInt(baseParRepo.findAllByBaseParKey("cancelAfterDays").get().getStringValue());
+  }
+
+  public Integer reminderAfterDays(){
+    return Integer.parseInt(baseParRepo.findAllByBaseParKey("reminderAfterDays").get().getStringValue());
+  }
+
   public void save(BasePar basePar) {
     baseParRepo.save(basePar);
   }

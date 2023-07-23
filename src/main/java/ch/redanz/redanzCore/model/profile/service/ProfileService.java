@@ -66,7 +66,9 @@ public class ProfileService {
     model.put("expires", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN.getOutTextKey(), languageKey).getOutText());
     model.put("regards", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(), languageKey).getOutText());
     model.put("see_you", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(), languageKey).getOutText());
-    model.put("team", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(), languageKey).getOutText());
+    model.put(
+      "team", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(), languageKey).getOutText().replace("{1}", baseParService.organizerName())
+    );
     Template template = mailConfig.getTemplate("profileReceived.ftl");
 
     EmailService.sendEmail(
