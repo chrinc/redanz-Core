@@ -2,7 +2,6 @@ package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationPayment;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
@@ -10,7 +9,6 @@ import ch.redanz.redanzCore.model.registration.repository.DonationRegistrationRe
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationPaymentRepo;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
-import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import com.google.gson.JsonObject;
@@ -90,10 +88,11 @@ public class PaymentService {
     // specials
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
       totalAmount.addAndGet((int) specialRegistration.getSpecialId().getPrice());
+      String description = specialRegistration.getSpecialId().getDescription() == null ? "": specialRegistration.getSpecialId().getDescription();
       specials.add(
         List.of(
           specialRegistration.getSpecialId().getName(),
-          specialRegistration.getSpecialId().getDescription(),
+          description,
           String.valueOf((int) specialRegistration.getSpecialId().getPrice())
         )
       );

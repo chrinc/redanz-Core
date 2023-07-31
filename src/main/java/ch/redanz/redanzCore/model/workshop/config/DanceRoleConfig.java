@@ -10,14 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum DanceRoleConfig {
-  LEADER("Leader", "", "lead"),
-  FOLLOWER("Follower", "", "follow"),
-  SWITCH("Switch", "", "switch");
+  LEADER("Leader", "", "lead", "l"),
+  FOLLOWER("Follower", "", "follow", "f"),
+  SWITCH("Switch", "", "switch", "s");
 
 
   private final String name;
   private final String description;
   private final String intrnalId;
+  private final String abbreviation;
 
   public static void setup(DanceRoleService danceRoleService) {
 
@@ -27,13 +28,15 @@ public enum DanceRoleConfig {
           new DanceRole(
             danceRoleConfig.name,
             danceRoleConfig.description,
-            danceRoleConfig.intrnalId
+            danceRoleConfig.intrnalId,
+            danceRoleConfig.abbreviation
           )
         );
       } else {
         DanceRole danceRole = danceRoleService.findByName(danceRoleConfig.name);
         danceRole.setDescription(danceRoleConfig.description);
         danceRole.setInternalId(danceRoleConfig.intrnalId);
+        danceRole.setAbbreviation(danceRoleConfig.abbreviation);
         danceRoleService.save(danceRole);
       }
     }

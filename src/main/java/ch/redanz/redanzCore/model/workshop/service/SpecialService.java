@@ -34,7 +34,15 @@ public class SpecialService {
   public Set<Special> findByEventOrBundle(Event event, Bundle bundle) {
     Set<Special> allSpecials;
     allSpecials = findByEvent(event);
+    allSpecials.forEach(special -> {
+      log.info("event");
+      log.info(special.getName());
+    });
     allSpecials.addAll(findByBundle(bundle));
+    allSpecials.forEach(special -> {
+      log.info("on bundle");
+      log.info(special.getName());
+    });
     return allSpecials;
   }
   public Special findByName(String name) {

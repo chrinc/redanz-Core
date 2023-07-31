@@ -108,12 +108,6 @@ public class FoodRegistrationService {
     );
   }
   public int countFoodSlotDone(Food food, Slot slot, Event event){
-    // log.info("inc@countFoodSlotDone,  food: " + food.getName());
-    // log.info("inc@countFoodSlotDone,  slot: " + slot.getName());
-    // log.info("inc@countFoodSlotDone,  event: " + event.getName());
-    // log.info("inc@countFoodSlotDone,  count: " + foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-    //   food, slot, workflowStatusService.getDone(), event
-    // ));
     return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
       food, slot, workflowStatusService.getDone(), event
     );
@@ -121,8 +115,7 @@ public class FoodRegistrationService {
   public int countFoodSlotConfirmingAndDone(Food food, Slot slot, Event event) {
     return countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
   }
-
-  public int countFoodSlotSubmittedReleasedAndDone(Food food, Slot slot, Event event) {
+  public int countFoodSlotSubmittedConfirmingAndDone(Food food, Slot slot, Event event) {
     return countFoodSlotSubmitted(food, slot, event) + countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
   }
 
@@ -163,5 +156,27 @@ public class FoodRegistrationService {
 
   public List<FoodRegistration> getAllByRegistration(Registration registration) {
     return foodRegistrationRepo.findAllByRegistration(registration);
+  }
+
+  public List<String> countFoodSlotSubmittedAsList(Food food, Slot slot, Event event){
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotSubmitted(food, slot, event)));
+    return foodList;
+
+  }
+  public List<String>  countFoodSlotConfirmingAsList(Food food, Slot slot, Event event){
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotConfirming(food, slot, event)));
+    return foodList;
+  }
+  public List<String> countFoodSlotDoneAsList(Food food, Slot slot, Event event){
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotDone(food, slot, event)));
+    return foodList;
+  }
+  public List<String> countFoodSlotSubmittedConfirmingAndDoneAsList(Food food, Slot slot, Event event) {
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotSubmitted(food, slot, event) + countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event)));
+    return foodList;
   }
 }

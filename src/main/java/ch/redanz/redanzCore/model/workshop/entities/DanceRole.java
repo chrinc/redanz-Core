@@ -21,6 +21,7 @@ public class DanceRole {
   private Long danceRoleId;
   private String name;
   private String description;
+  private String abbreviation;
 
   @Column(name = "internal_id")
   private String internalId;
@@ -33,10 +34,11 @@ public class DanceRole {
   public DanceRole() {
   }
 
-  public DanceRole(String name, String description, String internalId) {
+  public DanceRole(String name, String description, String internalId, String abbreviation) {
     this.name = name;
     this.description = description;
     this.internalId = internalId;
+    this.abbreviation = abbreviation;
   }
 }
 

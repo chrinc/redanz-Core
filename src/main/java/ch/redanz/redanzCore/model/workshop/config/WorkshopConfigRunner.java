@@ -48,7 +48,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
 
     EventConfig.setup(eventService);
     TrackConfig.setup(trackService);
-    BundleConfig.setup(bundleService);
+    BundleConfig.setup(bundleService, slotService);
     EventBundleConfig.setup(bundleService, eventService);
     BundleTrackConfig.setup(bundleService, trackService);
 
@@ -71,6 +71,7 @@ public class WorkshopConfigRunner implements CommandLineRunner {
 
     PrivateClassConfig.setup(privateClassService);
     EventPrivateClassConfig.setup(privateClassService, eventService);
-    EventSpecialsConfig.setup(specialService, eventService);
+//    EventSpecialsConfig.setup(specialService, eventService);
+    BundleSpecialConfig.setup(specialService, bundleService);
   }
 }

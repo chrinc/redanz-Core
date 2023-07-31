@@ -7,10 +7,8 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.repository.PrivateClassRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.SpecialRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
-import ch.redanz.redanzCore.model.workshop.entities.Special;
-import ch.redanz.redanzCore.model.workshop.entities.Track;
+import ch.redanz.redanzCore.model.workshop.entities.*;
+import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
 import ch.redanz.redanzCore.model.workshop.service.SpecialService;
@@ -37,6 +35,7 @@ public class SpecialRegistrationService {
   private final PrivateClassService privateClassService;
   private final WorkflowStatusService workflowStatusService;
   private final OutTextService outTextService;
+  private final DanceRoleService danceRoleService;
 
   public void save(Registration registration, Special special) {
     specialRegistrationRepo.save(
@@ -172,11 +171,26 @@ public class SpecialRegistrationService {
   public int countSpecialsConfirming(Special special, Event event) {
     return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getConfirming(), event);
   }
+  public int countSpecialsDone(Special special, Event event, DanceRole danceRole) {
+    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getDone(), event, danceRole);
+  }
+  public int countSpecialsSubmitted(Special special, Event event, DanceRole danceRole) {
+    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getSubmitted(), event, danceRole);
+  }
+  public int countSpecialsConfirming(Special special, Event event, DanceRole danceRole) {
+    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getConfirming(), event, danceRole);
+  }
   public int countSpecialRegistrations(Special special, Event event) {
     return
          countSpecialsSubmitted(special, event)
        + countSpecialsConfirming(special, event)
        + countSpecialsDone(special, event);
+  }
+  public int countSpecialRegistrations(Special special, Event event, DanceRole danceRole) {
+    return
+         countSpecialsSubmitted(special, event, danceRole)
+       + countSpecialsConfirming(special, event, danceRole)
+       + countSpecialsDone(special, event, danceRole);
   }
   public int countSpecialsConfirmingAndDone(Special special, Event event) {
     return
@@ -256,5 +270,73 @@ public class SpecialRegistrationService {
 
   public List<PrivateClassRegistration> findAllPrivateClassesByRegistration(Registration registration) {
     return privateClassRegistrationRepo.findAllByRegistration(registration);
+  }
+
+  private String formatCountToString(String formatedCount, int count, String pfx) {
+    if (count > 0) {
+      formatedCount = formatedCount == "" ? "" : ", ";
+      formatedCount = formatedCount + pfx + count;
+      return formatedCount;
+    }
+    return "";
+  }
+
+  public List<String> countSpecialRegistrationsAndSplitRoles(Special special, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countSpecialRegistrations(special, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countSpecialRegistrations(special, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countSpecialsDoneAndSplitRoles(Special special, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countSpecialsDone(special, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countSpecialsDone(special, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countSpecialsSubmittedAndSplitRoles(Special special, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countSpecialsSubmitted(special, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countSpecialsSubmitted(special, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+  public List<String> countSpecialsConfirmingAndSplitRoles(Special special, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countSpecialsConfirming(special, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countSpecialsConfirming(special, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
   }
 }

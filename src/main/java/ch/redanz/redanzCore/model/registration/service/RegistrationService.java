@@ -2,23 +2,14 @@ package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.profile.entities.Person;
-import ch.redanz.redanzCore.model.profile.entities.User;
-import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowTransition;
+import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
-import ch.redanz.redanzCore.model.workshop.config.EventConfig;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
-import ch.redanz.redanzCore.model.workshop.entities.Bundle;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.Special;
-import ch.redanz.redanzCore.model.workshop.entities.Track;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.service.log.ErrorLogType;
@@ -27,7 +18,6 @@ import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.web.authentication.preauth.x509.SubjectDnX509PrincipalExtractor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -175,22 +167,61 @@ public class RegistrationService {
       workflowStatusService.getDone(),true, event
     );
   }
-  private int countBundlesSubmitted(Bundle bundle, Event event) {
+  public int countDone(Event event, DanceRole danceRole) {
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndDanceRole(
+      workflowStatusService.getDone(),true, event, danceRole
+    );
+  }
+
+  public int countSubmittedConfirmingAndDone(Event event, DanceRole danceRole) {
+    return countSubmitted(event, danceRole) + countConfirming(event, danceRole) + countDone(event, danceRole);
+  }
+
+  public int countSubmitted(Event event, DanceRole danceRole) {
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndDanceRole(
+      workflowStatusService.getSubmitted(), true, event, danceRole
+    );
+  }
+
+  public int countConfirming(Event event, DanceRole danceRole) {
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndDanceRole(
+      workflowStatusService.getConfirming(), true, event, danceRole
+    );
+  }
+  public int countBundlesSubmitted(Bundle bundle, Event event) {
     return
       registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEvent(
         bundle, workflowStatusService.getSubmitted(),true, event
       );
   }
-  private int countBundlesConfirming(Bundle bundle, Event event) {
+  public int countBundlesSubmitted(Bundle bundle, Event event, DanceRole danceRole) {
+    return
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        bundle, workflowStatusService.getSubmitted(),true, event, danceRole
+      );
+  }
+  public int countBundlesConfirming(Bundle bundle, Event event) {
     return
       registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEvent(
         bundle, workflowStatusService.getConfirming(), true, event
+      );
+  }
+  public int countBundlesConfirming(Bundle bundle, Event event, DanceRole danceRole) {
+    return
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        bundle, workflowStatusService.getConfirming(), true, event, danceRole
       );
   }
   public int countBundlesDone(Bundle bundle, Event event) {
     return
       registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEvent(
         bundle, workflowStatusService.getDone(), true, event
+      );
+  }
+  public int countBundlesDone(Bundle bundle, Event event, DanceRole danceRole) {
+    return
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        bundle, workflowStatusService.getDone(), true, event, danceRole
       );
   }
   public int countBundlesConfirmingAndDone(Bundle bundle, Event event) {
@@ -201,18 +232,39 @@ public class RegistrationService {
       + countBundlesDone(bundle, event)
       + countBundlesSubmitted(bundle, event);
   }
-  private int countTracksConfirming(Track track, Event event) {
+  public int countBundlesSubmittedConfirmingAndDone(Bundle bundle, Event event, DanceRole danceRole) {
+    return countBundlesConfirming(bundle, event, danceRole)
+      + countBundlesDone(bundle, event, danceRole)
+      + countBundlesSubmitted(bundle, event, danceRole);
+  }
+
+  public int countTracksConfirming(Track track, Event event) {
     if (track == null) return 0;
     return
       registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEvent(
         track, workflowStatusService.getConfirming(), true, event
       );
   }
-  private int countTracksSubmitted(Track track, Event event) {
+
+  public int countTracksConfirming(Track track, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        track, workflowStatusService.getConfirming(), true, event, danceRole
+      );
+  }
+  public int countTracksSubmitted(Track track, Event event) {
     if (track == null) return 0;
     return
       registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEvent(
         track, workflowStatusService.getSubmitted(), true, event
+      );
+  }
+  public int countTracksSubmitted(Track track, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        track, workflowStatusService.getSubmitted(), true, event, danceRole
       );
   }
   public int countTracksDone(Track track, Event event) {
@@ -220,6 +272,13 @@ public class RegistrationService {
     return
       registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEvent(
         track, workflowStatusService.getDone(),true, event
+      );
+  }
+  public int countTracksDone(Track track, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        track, workflowStatusService.getDone(),true, event, danceRole
       );
   }
   public int countTracksConfirmingAndDone(Track track, Event event) {
@@ -232,6 +291,12 @@ public class RegistrationService {
     return countTracksDone(track, event)
       + countTracksConfirming(track, event)
       + countTracksSubmitted(track, event);
+  }
+  public int countTracksSubmittedConfirmingAndDone(Track track, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return countTracksDone(track, event, danceRole)
+      + countTracksConfirming(track, event, danceRole)
+      + countTracksSubmitted(track, event, danceRole);
   }
 
   public Optional<Registration> findByParticipantAndEvent(Person participant, Event event) {
@@ -600,4 +665,213 @@ public class RegistrationService {
       true,event, bundle
     );
   }
+
+  private String formatCountToString(String formatedCount, int count, String pfx) {
+    if (count > 0) {
+      formatedCount = formatedCount == "" ? "" : ", ";
+      formatedCount = formatedCount + pfx + count;
+      return formatedCount;
+    }
+    return "";
+  }
+
+  public List<String> countBundlesDoneAndSplitRoles(Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countBundlesDone(bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countBundlesDone(bundle, event, danceRole)
+          ,danceRole.getName() + ": "
+        ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countBundlesSubmittedConfirmingAndDoneAndSplitRoles(Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countBundlesSubmittedConfirmingAndDone(bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countBundlesSubmittedConfirmingAndDone(bundle, event, danceRole)
+          ,danceRole.getName() + ": "
+        ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countBundlesSubmittedAndSplitRoles(Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countBundlesSubmitted(bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countBundlesSubmitted(bundle, event, danceRole)
+          ,danceRole.getName() + ": "
+        ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countBundlesConfirmingAndSplitRoles(Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countBundlesConfirming(bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countBundlesConfirming(bundle, event, danceRole)
+          ,danceRole.getName() + ": "
+        ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countTracksSubmittedConfirmingAndDoneAndSplitRoles(Track track, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksSubmittedConfirmingAndDone(track, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksSubmittedConfirmingAndDone(track, event, danceRole)
+          ,danceRole.getName() + ": "
+          ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countTracksSubmittedAndSplitRoles(Track track, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksSubmitted(track, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksSubmitted(track, event, danceRole)
+        ,danceRole.getName() + ": "
+          ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countTracksConfirmingAndSplitRoles(Track track, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksConfirming(track, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksConfirming(track, event, danceRole)
+        ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+  public List<String> countTracksDoneAndSplitRoles(Track track, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksConfirming(track, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksDone(track, event, danceRole)
+        ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+  public List<String> countSubmittedConfirmingAndDoneAndSplitRoles(Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countSubmittedConfirmingAndDone(event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countSubmittedConfirmingAndDone(event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countConfirmingAndSplitRoles(Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countConfirming(event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countConfirming(event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+  public List<String> countSubmittedAndSplitRoles(Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countSubmitted(event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countSubmitted(event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+  public List<String> countDoneAndSplitRoles(Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countDone(event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countDone(event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+
+  public List<Registration> findAllByEventAndSlot(Event event, Slot slot) {
+    return findAllByEvent(event)
+      .stream()
+      .filter(registration -> registration.getBundle().getPartySlots().contains(slot))
+      .collect(Collectors.toList());
+
+//    List<Registration> registrations = findAllByEvent(event);
+//    List<Registration> slotRegiestrations = new ArrayList<>();
+//    registrations.forEach(registration -> {
+//      if (registration.getBundle().getPartySlots().contains(slot)) {
+//        slotRegiestrations.add(registration);
+//      }
+//    });
+//    return slotRegiestrations;
+  }
+
 }

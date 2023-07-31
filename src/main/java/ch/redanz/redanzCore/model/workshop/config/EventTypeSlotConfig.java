@@ -21,6 +21,10 @@ public enum EventTypeSlotConfig {
   EVENT2023_ACCOM_SAT(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_SATURDAY, null,3),
   EVENT2023_ACCOM_SUN(EventConfig.EVENT2023, TypeSlotConfig.ACCOMMODATION_SLOT_SUNDAY, null,4 ),
 
+  EVENT2023_PARTY_THU(EventConfig.EVENT2023, TypeSlotConfig.PARTY_FRI, null, 1),
+  EVENT2023_PARTY_FRI(EventConfig.EVENT2023, TypeSlotConfig.PARTY_SAT, null, 2),
+  EVENT2023_PARTY_SAT(EventConfig.EVENT2023, TypeSlotConfig.PARTY_SUN, null,3),
+
   EVENT2023_FOOD_SAT(EventConfig.EVENT2023, TypeSlotConfig.FOOD_SLOT_SATURDAY, FoodConfig.FOOD_ORIENTAL, 1),
   EVENT2023_FOOD_SUN(EventConfig.EVENT2023, TypeSlotConfig.FOOD_SLOT_SUNDAY, FoodConfig.FOOD_VARIETY, 2),
 
@@ -41,19 +45,17 @@ public enum EventTypeSlotConfig {
 
       if (foodType) {
         FoodConfig foodConfig = (FoodConfig) eventTypeSlotConfig.getTypeConfig();
-
-        TypeSlot typeSlot = slotService.findByTypeObjectIdAndSlot(
+        TypeSlot foodTypeSlot = slotService.findByTypeObjectIdAndSlot(
           eventTypeSlotConfig.typeSlotConfig.getType(),
           foodService.findByName(foodConfig.getName()).getFoodId()
           , slotService.findByName(eventTypeSlotConfig.typeSlotConfig.getSlotConfig().getName())
         );
-
         if (!eventService.existsEventSlotType(
-          event, typeSlot
+          event, foodTypeSlot
         )) {
           eventService.save(
             new EventTypeSlot(
-              typeSlot,
+              foodTypeSlot,
               event,
               eventTypeSlotConfig.seqNr
             )

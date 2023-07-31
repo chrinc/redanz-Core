@@ -21,6 +21,10 @@ public enum TypeSlotConfig {
   FOOD_SLOT_SATURDAY("food", SlotConfig.SLOT_SATURDAY_LUNCH , FoodConfig.FOOD_ORIENTAL),
   FOOD_SLOT_SUNDAY  ("food", SlotConfig.SLOT_SUNDAY_LUNCH   , FoodConfig.FOOD_VARIETY),
 
+  PARTY_FRI( "party"    , SlotConfig.SLOT_FRIDAY     ,null),
+  PARTY_SAT(   "party"    , SlotConfig.SLOT_SATURDAY , null),
+  PARTY_SUN( "party"    , SlotConfig.SLOT_SUNDAY     , null),
+
   ACCOMMODATION_SLOT_THURSDAY( "accommodation"    , SlotConfig.SLOT_THURSDAY    , null),
   ACCOMMODATION_SLOT_FRIDAY(   "accommodation"    , SlotConfig.SLOT_FRIDAY      , null),
   ACCOMMODATION_SLOT_SATURDAY( "accommodation"    , SlotConfig.SLOT_SATURDAY    , null),
@@ -32,8 +36,6 @@ public enum TypeSlotConfig {
 
   public static void setup(SlotService slotService, FoodService foodService) {
     for (TypeSlotConfig typeSlotConfig : TypeSlotConfig.values()) {
-
-      log.info(typeSlotConfig.type + ", " + typeSlotConfig.slotConfig.getName() + ", " + typeSlotConfig.typeConfig);
       if (typeSlotConfig.getTypeConfig() != null && Objects.equals(typeSlotConfig.getTypeConfig().getClass(), FoodConfig.class)) {
         assert typeSlotConfig.getTypeConfig() instanceof FoodConfig;
         FoodConfig foodConfig = (FoodConfig) typeSlotConfig.getTypeConfig();
@@ -54,7 +56,14 @@ public enum TypeSlotConfig {
           );
         }
       } else {
-        if (!slotService.existsByName(typeSlotConfig.getSlotConfig().getName())) {
+
+        if (!slotService.typeSlotExists(
+          typeSlotConfig.getType()
+          ,null
+          , slotService.findByName(typeSlotConfig.getSlotConfig().getName()
+          )
+        ))
+        {
           slotService.save(
             new TypeSlot(
               typeSlotConfig.getType(),

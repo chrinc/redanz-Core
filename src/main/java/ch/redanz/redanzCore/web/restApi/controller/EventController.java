@@ -127,6 +127,19 @@ public class EventController {
     return outTextService.getOutTextByType(types);
   }
 
+  @GetMapping(path = "/slots/all")
+  public List<Slot> getAllSlots(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return slotService.getAllSlots(eventService.findByEventId(eventId));
+  }
+  @GetMapping(path = "/slots/party")
+  public List<Slot> getAllPartySlots(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return slotService.getAllSlots("party", eventService.findByEventId(eventId));
+  }
+
   @GetMapping(path = "/volunteer/slot/all")
   public List<Slot> getAllVolunteerSlots(
     @RequestParam("eventId") Long eventId

@@ -41,7 +41,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   public void run(String... args) {
     if (eventService.findAll().isEmpty()) {
       TrackConfig.setup(trackService);
-      BundleConfig.setup(bundleService);
+      BundleConfig.setup(bundleService, slotService);
       BundleTrackConfig.setup(bundleService, trackService);
       EventConfig.setup(eventService);
       EventBundleConfig.setup(bundleService, eventService);
@@ -67,6 +67,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       PrivateClassConfig.setup(privateClassService);
       EventPrivateClassConfig.setup(privateClassService, eventService);
       EventSpecialsConfig.setup(specialService, eventService);
+      BundleSpecialConfig.setup(specialService, bundleService);
     }
   }
 }

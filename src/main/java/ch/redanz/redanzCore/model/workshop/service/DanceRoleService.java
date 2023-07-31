@@ -5,6 +5,8 @@ import ch.redanz.redanzCore.model.workshop.repository.DanceRoleRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class DanceRoleService {
@@ -26,5 +28,9 @@ public class DanceRoleService {
 
   public DanceRole findByName(String name) {
     return danceRoleRepo.findByName(name);
+  }
+
+  public List<DanceRole> all() {
+    return danceRoleRepo.findAll();
   }
 }

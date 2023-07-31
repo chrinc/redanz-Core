@@ -31,7 +31,7 @@ public class ZahlsPaymentController {
     @RequestParam("registrationId") Long registrationId
   ) {
     try {
-      // log.info("ing@payment-intent");
+       log.info("ing@payment-intent");
       // log.info("registrationId: " + registrationId);
       return paymentService.getPaymentDetails(
         registrationService.findByRegistrationId(registrationId)

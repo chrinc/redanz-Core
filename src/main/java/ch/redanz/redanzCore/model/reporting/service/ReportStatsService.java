@@ -42,10 +42,11 @@ public class ReportStatsService {
         new ResponseStats(
           "Pass"
           ,bundle.getName()
-          ,registrationService.countBundlesSubmittedConfirmingAndDone(bundle, event)
-          ,registrationService.countBundlesConfirmingAndDone(bundle, event)
-          ,registrationService.countBundlesDone(bundle, event)
-         ,bundle.getCapacity()
+          ,registrationService.countBundlesSubmittedConfirmingAndDoneAndSplitRoles(bundle, event)
+          ,registrationService.countBundlesSubmittedAndSplitRoles(bundle, event)
+          ,registrationService.countBundlesConfirmingAndSplitRoles(bundle, event)
+          ,registrationService.countBundlesDoneAndSplitRoles(bundle, event)
+           ,bundle.getCapacity()
         )
       );
     });
@@ -55,9 +56,10 @@ public class ReportStatsService {
         new ResponseStats(
           "Track"
           ,track.getName()
-         ,registrationService.countTracksSubmittedConfirmingAndDone(track, event)
-         ,registrationService.countTracksConfirmingAndDone(track, event)
-         ,registrationService.countTracksDone(track, event)
+         ,registrationService.countTracksSubmittedConfirmingAndDoneAndSplitRoles(track, event)
+         ,registrationService.countTracksSubmittedAndSplitRoles(track, event)
+         ,registrationService.countTracksConfirmingAndSplitRoles(track, event)
+         ,registrationService.countTracksDoneAndSplitRoles(track, event)
          ,track.getCapacity()
         )
       );
@@ -68,9 +70,10 @@ public class ReportStatsService {
         new ResponseStats(
           "Special"
           ,outTextService.getOutTextByKeyAndLangKey(special.getName(), language.getLanguageKey()).getOutText()
-         ,specialRegistrationService.countSpecialRegistrations(special, event)
-         ,specialRegistrationService.countSpecialsConfirmingAndDone(special, event)
-         ,specialRegistrationService.countSpecialsDone(special, event)
+         ,specialRegistrationService.countSpecialRegistrationsAndSplitRoles(special, event)
+         ,specialRegistrationService.countSpecialsSubmittedAndSplitRoles(special, event)
+         ,specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
+         ,specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
          ,special.getCapacity()
         )
       );
@@ -80,9 +83,10 @@ public class ReportStatsService {
       new ResponseStats(
         "Workshop"
         ,event.getName()
-        ,registrationService.countSubmittedConfirmingAndDone(event)
-        ,registrationService.countConfirmingAndDone(event)
-        ,registrationService.countDone(event)
+        ,registrationService.countSubmittedConfirmingAndDoneAndSplitRoles(event)
+        ,registrationService.countSubmittedAndSplitRoles(event)
+        ,registrationService.countConfirmingAndSplitRoles(event)
+        ,registrationService.countDoneAndSplitRoles(event)
        ,event.getCapacity()
       )
     );
@@ -96,9 +100,10 @@ public class ReportStatsService {
         new ResponseStats(
           "Food"
           , outTextService.getOutTextByKeyAndLangKey(slot.getName(), language.getLanguageKey()).getOutText()
-          , foodRegistrationService.countFoodSlotSubmittedReleasedAndDone(food, slot, event)
-          , foodRegistrationService.countFoodSlotConfirmingAndDone(food, slot, event)
-          , foodRegistrationService.countFoodSlotDone(food, slot, event)
+          , foodRegistrationService.countFoodSlotSubmittedConfirmingAndDoneAsList(food, slot, event)
+          , foodRegistrationService.countFoodSlotSubmittedAsList(food, slot, event)
+          , foodRegistrationService.countFoodSlotConfirmingAsList(food, slot, event)
+          , foodRegistrationService.countFoodSlotDoneAsList(food, slot, event)
           , null
         )
       );
@@ -109,9 +114,10 @@ public class ReportStatsService {
         new ResponseStats(
           "Discount"
           ,outTextService.getOutTextByKeyAndLangKey(discount.getName(), language.getLanguageKey()).getOutText()
-          , discountRegistrationService.countDiscountSubmittedConfirmingAndDoneByEvent(discount, event)
-          , discountRegistrationService.countDiscountConfirmingAndDoneByEvent(discount, event)
-          , discountRegistrationService.countDiscountDoneByEvent(discount, event)
+          , discountRegistrationService.countDiscountSubmittedConfirmingAndDoneAsList(discount, event)
+          , discountRegistrationService.countDiscountSubmittedAsList(discount, event)
+          , discountRegistrationService.countDiscountConfirmingAsList(discount, event)
+          , discountRegistrationService.countDiscountDoneAsList(discount, event)
           , discount.getCapacity()
         )
       );

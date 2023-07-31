@@ -10,12 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum SpecialConfig {
-  SPECIAL_FRI_SPECIAL(OutTextConfig.LABEL_FRI_SPECIAL_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FRI_SPECIAL_DESC_EN.getOutTextKey(), 20, 60);
+  SPECIAL_FRI_SPECIAL(OutTextConfig.LABEL_FRI_SPECIAL_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FRIDAY_SPECIAL_DESC_EN.getOutTextKey(), 20, 60, false, OutTextConfig.LABEL_PASS_URL_EN.getOutTextKey()),
+  SUN_TICKET(OutTextConfig.LABEL_PARTY_SUN_NAME_EN.getOutTextKey(), null, 10, 40, false, null);
 
   private final String name;
   private final String description;
   private final Integer capacity;
   private final double price;
+  private final boolean soldOut;
+  private final String url;
 
   public static void setup(SpecialService specialService) {
     for (SpecialConfig specialConfig : SpecialConfig.values()) {
@@ -25,7 +28,9 @@ public enum SpecialConfig {
             specialConfig.getName(),
             specialConfig.getDescription(),
             specialConfig.price,
-            specialConfig.capacity
+            specialConfig.capacity,
+            specialConfig.soldOut,
+            specialConfig.getUrl()
           )
         );
       } else {
@@ -33,6 +38,7 @@ public enum SpecialConfig {
         special.setDescription(specialConfig.description);
         special.setCapacity(specialConfig.capacity);
         special.setPrice(specialConfig.price);
+        special.setUrl(specialConfig.url);
         specialService.save(special);
       }
     }

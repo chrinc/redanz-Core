@@ -18,6 +18,7 @@ public class Special implements Serializable {
   private Long specialId;
   private String name;
   private String description;
+  private String url;
   private double price;
   private Integer capacity;
 
@@ -27,11 +28,13 @@ public class Special implements Serializable {
   public Special() {
   }
 
-  public Special(String name, String description, Double price, Integer capacity) {
+  public Special(String name, String description, Double price, Integer capacity, boolean soldOut, String url) {
     this.name = name;
     this.description = description;
     this.price = price;
     this.capacity = capacity;
+    this.soldOut = soldOut;
+    this.url = url;
   }
   public Special(String name, String description) {
     this.name = name;

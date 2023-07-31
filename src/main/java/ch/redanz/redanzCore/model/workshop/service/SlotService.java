@@ -25,7 +25,6 @@ public class SlotService {
   public boolean foodSlotExists(
     Slot slot, Food food
   ) {
-    log.info("foodSlotExists, food: " + food.getName() + ", slot: " + slot.getName() +": " + Boolean.toString(typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot("food", food.getFoodId(), slot)));
     return  typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot("food", food.getFoodId(), slot);
   }
 
@@ -40,6 +39,9 @@ public class SlotService {
   }
   public boolean existsByName(String name) {
     return slotRepo.existsByName(name);
+  }
+  public boolean typeSlotExists(String type, Long objectTypeId, Slot slot) {
+    return typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot(type, objectTypeId,  slot);
   }
 
   public void save(TypeSlot typeSlot) {
@@ -108,7 +110,20 @@ public class SlotService {
     );
   }
 
-  private List<Slot> getAllSlots(String type, Event event) {
+  public List<Slot> getAllSlots(Event event) {
+    List<Slot> slots = new ArrayList<>();
+    typeSlotRepo.findAll().forEach(
+      typeSlot -> {
+        if (eventHasTypeSlot(event, typeSlot)) {
+          slots.add(typeSlot.getSlot());
+        }
+      }
+    );
+    slots.sort(Comparator.comparing(Slot::getSlotId));
+    return slots;
+  }
+
+  public List<Slot> getAllSlots(String type, Event event) {
     List<Slot> slots = new ArrayList<>();
     typeSlotRepo.findAllByType(type).forEach(
       typeSlot -> {

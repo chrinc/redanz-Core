@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.registration.repository;
 import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
+import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
@@ -48,4 +49,8 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     int countAllByBundleAndWorkflowStatusAndActiveAndEvent(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event);
     int countAllByTrackAndWorkflowStatusAndActiveAndEvent(Track track, WorkflowStatus workflowStatus, Boolean active, Event event);
     int countAllByEventAndActive(Event event, Boolean active);
+    int countAllByWorkflowStatusAndActiveAndEventAndDanceRole(WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
+    int countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
+    int countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(Track track, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
+    int countAllByEventAndActiveAndDanceRole(Event event, Boolean active, DanceRole danceRole);
 }

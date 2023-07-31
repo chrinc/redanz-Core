@@ -23,7 +23,7 @@ public class WorkflowTransitionService {
   }
 
   public WorkflowTransition findFirstByRegistrationOrderByTransitionTimestampDesc(Registration registration) {
-    return workflowTransitionRepo.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
+    return workflowTransitionRepo.findFirstByRegistrationOrderByTransitionTimestampDescWorkflowStatusDesc(registration);
   }
 
   public void setWorkflowStatus(Registration registration, WorkflowStatus workflowStatus) {

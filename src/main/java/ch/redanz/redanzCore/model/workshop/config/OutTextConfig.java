@@ -85,8 +85,15 @@ public enum OutTextConfig {
   LABEL_FUN_DESC_GE("FRONT_LOGIN", "LABEL-FUN-DESC", "4 Free-Choice Klassen (SA/SO), 3 Parties (FR/SA/SO)", "GE"),
   LABEL_PARTY_SUN_DESC_EN("FRONT_LOGIN", "LABEL-PARTY-SUN-DESC", "1 Party (SUN)", "EN"),
   LABEL_PARTY_SUN_DESC_GE("FRONT_LOGIN", "LABEL-PARTY-SUN-DESC", "1 Party (SO)", "GE"),
+  LABEL_PARTY_SUN_NAME_EN("FRONT_LOGIN", "LABEL-PARTY-SUN-NAME", "Sunday Party Ticket", "EN"),
+  LABEL_PARTY_SUN_NAME_GE("FRONT_LOGIN", "LABEL-PARTY-SUN-NAME", "Sunday Party Ticket", "GE"),
   LABEL_FRIDAY_PACKAGE_DESC_EN("FRONT_LOGIN", "LABEL-FRIDAY-PACKAGE-DESC", "1 Solo Jazz Trio Class (FRI), 1 Party (FRI)", "EN"),
   LABEL_FRIDAY_PACKAGE_DESC_GE("FRONT_LOGIN", "LABEL-FRIDAY-PACKAGE-DESC", "1 Solo Jazz Trio Klasse (FR), 1 Party (FR)", "GE"),
+  LABEL_FRIDAY_SPECIAL_DESC_EN("FRONT_LOGIN", "LABEL-FRIDAY-SPECIAL-DESC", "Solo Jazz Trio Class with Jazz Messengers Sonia Ortega, Héctor Artal and Clàudia Fonte", "EN"),
+  LABEL_FRIDAY_SPECIAL_DESC_GE("FRONT_LOGIN", "LABEL-FRIDAY-SPECIAL-DESC", "Solo Jazz Trio Klasse mit den Jazz Messengers Sonia Ortega, Héctor Artal und Clàudia Fonte", "GE"),
+
+  LABEL_PASS_URL_EN("FRONT_LOGIN", "LABEL-PASS-URL", "https://stirit.ch/?page_id=6959&lang=en", "EN"),
+  LABEL_PASS_URL_GE("FRONT_LOGIN", "LABEL-PASS-URL", "https://stirit.ch/?page_id=7260&lang=de", "GE"),
 
   // CLASSES
   LABEL_PRIVATE_ELZE_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop or Solo Jazz with Elze (1 couple, 1 follower, 1 leader or 3-4 followers) / SAT 6pm-7pm", "EN"),

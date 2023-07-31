@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.web.restApi.controller;
 
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.VolunteerSlotRegistration;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.registration.service.*;
@@ -31,6 +32,8 @@ public class RegistrationController {
   private final EventService eventService;
   private final BaseParService baseParService;
   private final WorkflowTransitionService workflowTransitionService;
+  private final GuestService guestService;
+  private final CheckInService checkInService;
 
   @Autowired
   Configuration mailConfig;
@@ -218,5 +221,76 @@ public class RegistrationController {
 
   @GetMapping(path = "/confirming/reminder")
   public void sendConfirmingReminder() {
+  }
+
+  @PostMapping(path = "/guests/update")
+  @Transactional
+  public void guestsUpdate(
+    @RequestParam("userId") Long userId,
+    @RequestParam("eventId") Long eventId,
+    @RequestBody String guestsJsonObject
+  ) {
+    try {
+      log.info("update guest List");
+      Event event = eventService.findByEventId(eventId);
+      guestService.updateGuestListRequest(JsonParser.parseString(guestsJsonObject).getAsJsonArray(), event);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/guest/update")
+  @Transactional
+  public void guestUpdate(
+    @RequestParam("userId") Long userId,
+    @RequestParam("eventId") Long eventId,
+    @RequestBody String guestJsonObject
+  ) {
+    try {
+      log.info("update guest List");
+      Event event = eventService.findByEventId(eventId);
+      guestService.updateGuestRequest(JsonParser.parseString(guestJsonObject).getAsJsonObject(), event);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/guest/remv")
+  @Transactional
+  public void remvGuest(
+    @RequestParam("userId") Long userId,
+    @RequestParam("eventId") Long eventId,
+    @RequestBody String guestJsonObject
+  ) {
+    try {
+      log.info("remove guest");
+      Event event = eventService.findByEventId(eventId);
+      guestService.removeGuest(JsonParser.parseString(guestJsonObject).getAsJsonObject(), event);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+    }
+  }
+  @PostMapping(path = "/checkIn")
+  @Transactional
+  public void checkIn(
+    @RequestParam("userId") Long userId,
+    @RequestParam("eventId") Long eventId,
+    @RequestBody String guestJsonObject
+  ) {
+    try {
+      log.info("remove guest");
+      Event event = eventService.findByEventId(eventId);
+      checkInService.checkInRequest(JsonParser.parseString(guestJsonObject).getAsJsonObject());
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+    }
   }
 }

@@ -32,6 +32,15 @@ public class Bundle implements Serializable {
     inverseJoinColumns = @JoinColumn(name = "special_id"))
   private List<Special> specials;
 
+
+  @ManyToMany(cascade=CascadeType.ALL)
+  @JoinTable(
+    name="bundle_party_slots",
+    joinColumns = @JoinColumn(name="bundle_id"),
+    inverseJoinColumns = @JoinColumn(name="slot_id")
+  )
+  private List<Slot> partySlots;
+
   private String name;
 
   @Column(name = "internal_id")
@@ -62,7 +71,8 @@ public class Bundle implements Serializable {
     Integer capacity,
     Boolean simpleTicket,
     String internalId,
-    Integer seqNr
+    Integer seqNr,
+    List<Slot> partySlots
   ) {
     this.name = name;
     this.price = price;
@@ -71,6 +81,7 @@ public class Bundle implements Serializable {
     this.simpleTicket = simpleTicket;
     this.internalId = internalId;
     this.seqNr = seqNr;
+    this.partySlots = partySlots;
   }
 
   public static List<Map<String, String>> schema() {
