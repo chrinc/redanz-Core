@@ -41,6 +41,9 @@ public class SlotService {
   public boolean existsByName(String name) {
     return slotRepo.existsByName(name);
   }
+  public boolean typeSlotExists(String type, Long objectTypeId, Slot slot) {
+    return typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot(type, objectTypeId,  slot);
+  }
 
   public void save(TypeSlot typeSlot) {
     typeSlotRepo.save(typeSlot);

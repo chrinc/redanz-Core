@@ -41,19 +41,17 @@ public enum EventTypeSlotConfig {
 
       if (foodType) {
         FoodConfig foodConfig = (FoodConfig) eventTypeSlotConfig.getTypeConfig();
-
-        TypeSlot typeSlot = slotService.findByTypeObjectIdAndSlot(
+        TypeSlot foodTypeSlot = slotService.findByTypeObjectIdAndSlot(
           eventTypeSlotConfig.typeSlotConfig.getType(),
           foodService.findByName(foodConfig.getName()).getFoodId()
           , slotService.findByName(eventTypeSlotConfig.typeSlotConfig.getSlotConfig().getName())
         );
-
         if (!eventService.existsEventSlotType(
-          event, typeSlot
+          event, foodTypeSlot
         )) {
           eventService.save(
             new EventTypeSlot(
-              typeSlot,
+              foodTypeSlot,
               event,
               eventTypeSlotConfig.seqNr
             )

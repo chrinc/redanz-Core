@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface WorkflowTransitionRepo extends JpaRepository<WorkflowTransition, Long> {
-  WorkflowTransition findFirstByRegistrationOrderByTransitionTimestampDesc(Registration registration);
+  WorkflowTransition findFirstByRegistrationOrderByTransitionTimestampDescWorkflowStatusDesc(Registration registration);
 }

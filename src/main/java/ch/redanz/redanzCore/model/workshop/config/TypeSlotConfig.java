@@ -54,7 +54,14 @@ public enum TypeSlotConfig {
           );
         }
       } else {
-        if (!slotService.existsByName(typeSlotConfig.getSlotConfig().getName())) {
+
+        if (!slotService.typeSlotExists(
+          typeSlotConfig.getType()
+          ,null
+          , slotService.findByName(typeSlotConfig.getSlotConfig().getName()
+          )
+        ))
+        {
           slotService.save(
             new TypeSlot(
               typeSlotConfig.getType(),
