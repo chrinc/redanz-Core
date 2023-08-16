@@ -31,17 +31,11 @@ public class SpecialService {
   public boolean existsByName(String name) {
     return specialRepo.existsByName(name);
   }
-  public Set<Special> findByEventOrBundle(Event event, Bundle bundle) {
+  public Set<Special> findByEventOrBundle(Event event) {
     Set<Special> allSpecials;
     allSpecials = findByEvent(event);
-    allSpecials.forEach(special -> {
-      log.info("event");
-      log.info(special.getName());
-    });
-    allSpecials.addAll(findByBundle(bundle));
-    allSpecials.forEach(special -> {
-      log.info("on bundle");
-      log.info(special.getName());
+    event.getEventBundles().forEach(eventBundle -> {
+      allSpecials.addAll(findByBundle(eventBundle.getBundle()));
     });
     return allSpecials;
   }

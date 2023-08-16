@@ -165,9 +165,9 @@ public class EventController {
   ) {
     // log.info("inc@special/all, bundleId: " + bundleId);
     if (bundleId == null) {
-      return specialService.findByEventOrBundle(eventService.getCurrentEvent(), null);
+      return specialService.findByEventOrBundle(eventService.getCurrentEvent());
     } else {
-      return specialService.findByEventOrBundle(eventService.getCurrentEvent(), bundleService.findByBundleId(bundleId));
+      return specialService.findByBundle(bundleService.findByBundleId(bundleId));
     }
   }
   @GetMapping(path = "/privateClasses/all")

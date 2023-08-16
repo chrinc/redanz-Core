@@ -65,7 +65,7 @@ public class ReportStatsService {
       );
     });
 
-    specialService.findByEvent(event).forEach(special -> {
+    specialService.findByEventOrBundle(event).forEach(special -> {
       stats.add(
         new ResponseStats(
           "Special"

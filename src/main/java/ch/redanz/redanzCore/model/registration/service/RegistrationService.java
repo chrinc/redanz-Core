@@ -87,7 +87,7 @@ public class RegistrationService {
         }
       }
 
-      specialService.findByEventOrBundle(event, bundle).forEach(special -> {
+      specialService.findByEventOrBundle(event).forEach(special -> {
         specialRegistrationService.soldOut(
           special
          ,specialRegistrationService.countSpecialRegistrations(special, event) >= special.getCapacity()
