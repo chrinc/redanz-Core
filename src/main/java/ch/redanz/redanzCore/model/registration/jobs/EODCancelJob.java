@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,7 +34,9 @@ public class EODCancelJob {
   private final EventService eventService;
   private final BaseParService baseParService;
 
+
   @Scheduled(cron = "${cron.matching.scheduler.value.cancel}")
+  @Transactional
   public void runCancelJob() {
     if (baseParService.doEODCancel()) {
       log.info("Job: runCancel");

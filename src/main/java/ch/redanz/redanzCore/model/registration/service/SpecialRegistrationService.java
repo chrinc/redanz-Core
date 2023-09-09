@@ -274,7 +274,7 @@ public class SpecialRegistrationService {
 
   private String formatCountToString(String formatedCount, int count, String pfx) {
     if (count > 0) {
-      formatedCount = formatedCount == "" ? "" : ", ";
+      formatedCount = formatedCount.isBlank() ? "" : ", ";
       formatedCount = formatedCount + pfx + count;
       return formatedCount;
     }
