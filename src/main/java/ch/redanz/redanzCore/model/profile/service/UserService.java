@@ -63,6 +63,9 @@ public class UserService implements UserDetailsService {
   public boolean userIsTester(User user) {
     return testUserRepo.existsByEmailIgnoreCase(user.getEmail().replace(".", ""));
   }
+  public boolean emailIsTester(String email) {
+    return testUserRepo.existsByEmailIgnoreCase(email.replace(".", ""));
+  }
 
   public void save(User user) {
     userRepo.save(user);

@@ -62,7 +62,8 @@ public class Guest implements Serializable {
     String description,
     Event event,
     List<Slot> slots,
-    boolean active
+    boolean active,
+    Person person
 
   ) {
     this.name = name;
@@ -70,6 +71,7 @@ public class Guest implements Serializable {
     this.event = event;
     this.slots = slots;
     this.active = active;
+    this.person = person;
   }
 
   public Guest(
@@ -100,10 +102,19 @@ public class Guest implements Serializable {
         }});
         add(new HashMap<>() {{
           put("key", "slots");
-          put("type", "list");
+          put("type", "multiple");
           put("restriction", "party");
           put("label", "Slots");
           put("elemKey", "slotId");
+          put("elemLabel", "name");
+        }});
+        add(new HashMap<>() {{
+          put("key", "person");
+          put("type", "list");
+          put("restriction", "organizer");
+          put("label", "Added By");
+          put("elemKey", "personId");
+          put("elemLabel", "firstName");
         }});
 //        add(new HashMap<>() {{
 //          put("key", "person");

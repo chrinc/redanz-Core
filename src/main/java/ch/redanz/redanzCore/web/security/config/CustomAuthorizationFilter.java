@@ -73,7 +73,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
               )
             )
           ) {
-            authorities.stream().filter(auth -> auth.getAuthority().equals(UserRole.ORGANIZER.name()))
+            authorities.stream().filter(
+              auth ->
+                   auth.getAuthority().equals(UserRole.ORGANIZER.name())
+                || auth.getAuthority().equals(UserRole.ADMIN.name())
+              )
               .findAny()
               .orElseThrow(
                 () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
@@ -81,7 +85,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           }
           // only organizers are authorized to retrieve report data
           if (request.getServletPath().startsWith("/core-api/app/report")) {
-             authorities.stream().filter(auth -> auth.getAuthority().equals(UserRole.ORGANIZER.name()))
+             authorities.stream().filter(
+               auth ->
+                    auth.getAuthority().equals(UserRole.ORGANIZER.name())
+                 || auth.getAuthority().equals(UserRole.ADMIN.name())
+               )
                .findAny()
                .orElseThrow(
                  () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
@@ -90,7 +98,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
           // only organizers to run jobs
           if (request.getServletPath().startsWith("/core-api/app/jobs")) {
-             authorities.stream().filter(auth -> auth.getAuthority().equals(UserRole.ORGANIZER.name()))
+             authorities.stream().filter(
+               auth ->
+                    auth.getAuthority().equals(UserRole.ORGANIZER.name())
+                 || auth.getAuthority().equals(UserRole.ADMIN.name())
+               )
                .findAny()
                .orElseThrow(
                  () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())

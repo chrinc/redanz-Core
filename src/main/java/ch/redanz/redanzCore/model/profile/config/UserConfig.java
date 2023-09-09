@@ -29,7 +29,7 @@ public enum UserConfig {
 
   // ORGANIZERS
   ORG_SONNY_USER("org_sonny_user@gmail.com", "password", UserRole.ORGANIZER, false, true),
-  ORG_ANN_USER("org_ann_user@gmail.com", "password", UserRole.ORGANIZER, false, true);
+  ORG_ANN_USER("org_ann_user@gmail.com", "password", UserRole.ADMIN, false, true);
 
   final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
   private final String email;

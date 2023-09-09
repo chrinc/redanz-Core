@@ -1,6 +1,8 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
+import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
@@ -30,6 +32,7 @@ public class EventController {
   private final BundleService bundleService;
   private final PrivateClassService privateClassService;
   private final VolunteerService volunteerService;
+  private final PersonService personService;
 
   @GetMapping(path = "/schema/event")
   public List<Map<String, String>> getEventSchema() {
@@ -182,5 +185,20 @@ public class EventController {
       privateClasses =  privateClassService.findByEventAndBundle(eventService.findByEventId(eventId), bundleService.findByBundleId(bundleId));
     }
     return privateClasses;
+  }
+
+  @GetMapping (path = "/person/organizer")
+  @Transactional
+  public List<Person> getCheckInSlots(
+    @RequestParam("eventId") Long eventId
+  ) {
+    try {
+      Event event = eventService.findByEventId(eventId);
+      return personService.getAlOrganizers(event);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
 }

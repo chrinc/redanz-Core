@@ -43,6 +43,7 @@ public class UserRegistrationService {
     String token = userService.signUpNewUser(
       new User(request.getEmail(),
         request.getPassword(),
+        userService.emailIsTester(request.getEmail()) ? UserRole.ORGANIZER :
         UserRole.PARTICIPANT) // @Todo variable?
     );
     return token;
