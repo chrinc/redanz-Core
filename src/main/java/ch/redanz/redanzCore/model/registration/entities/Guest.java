@@ -130,7 +130,7 @@ public class Guest implements Serializable {
         add(new HashMap<>() {{
           put("key", "isRemove");
           put("type", "isRemove");
-          put("label", "");
+          put("label", "LABEL-ACTION-DELETE");
         }});
       }
     };
