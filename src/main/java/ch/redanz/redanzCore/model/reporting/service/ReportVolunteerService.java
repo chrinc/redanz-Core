@@ -31,11 +31,10 @@ public class ReportVolunteerService {
           , registration.getParticipant().getLastName()
           , registration.getParticipant().getUser().getEmail()
           , registration.getParticipant().getMobile()
-          , volunteerRegistration.getType().getDescription()
+          , volunteerRegistration.getType() == null ? null : volunteerRegistration.getType().getDescription()
           , volunteerService.getSlots(volunteerRegistration, language)
           , volunteerRegistration.getIntro()
           , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
-
         )
       );
 
