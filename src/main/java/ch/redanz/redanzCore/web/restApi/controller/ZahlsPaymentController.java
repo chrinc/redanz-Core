@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.registration.service.PaymentService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
@@ -31,8 +32,6 @@ public class ZahlsPaymentController {
     @RequestParam("registrationId") Long registrationId
   ) {
     try {
-       log.info("ing@payment-intent");
-      // log.info("registrationId: " + registrationId);
       return paymentService.getPaymentDetails(
         registrationService.findByRegistrationId(registrationId)
       );
@@ -48,7 +47,7 @@ public class ZahlsPaymentController {
     try {
       return
         ResponseEntity.ok().body(paymentService.awaitPaymentConfirmation(
-            registrationService.getRegistration(userId, eventService.getCurrentEvent())
+            registrationService.getRegistration(userId, eventService.getCurrentEvent(), RegistrationType.PARTICIPANT)
           )
         );
     } catch (TimeoutException timeoutException) {

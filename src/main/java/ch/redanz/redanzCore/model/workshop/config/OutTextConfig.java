@@ -180,6 +180,14 @@ public enum OutTextConfig {
   // profile
   LABEL_EMAIL_CONFIRMED_EN("FRONT_BASE", "LABEL_EMAIL_CONFIRMED", "Thank you. Your email address has been confirmed.", "EN"),
   LABEL_EMAIL_CONFIRMED_GE("FRONT_BASE", "LABEL_EMAIL_CONFIRMED", "Vielen Dank, deine Email-Adresse wurde bestätigt.", "GE"),
+
+  // languages
+  LABEL_LANGUAGE_ENGLISH_EN("FRONT_BASE", "LABEL-LANGUAGE-ENGLSH", "English", "EN"),
+  LABEL_LANGUAGE_ENGLISH_GE("FRONT_BASE", "LABEL-LANGUAGE-ENGLSH", "Englisch", "GE"),
+  LABEL_LANGUAGE_GERMAN_EN("FRONT_BASE",  "LABEL-LANGUAGE-GERMAN", "German", "EN"),
+  LABEL_LANGUAGE_GERMAN_GE("FRONT_BASE",  "LABEL-LANGUAGE-GERMAN", "Deutsch", "GE"),
+
+
   // EXCEPTION HANDLING
   LABEL_ERROR_USER_TAKEN_EN("FRONT_BASE", "LABEL-ERROR-USER-TAKEN", "Email already taken", "EN"),
   LABEL_ERROR_USER_TAKEN_GE("FRONT_BASE", "LABEL-ERROR-USER-TAKEN", "Die Email-Adresse wird bereits verwendet", "GE"),

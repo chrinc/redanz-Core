@@ -11,4 +11,5 @@ public interface HostRegistrationRepo extends JpaRepository<HostRegistration, Lo
     HostRegistration findAllByRegistration(Registration registration);
     List<HostRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, boolean active);
     void deleteAllByRegistration(Registration registration);
+    boolean existsByRegistration(Registration registration);
 }

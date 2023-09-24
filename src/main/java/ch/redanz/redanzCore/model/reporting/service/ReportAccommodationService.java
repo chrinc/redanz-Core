@@ -28,7 +28,7 @@ public class ReportAccommodationService {
       Registration registration = hostRegistration.getRegistration();
       accommodations.add(
         new ResponseAccommodation(
-          registration.getParticipant().getUser().getUserId()
+          registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
           , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
           , registration.getParticipant().getFirstName()
@@ -39,6 +39,7 @@ public class ReportAccommodationService {
           , ""
           , hostingService.getUtils(hostRegistration, language)
           , hostRegistration.getHostComment()
+          , registration.getRegistrationType().name()
         )
       );
     });
@@ -58,6 +59,7 @@ public class ReportAccommodationService {
               + (hosteeRegistration.isSharedBed() ? " (shared bed)" : "")
           , hostingService.getUtils(hosteeRegistration, language)
           , hosteeRegistration.getComment()
+          , registration.getRegistrationType().name()
         )
       );
     });

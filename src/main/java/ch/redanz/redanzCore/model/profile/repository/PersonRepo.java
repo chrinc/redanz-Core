@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface PersonRepo extends JpaRepository<Person, Long> {
   Person findByPersonId(Long personId);
-
+  List<Person> findAllByActive(boolean active);
   List<Person> findAllByUserUserRole(UserRole userRole);
 
   Person findByUser(User user);

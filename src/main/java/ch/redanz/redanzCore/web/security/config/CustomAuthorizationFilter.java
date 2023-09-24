@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.web.security.config;
 
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
@@ -34,6 +35,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
   private final UserService userService;
   private final RegistrationService registrationService;
+  private final PersonService personService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -59,20 +61,36 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             authorities.add(new SimpleGrantedAuthority(role));
           });
 
-          // only allow retrieve own user data
+
+          // except you are admin or organizer
           Long requestUserId = request.getParameter("userId") == null ? null : Long.valueOf(request.getParameter("userId"));
+          Long requestPersonId = request.getParameter("personId") == null ? null : Long.valueOf(request.getParameter("personId"));
           Long requestRegistrationId = request.getParameter("registrationId") == null ? null : Long.valueOf(request.getParameter("registrationId"));
+//          authorities.stream().forEach(simpleGrantedAuthority -> {
+//              log.info("simpleGrantedAuthority: {}", simpleGrantedAuthority.getAuthority());
+//          });
+//          log.info("requestUserId: {}", requestUserId);
+//          log.info("userService.getUser(username).getUserId(): {}", userService.getUser(username).getUserId());
+//          log.info("requestPersonId: {}", requestPersonId);
+//          log.info("personService.findByUser(userService.getUser(username)).getPersonId(): {}", personService.findByUser(userService.getUser(username)).getPersonId());
+//          log.info("requestRegistrationId: {}", requestRegistrationId);
+//          if (requestRegistrationId != null) {
+//          log.info("user PersonId: {}", personService.findByUser(userService.getUser(username)).getPersonId());
+//          log.info("getParticipant().getPersonId(): {}", registrationService.findByRegistrationId(requestRegistrationId).getParticipant().getPersonId());
+//          }
 
           if (
-            (
-               requestUserId != null && !Objects.equals(userService.getUser(username).getUserId(), requestUserId))
+               (requestUserId != null && !Objects.equals(userService.getUser(username).getUserId(), requestUserId))
+            || (requestPersonId != null && !Objects.equals(personService.findByUser(userService.getUser(username)).getPersonId(), requestPersonId))
             || (
-              requestRegistrationId != null && !Objects.equals(
-                userService.getUser(username).getUserId(),
-                registrationService.findByRegistrationId(requestRegistrationId).getParticipant().getUser().getUserId()
+              requestRegistrationId != null
+                && !Objects.equals(
+                personService.findByUser(userService.getUser(username)).getPersonId(),
+                registrationService.findByRegistrationId(requestRegistrationId).getParticipant().getPersonId()
               )
             )
           ) {
+
             authorities.stream().filter(
               auth ->
                    auth.getAuthority().equals(UserRole.ORGANIZER.name())
@@ -85,6 +103,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           }
           // only organizers are authorized to retrieve report data
           if (request.getServletPath().startsWith("/core-api/app/report")) {
+
              authorities.stream().filter(
                auth ->
                     auth.getAuthority().equals(UserRole.ORGANIZER.name())
@@ -95,8 +114,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                  () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
                );
           }
-
-          // only organizers to run jobs
           if (request.getServletPath().startsWith("/core-api/app/jobs")) {
              authorities.stream().filter(
                auth ->

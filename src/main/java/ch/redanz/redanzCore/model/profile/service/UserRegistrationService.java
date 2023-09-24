@@ -1,6 +1,5 @@
 package ch.redanz.redanzCore.model.profile.service;
 
-import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
@@ -34,16 +33,22 @@ public class UserRegistrationService {
   private Environment environment;
 
   public String register(UserResponse request) {
-    boolean isValidEmail = emailValidator.test(request.getEmail());
+    boolean isValidEmail = emailValidator.test(request.getUsername());
 
     if (!isValidEmail) {
       throw new IllegalStateException("email not valid");
     }
 
+//    log.info("request {}");
+//    log.info(request.toString());
+//    log.info(request.getUsername());
+//    log.info(request.getPassword());
+
     String token = userService.signUpNewUser(
-      new User(request.getEmail(),
+      new User(
+        request.getUsername(),
         request.getPassword(),
-        userService.emailIsTester(request.getEmail()) ? UserRole.ORGANIZER :
+        userService.usernameIsTester(request.getUsername()) ? UserRole.ORGANIZER :
         UserRole.PARTICIPANT) // @Todo variable?
     );
     return token;
@@ -77,7 +82,7 @@ public class UserRegistrationService {
     }
     confirmationTokenService.setConfirmedAt(token);
     userService.enableUser(
-      confirmationToken.getUser().getEmail()
+      confirmationToken.getUser().getUsername()
     );
 
     return

@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class ResponsePersonRegistrations {
-  private Long userId;
+  private Long personId;
   private Long registrationId;
   private String workflowStatus;
   private String bundle;

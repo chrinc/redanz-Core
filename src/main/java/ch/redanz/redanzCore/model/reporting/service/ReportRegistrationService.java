@@ -8,7 +8,6 @@ import ch.redanz.redanzCore.model.reporting.response.ResponseRegistration;
 import ch.redanz.redanzCore.model.reporting.response.ResponseRegistrationDetails;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -96,13 +95,13 @@ public class ReportRegistrationService {
         if (!ignoreRegistration && !partnerRegistrations.contains(registration)) {
           registrations.add(
             new ResponseRegistration(
-              registration.getParticipant().getUser().getUserId(),
+              registration.getParticipant().getPersonId(),
               registration.getBundle().getName(),
               registration.getTrack() == null ? null : registration.getTrack().getName(),
               registration.getParticipant().getFirstName(),
               registration.getParticipant().getLastName(),
               registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
-              hasPartner ? registrationMatching.getRegistration2().getParticipant().getUser().getUserId() : null,
+              hasPartner ? registrationMatching.getRegistration2().getParticipant().getPersonId() : null,
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getFirstName() : null,
               hasPartner ? registrationMatching.getRegistration2().getParticipant().getLastName() : null,
               hasPartner ? registrationMatching.getRegistration2().getDanceRole().getName() : null,
@@ -128,11 +127,11 @@ public class ReportRegistrationService {
       if (workflowStatusList.contains(workflowStatus)) {
         registrationDetails.add(
           new ResponseRegistrationDetails(
-            registration.getParticipant().getUser().getUserId(),
+            registration.getParticipant().getPersonId(),
             registration.getRegistrationId(),
             registration.getParticipant().getFirstName(),
             registration.getParticipant().getLastName(),
-            registration.getParticipant().getUser().getEmail(),
+            registration.getParticipant().getEmail(),
             registration.getBundle().getName(),
             registration.getTrack() == null ? null : registration.getTrack().getName(),
             registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),

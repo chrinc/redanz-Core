@@ -11,4 +11,5 @@ public interface VolunteerRegistrationRepo extends JpaRepository<VolunteerRegist
   VolunteerRegistration findByRegistration (Registration registration);
   List<VolunteerRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, boolean active);
   void deleteAllByRegistration(Registration registration);
+  boolean existsByRegistration(Registration registration);
 }

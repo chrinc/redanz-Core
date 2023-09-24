@@ -79,12 +79,16 @@ public class HostingService {
 
   public void updateHostRegistrationRequest(Registration registration, JsonObject request) {
     JsonArray hostRegistrationArray = hostRegistrationArray(request);
-    // log.info("hostRegistrationArray: " + hostRegistrationArray);
+//     log.info("request: " + request.getAsString());
+//    log.info("hostRegistrationArray: " + hostRegistrationArray);
     if (hostRegistrationArray != null) {
+//      log.info("update existing host");
 
       // update existing
       updateHostRegistration(registration, hostRegistrationArray);
+//      log.info("update existing host, bfr sleep util");
       updateHostSleepUtilRegistration(registration, hostRegistrationArray);
+//      log.info("hldaupdatete existing host, bfr slot reg");
       updateHostSlotRegistration(registration, hostRegistrationArray);
 
     } else {
@@ -525,5 +529,26 @@ public class HostingService {
         hosteeRegistrationRepo.deleteAllByRegistration(registration);
       }
     }
+  }
+
+  public void onDeleteHost(Registration registration) {
+    HostRegistration hostRegistration = hostRegistrationRepo.findAllByRegistration(registration);
+    hostSleepUtilRegistrationRepo.deleteAllByHostRegistration(hostRegistration);
+    hostSlotRegistrationRepo.deleteAllByHostRegistration(hostRegistration);
+    hostRegistrationRepo.deleteAllByRegistration(registration);
+  }
+
+  public void onDeleteHostee(Registration registration) {
+    HosteeRegistration hosteeRegistration = hosteeRegistrationRepo.findByRegistration(registration);
+    hosteeSleepUtilsRegistrationRepo.deleteAllByHosteeRegistration(hosteeRegistration);
+    hosteeSlotRegistrationRepo.deleteAllByHosteeRegistration(hosteeRegistration);
+    hosteeRegistrationRepo.deleteAllByRegistration(registration);
+  }
+
+  public boolean hasHosteeRegistration(Registration registration) {
+    return hosteeRegistrationRepo.existsByRegistration(registration);
+  }
+  public boolean hasHostRegistration(Registration registration) {
+    return hostRegistrationRepo.existsByRegistration(registration);
   }
 }

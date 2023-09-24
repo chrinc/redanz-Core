@@ -2,9 +2,7 @@ package ch.redanz.redanzCore.model.profile.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +17,8 @@ import java.util.Collections;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
+@Setter
+@Getter
 @Table(name = "user")
 public class User implements Serializable, UserDetails {
   @SequenceGenerator(
@@ -34,18 +34,18 @@ public class User implements Serializable, UserDetails {
   @JoinColumn(name = "user_id")
   private Long userId;
   @JsonIgnore
-  private String email;
+  private String username;
   @JsonIgnore
   private String password;
 
 
   public User(
-    String email,
+    String username,
     String password,
     UserRole userRole,
     Boolean locked,
     Boolean enabled) {
-    this.email = email;
+    this.username = username;
     this.password = password;
     this.userRole = userRole;
     this.locked = locked;
@@ -63,10 +63,10 @@ public class User implements Serializable, UserDetails {
 //  public User () {}
 
   public User(
-    String email,
+    String username,
     String password,
     UserRole userRole) {
-    this.email = email;
+    this.username = username;
     this.password = password;
     this.userRole = userRole;
   }
@@ -82,10 +82,10 @@ public class User implements Serializable, UserDetails {
   }
 
   // implements UserDetails
-  @Override
-  public String getUsername() {
-    return email;
-  }
+//  @Override
+//  public String getUsername() {
+//    return username;
+//  }
 
   @Override
   public boolean isAccountNonExpired() {
@@ -111,8 +111,9 @@ public class User implements Serializable, UserDetails {
     return userId;
   }
 
-  public String getEmail() {
-    return email;
+  @Override
+  public String getUsername() {
+    return username;
   }
 
   public UserRole getUserRole() {
@@ -128,8 +129,8 @@ public class User implements Serializable, UserDetails {
     this.userRole = userRole;
   }
 
-  public void setEmail(String email) {
-    this.email = email;
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public void setPassword(String password) {
@@ -141,7 +142,7 @@ public class User implements Serializable, UserDetails {
     return
       "User{"
         + "userId=" + userId + '\''
-        + ", ch.redanz.redanzCore.email=" + email + '\''
+        + ", ch.redanz.redanzCore.username=" + username + '\''
         + ", password= '" + password + '\''
         + ", role= '" + userRole
         + "}";

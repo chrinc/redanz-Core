@@ -24,7 +24,7 @@ public class ReportPersonService {
 
   public List<ResponsePerson> getAllPersonsReport() {
     List<ResponsePerson> personResponseList = new ArrayList<>();
-    personService.findAll().forEach(person -> {
+    personService.findAll(true).forEach(person -> {
       personResponseList.add(
         new ResponsePerson(
           person.getFirstName(),
@@ -32,9 +32,10 @@ public class ReportPersonService {
           person.getStreet(),
           person.getPostalCode(),
           person.getCity(),
-          person.getUser().getEmail(),
-          person.getUser().getUserRole().toString(),
-          person.getPersonLang().getLanguageKey()
+          person.getEmail(),
+          person.getUser() == null ? "NO USER" : person.getUser().getUserRole().toString(),
+          person.getPersonLang().getLanguageKey(),
+          person.getPersonId()
         )
       );
     });
@@ -47,14 +48,14 @@ public class ReportPersonService {
     registrationService.findAllByEvent(event).forEach(registration -> {
       personRegistrations.add(
         new ResponsePersonRegistrations(
-          registration.getParticipant().getUser().getUserId()
+          registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
           , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
           , registration.getBundle().getName()
           , registration.getTrack() == null ? null : registration.getTrack().getName()
           , registration.getParticipant().getFirstName()
           , registration.getParticipant().getLastName()
-          , registration.getParticipant().getUser().getEmail()
+          , registration.getParticipant().getEmail()
           , registration.getParticipant().getMobile()
           , registration.getParticipant().getStreet()
           , registration.getParticipant().getPostalCode()

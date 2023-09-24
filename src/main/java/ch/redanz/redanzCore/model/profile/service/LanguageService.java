@@ -5,6 +5,8 @@ import ch.redanz.redanzCore.model.workshop.repository.LanguageRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class LanguageService {
@@ -14,6 +16,7 @@ public class LanguageService {
   public void save(Language language) {
     languageRepo.save(language);
   }
+  public List<Language> findAll() {return languageRepo.findAll(); }
   public Language findLanguageByLanguageKey(String key) {
     return languageRepo.findLanguageByLanguageKey(key).get();
   }

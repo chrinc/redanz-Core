@@ -21,7 +21,7 @@ public enum SleepUtilConfig {
 
   public static void setup(SleepUtilService sleepUtilService) {
     for (SleepUtilConfig sleepUtilConfig : SleepUtilConfig.values()) {
-      if (sleepUtilService.existsByName(sleepUtilConfig.getName())) {
+      if (!sleepUtilService.existsByName(sleepUtilConfig.getName())) {
         sleepUtilService.save(
           new SleepUtil(
             sleepUtilConfig.getName()

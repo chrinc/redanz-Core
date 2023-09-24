@@ -107,7 +107,7 @@ public class RegistrationEmailService {
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -171,7 +171,7 @@ public class RegistrationEmailService {
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      person.getUser().getEmail(),
+      person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -256,7 +256,7 @@ public class RegistrationEmailService {
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -323,7 +323,7 @@ public class RegistrationEmailService {
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -397,7 +397,7 @@ public class RegistrationEmailService {
 
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -463,13 +463,13 @@ public class RegistrationEmailService {
       try {
         EmailService.sendEmail(
           EmailService.getSession(),
-          registration.getParticipant().getUser().getEmail(),
+          registration.getParticipant().getEmail(),
           subject,
           FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
           ,baseParService.testMailOnly()
           ,baseParService.testEmail()
           ,false
-          ,userService.findByUserId(senderUser).getEmail()
+          ,userService.findByUserId(senderUser).getUsername()
         );
       } catch (IOException e) {
         throw new RuntimeException(e);
@@ -478,6 +478,14 @@ public class RegistrationEmailService {
       }
 
     });
+  }
+
+  public void postPoneLastReminderDate(Registration registration) {
+    RegistrationEmail registrationEmail = registrationEmailRepo.findByRegistration(registration);
+
+    if (registrationEmail.getReminderSentDate() != null) {
+      registrationEmail.setReminderSentDate(LocalDateTime.now());
+    }
   }
 
 }

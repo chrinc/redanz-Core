@@ -18,6 +18,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,7 +34,20 @@ public class ProfileService {
   Configuration mailConfig;
 
   public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
-    Person newPerson = new Person(userService.findByUserId(userId), personResponse.getFirstName(), personResponse.getLastName(), personResponse.getStreet(), personResponse.getPostalCode(), personResponse.getCity(), countryService.findCountry(personResponse.getCountryId()), languageService.findLanguageByLanguageKey(personResponse.getLanguage()));
+    Person newPerson = new Person(
+      userService.findByUserId(userId)
+      ,personResponse.getFirstName()
+      ,personResponse.getLastName()
+      ,personResponse.getStreet()
+      ,personResponse.getPostalCode()
+      ,personResponse.getCity()
+      ,countryService.findCountry(personResponse.getCountryId())
+      ,languageService.findLanguageByLanguageKey(personResponse.getLanguage())
+      ,userService.findByUserId(userId).getUsername()
+      ,true
+
+    );
+
     newPerson.setUpdateTimestamp(LocalDateTime.now());
     personService.addPerson(newPerson);
     sendRegisteredProfileEmail(newPerson, registrationLink, headerLink);
@@ -51,8 +65,26 @@ public class ProfileService {
     personService.savePerson(updatePerson);
   }
 
-  public Person getProfile(Long userId) {
-    return personService.findByUser(userService.findByUserId(userId));
+  public void remove(Person person) {
+    if (person.getUser() != null) {
+      userService.delete(person.getUser());
+      person.setUser(null);
+    }
+
+    person.setActive(false);
+    personService.savePerson(person);
+  }
+
+  public Person getProfile(Long personId) {
+    return personService.findByPersonId(personId);
+  }
+
+  public Person getProfile(String username) {
+    return personService.findByUser(userService.getUser(username));
+  }
+
+  public List<Person> getPersons() {
+    return personService.findAll(true);
   }
 
   public void sendRegisteredProfileEmail(Person person, String registrationLink, String headerLink) throws IOException, TemplateException {
@@ -73,7 +105,7 @@ public class ProfileService {
 
     EmailService.sendEmail(
       EmailService.getSession(),
-      person.getUser().getEmail(),
+      person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CONFIRM_SUBJECT_EN.getOutTextKey(),
         languageKey

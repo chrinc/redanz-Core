@@ -32,14 +32,14 @@ public enum UserConfig {
   ORG_ANN_USER("org_ann_user@gmail.com", "password", UserRole.ADMIN, false, true);
 
   final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-  private final String email;
+  private final String username;
   private final String password;
   private final UserRole userRole;
   private final Boolean locked;
   private final Boolean enabled;
 
-  UserConfig(String email, String password, UserRole userRole, Boolean locked, Boolean enabled) {
-    this.email = email;
+  UserConfig(String username, String password, UserRole userRole, Boolean locked, Boolean enabled) {
+    this.username = username;
     this.password = bCryptPasswordEncoder.encode(password);
     this.userRole = userRole;
     this.locked = locked;
@@ -51,7 +51,7 @@ public enum UserConfig {
     for (UserConfig roleConfig : UserConfig.values()) {
       userService.save(
         new User(
-          roleConfig.getEmail(),
+          roleConfig.getUsername(),
           roleConfig.getPassword(),
           roleConfig.getUserRole(),
           roleConfig.getLocked(),

@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.registration.repository;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
@@ -17,12 +18,12 @@ import java.util.Optional;
 
 @Repository
 public interface RegistrationRepo extends JpaRepository<Registration, Long> {
-    Optional<Registration> findByParticipantAndEventAndActive(Person participant, Event event, Boolean active);
+    Optional<Registration> findByParticipantAndEventAndRegistrationTypeAndActive(Person participant, Event event, RegistrationType registrationType, Boolean active);
     Registration findByRegistrationId(Long registrationId);
-    List<Registration> findAllByEventAndActive(Event event, Boolean active);
+    List<Registration> findAllByEventAndActiveAndRegistrationType(Event event, Boolean active, RegistrationType type);
     List<Registration> findAllByParticipantAndActiveAndEventArchivedAndEventActive(Person participant, Boolean active, Boolean archived, Boolean eventActive);
     List<Registration> findAllByParticipantAndActive(Person person, Boolean active);
-    List<Registration> findAllByWorkflowStatusAndActiveAndEvent(WorkflowStatus workflowStatus, Boolean active, Event event);
+    List<Registration> findAllByWorkflowStatusAndActiveAndEventAndRegistrationType(WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
     List<Registration> findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndBundle(
       Boolean active, Event event, WorkflowStatus workflowStatus, Language personLang, Bundle bundle
     );
@@ -32,8 +33,8 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     List<Registration> findAllByActiveAndEventAndWorkflowStatusAndBundle(
       Boolean active, Event event, WorkflowStatus workflowStatus, Bundle bundle
     );
-    List<Registration> findAllByActiveAndEventAndWorkflowStatus(
-      Boolean active, Event event, WorkflowStatus workflowStatus
+    List<Registration> findAllByActiveAndEventAndWorkflowStatusAndRegistrationType(
+      Boolean active, Event event, WorkflowStatus workflowStatus, RegistrationType type
     );
     List<Registration> findAllByActiveAndEventAndParticipantPersonLangAndBundle(
       Boolean active, Event event, Language personLang, Bundle bundle
@@ -45,10 +46,10 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
       Boolean active, Event event, Bundle bundle
     );
 
-    int countAllByWorkflowStatusAndActiveAndEvent(WorkflowStatus workflowStatus, Boolean active, Event event);
-    int countAllByBundleAndWorkflowStatusAndActiveAndEvent(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event);
-    int countAllByTrackAndWorkflowStatusAndActiveAndEvent(Track track, WorkflowStatus workflowStatus, Boolean active, Event event);
-    int countAllByEventAndActive(Event event, Boolean active);
+    int countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
+    int countAllByBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
+    int countAllByTrackAndWorkflowStatusAndActiveAndEventAndRegistrationType(Track track, WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
+    int countAllByEventAndActiveAndRegistrationType(Event event, Boolean active, RegistrationType type);
     int countAllByWorkflowStatusAndActiveAndEventAndDanceRole(WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
     int countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
     int countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(Track track, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);

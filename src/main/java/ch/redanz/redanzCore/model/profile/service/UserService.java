@@ -27,7 +27,7 @@ import java.util.UUID;
 @Slf4j // for logs
 @Transactional // no save required
 public class UserService implements UserDetailsService {
-  private final static String USER_NOT_FOUND_MESSAGE = "user with ch.redanz.redanzCore.email %s not found";
+//  private final static String USER_NOT_FOUND_MESSAGE = "user with ch.redanz.redanzCore.email %s not found";
   private final UserRepo userRepo;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ConfirmationTokenService confirmationTokenService;
@@ -39,15 +39,15 @@ public class UserService implements UserDetailsService {
 //  private final String tokenExpires;
 
   @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    User user = userRepo.findByEmail(email);
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    User user = userRepo.findByUsername(username);
     // log.info("inc load User by username");
     if (user == null) {
       throw new UsernameNotFoundException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
     }
     try {
       return new org.springframework.security.core.userdetails.User(
-        user.getEmail(),
+        user.getUsername(),
         user.getPassword(),
         user.getEnabled(),
         user.isAccountNonExpired(),
@@ -61,10 +61,10 @@ public class UserService implements UserDetailsService {
   }
 
   public boolean userIsTester(User user) {
-    return testUserRepo.existsByEmailIgnoreCase(user.getEmail().replace(".", ""));
+    return testUserRepo.existsByUsernameIgnoreCase(user.getUsername().replace(".", ""));
   }
-  public boolean emailIsTester(String email) {
-    return testUserRepo.existsByEmailIgnoreCase(email.replace(".", ""));
+  public boolean usernameIsTester(String username) {
+    return testUserRepo.existsByUsernameIgnoreCase(username.replace(".", ""));
   }
 
   public void save(User user) {
@@ -72,8 +72,8 @@ public class UserService implements UserDetailsService {
   }
   public void delete(User user) {userRepo.delete(user);
   }
-  public User getUser(String email) {
-    return userRepo.findByEmail(email);
+  public User getUser(String username) {
+    return userRepo.findByUsername(username);
   }
 
   public User findByUserId(Long userId) {
@@ -85,7 +85,7 @@ public class UserService implements UserDetailsService {
   }
 
   public String signUpNewUser(User user) {
-    boolean userExists = userRepo.findByEmail(user.getEmail()) != null;
+    boolean userExists = userRepo.findByUsername(user.getUsername()) != null;
     if (userExists) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_TAKEN_EN.getOutTextKey());
     }
@@ -107,7 +107,7 @@ public class UserService implements UserDetailsService {
     return token;
   }
 
-  public void enableUser(String email) {
-    userRepo.enableUser(email);
+  public void enableUser(String username) {
+    userRepo.enableUser(username);
   }
 }

@@ -18,4 +18,5 @@ public class ResponsePerson {
   private String email;
   private String role;
   private String lang;
+  private Long personId;
 }

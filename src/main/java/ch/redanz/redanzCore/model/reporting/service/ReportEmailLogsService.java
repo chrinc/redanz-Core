@@ -1,25 +1,15 @@
 package ch.redanz.redanzCore.model.reporting.service;
 
-import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.reporting.response.ResponseEmailLogs;
-import ch.redanz.redanzCore.model.reporting.response.ResponseRegistration;
-import ch.redanz.redanzCore.model.reporting.response.ResponseRegistrationDetails;
-import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -42,11 +32,11 @@ public class ReportEmailLogsService {
         RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
         responseEmailLogs.add(
           new ResponseEmailLogs(
-            registration.getParticipant().getUser().getUserId(),
+            registration.getParticipant().getPersonId(),
             registration.getRegistrationId(),
             registration.getParticipant().getFirstName(),
             registration.getParticipant().getLastName(),
-            registration.getParticipant().getUser().getEmail(),
+            registration.getParticipant().getEmail(),
             registration.getBundle().getName(),
             registration.getWorkflowStatus().getName(),
             paymentService.amountDue(registration),

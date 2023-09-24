@@ -159,14 +159,18 @@ public class VolunteerService {
   }
 
   public void updateVolunteerRegistration(Registration registration, JsonObject volunteerRegistration) {
-    log.info("inc@updateVolunteerReg ");
-    log.info(volunteerRegistration.toString());
-    log.info(volunteerRegistration.get("typeId").toString());
+//     log.info("inc@updateVolunteerReg ");
+//     log.info(volunteerRegistration.toString());
+//     log.info(volunteerRegistration.get("typeId").toString());
     Long typeId = volunteerRegistration.get("typeId").isJsonNull() ? null : volunteerRegistration.get("typeId").getAsLong();
-    String intro = volunteerRegistration.get("intro").isJsonNull() ? null : volunteerRegistration.get("intro").getAsString();
-    String mobile = volunteerRegistration.get("mobile").isJsonNull() ? null : volunteerRegistration.get("mobile").getAsString();
+    String intro = volunteerRegistration.get("intro") == null  || volunteerRegistration.get("intro").isJsonNull() ? null : volunteerRegistration.get("intro").getAsString();
+    String mobile = volunteerRegistration.get("mobile") == null  || volunteerRegistration.get("mobile").isJsonNull() ? null : volunteerRegistration.get("mobile").getAsString();
+//    log.info("inc@updateVolunteerReg typeId: {}", typeId);
+//    log.info("inc@updateVolunteerReg intro: {}", intro);
+//    log.info("inc@updateVolunteerReg mobile: {}", mobile);
     VolunteerRegistration existingVolunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
 
+//    log.info("inc@updateVolunteerReg existingVolunteerRegistration: {}", existingVolunteerRegistration);
     if (existingVolunteerRegistration != null) {
 
       // update existing registration
@@ -199,8 +203,13 @@ public class VolunteerService {
       );
 
       // add mobile
-      registration.getParticipant().setMobile(mobile);
+//      log.info("inc@updateVolunteerReg bfr set mobile: {}", mobile);
+      if (mobile != null) {
+        registration.getParticipant().setMobile(mobile);
+      }
+//      log.info("inc@updateVolunteerReg bfr set save person: {}");
       personService.savePerson(registration.getParticipant());
+//      log.info("inc@updateVolunteerReg after set save person: {}");
     }
   }
 
@@ -215,20 +224,37 @@ public class VolunteerService {
   public void updateVolunteerRequest(Registration registration, JsonObject request) {
     JsonObject volunteerRegistrationObject = volunteerRegistrationObject(request);
 
+//    log.info("inc@updateVolunteerRequest");
     if (volunteerRegistrationObject != null) {
 
       // update existing
+//      log.info("inc@bfrupdateRegistration");
       updateVolunteerRegistration(registration, volunteerRegistrationObject);
+//      log.info("inc@bfrupdateSlotRegistration");
       updateVolunteerSlotRegistration(registration, volunteerRegistrationObject);
 
     } else {
+//      log.info("inc@object is null");
 
-      // delete existing host registration
+      // delete existing volunteer registration
       if (volunteerRegistrationRepo.findByRegistration(registration) != null) {
         volunteerSlotRegistrationRepo.deleteAllByVolunteerRegistration(volunteerRegistrationRepo.findByRegistration(registration));
         volunteerRegistrationRepo.deleteAllByRegistration(registration);
       }
     }
+
+//    log.info("inc@done");
+  }
+
+  public boolean hasVolunteerRegistration(Registration registration) {
+    return volunteerRegistrationRepo.existsByRegistration(registration);
+  }
+
+
+  public void onDeleteVolunteer(Registration registration) {
+    VolunteerRegistration volunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
+    volunteerSlotRegistrationRepo.deleteAllByVolunteerRegistration(volunteerRegistration);
+    volunteerRegistrationRepo.deleteAllByRegistration(registration);
   }
 
 }

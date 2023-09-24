@@ -5,6 +5,7 @@ import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.DonationRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.config.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
@@ -184,18 +185,21 @@ public enum RegistrationConfig {
       Registration newRegistration;
       if (registrationConfig.trackConfig != null && registrationConfig.danceRoleConfig != null) {
         newRegistration = new Registration(
-          personService.findByUser(userService.getUser(registrationConfig.getUserConfig().getEmail())),
+          personService.findByUser(userService.getUser(registrationConfig.getUserConfig().getUsername())),
           eventService.findByName(registrationConfig.eventConfig.getName()),
           bundleService.findByName(registrationConfig.bundleConfig.getName()),
           trackService.findByName(registrationConfig.trackConfig.getName()),
-          danceRoleService.findByName(registrationConfig.danceRoleConfig.getName())
+          danceRoleService.findByName(registrationConfig.danceRoleConfig.getName()),
+          RegistrationType.PARTICIPANT
+
         );
       } else {
         newRegistration =
           new Registration(
             eventService.findByName(registrationConfig.eventConfig.getName()),
             bundleService.findByName(registrationConfig.bundleConfig.getName()),
-            personService.findByUser(userService.getUser(registrationConfig.getUserConfig().getEmail()))
+            personService.findByUser(userService.getUser(registrationConfig.getUserConfig().getUsername())),
+            RegistrationType.PARTICIPANT
           );
       }
       registrationService.update(newRegistration);

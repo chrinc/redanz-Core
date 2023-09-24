@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class ResponseEmailLogs {
-  private Long userId;
+  private Long personId;
   private Long registrationId;
   private String firstName;
   private String lastName;

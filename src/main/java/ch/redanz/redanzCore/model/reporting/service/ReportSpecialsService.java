@@ -26,8 +26,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Slf4j
 public class ReportSpecialsService {
-  private final SpecialService specialService;
-  private final FoodService foodService;
   private final PrivateClassService privateClassService;
   private final OutTextService outTextService;
   private final FoodRegistrationService foodRegistrationService;
@@ -41,7 +39,7 @@ public class ReportSpecialsService {
     registrations.forEach(registration -> {
       specials.add(
         new ResponseSpecials(
-          registration.getParticipant().getUser().getUserId()
+          registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
           , registration.getParticipant().getFirstName()
           , registration.getParticipant().getLastName()

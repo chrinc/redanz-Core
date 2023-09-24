@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class ResponseRegistration {
-  private Long userId;
+  private Long personId;
   private String bundle;
   private String track;
   private String firstName;

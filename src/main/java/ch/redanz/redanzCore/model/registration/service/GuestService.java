@@ -46,7 +46,7 @@ public class GuestService {
 
   @Transactional
   public void removeGuest(JsonObject guest, Event event) throws IOException, TemplateException {
-    log.info("inc@start remove");
+//    log.info("inc@start remove");
     if (
       guest.getAsJsonObject().get("guestId") != null
         && !guest.getAsJsonObject().get("guestId").isJsonNull()

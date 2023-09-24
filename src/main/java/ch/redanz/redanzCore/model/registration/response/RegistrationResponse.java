@@ -14,7 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class RegistrationResponse {
   private Long registrationId;
-  private Long userId;
+  private Long personId;
   private Event event;
   private Long bundleId;
   private Long trackId;
@@ -31,15 +31,19 @@ public class RegistrationResponse {
   private List<SpecialRegistration> specialRegistrations;
   private List<PrivateClassRegistration> privateClassRegistrations;
 
-  public RegistrationResponse(Long registrationId, Long userId, Event event, Long bundleId) {
+  public RegistrationResponse(Long registrationId, Long personId, Event event, Long bundleId) {
     this.registrationId = registrationId;
-    this.userId = userId;
+    this.personId = personId;
     this.event = event;
     this.bundleId = bundleId;
   }
-  public RegistrationResponse(Long userId, Event event) {
-    this.userId = userId;
+  public RegistrationResponse(Long personId, Event event) {
+    this.personId = personId;
     this.event = event;
 //    this.workflowStatus = workflowStatus;
+  }
+
+  public RegistrationResponse(Event event) {
+    this.event = event;
   }
 }

@@ -47,7 +47,6 @@ public class ReportController {
 
   @GetMapping(path = "/person/all")
   public List<ResponsePerson> getAllPersonsReport() {
-
     return reportPersonService.getAllPersonsReport();
   }
 

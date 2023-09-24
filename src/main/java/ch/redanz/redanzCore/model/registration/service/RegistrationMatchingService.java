@@ -8,7 +8,6 @@ import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -151,8 +150,8 @@ public class RegistrationMatchingService {
   }
   private boolean isEmailMatch(RegistrationMatching baseMatcher, RegistrationMatching lookupMatcher) {
     return (
-      baseMatcher.getPartnerEmail().equalsIgnoreCase(lookupMatcher.getRegistration1().getParticipant().getUser().getEmail()) &&
-        lookupMatcher.getPartnerEmail().equalsIgnoreCase(baseMatcher.getRegistration1().getParticipant().getUser().getEmail())
+      baseMatcher.getPartnerEmail().equalsIgnoreCase(lookupMatcher.getRegistration1().getParticipant().getUser().getUsername()) &&
+        lookupMatcher.getPartnerEmail().equalsIgnoreCase(baseMatcher.getRegistration1().getParticipant().getUser().getUsername())
     );
   }
 

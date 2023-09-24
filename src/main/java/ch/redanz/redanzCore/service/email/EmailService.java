@@ -95,12 +95,12 @@ public class EmailService {
 
       boolean emailIsConfig = Arrays.stream(
         UserConfig.values()).anyMatch(
-        userConfig -> Objects.equals(userConfig.getEmail(), toEmail)
+        userConfig -> Objects.equals(userConfig.getUsername(), toEmail)
       );
 
       boolean bccIsConfig = Arrays.stream(
         UserConfig.values()).anyMatch(
-        userConfig -> Objects.equals(userConfig.getEmail(), bccEmail)
+        userConfig -> Objects.equals(userConfig.getUsername(), bccEmail)
       );
 
       msg.setRecipients(

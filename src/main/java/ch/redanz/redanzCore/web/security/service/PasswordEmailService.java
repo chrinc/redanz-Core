@@ -4,7 +4,6 @@ import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,8 +82,8 @@ public class PasswordEmailService {
         languageKey
       ).getOutText()
     );
-    log.info("set team");
-    log.info("baseParService.organizerName(): " + baseParService.organizerName());
+    // log.info("set team");
+    // log.info("baseParService.organizerName(): " + baseParService.organizerName());
     model.put("team",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
@@ -94,7 +92,7 @@ public class PasswordEmailService {
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      user.getEmail(),
+      user.getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RESET_PASSWORD_SUBJECT_EN.getOutTextKey(),
         languageKey

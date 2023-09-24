@@ -58,6 +58,10 @@ public class Registration implements Serializable {
   @OneToMany(cascade=CascadeType.ALL, mappedBy = "registration")
   private List<WorkflowTransition> transitionList;
 
+  @Column(name = "registration_type")
+  @Enumerated(EnumType.STRING)
+  private RegistrationType registrationType;
+
   private Boolean active;
 
   @ManyToMany(cascade=CascadeType.ALL)
@@ -68,20 +72,30 @@ public class Registration implements Serializable {
   )
   private List<Discount> discountList;
 
-  public Registration(Event event, Bundle bundle, Person participant) {
+  public Registration(Event event, Bundle bundle, Person participant, RegistrationType registrationType) {
     this.event = event;
     this.bundle = bundle;
     this.participant = participant;
     this.active = true;
+    this.registrationType = registrationType;
   }
 
-  public Registration(Person participant, Event event, Bundle bundle, Track track, DanceRole danceRole) {
+  public Registration(Person participant, Event event, Bundle bundle, Track track, DanceRole danceRole, RegistrationType registrationType) {
     this.participant = participant;
     this.event = event;
     this.bundle = bundle;
     this.track = track;
     this.danceRole = danceRole;
     this.active = true;
+    this.registrationType = registrationType;
+
+  }
+
+  public Registration(Person participant, Event event, RegistrationType registrationType) {
+    this.participant = participant;
+    this.event = event;
+    this.active = true;
+    this.registrationType = registrationType;
   }
 
   public Registration () {}

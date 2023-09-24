@@ -36,8 +36,8 @@ public class PersonService {
     return personRepo.findByPersonId(personId);
   }
 
-  public List<Person> findAll() {
-    return personRepo.findAll();
+  public List<Person> findAll(boolean active) {
+    return personRepo.findAllByActive(active);
   }
 
   public void savePerson(Person person) {
@@ -47,8 +47,5 @@ public class PersonService {
   public List<Person> getAlOrganizers(Event event) {
     // @Todo, event currently not used;
     return personRepo.findAllByUserUserRole(UserRole.ORGANIZER);
-
   }
-
-  ;
 }

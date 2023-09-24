@@ -2,6 +2,8 @@ package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.service.CountryService;
+import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.*;
@@ -25,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +53,8 @@ public class RegistrationService {
   private final SpecialService specialService;
   private final ErrorLogService errorLogService;
   private final PrivateClassService privateClassService;
+  private final LanguageService languageService;
+  private final CountryService countryService;
 
   public void update(Registration registration) {
     registrationRepo.save(registration);
@@ -130,11 +133,11 @@ public class RegistrationService {
   }
 
   public List<Registration> findAllCurrentEvent() {
-    return registrationRepo.findAllByEventAndActive(eventService.getCurrentEvent(), true);
+    return registrationRepo.findAllByEventAndActiveAndRegistrationType(eventService.getCurrentEvent(), true, RegistrationType.PARTICIPANT);
   }
 
   public List<Registration> findAllByEvent(Event event) {
-    return registrationRepo.findAllByEventAndActive(event, true);
+    return registrationRepo.findAllByEventAndActiveAndRegistrationType(event, true, RegistrationType.PARTICIPANT);
   }
 
   public List<WorkflowStatus> getWorkflowStatusList() {
@@ -142,8 +145,8 @@ public class RegistrationService {
   }
 
   public int countAll(Event event) {
-    return registrationRepo.countAllByEventAndActive(
-      event, true
+    return registrationRepo.countAllByEventAndActiveAndRegistrationType(
+      event, true, RegistrationType.PARTICIPANT
     );
   }
   public int countSubmittedConfirmingAndDone(Event event) {
@@ -153,18 +156,18 @@ public class RegistrationService {
     return countConfirming(event) + countDone(event);
   }
   public int countSubmitted(Event event) {
-    return registrationRepo.countAllByWorkflowStatusAndActiveAndEvent(
-      workflowStatusService.getSubmitted(), true, event
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(
+      workflowStatusService.getSubmitted(), true, event, RegistrationType.PARTICIPANT
     );
   }
   public int countConfirming(Event event) {
-    return registrationRepo.countAllByWorkflowStatusAndActiveAndEvent(
-      workflowStatusService.getConfirming(), true, event
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(
+      workflowStatusService.getConfirming(), true, event, RegistrationType.PARTICIPANT
     );
   }
   public int countDone(Event event) {
-    return registrationRepo.countAllByWorkflowStatusAndActiveAndEvent(
-      workflowStatusService.getDone(),true, event
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(
+      workflowStatusService.getDone(),true, event, RegistrationType.PARTICIPANT
     );
   }
   public int countDone(Event event, DanceRole danceRole) {
@@ -190,8 +193,8 @@ public class RegistrationService {
   }
   public int countBundlesSubmitted(Bundle bundle, Event event) {
     return
-      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEvent(
-        bundle, workflowStatusService.getSubmitted(),true, event
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        bundle, workflowStatusService.getSubmitted(),true, event, RegistrationType.PARTICIPANT
       );
   }
   public int countBundlesSubmitted(Bundle bundle, Event event, DanceRole danceRole) {
@@ -202,8 +205,8 @@ public class RegistrationService {
   }
   public int countBundlesConfirming(Bundle bundle, Event event) {
     return
-      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEvent(
-        bundle, workflowStatusService.getConfirming(), true, event
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        bundle, workflowStatusService.getConfirming(), true, event, RegistrationType.PARTICIPANT
       );
   }
   public int countBundlesConfirming(Bundle bundle, Event event, DanceRole danceRole) {
@@ -214,8 +217,8 @@ public class RegistrationService {
   }
   public int countBundlesDone(Bundle bundle, Event event) {
     return
-      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEvent(
-        bundle, workflowStatusService.getDone(), true, event
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        bundle, workflowStatusService.getDone(), true, event, RegistrationType.PARTICIPANT
       );
   }
   public int countBundlesDone(Bundle bundle, Event event, DanceRole danceRole) {
@@ -241,8 +244,8 @@ public class RegistrationService {
   public int countTracksConfirming(Track track, Event event) {
     if (track == null) return 0;
     return
-      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEvent(
-        track, workflowStatusService.getConfirming(), true, event
+      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        track, workflowStatusService.getConfirming(), true, event, RegistrationType.PARTICIPANT
       );
   }
 
@@ -256,8 +259,8 @@ public class RegistrationService {
   public int countTracksSubmitted(Track track, Event event) {
     if (track == null) return 0;
     return
-      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEvent(
-        track, workflowStatusService.getSubmitted(), true, event
+      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        track, workflowStatusService.getSubmitted(), true, event, RegistrationType.PARTICIPANT
       );
   }
   public int countTracksSubmitted(Track track, Event event, DanceRole danceRole) {
@@ -270,8 +273,8 @@ public class RegistrationService {
   public int countTracksDone(Track track, Event event) {
     if (track == null) return 0;
     return
-      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEvent(
-        track, workflowStatusService.getDone(),true, event
+      registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        track, workflowStatusService.getDone(),true, event, RegistrationType.PARTICIPANT
       );
   }
   public int countTracksDone(Track track, Event event, DanceRole danceRole) {
@@ -299,9 +302,9 @@ public class RegistrationService {
       + countTracksSubmitted(track, event, danceRole);
   }
 
-  public Optional<Registration> findByParticipantAndEvent(Person participant, Event event) {
+  public Optional<Registration> findByParticipantAndEvent(Person participant, Event event, RegistrationType registrationType) {
     // log.info("inc@findByParticipantAndEvent");
-    return registrationRepo.findByParticipantAndEventAndActive(participant, event, true);
+    return registrationRepo.findByParticipantAndEventAndRegistrationTypeAndActive(participant, event, registrationType, true);
   }
 
   public void onCancel(Registration registration) throws TemplateException, IOException {
@@ -320,6 +323,41 @@ public class RegistrationService {
       workflowStatusService.getDeleted()
     );
     updateSoldOut(registration.getEvent());
+  }
+
+  public void onDeleteHost(Registration registration) throws TemplateException, IOException {
+    hostingService.onDeleteHost(registration);
+    if (isEmptyStaffRegistration(registration)) {
+      registration.setActive(false);
+      update(registration);
+      workflowTransitionService.setWorkflowStatus(
+        registration,
+        workflowStatusService.getDeleted()
+      );
+    }
+  }
+
+  public void onDeleteHostee(Registration registration) throws TemplateException, IOException {
+    hostingService.onDeleteHostee(registration);
+    if (isEmptyStaffRegistration(registration)) {
+      registration.setActive(false);
+      update(registration);
+      workflowTransitionService.setWorkflowStatus(
+        registration,
+        workflowStatusService.getDeleted()
+      );
+    }
+  }
+  public void onDeleteVolunteer(Registration registration) throws TemplateException, IOException {
+    volunteerService.onDeleteVolunteer(registration);
+    if (isEmptyStaffRegistration(registration)) {
+      registration.setActive(false);
+      update(registration);
+      workflowTransitionService.setWorkflowStatus(
+        registration,
+        workflowStatusService.getDeleted()
+      );
+    }
   }
 
   public void onManualRelease(Registration registration) throws TemplateException, IOException {
@@ -348,15 +386,16 @@ public class RegistrationService {
   }
 
   public List<Registration> getAllByWorkflowStatus(WorkflowStatus workflowStatus, Event event) {
-    return registrationRepo.findAllByWorkflowStatusAndActiveAndEvent(
+    return registrationRepo.findAllByWorkflowStatusAndActiveAndEventAndRegistrationType(
       workflowStatus,
       true,
-      event
+      event,
+      RegistrationType.PARTICIPANT
     );
   }
 
   @Transactional
-  public Registration updateRegistrationRequest(Long userId, Event event, JsonObject request) throws IOException, TemplateException {
+  public Registration updateRegistrationRequest(Long personId, Event event, JsonObject request) throws IOException, TemplateException {
     // log.info("inc@updateRegistration, userId: {}", userId);
     // log.info("inc@updateRegistration, request: {}", request);
     boolean isNewRegistration = false;
@@ -372,16 +411,18 @@ public class RegistrationService {
 
     // log.info("inc@updateRegistration, after registrationRequest");
     if (findByParticipantAndEvent(
-      personService.findByUser(userService.findByUserId(userId)),
-      event
+      personService.findByPersonId(personId),
+      event,
+      RegistrationType.PARTICIPANT
     ).isPresent()) {
         // log.info("inc@updateRegistration, update Registration");
         // update Registration
         registration = findByParticipantAndEvent(
-          personService.findByUser(userService.findByUserId(userId)),
-          event
+          personService.findByPersonId(personId),
+          event,
+          RegistrationType.PARTICIPANT
         ).get();
-        updateRegistration(registration, registrationRequest, userId);
+        updateRegistration(registration, registrationRequest, personId, RegistrationType.PARTICIPANT);
       }
 
     // new Registration
@@ -389,15 +430,16 @@ public class RegistrationService {
       try {
         isNewRegistration = true;
         // log.info("inc@updateRegistration, isNewRegistration");
-        saveNewRegistration(registrationRequest, userId);
+        saveNewRegistration(registrationRequest, personId, RegistrationType.PARTICIPANT);
       } catch (Exception exception) {
-        errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for userId: " + userId + ", request: " + request);
+        errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for personId: " + personId + ", request: " + request);
         throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
       }
       // log.info("inc@updateRegistration, bfr findByParticipantAndEvent");
       registration = findByParticipantAndEvent(
-        personService.findByUser(userService.findByUserId(userId)),
-        event
+        personService.findByPersonId(personId),
+        event,
+        RegistrationType.PARTICIPANT
       ).get();
       // log.info("inc@updateRegistration, after findByParticipantAndEvent");
       discountRegistrationService.saveEarlyBird(registration, countAll(event));
@@ -431,24 +473,150 @@ public class RegistrationService {
         );
         registrationEmailService.sendRegistrationSubmittedEmail(registration);
       } catch (Exception exception) {
-        errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Update Workflow Status for userId: " + userId + ", request: " + request);
+        errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Update Workflow Status for personId: " + personId + ", request: " + request);
       }
     }
 
     return registration;
   }
 
-  public Registration getRegistration(Long userId, Event event) {
-    return registrationRepo.findByParticipantAndEventAndActive(
+  @Transactional
+  public void updateStaffRegistrationRequest(Event event, JsonObject request) throws IOException, TemplateException {
+    boolean isNewRegistration = false;
+    Registration registration;
+    // ignore if user already has a registration
+
+//    log.info("inc@updateStaffRegistrationRequest");
+//    log.info(request.get("profile").getAsJsonObject().toString());
+//    log.info(request.get("hostRegistration").get().toString());
+    JsonObject personRequest = request.get("profile").getAsJsonObject();
+
+    Person person;
+
+    if (
+      personRequest.get("personId") != null
+        && !personRequest.get("personId").isJsonNull()) {
+      person = personService.findByPersonId(personRequest.get("personId").getAsLong());
+      person.setFirstName(personRequest.get("firstName").getAsString());
+      person.setLastName(personRequest.get("lastName").getAsString());
+      person.setPostalCode(personRequest.get("postalCode").getAsString());
+      person.setStreet(personRequest.get("street").getAsString());
+      person.setCity(personRequest.get("city").getAsString());
+      person.setEmail(personRequest.get("email").getAsString());
+//      log.info("personRequest.get: {}", personRequest.get("mobile"));
+//      log.info(person.getPersonId().toString());
+      if (personRequest.get("mobile") != null && !personRequest.get("mobile").isJsonNull()) {
+//        log.info("inc@update mobile");
+        person.setMobile(personRequest.get("mobile").getAsString());
+      }
+      person.setCountry(countryService.findCountry(personRequest.get("countryId").getAsLong()));
+//      log.info(personRequest.toString());
+      person.setActive(true);
+
+      personService.savePerson(person);
+
+
+
+    } else {
+      person = new Person(
+        personRequest.get("firstName").getAsString()
+        , personRequest.get("lastName").getAsString()
+        , personRequest.get("street").getAsString()
+        , personRequest.get("postalCode").getAsString()
+        , personRequest.get("city").getAsString()
+        , countryService.findCountry(personRequest.get("countryId").getAsLong())
+        , personRequest.get("email").getAsString()
+        , personRequest.get("mobile").getAsString()
+        , languageService.findLanguageByLanguageKey(personRequest.get("language").getAsString())
+        , true
+      );
+    }
+
+    personService.savePerson(person);
+
+    if (findByParticipantAndEvent(
+      person,
+      event,
+      RegistrationType.PARTICIPANT
+    ).isPresent()) {
+        // log.info("inc@updateRegistration, update Registration");
+        // update Registration
+        registration = findByParticipantAndEvent(
+          person,
+          event,
+          RegistrationType.PARTICIPANT
+        ).get();
+      }
+    else if (findByParticipantAndEvent(
+      person,
+      event,
+      RegistrationType.STAFF
+    ).isPresent()) {
+      // log.info("inc@updateRegistration, update Registration");
+      // update Registration
+      registration = findByParticipantAndEvent(
+        person,
+        event,
+        RegistrationType.STAFF
+      ).get();
+    }
+
+    // new Registration
+    else {
+      try {
+        isNewRegistration = true;
+        // log.info("inc@updateRegistration, isNewRegistration");
+
+        update(
+          new Registration(
+            person,
+            event,
+            RegistrationType.STAFF
+          )
+        );
+        // log.info("inc@updateRegistration, bfr findByParticipantAndEvent");
+        registration = findByParticipantAndEvent(
+          person,
+          event,
+          RegistrationType.STAFF
+        ).get();
+      } catch (Exception exception) {
+        errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for personId: " + person.getPersonId() + ", request: " + request);
+        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
+      }
+    }
+//    log.info("inc@updateRegistration, bfr Host");
+    hostingService.updateHostRegistrationRequest(registration, request);
+//    log.info("inc@updateRegistration, bfr Hostee");
+    hostingService.updateHosteeRegistrationRequest(registration, request);
+//    log.info("inc@updateRegistration, bfr Volunteer");
+    volunteerService.updateVolunteerRequest(registration, request);
+
+//    log.info("inc@updateRegistration, isNewRegistration: {}", isNewRegistration);
+    if (isNewRegistration) {
+      try {
+        workflowTransitionService.setWorkflowStatus(
+          registration
+          ,workflowStatusService.getDone()
+        );
+      } catch (Exception exception) {
+        throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+      }
+    }
+  }
+
+  public Registration getRegistration(Long userId, Event event, RegistrationType registrationType) {
+    return registrationRepo.findByParticipantAndEventAndRegistrationTypeAndActive(
       personService.findByUser(userService.findByUserId(userId)),
       event,
+      registrationType,
       true
     ).get();
   }
   public RegistrationResponse getRegistrationResponse(Registration registration) {
     RegistrationResponse registrationResponse = new RegistrationResponse(
       registration.getRegistrationId(),
-      registration.getParticipant().getUser().getUserId(),
+      registration.getParticipant().getPersonId(),
       registration.getEvent(),
       registration.getBundle().getBundleId()
     );
@@ -524,26 +692,31 @@ public class RegistrationService {
     return registrationResponse;
   }
 
-  public RegistrationResponse getRegistrationResponse(Long userId, Long eventId) {
+  public RegistrationResponse getRegistrationResponse(Long personId, Long eventId, RegistrationType registrationType) {
     Optional<Registration> registrationOptional =
       findByParticipantAndEvent(
-        personService.findByUser(userService.findByUserId(userId)),
-        eventService.findByEventId(eventId)
+        personService.findByPersonId(personId),
+        eventService.findByEventId(eventId),
+        registrationType
       );
     if (registrationOptional.isPresent()) {
       Registration registration = registrationOptional.get();
       RegistrationResponse registrationResponse = getRegistrationResponse(registration);
       return registrationResponse;
     } else {
-      return new RegistrationResponse(userId, eventService.findByEventId(eventId));
+      return new RegistrationResponse(personId, eventService.findByEventId(eventId));
     }
   }
 
-  public List<RegistrationResponse> getAllUserRegistrationResponses(Long userId) {
+  public RegistrationResponse getNewRegistrationResponse(Long eventId) {
+      return new RegistrationResponse(eventService.findByEventId(eventId));
+  }
+
+  public List<RegistrationResponse> getAllUserRegistrationResponses(Long personId) {
     List<RegistrationResponse> registrationResponses = new ArrayList<>();
     List<Registration> registrations =
       registrationRepo.findAllByParticipantAndActive(
-        personService.findByUser(userService.findByUserId(userId)), true
+        personService.findByPersonId(personId), true
       );
 
     if (registrations != null) {
@@ -554,11 +727,11 @@ public class RegistrationService {
     return registrationResponses;
   }
 
-  public List<RegistrationResponse> getUserActiveRegistrationResponses(Long userId) {
+  public List<RegistrationResponse> getUserActiveRegistrationResponses(Long personId) {
     List<RegistrationResponse> registrationResponses = new ArrayList<>();
     List<Registration> registrations =
       registrationRepo.findAllByParticipantAndActiveAndEventArchivedAndEventActive(
-        personService.findByUser(userService.findByUserId(userId)), true
+        personService.findByPersonId(personId), true
     ,false
     ,true
       );
@@ -571,15 +744,18 @@ public class RegistrationService {
     return registrationResponses;
   }
 
-  public List<RegistrationResponse> getUserInactiveRegistrationResponses(Long userId) {
+  public List<RegistrationResponse> getUserInactiveRegistrationResponses(Long personId) {
     List<RegistrationResponse> registrationResponses = new ArrayList<>();
+//    log.info("inc@getUserInactiveRegistrationResponses");
     List<Registration> registrations =
       registrationRepo.findAllByParticipantAndActiveAndEventArchivedAndEventActive(
-        personService.findByUser(userService.findByUserId(userId)), true
+        personService.findByPersonId(personId)
+        , true
         ,false
         ,false
       );
 
+//    log.info("inc@getUserInactiveRegistrationResponses, registrations: {}", registrations);
     if (registrations != null) {
       registrations.forEach(registration -> {
         registrationResponses.add(getRegistrationResponse(registration));
@@ -588,11 +764,12 @@ public class RegistrationService {
     return registrationResponses;
   }
 
-  private void saveNewRegistration(RegistrationRequest request, Long userId) {
+  private void saveNewRegistration(RegistrationRequest request, Long personId, RegistrationType registrationType) {
     Registration newRegistration = new Registration(
       eventService.findByEventId(request.getEventId()),
       bundleService.findByBundleId(request.getBundleId()),
-      personService.findByUser(userService.findByUserId(userId))
+      personService.findByPersonId(personId),
+      registrationType
     );
     if (request.getTrackId() != null) {
       newRegistration.setTrack(trackService.findByTrackId(request.getTrackId()));
@@ -607,12 +784,13 @@ public class RegistrationService {
     return registrationRepo.findByRegistrationId(registrationId);
   }
 
-  private void updateRegistration(Registration registration, RegistrationRequest request, Long userId) {
+  private void updateRegistration(Registration registration, RegistrationRequest request, Long personId, RegistrationType registrationType) {
     registration.setEvent(eventService.findByEventId(request.getEventId()));
     registration.setBundle(bundleService.findByBundleId(request.getBundleId()));
-    registration.setParticipant(personService.findByUser(userService.findByUserId(userId)));
+    registration.setParticipant(personService.findByPersonId(personId));
     registration.setTrack(trackService.findByTrackId(request.getTrackId()));
     registration.setDanceRole(danceRoleService.findByDanceRoleId(request.getDanceRoleId()));
+    registration.setRegistrationType(registrationType);
     update(registration);
   }
 
@@ -640,8 +818,8 @@ public class RegistrationService {
   public List<Registration> findAllByEventAndStatus(
     Event event, WorkflowStatus workflowStatus
   ) {
-    return registrationRepo.findAllByActiveAndEventAndWorkflowStatus(
-      true,event, workflowStatus
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndRegistrationType(
+      true,event, workflowStatus, RegistrationType.PARTICIPANT
     );
   }
   public List<Registration> findAllByEventLangAndBundle(
@@ -863,15 +1041,13 @@ public class RegistrationService {
       .stream()
       .filter(registration -> registration.getBundle().getPartySlots().contains(slot))
       .collect(Collectors.toList());
-
-//    List<Registration> registrations = findAllByEvent(event);
-//    List<Registration> slotRegiestrations = new ArrayList<>();
-//    registrations.forEach(registration -> {
-//      if (registration.getBundle().getPartySlots().contains(slot)) {
-//        slotRegiestrations.add(registration);
-//      }
-//    });
-//    return slotRegiestrations;
   }
 
+  public boolean isEmptyStaffRegistration(Registration registration){
+    return
+         registration.getRegistrationType() == RegistrationType.STAFF
+      && !hostingService.hasHosteeRegistration(registration)
+      && !hostingService.hasHostRegistration(registration)
+      && !volunteerService.hasVolunteerRegistration(registration);
+  }
 }
