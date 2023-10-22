@@ -19,12 +19,11 @@ import java.util.Locale;
 @Getter
 @AllArgsConstructor
 public enum BundleConfig {
-  EXTRA_FUN_PASS("Extra FUN Pass", 330, OutTextConfig.LABEL_EXTRAFUN_DESC_EN.getOutTextKey(), 120, false, "extra_fun_pass", 1, null),
-  FUN_PASS("FUN Pass", 250, OutTextConfig.LABEL_FUN_DESC_EN.getOutTextKey(), 90, false, "fun_pass", 2, null),
-  PARTYPASS("Party Pass", 100, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 49, false, "party_pass", 4, null),
-  PARTY_SUN("Sunday Party Ticket", 40, OutTextConfig.LABEL_PARTY_SUN_DESC_EN.getOutTextKey(), 30, true, "party_sunday",5, List.of(SlotConfig.SLOT_SUNDAY)),
-  FRIDAY_SPECIAL("Friday Special", 90, OutTextConfig.LABEL_FRIDAY_PACKAGE_DESC_EN.getOutTextKey(), 20, false, "friday_special",3, null)
-  ;
+  EXTRA_FUN_PASS("Extra FUN Pass", 330, OutTextConfig.LABEL_EXTRAFUN_DESC_EN.getOutTextKey(), 120, false, "extra_fun_pass", 1, null, "#ffaa4d"),
+  FUN_PASS("FUN Pass", 250, OutTextConfig.LABEL_FUN_DESC_EN.getOutTextKey(), 90, false, "fun_pass", 2, null, "#FF3EB5"),
+  PARTYPASS("Party Pass", 100, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 50, false, "party_pass", 4, null, "#9DE7D7"),
+  PARTY_SUN("Sunday Party Ticket", 40, OutTextConfig.LABEL_PARTY_SUN_DESC_EN.getOutTextKey(), 19, true, "party_sunday",5, List.of(SlotConfig.SLOT_SUNDAY), "#ff0000"),
+  FRIDAY_SPECIAL("Friday Special", 90, OutTextConfig.LABEL_FRIDAY_PACKAGE_DESC_EN.getOutTextKey(), 15, false, "friday_special",3, null, "#0096FF");
 
   private final String name;
   private final Integer price;
@@ -34,6 +33,7 @@ public enum BundleConfig {
   private final String internalId;
   private final Integer seqNr;
   private final List<SlotConfig> partySlots;
+  private final String color;
 
   public static void setup(BundleService bundleService, SlotService slotService) {
     List<Slot> partySlots = new ArrayList<>();
@@ -58,7 +58,8 @@ public enum BundleConfig {
             bundleConfig.getSimpleTicket(),
             bundleConfig.getInternalId(),
             bundleConfig.getSeqNr(),
-            partySlots
+            partySlots,
+            bundleConfig.color
           )
         );
       } else {
@@ -70,6 +71,7 @@ public enum BundleConfig {
         bundle.setInternalId(bundleConfig.internalId);
         bundle.setSeqNr(bundleConfig.seqNr);
         bundle.setPartySlots(partySlots);
+        bundle.setColor(bundleConfig.color);
         bundleService.save(bundle);
       }
     }

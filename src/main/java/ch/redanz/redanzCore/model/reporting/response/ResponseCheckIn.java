@@ -22,9 +22,13 @@ public class ResponseCheckIn {
   private String bundle;
   private String track;
   private Slot slot;
+  private String food;
+  private String addons;
+  private String privates;
   private String workflowStatus;
   private Long amountDue;
   private Long totalAmount;
+  private String color;
   private ZonedDateTime checkInTime;
 
   public static List<Map<String, String>> schema() {
@@ -43,6 +47,11 @@ public class ResponseCheckIn {
           put("label", "Name");
         }});
         add(new HashMap<>() {{
+          put("key", "color");
+          put("type", "color");
+          put("label", "Wrist Band Color");
+        }});
+        add(new HashMap<>() {{
           put("key", "bundle");
           put("type", "text");
           put("label", "Bundle / Guest");
@@ -52,11 +61,31 @@ public class ResponseCheckIn {
           put("type", "text");
           put("label", "Track / Description");
         }});
+
+        add(new HashMap<>() {{
+          put("key", "food");
+          put("type", "text");
+          put("label", "Food");
+        }});
+
+        add(new HashMap<>() {{
+          put("key", "addons");
+          put("type", "text");
+          put("label", "Addons");
+        }});
+
+        add(new HashMap<>() {{
+          put("key", "privates");
+          put("type", "text");
+          put("label", "Privates");
+        }});
+
 //        add(new HashMap<>() {{
 //          put("key", "slot");
 //          put("type", "text");
 //          put("label", "Slot");
 //        }});
+
 
         add(new HashMap<>() {{
           put("key", "workflowStatus");

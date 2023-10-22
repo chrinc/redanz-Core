@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum SpecialConfig {
-  SPECIAL_FRI_SPECIAL(OutTextConfig.LABEL_FRI_SPECIAL_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FRIDAY_SPECIAL_DESC_EN.getOutTextKey(), 20, 60, false, OutTextConfig.LABEL_PASS_URL_EN.getOutTextKey()),
+  SPECIAL_FRI_SPECIAL(OutTextConfig.LABEL_FRI_SPECIAL_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FRIDAY_SPECIAL_DESC_EN.getOutTextKey(), 25, 60, false, OutTextConfig.LABEL_PASS_URL_EN.getOutTextKey()),
   SUN_TICKET(OutTextConfig.LABEL_PARTY_SUN_NAME_EN.getOutTextKey(), null, 10, 40, false, null);
 
   private final String name;

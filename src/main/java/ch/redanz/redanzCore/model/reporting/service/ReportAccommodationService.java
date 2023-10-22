@@ -47,7 +47,7 @@ public class ReportAccommodationService {
       Registration registration = hosteeRegistration.getRegistration();
       accommodations.add(
         new ResponseAccommodation(
-          registration.getParticipant().getUser().getUserId()
+          registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
           , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
           , registration.getParticipant().getFirstName()

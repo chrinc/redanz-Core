@@ -46,7 +46,8 @@ public class RegistrationController {
     @RequestParam("eventId") Long eventId
   ) {
     try {
-      return registrationService.getRegistrationResponse(personId, eventId, RegistrationType.PARTICIPANT);
+      return registrationService.getRegistrationResponse(personId, eventId);
+//      return registrationService.getRegistrationResponse(personId, eventId, RegistrationType.PARTICIPANT);
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }

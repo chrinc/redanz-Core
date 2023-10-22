@@ -79,7 +79,7 @@ public class HostingService {
 
   public void updateHostRegistrationRequest(Registration registration, JsonObject request) {
     JsonArray hostRegistrationArray = hostRegistrationArray(request);
-//     log.info("request: " + request.getAsString());
+//     log.info("hostRegistrationArray: " + hostRegistrationArray.getAsString());
 //    log.info("hostRegistrationArray: " + hostRegistrationArray);
     if (hostRegistrationArray != null) {
 //      log.info("update existing host");
@@ -134,6 +134,9 @@ public class HostingService {
   public void updateHostRegistration(Registration registration, JsonArray hostRegistration) {
     JsonObject personCountJson = hostRegistration.get(1).getAsJsonObject();
     JsonObject hostCommentJson = hostRegistration.get(3).getAsJsonObject();
+
+//    log.info("hostRegistration.getAsString(): ");
+//    log.info(hostRegistration.toString());
 
     HostRegistration existingHostregistration = hostRegistrationRepo.findAllByRegistration(registration);
 

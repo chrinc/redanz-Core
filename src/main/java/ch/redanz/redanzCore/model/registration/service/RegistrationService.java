@@ -488,7 +488,6 @@ public class RegistrationService {
 
 //    log.info("inc@updateStaffRegistrationRequest");
 //    log.info(request.get("profile").getAsJsonObject().toString());
-//    log.info(request.get("hostRegistration").get().toString());
     JsonObject personRequest = request.get("profile").getAsJsonObject();
 
     Person person;
@@ -503,19 +502,15 @@ public class RegistrationService {
       person.setStreet(personRequest.get("street").getAsString());
       person.setCity(personRequest.get("city").getAsString());
       person.setEmail(personRequest.get("email").getAsString());
-//      log.info("personRequest.get: {}", personRequest.get("mobile"));
-//      log.info(person.getPersonId().toString());
+      if (personRequest.get("language") != null && !personRequest.get("language").isJsonNull()) {
+        person.setPersonLang(languageService.findLanguageByLanguageKey(personRequest.get("language").getAsString()));
+      }
       if (personRequest.get("mobile") != null && !personRequest.get("mobile").isJsonNull()) {
-//        log.info("inc@update mobile");
         person.setMobile(personRequest.get("mobile").getAsString());
       }
       person.setCountry(countryService.findCountry(personRequest.get("countryId").getAsLong()));
-//      log.info(personRequest.toString());
       person.setActive(true);
-
       personService.savePerson(person);
-
-
 
     } else {
       person = new Person(
@@ -526,7 +521,7 @@ public class RegistrationService {
         , personRequest.get("city").getAsString()
         , countryService.findCountry(personRequest.get("countryId").getAsLong())
         , personRequest.get("email").getAsString()
-        , personRequest.get("mobile").getAsString()
+        , personRequest.get("mobile") == null ||personRequest.get("mobile").isJsonNull() ? null : personRequest.get("mobile").getAsString()
         , languageService.findLanguageByLanguageKey(personRequest.get("language").getAsString())
         , true
       );
@@ -618,12 +613,14 @@ public class RegistrationService {
       registration.getRegistrationId(),
       registration.getParticipant().getPersonId(),
       registration.getEvent(),
-      registration.getBundle().getBundleId()
+      registration.getBundle() != null ? registration.getBundle().getBundleId() : null
     );
 
     registrationResponse.setEvent(registration.getEvent());
     registrationResponse.setRegistrationId(registration.getRegistrationId());
-    registrationResponse.setBundleId(registration.getBundle().getBundleId());
+    if (registration.getBundle() != null) {
+      registrationResponse.setBundleId(registration.getBundle().getBundleId());
+    }
 
     // track
     if (registration.getTrack() != null) {
@@ -692,13 +689,27 @@ public class RegistrationService {
     return registrationResponse;
   }
 
-  public RegistrationResponse getRegistrationResponse(Long personId, Long eventId, RegistrationType registrationType) {
+//  public RegistrationResponse getRegistrationResponse(Long personId, Long eventId, RegistrationType registrationType) {
+  public RegistrationResponse getRegistrationResponse(Long personId, Long eventId) {
     Optional<Registration> registrationOptional =
       findByParticipantAndEvent(
         personService.findByPersonId(personId),
         eventService.findByEventId(eventId),
-        registrationType
+        RegistrationType.PARTICIPANT
       );
+    if (!registrationOptional.isPresent()) {
+      registrationOptional =
+        findByParticipantAndEvent(
+          personService.findByPersonId(personId),
+          eventService.findByEventId(eventId),
+          RegistrationType.STAFF
+        );
+    }
+
+//    log.info("registrationType: {}", registrationType);
+    log.info("personId: {}", personId);
+    log.info("eventId: {}", eventId);
+    log.info("registrationOptional.isPresent(): {}", registrationOptional.isPresent());
     if (registrationOptional.isPresent()) {
       Registration registration = registrationOptional.get();
       RegistrationResponse registrationResponse = getRegistrationResponse(registration);
@@ -966,13 +977,13 @@ public class RegistrationService {
   public List<String> countTracksDoneAndSplitRoles(Track track, Event event) {
     StringBuilder countPartBuilder = new StringBuilder();
     List<String> count = new ArrayList<>();
-    count.add(String.valueOf(countTracksConfirming(track, event)));
+    count.add(String.valueOf(countTracksDone(track, event)));
     danceRoleService.all().forEach(danceRole -> {
       countPartBuilder.append(
         formatCountToString(
           countPartBuilder.toString()
-          ,countTracksDone(track, event, danceRole)
-        ,danceRole.getName() + ": "));
+          , countTracksDone(track, event, danceRole)
+          , danceRole.getName() + ": "));
     });
     count.add(countPartBuilder.toString());
     return count;

@@ -21,11 +21,13 @@ public class Slot implements Serializable {
   private Long slotId;
 
   private String name;
+  private String color;
 
   public Slot() {
   }
 
-  public Slot(String name) {
+  public Slot(String name, String color) {
     this.name = name;
+    this.color = color;
   }
 }

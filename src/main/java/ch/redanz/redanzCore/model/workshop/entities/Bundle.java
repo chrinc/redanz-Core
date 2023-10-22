@@ -54,6 +54,8 @@ public class Bundle implements Serializable {
   @Column(name = "sold_out")
   private boolean soldOut;
 
+  private String color;
+
   @Column(name = "seq_nr")
   private Integer seqNr;
 
@@ -72,7 +74,8 @@ public class Bundle implements Serializable {
     Boolean simpleTicket,
     String internalId,
     Integer seqNr,
-    List<Slot> partySlots
+    List<Slot> partySlots,
+    String color
   ) {
     this.name = name;
     this.price = price;
@@ -82,6 +85,7 @@ public class Bundle implements Serializable {
     this.internalId = internalId;
     this.seqNr = seqNr;
     this.partySlots = partySlots;
+    this.color = color;
   }
 
   public static List<Map<String, String>> schema() {
@@ -131,6 +135,12 @@ public class Bundle implements Serializable {
           put("key", "internalId");
           put("type", "internalId");
           put("label", "Internal ID");
+        }});
+
+        add(new HashMap<>() {{
+          put("key", "color");
+          put("type", "color");
+          put("label", "Wrist Band Color");
         }});
         add(new HashMap<>() {{
           put("key", "seqNr");
