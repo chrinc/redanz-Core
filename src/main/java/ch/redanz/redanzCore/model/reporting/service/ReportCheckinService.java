@@ -26,6 +26,7 @@ public class ReportCheckinService {
   private final LanguageService languageService;
   private final SpecialRegistrationService specialRegistrationService;
   private final PrivateClassService privateClassService;
+  private final DiscountRegistrationService discountRegistrationService;
 
   public List<ResponseCheckIn> getCheckinReport(Event event) {
     List<ResponseCheckIn> responseCheckIns = new ArrayList<>();
@@ -42,6 +43,7 @@ public class ReportCheckinService {
             checkIn.getSlot() == null ? null : checkIn.getSlot(),
             isGuest ? "" : foodRegistrationService.getReportFoodSlots(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
             isGuest ? "": specialRegistrationService.getReportSpecials(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
+            isGuest ? "": discountRegistrationService.getReportDiscounts(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
             isGuest ? "": privateClassService.getReportPrivates(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
             isGuest ? "" : checkIn.getRegistration().getWorkflowStatus().getName(),
             isGuest ? null : paymentService.amountDue(checkIn.getRegistration()),

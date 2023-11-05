@@ -98,14 +98,14 @@ public enum OutTextConfig {
   LABEL_PASS_URL_GE("FRONT_LOGIN", "LABEL-PASS-URL", "https://stirit.ch/?page_id=7260&lang=de", "GE"),
 
   // CLASSES
-  LABEL_PRIVATE_ELZE_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop or Solo Jazz with Elze (1 couple, 1 follower, 1 leader or 3-4 followers) / SAT 6pm-7pm", "EN"),
-  LABEL_PRIVATE_ELZE_DESC_GE("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop oder Solo Jazz mit Elze (1 Tanzpaar, 1 Follower, 1 Leader oder 3-4 Followers) / SA 18.00-19.00 Uhr", "GE"),
-  LABEL_PRIVATE_SONIA_HECTOR_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop with Sonia and Héctor (1 couple) / FRI 5pm-6pm", "EN"),
-  LABEL_PRIVATE_SONIA_HECTOR_GE("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop mit Sonia und Héctor (1 Tanzpaar) / FR 17.00-18.00 Uhr", "GE"),
-  LABEL_PRIVATE_BARA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz or Tap with Bára / SAT 6pm - 7pm", "EN"),
-  LABEL_PRIVATE_BARA_GE("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz oder Tap mit Bára / SA 18.00-19.00 Uhr", "GE"),
-  LABEL_PRIVATE_CLAUDIA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop or Solo Jazz with Clàudia (1 Couple or Solo) / SUN 4pm-5pm", "EN"),
-  LABEL_PRIVATE_CLAUDIA_GE("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop oder Solo Jazz mit Clàudia (1 Tanzpaar oder Solo) / SO 16:00-17:00 Uhr", "GE"),
+  LABEL_PRIVATE_ELZE_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop or Solo Jazz with Elze (1 couple, 1 follower, 1 leader or 3-4 followers) / SAT 6pm-7pm / Room 6", "EN"),
+  LABEL_PRIVATE_ELZE_DESC_GE("FRONT_LOGIN", "LABEL-PRIVATE-ELZE-DESC", "Lindy Hop oder Solo Jazz mit Elze (1 Tanzpaar, 1 Follower, 1 Leader oder 3-4 Followers) / SA 18.00-19.00 Uhr / Saal 6", "GE"),
+  LABEL_PRIVATE_SONIA_HECTOR_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop with Sonia and Héctor (1 couple) / FRI 5pm-6pm / Room 4", "EN"),
+  LABEL_PRIVATE_SONIA_HECTOR_GE("FRONT_LOGIN", "LABEL-PRIVATE-SONJA-HECTOR-DESC", "Lindy Hop mit Sonia und Héctor (1 Tanzpaar) / FR 17.00-18.00 Uhr / Saal 4", "GE"),
+  LABEL_PRIVATE_BARA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz or Tap with Bára / SAT 6pm - 7pm / Room 4", "EN"),
+  LABEL_PRIVATE_BARA_GE("FRONT_LOGIN", "LABEL-PRIVATE-BARA-DESC", "Solo Jazz oder Tap mit Bára / SA 18.00-19.00 Uhr / Room 4", "GE"),
+  LABEL_PRIVATE_CLAUDIA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop or Solo Jazz with Clàudia (1 Couple or Solo) / SUN 4pm-5pm / Room 11", "EN"),
+  LABEL_PRIVATE_CLAUDIA_GE("FRONT_LOGIN", "LABEL-PRIVATE-CLAUDIA-DESC", "Lindy Hop oder Solo Jazz mit Clàudia (1 Tanzpaar oder Solo) / SO 16:00-17:00 Uhr / Saal 11", "GE"),
 
   // Sleep Utils
   LABEL_SLEEP_UTIL_MATTRESS_DOUBLE_EN("FRONT_LOGIN", "LABEL-SLEEP-UTIL-MATTRESS-DOUBLE", "Double Mattress", "EN"),

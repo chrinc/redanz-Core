@@ -24,6 +24,7 @@ public class ResponseCheckIn {
   private Slot slot;
   private String food;
   private String addons;
+  private String discounts;
   private String privates;
   private String workflowStatus;
   private Long amountDue;
@@ -86,6 +87,11 @@ public class ResponseCheckIn {
 //          put("label", "Slot");
 //        }});
 
+        add(new HashMap<>() {{
+          put("key", "discounts");
+          put("type", "text");
+          put("label", "Discounts");
+        }});
 
         add(new HashMap<>() {{
           put("key", "workflowStatus");
