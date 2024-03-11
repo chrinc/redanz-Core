@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class ResponseAccommodation {
-  private Long userId;
+  private Long personId;
   private Long registrationId;
   private String workflowStatus;
   private String firstName;
@@ -21,4 +21,5 @@ public class ResponseAccommodation {
   private String namePartner;
   private String utilities;
   private String comments;
+  private String registrationType;
 }

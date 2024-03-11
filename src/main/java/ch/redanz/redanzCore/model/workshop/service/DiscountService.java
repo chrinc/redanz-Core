@@ -27,7 +27,12 @@ public class DiscountService {
   public Discount findByDiscountId(Long discountId) {
     return discountRepo.findDiscountByDiscountId(discountId);
   }
-
+  public boolean existsByName(String name) {
+    return discountRepo.existsByName(name);
+  }
+  public boolean eventDiscountExists(Event event, Discount discount) {
+    return eventDiscountRepo.existsByEventAndDiscount(event, discount);
+  }
   public Discount findByName(String name) {
     return discountRepo.findDiscountByName(name);
   }

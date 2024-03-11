@@ -18,6 +18,13 @@ public class BaseParService {
       false; // default: false
   }
 
+  public BasePar findByKey(String key) {
+    return baseParRepo.findByBaseParKey(key);
+  }
+
+  public boolean existsByKey(String key) {
+    return  baseParRepo.existsByBaseParKey(key);
+  }
   public boolean doAutoRelease(){
     return baseParRepo.findAllByBaseParKey("doAutoRelease").isPresent() ?
     baseParRepo.findAllByBaseParKey("doAutoRelease").get().getBoolValue() :
@@ -58,6 +65,20 @@ public class BaseParService {
     return testMailOnly() ?
       baseParRepo.findAllByBaseParKey("testMailOnly").get().getStringValue() :
     null; // default: true
+  }
+
+  public String organizerName(){
+    return baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() != null ?
+      baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() : "";
+    // default: ""
+  }
+
+  public Integer cancelAfterDays(){
+    return Integer.parseInt(baseParRepo.findAllByBaseParKey("cancelAfterDays").get().getStringValue());
+  }
+
+  public Integer reminderAfterDays(){
+    return Integer.parseInt(baseParRepo.findAllByBaseParKey("reminderAfterDays").get().getStringValue());
   }
 
   public void save(BasePar basePar) {

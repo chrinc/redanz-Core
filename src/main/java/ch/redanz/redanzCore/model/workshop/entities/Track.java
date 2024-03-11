@@ -31,6 +31,9 @@ public class Track implements Serializable {
   @Column(name = "partner_required")
   private Boolean partnerRequired;
 
+  @Column(name = "internal_id")
+  private String internalId;
+
   @Column(name = "required_dance_level")
   @Enumerated(EnumType.STRING)
   private DanceLevel requiredDanceLevel;
@@ -52,13 +55,15 @@ public class Track implements Serializable {
     String description,
     Integer capacity,
     Boolean partnerRequired,
-    DanceLevel danceLevel
+    DanceLevel danceLevel,
+    String internalId
   ) {
     this.name = name;
     this.description = description;
     this.capacity = capacity;
     this.partnerRequired = partnerRequired;
     this.requiredDanceLevel = danceLevel;
+    this.internalId = internalId;
   }
 
   public static List<Map<String, String>> schema() {
@@ -108,6 +113,11 @@ public class Track implements Serializable {
           put("key", "isEdit");
           put("type", "isEdit");
           put("label", "");
+        }});
+        add(new HashMap<>() {{
+          put("key", "internalId");
+          put("type", "internalId");
+          put("label", "Internal Id");
         }});
       }
     };

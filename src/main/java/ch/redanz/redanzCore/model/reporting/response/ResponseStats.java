@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -12,8 +14,9 @@ import lombok.ToString;
 public class ResponseStats {
   private String type;
   private String item;
-  private int countSubmitted;
-  private int countConfirming;
-  private int countDone;
+  private List<String> countAll;
+  private List<String> countSubmitted;
+  private List<String> countConfirming;
+  private List<String> countDone;
   private Integer maxCount;
 }

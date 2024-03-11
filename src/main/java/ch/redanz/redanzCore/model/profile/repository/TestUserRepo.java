@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TestUserRepo extends JpaRepository<TestUser, Long> {
-  boolean existsByEmailIgnoreCase(String email);
+  boolean existsByUsernameIgnoreCase(String username);
 }

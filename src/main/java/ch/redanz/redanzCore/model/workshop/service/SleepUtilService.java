@@ -19,6 +19,9 @@ public class SleepUtilService {
     return sleepUtilRepository.findAll();
   }
 
+  public boolean existsByName(String name) {
+    return sleepUtilRepository.existsByName(name);
+  }
   public List<SleepUtil> findHostSleepUtils() {
     List<SleepUtil> hostSleepUtils = new ArrayList<>();
     hostSleepUtils.add(sleepUtilRepository.findBySleepUtilId(1L));

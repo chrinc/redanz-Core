@@ -2,8 +2,6 @@ package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.registration.entities.BasePar;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
-import ch.redanz.redanzCore.model.workshop.entities.Discount;
-import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +16,10 @@ public enum BaseParConfig {
   DOEODCANCEL("doEODCancel"  , true, null),
   DOEODMATCHING("doEODMatching"  , true, null),
   DOEODRELEASE("doEODRelease"  , true, null),
-  DOEODREMINDER("doEODReminder"  , true, null);
+  DOEODREMINDER("doEODReminder"  , true, null),
+  REMINDERAFTERDAYS("reminderAfterDays"  , false, "14"),
+  CANCELAFTERDAYS("cancelAfterDays"  , false, "3"),
+  ORGANIZERNAME("organizerName"  , false, "Stir it!");
 
   private final String baseParKey;
   private final boolean boolVal;
@@ -27,13 +28,20 @@ public enum BaseParConfig {
   public static void setup(BaseParService baseParService) {
 
     for (BaseParConfig baseParConfig : BaseParConfig.values()) {
-      baseParService.save(
-        new BasePar(
-          baseParConfig.baseParKey,
-          baseParConfig.boolVal,
-          baseParConfig.stringVal
-        )
-      );
+      if (!baseParService.existsByKey(baseParConfig.baseParKey)) {
+        baseParService.save(
+          new BasePar(
+            baseParConfig.baseParKey,
+            baseParConfig.boolVal,
+            baseParConfig.stringVal
+          )
+        );
+      } else {
+        BasePar basePar = baseParService.findByKey(baseParConfig.baseParKey);
+        basePar.setBoolValue(baseParConfig.boolVal);
+        basePar.setStringValue(baseParConfig.stringVal);
+        baseParService.save(basePar);
+      }
     }
   }
 }

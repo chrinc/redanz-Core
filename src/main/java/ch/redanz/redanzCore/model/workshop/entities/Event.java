@@ -52,6 +52,9 @@ public class Event implements Serializable {
   @Column(name = "sold_out")
   private boolean soldOut = false;
 
+  @Column(name = "internal_id")
+  private String internalId;
+
   @Column(name = "event_from")
   private LocalDate eventFrom;
 
@@ -77,7 +80,7 @@ public class Event implements Serializable {
   public Event() {
   }
 
-  public Event(String name, Integer capacity, LocalDate eventFrom, LocalDate eventTo, ZonedDateTime registrationStart, boolean active, boolean archived, String description) {
+  public Event(String name, Integer capacity, LocalDate eventFrom, LocalDate eventTo, ZonedDateTime registrationStart, boolean active, boolean archived, String description, String internalId) {
     this.name = name;
     this.capacity = capacity;
     this.eventFrom = eventFrom;
@@ -86,6 +89,7 @@ public class Event implements Serializable {
     this.active = active;
     this.archived = archived;
     this.description = description;
+    this.internalId = internalId;
   }
 
   public static List<Map<String, String>> schema() {
@@ -100,6 +104,7 @@ public class Event implements Serializable {
 //        add(new HashMap<>() {{put("key", "archived");             put("type", "bool");     put("label", "Archived");}});
         add(new HashMap<>() {{put("key", "description");          put("type", "text");     put("label", "Description");}});
         add(new HashMap<>() {{put("key", "isEdit");               put("type", "isEdit");   put("label", "");}});
+        add(new HashMap<>() {{put("key", "internalId");           put("type", "internalId");   put("label", "Internal Id");}});
       }
     };
   }
@@ -115,6 +120,7 @@ public class Event implements Serializable {
         put("active", String.valueOf(active));
 //        put("archived", String.valueOf(archived));
         put("description", description);
+        put("internalId", internalId);
 //        put("isEdit", true)
       }
     };

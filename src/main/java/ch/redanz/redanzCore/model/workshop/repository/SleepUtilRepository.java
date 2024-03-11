@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SleepUtilRepository extends JpaRepository<SleepUtil, Long> {
   SleepUtil findBySleepUtilId(Long sleepUtilId);
-
+  boolean existsByName(String name);
   SleepUtil findByName(String name);
 }

@@ -55,7 +55,6 @@ public class RegistrationEmailService {
     model.put("link", environment.getProperty("link.login"));
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationSubmitted.ftl");
-    // log.info("send email?");
 
     String languageKey =
       registration.getParticipant().getPersonLang() == null ?
@@ -63,7 +62,6 @@ public class RegistrationEmailService {
         registration.getParticipant().getPersonLang().getLanguageKey();
 
     model.put("headerLink",  environment.getProperty("email.header.link"));
-
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_SUBMITTED_HEADER_EN.getOutTextKey(),
@@ -74,7 +72,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_SUBMITTED_BASE_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("details",
       outTextService.getOutTextByKeyAndLangKey(
@@ -86,7 +84,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
     model.put("see_you",
@@ -105,11 +103,11 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -145,7 +143,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("base",
       outTextService.getOutTextByKeyAndLangKey(
@@ -169,11 +167,11 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      person.getUser().getEmail(),
+      person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -205,13 +203,13 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("base01",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_BASE01_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
     );
     model.put("base02",
       outTextService.getOutTextByKeyAndLangKey(
@@ -223,7 +221,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_BASE03_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.cancelAfterDays().toString())
     );
 
     model.put("details",
@@ -236,7 +234,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
@@ -254,11 +252,11 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -291,7 +289,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("base01",
       outTextService.getOutTextByKeyAndLangKey(
@@ -303,7 +301,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_BASE02_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
     );
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
@@ -321,11 +319,11 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -357,7 +355,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_HEADER01_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", registration.getEvent().getName())
     );
     model.put("header02",
       outTextService.getOutTextByKeyAndLangKey(
@@ -375,7 +373,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
     model.put("see_you",
@@ -394,12 +392,12 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
     EmailService.sendEmail(
       EmailService.getSession(),
-      registration.getParticipant().getUser().getEmail(),
+      registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
         languageKey
@@ -459,19 +457,19 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
       try {
         EmailService.sendEmail(
           EmailService.getSession(),
-          registration.getParticipant().getUser().getEmail(),
+          registration.getParticipant().getEmail(),
           subject,
           FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
           ,baseParService.testMailOnly()
           ,baseParService.testEmail()
           ,false
-          ,userService.findByUserId(senderUser).getEmail()
+          ,userService.findByUserId(senderUser).getUsername()
         );
       } catch (IOException e) {
         throw new RuntimeException(e);
@@ -479,10 +477,15 @@ public class RegistrationEmailService {
         throw new RuntimeException(e);
       }
 
-//      registrationEmail.setReleasedSentDate(LocalDateTime.now());
-//    update(registrationEmail);
-
     });
+  }
+
+  public void postPoneLastReminderDate(Registration registration) {
+    RegistrationEmail registrationEmail = registrationEmailRepo.findByRegistration(registration);
+
+    if (registrationEmail.getReminderSentDate() != null) {
+      registrationEmail.setReminderSentDate(LocalDateTime.now());
+    }
   }
 
 }

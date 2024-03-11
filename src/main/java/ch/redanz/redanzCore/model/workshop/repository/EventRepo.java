@@ -17,6 +17,7 @@ public interface EventRepo extends JpaRepository<Event, Long> {
   List<Event> findAllByArchived(Boolean archived);
   Event findDistinctFirstByActive(Boolean active);
   Event findByEventId(Long eventId);
+  Boolean existsByName(String name);
 //  List<Special> findSpecialsByEvent(Event event);
 //  List<Special> findSpecialsByEvent(Event event);
 

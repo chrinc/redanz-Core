@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.service.DiscountRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseStats;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
@@ -29,6 +30,8 @@ public class ReportStatsService {
   private final FoodRegistrationService foodRegistrationService;
   private final DiscountService discountService;
   private final DiscountRegistrationService discountRegistrationService;
+  private final SpecialService specialService;
+  private final SpecialRegistrationService specialRegistrationService;
 
   public List<ResponseStats> getStatsReport(Language language, Event event) {
     List<ResponseStats> stats = new ArrayList<>();
@@ -39,24 +42,39 @@ public class ReportStatsService {
         new ResponseStats(
           "Pass"
           ,bundle.getName()
-          ,registrationService.countBundlesSubmittedConfirmingAndDone(bundle, event)
-          ,registrationService.countBundlesConfirmingAndDone(bundle, event)
-          ,registrationService.countBundlesDone(bundle, event)
-         ,bundle.getCapacity()
+          ,registrationService.countBundlesSubmittedConfirmingAndDoneAndSplitRoles(bundle, event)
+          ,registrationService.countBundlesSubmittedAndSplitRoles(bundle, event)
+          ,registrationService.countBundlesConfirmingAndSplitRoles(bundle, event)
+          ,registrationService.countBundlesDoneAndSplitRoles(bundle, event)
+           ,bundle.getCapacity()
         )
       );
     });
     // log.info("bundles: " );
-
     trackService.getAllByEvent(event).forEach(track -> {
       stats.add(
         new ResponseStats(
           "Track"
           ,track.getName()
-         ,registrationService.countTracksSubmittedConfirmingAndDone(track, event)
-         ,registrationService.countTracksConfirmingAndDone(track, event)
-         ,registrationService.countTracksDone(track, event)
+         ,registrationService.countTracksSubmittedConfirmingAndDoneAndSplitRoles(track, event)
+         ,registrationService.countTracksSubmittedAndSplitRoles(track, event)
+         ,registrationService.countTracksConfirmingAndSplitRoles(track, event)
+         ,registrationService.countTracksDoneAndSplitRoles(track, event)
          ,track.getCapacity()
+        )
+      );
+    });
+
+    specialService.findByEventOrBundle(event).forEach(special -> {
+      stats.add(
+        new ResponseStats(
+          "Special"
+          ,outTextService.getOutTextByKeyAndLangKey(special.getName(), language.getLanguageKey()).getOutText()
+         ,specialRegistrationService.countSpecialRegistrationsAndSplitRoles(special, event)
+         ,specialRegistrationService.countSpecialsSubmittedAndSplitRoles(special, event)
+         ,specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
+         ,specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
+         ,special.getCapacity()
         )
       );
     });
@@ -65,9 +83,10 @@ public class ReportStatsService {
       new ResponseStats(
         "Workshop"
         ,event.getName()
-        ,registrationService.countSubmittedConfirmingAndDone(event)
-        ,registrationService.countConfirmingAndDone(event)
-        ,registrationService.countDone(event)
+        ,registrationService.countSubmittedConfirmingAndDoneAndSplitRoles(event)
+        ,registrationService.countSubmittedAndSplitRoles(event)
+        ,registrationService.countConfirmingAndSplitRoles(event)
+        ,registrationService.countDoneAndSplitRoles(event)
        ,event.getCapacity()
       )
     );
@@ -81,9 +100,10 @@ public class ReportStatsService {
         new ResponseStats(
           "Food"
           , outTextService.getOutTextByKeyAndLangKey(slot.getName(), language.getLanguageKey()).getOutText()
-          , foodRegistrationService.countFoodSlotSubmittedReleasedAndDone(food, slot, event)
-          , foodRegistrationService.countFoodSlotConfirmingAndDone(food, slot, event)
-          , foodRegistrationService.countFoodSlotDone(food, slot, event)
+          , foodRegistrationService.countFoodSlotSubmittedConfirmingAndDoneAsList(food, slot, event)
+          , foodRegistrationService.countFoodSlotSubmittedAsList(food, slot, event)
+          , foodRegistrationService.countFoodSlotConfirmingAsList(food, slot, event)
+          , foodRegistrationService.countFoodSlotDoneAsList(food, slot, event)
           , null
         )
       );
@@ -94,9 +114,10 @@ public class ReportStatsService {
         new ResponseStats(
           "Discount"
           ,outTextService.getOutTextByKeyAndLangKey(discount.getName(), language.getLanguageKey()).getOutText()
-          , discountRegistrationService.countDiscountSubmittedConfirmingAndDoneByEvent(discount, event)
-          , discountRegistrationService.countDiscountConfirmingAndDoneByEvent(discount, event)
-          , discountRegistrationService.countDiscountDoneByEvent(discount, event)
+          , discountRegistrationService.countDiscountSubmittedConfirmingAndDoneAsList(discount, event)
+          , discountRegistrationService.countDiscountSubmittedAsList(discount, event)
+          , discountRegistrationService.countDiscountConfirmingAsList(discount, event)
+          , discountRegistrationService.countDiscountDoneAsList(discount, event)
           , discount.getCapacity()
         )
       );

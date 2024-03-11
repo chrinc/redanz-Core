@@ -19,6 +19,10 @@ public class FoodService {
     return foodRepo.findAll();
   }
 
+  public boolean existsByName(String name) {
+    return foodRepo.existsByName(name);
+  }
+
   public Food findByName(String name) {
     return foodRepo.findByName(name);
   }

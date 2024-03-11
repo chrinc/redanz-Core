@@ -18,5 +18,5 @@ public class TestUser {
   @Id
   private Long id;
 
-  private String email;
+  private String username;
 }

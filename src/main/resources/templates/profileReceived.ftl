@@ -24,11 +24,12 @@
                 <a href=${link}>${activate_now}</a>
             </p>
         </blockquote>
-
+        </br>
         ${expires}.
-        <p>${see_you}</p>
-        ${regards}<br>
-        ${team}
+        <p>
+        <p>${regards} <br>
+            ${team}
+        </p>
     </div>
 </div>
 </body>

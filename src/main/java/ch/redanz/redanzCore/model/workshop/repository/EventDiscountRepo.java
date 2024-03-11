@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface EventDiscountRepo extends JpaRepository<EventDiscount, EventDiscountId> {
   List<EventDiscount> findAllByEvent(Event event);
+  boolean existsByEventAndDiscount(Event event, Discount discount);
 }
