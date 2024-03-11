@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.registration.config;
 import ch.redanz.redanzCore.model.profile.config.UserConfig;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
@@ -16,17 +17,17 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Slf4j
 public enum RegistrationMatchingConfig {
-  NORMA_REGISTRATION  ( UserConfig.NORMA_USER.getEmail()   ,"franky_user@gmail.com", EventConfig.EVENT2023),
-  WILLIAM_REGISTRATION( UserConfig.WILLIAM_USER.getEmail() ,null , EventConfig.EVENT2023),
-  ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER.getEmail()  ,null , EventConfig.EVENT2023),
-  NAOMI_REGISTRATION  ( UserConfig.NAOMI_USER.getEmail()   ,"billy_user@gmail.com" , EventConfig.EVENT2023),
-  EDDIE_REGISTRATION  ( UserConfig.EDDIE_USER.getEmail()   ,null , EventConfig.EVENT2023),
-  OLIVER_REGISTRATION ( UserConfig.OLIVER_USER.getEmail()  ,null , EventConfig.EVENT2023),
-  HARRY_REGISTRATION  ( UserConfig.HARRY_USER.getEmail()   ,null,  EventConfig.EVENT2023),
-  BILLY_REGISTRATION  ( UserConfig.BILLY_USER.getEmail()   ,"naomi_user@gmail.com" , EventConfig.EVENT2023),
-  FRANKY_REGISTRATION ( UserConfig.FRANKY_USER.getEmail()  ,"norma_user@gmail.com", EventConfig.EVENT2023),
-  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER.getEmail() ,null,  EventConfig.EVENT2023);
-
+  NORMA_REGISTRATION  ( UserConfig.NORMA_USER.getUsername()   ,"franky_user@gmail.com", EventConfig.REDANZ_EVENT),
+  WILLIAM_REGISTRATION( UserConfig.WILLIAM_USER.getUsername() ,null , EventConfig.REDANZ_EVENT),
+//  ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER.getUsername()  ,null , EventConfig.REDANZ_EVENT),
+//  NAOMI_REGISTRATION  ( UserConfig.NAOMI_USER.getUsername()   ,"billy_user@gmail.com" , EventConfig.REDANZ_EVENT),
+//  EDDIE_REGISTRATION  ( UserConfig.EDDIE_USER.getUsername()   ,null , EventConfig.REDANZ_EVENT),
+  OLIVER_REGISTRATION ( UserConfig.OLIVER_USER.getUsername()  ,null , EventConfig.REDANZ_EVENT),
+  HARRY_REGISTRATION  ( UserConfig.HARRY_USER.getUsername()   ,null,  EventConfig.REDANZ_EVENT),
+//  BILLY_REGISTRATION  ( UserConfig.BILLY_USER.getUsername()   ,"naomi_user@gmail.com" , EventConfig.REDANZ_EVENT),
+  FRANKY_REGISTRATION ( UserConfig.FRANKY_USER.getUsername()  ,"norma_user@gmail.com", EventConfig.REDANZ_EVENT)
+//  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER.getUsername() ,null,  EventConfig.REDANZ_EVENT);
+;
   private final String user1Email;
   private final String partnerEmail;
   private final EventConfig eventConfig;
@@ -43,7 +44,8 @@ public enum RegistrationMatchingConfig {
         new RegistrationMatching(
           registrationService.findByParticipantAndEvent(
             personService.findByUser(userService.getUser(registrationMatchingConfig.user1Email)),
-            eventService.findByName(registrationMatchingConfig.eventConfig.getName())
+            eventService.findByName(registrationMatchingConfig.eventConfig.getName()),
+            RegistrationType.PARTICIPANT
           ).get(),
           registrationMatchingConfig.partnerEmail
         )

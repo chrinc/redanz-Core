@@ -1,6 +1,8 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 
+import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
@@ -15,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -33,6 +32,7 @@ public class EventController {
   private final BundleService bundleService;
   private final PrivateClassService privateClassService;
   private final VolunteerService volunteerService;
+  private final PersonService personService;
 
   @GetMapping(path = "/schema/event")
   public List<Map<String, String>> getEventSchema() {
@@ -130,6 +130,19 @@ public class EventController {
     return outTextService.getOutTextByType(types);
   }
 
+  @GetMapping(path = "/slots/all")
+  public List<Slot> getAllSlots(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return slotService.getAllSlots(eventService.findByEventId(eventId));
+  }
+  @GetMapping(path = "/slots/party")
+  public List<Slot> getAllPartySlots(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return slotService.getAllSlots("party", eventService.findByEventId(eventId));
+  }
+
   @GetMapping(path = "/volunteer/slot/all")
   public List<Slot> getAllVolunteerSlots(
     @RequestParam("eventId") Long eventId
@@ -150,14 +163,14 @@ public class EventController {
   }
 
   @GetMapping(path = "/special/all")
-  public List<Special> getSpecials(
+  public Set<Special> getSpecials(
     @RequestParam("bundleId") Long bundleId
   ) {
     // log.info("inc@special/all, bundleId: " + bundleId);
     if (bundleId == null) {
-      return specialService.findByEventOrBundle(eventService.getCurrentEvent(), null);
+      return specialService.findByEventOrBundle(eventService.getCurrentEvent());
     } else {
-      return specialService.findByEventOrBundle(eventService.getCurrentEvent(), bundleService.findByBundleId(bundleId));
+      return specialService.findByBundle(bundleService.findByBundleId(bundleId));
     }
   }
   @GetMapping(path = "/privateClasses/all")
@@ -165,18 +178,27 @@ public class EventController {
     @RequestParam("bundleId") Long bundleId,
     @RequestParam("eventId") Long eventId
   ) {
-    // log.info("inc@privateClasses/all, bundleId: " + bundleId);
     List<PrivateClass> privateClasses;
-
     if (bundleId == null) {
       privateClasses =  privateClassService.findByEvent(eventService.findByEventId(eventId));
     } else {
       privateClasses =  privateClassService.findByEventAndBundle(eventService.findByEventId(eventId), bundleService.findByBundleId(bundleId));
     }
-
-    log.info(privateClasses.toString());
-    log.info(String.valueOf(privateClasses.size()));
-
     return privateClasses;
+  }
+
+  @GetMapping (path = "/person/organizer")
+  @Transactional
+  public List<Person> getCheckInSlots(
+    @RequestParam("eventId") Long eventId
+  ) {
+    try {
+      Event event = eventService.findByEventId(eventId);
+      return personService.getAlOrganizers(event);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
 }

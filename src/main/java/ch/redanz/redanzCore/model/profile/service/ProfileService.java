@@ -18,6 +18,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,7 +34,20 @@ public class ProfileService {
   Configuration mailConfig;
 
   public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
-    Person newPerson = new Person(userService.findByUserId(userId), personResponse.getFirstName(), personResponse.getLastName(), personResponse.getStreet(), personResponse.getPostalCode(), personResponse.getCity(), countryService.findCountry(personResponse.getCountryId()), languageService.findLanguageByLanguageKey(personResponse.getLanguage()));
+    Person newPerson = new Person(
+      userService.findByUserId(userId)
+      ,personResponse.getFirstName()
+      ,personResponse.getLastName()
+      ,personResponse.getStreet()
+      ,personResponse.getPostalCode()
+      ,personResponse.getCity()
+      ,countryService.findCountry(personResponse.getCountryId())
+      ,languageService.findLanguageByLanguageKey(personResponse.getLanguage())
+      ,userService.findByUserId(userId).getUsername()
+      ,true
+
+    );
+
     newPerson.setUpdateTimestamp(LocalDateTime.now());
     personService.addPerson(newPerson);
     sendRegisteredProfileEmail(newPerson, registrationLink, headerLink);
@@ -51,14 +65,31 @@ public class ProfileService {
     personService.savePerson(updatePerson);
   }
 
-  public Person getProfile(Long userId) {
-    return personService.findByUser(userService.findByUserId(userId));
+  public void remove(Person person) {
+    if (person.getUser() != null) {
+      userService.delete(person.getUser());
+      person.setUser(null);
+    }
+
+    person.setActive(false);
+    personService.savePerson(person);
+  }
+
+  public Person getProfile(Long personId) {
+    return personService.findByPersonId(personId);
+  }
+
+  public Person getProfile(String username) {
+    return personService.findByUser(userService.getUser(username));
+  }
+
+  public List<Person> getPersons() {
+    return personService.findAll(true);
   }
 
   public void sendRegisteredProfileEmail(Person person, String registrationLink, String headerLink) throws IOException, TemplateException {
     String languageKey = person.getPersonLang() == null ? languageService.findLanguageByLanguageKey("GE").getLanguageKey() : person.getPersonLang().getLanguageKey();
     Map<String, Object> model = new HashMap<>();
-    log.info("inc@sendprofileemial: heade: {}", headerLink);
     model.put("headerLink", headerLink);
     model.put("link", registrationLink);
     model.put("firstName", person.getFirstName());
@@ -67,12 +98,14 @@ public class ProfileService {
     model.put("expires", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN.getOutTextKey(), languageKey).getOutText());
     model.put("regards", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(), languageKey).getOutText());
     model.put("see_you", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(), languageKey).getOutText());
-    model.put("team", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(), languageKey).getOutText());
+    model.put(
+      "team", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(), languageKey).getOutText().replace("{1}", baseParService.organizerName())
+    );
     Template template = mailConfig.getTemplate("profileReceived.ftl");
 
     EmailService.sendEmail(
       EmailService.getSession(),
-      person.getUser().getEmail(),
+      person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CONFIRM_SUBJECT_EN.getOutTextKey(),
         languageKey

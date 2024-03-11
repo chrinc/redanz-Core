@@ -46,7 +46,7 @@ public enum PersonConfig {
     for (PersonConfig personConfig : PersonConfig.values()) {
       personService.save(
         new Person(
-          userService.getUser(personConfig.userConfig.getEmail()),
+          userService.getUser(personConfig.userConfig.getUsername()),
           personConfig.firstName,
           personConfig.lastName,
           personConfig.street,
@@ -55,7 +55,9 @@ public enum PersonConfig {
           // countries need to be loaded first
           null,
 //          countryService.findCountry(personConfig.countryId),
-          languageService.findLanguageByLanguageKey(personConfig.getLanguageConfig().getKey())
+          languageService.findLanguageByLanguageKey(personConfig.getLanguageConfig().getKey()),
+          userService.getUser(personConfig.userConfig.getUsername()).getUsername(),
+          true
         )
       );
     }

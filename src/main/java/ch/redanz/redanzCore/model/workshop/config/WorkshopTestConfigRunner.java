@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(200)
-@Profile("dev || test")
+@Profile("rdev || dev")
 public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final BundleService bundleService;
   private final TrackService trackService;
@@ -35,12 +35,13 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final VolunteerService volunteerService;
   private final BaseParService baseParService;
   private final CountryService countryService;
+  private final PrivateClassService privateClassService;
 
   @Override
   public void run(String... args) {
     if (eventService.findAll().isEmpty()) {
       TrackConfig.setup(trackService);
-      BundleConfig.setup(bundleService);
+      BundleConfig.setup(bundleService, slotService);
       BundleTrackConfig.setup(bundleService, trackService);
       EventConfig.setup(eventService);
       EventBundleConfig.setup(bundleService, eventService);
@@ -55,13 +56,18 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       SleepUtilConfig.setup(sleepUtilService);
       DiscountConfig.setup(discountService);
       TrackDiscountConfig.setup(trackService, discountService);
-      EventTypeSlotConfig.setup(slotService, eventService);
+      EventTypeSlotConfig.setup(slotService, eventService, foodService);
       SpecialConfig.setup(specialService);
       EventDiscountConfig.setup(discountService, eventService);
       VolunteerTypeConfig.setup(volunteerService);
       EventVolunteerTypeConfig.setup(eventService, volunteerService);
       BaseParConfig.setup(baseParService);
       CountryConfig.setup(countryService, languageService);
+
+      PrivateClassConfig.setup(privateClassService);
+      EventPrivateClassConfig.setup(privateClassService, eventService);
+      EventSpecialsConfig.setup(specialService, eventService);
+      BundleSpecialConfig.setup(specialService, bundleService);
     }
   }
 }

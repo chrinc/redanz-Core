@@ -11,7 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public enum FoodConfig {
   FOOD_VEDA(OutTextConfig.LABEL_FOOD_VEDA_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FOOD_VEDA_DESC_EN.getOutTextKey(), 20),
-  FOOD_SOUP(OutTextConfig.LABEL_FOOD_SOUP_DESC_EN.getOutTextKey(), OutTextConfig.LABEL_FOOD_SOUP_DESC_EN.getOutTextKey(), 15);
+  FOOD_BUFFET(OutTextConfig.LABEL_FOOD_BUFFET_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FOOD_BUFFET_DESC_EN.getOutTextKey(), 25),
+  FOOD_ASIAN(OutTextConfig.LABEL_FOOD_ASIAN_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FOOD_ASIAN_DESC_EN.getOutTextKey(), 10);
 
   private final String name;
   private final String description;
@@ -20,13 +21,20 @@ public enum FoodConfig {
   public static void setup(FoodService foodService) {
 
     for (FoodConfig foodConfig : FoodConfig.values()) {
-      foodService.save(
-        new Food(
-          foodConfig.getName(),
-          foodConfig.getPrice(),
-          foodConfig.getDescription()
-        )
-      );
+      if (!foodService.existsByName(foodConfig.getName())) {
+        foodService.save(
+          new Food(
+            foodConfig.getName(),
+            foodConfig.getPrice(),
+            foodConfig.getDescription()
+          )
+        );
+      } else {
+        Food food = foodService.findByName(foodConfig.getName());
+        food.setDescription(foodConfig.description);
+        food.setPrice(foodConfig.price);
+        foodService.save(food);
+      }
     }
   }
 }

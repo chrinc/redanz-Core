@@ -5,13 +5,21 @@ import ch.redanz.redanzCore.model.workshop.repository.DanceRoleRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class DanceRoleService {
   private final DanceRoleRepo danceRoleRepo;
 
+  public boolean existsByName(String name) {
+    return danceRoleRepo.existsByName(name);
+  }
   public void save(DanceRole danceRole) {
     danceRoleRepo.save(danceRole);
+  }
+  public DanceRole findByInternalId(String internalId) {
+    return danceRoleRepo.findByInternalId(internalId);
   }
 
   public DanceRole findByDanceRoleId(Long danceRoleId) {
@@ -20,5 +28,9 @@ public class DanceRoleService {
 
   public DanceRole findByName(String name) {
     return danceRoleRepo.findByName(name);
+  }
+
+  public List<DanceRole> all() {
+    return danceRoleRepo.findAll();
   }
 }

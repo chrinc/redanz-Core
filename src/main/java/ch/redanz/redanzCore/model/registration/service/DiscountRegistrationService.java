@@ -1,16 +1,13 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.config.BundleConfig;
 import ch.redanz.redanzCore.model.workshop.config.DiscountConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Discount;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.BundleService;
-import ch.redanz.redanzCore.model.workshop.service.DiscountService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.TrackService;
+import ch.redanz.redanzCore.model.workshop.service.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
@@ -20,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @AllArgsConstructor
@@ -29,8 +27,7 @@ public class DiscountRegistrationService {
   private final DiscountService discountService;
   private final WorkflowStatusService workflowStatusService;
   private final TrackService trackService;
-  private final EventService eventService;
-  private final BundleService bundleService;
+  private final OutTextService outTextService;
 
   public void save(Registration registration, Discount discount) {
     discountRegistrationRepo.save(
@@ -142,25 +139,61 @@ public class DiscountRegistrationService {
     return discountRegistrationRepo.findAllByRegistration(registration);
   }
 
-  public int countDiscountSubmittedByEvent(Discount discount, Event event){
+  public int countDiscountSubmitted(Discount discount, Event event){
     return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
       discount, workflowStatusService.getSubmitted(), event
     );
   }
-  public int countDiscountConfirmingByEvent(Discount discount, Event event){
+  public int countDiscountConfirming(Discount discount, Event event){
     return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
       discount, workflowStatusService.getConfirming(), event
     );
   }
-  public int countDiscountDoneByEvent(Discount discount, Event event){
+  public int countDiscountDone(Discount discount, Event event){
     return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
       discount, workflowStatusService.getDone(), event
     );
   }
-  public int countDiscountSubmittedConfirmingAndDoneByEvent(Discount discount, Event event) {
-    return countDiscountConfirmingByEvent(discount,event) + countDiscountDoneByEvent(discount, event) + countDiscountSubmittedByEvent(discount, event);
+  public int countDiscountSubmittedConfirmingAndDone(Discount discount, Event event) {
+    return countDiscountConfirming(discount,event) + countDiscountDone(discount, event) + countDiscountSubmitted(discount, event);
   }
-  public int countDiscountConfirmingAndDoneByEvent(Discount discount, Event event) {
-    return countDiscountConfirmingByEvent(discount, event) + countDiscountDoneByEvent(discount, event);
+  public int countDiscountConfirmingAndDone(Discount discount, Event event) {
+    return countDiscountConfirming(discount, event) + countDiscountDone(discount, event);
   }
+
+  public List<String> countDiscountSubmittedAsList(Discount discount, Event event){
+    List<String> discountList = new ArrayList<>();
+    discountList.add(String.valueOf(countDiscountSubmitted(discount, event)));
+    return discountList;
+
+  }
+  public List<String>  countDiscountConfirmingAsList(Discount discount, Event event){
+    List<String> discountList = new ArrayList<>();
+    discountList.add(String.valueOf(countDiscountConfirming(discount, event)));
+    return discountList;
+  }
+  public List<String> countDiscountDoneAsList(Discount discount, Event event){
+    List<String> discountList = new ArrayList<>();
+    discountList.add(String.valueOf(countDiscountDone(discount, event)));
+    return discountList;
+  }
+  public List<String> countDiscountSubmittedConfirmingAndDoneAsList(Discount discount, Event event) {
+    List<String> discountList = new ArrayList<>();
+    discountList.add(String.valueOf(countDiscountSubmittedConfirmingAndDone(discount, event)));
+    return discountList;
+  }
+
+  public String getReportDiscounts(Registration registration, Language language) {
+    AtomicReference<String> discounts = new AtomicReference<>();
+    discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
+      String specialOutText = outTextService.getOutTextByKeyAndLangKey(discountRegistration.getDiscount().getName(), language.getLanguageKey()).getOutText();
+      if (discounts.get() == null)
+        discounts.set(specialOutText);
+      else {
+        discounts.set(discounts.get() + ", " + specialOutText);
+      }
+    });
+    return discounts.get() == null ? "" : discounts.toString();
+  }
+
 }

@@ -7,6 +7,6 @@ public interface DiscountRepo extends JpaRepository<Discount, Long> {
   Discount findByName(String name);
 
   Discount findDiscountByDiscountId(Long discountId);
-
+  boolean existsByName(String name);
   Discount findDiscountByName(String name);
 }

@@ -6,9 +6,6 @@ import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.ProfileService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.web.security.config.JWTConfig;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -37,12 +34,42 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 public class LoginController {
   private final UserService userService;
   private final ProfileService profileService;
+  private final PersonService personService;
 
   @GetMapping(path = "/user-id")
   public Long userId(
-    @RequestParam("email") String email
+    @RequestParam("username") String username
   ) {
-    return userService.getUser(email).getUserId();
+    return userService.getUser(username).getUserId();
+  }
+
+  @GetMapping(path = "/person-id")
+  public Long personId(
+    @RequestParam("username") String username
+  ) {
+    return personService.findByUser(userService.getUser(username)).getPersonId();
+  }
+
+  @GetMapping(path = "/person")
+  public Person person(
+    @RequestParam("personId") Long personId
+  ) {
+    try {
+      return profileService.getProfile(personId);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/person-by-username")
+  public Person getPersonByUserName(
+    @RequestParam("username") String username
+  ) {
+    try {
+      return profileService.getProfile(username);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 
   @GetMapping(path = "/user-is-tester")
@@ -60,17 +87,6 @@ public class LoginController {
   public Integer checkServer(
   ) {
     return 1;
-  }
-
-  @GetMapping(path = "/profile")
-  public Person profile(
-    @RequestParam("userId") Long userId
-  ) {
-    try {
-      return profileService.getProfile(userId);
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
-    }
   }
 
   @GetMapping("/token/refresh")

@@ -1,9 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
-import ch.redanz.redanzCore.model.workshop.entities.Bundle;
-import ch.redanz.redanzCore.model.workshop.entities.BundleTrack;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.EventBundle;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.BundleEventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.BundleRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TrackBundleRepo;
@@ -40,9 +37,18 @@ public class BundleService {
 
         return bundles;
     }
-
+    public boolean existsByName(String name) {
+        return bundleRepo.existsByName(name);
+    }
     public Bundle findByBundleId(Long bundleId) {
         return bundleRepo.findByBundleId(bundleId);
     }
     public Bundle findByName(String name){return bundleRepo.findByName(name);}
+    public Bundle findByInternalId(String internalId) {
+        return bundleRepo.findByInternalId(internalId);
+    }
+
+    public boolean bundleTrackExists(Bundle bundle, Track track) {
+        return trackBundleRepo.existsByBundleAndTrack(bundle, track);
+    }
 }

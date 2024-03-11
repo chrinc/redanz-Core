@@ -21,9 +21,10 @@ public class TrackService {
   private final TrackBundleRepo trackBundleRepo;
   private final TrackDanceRoleRepo trackDanceRoleRepo;
   private final TrackDiscountRepo trackDiscountRepo;
-  private final EventService eventService;
   private final BundleService bundleService;
-
+  public boolean trackDiscountExists(Track track, Discount discount) {
+    return trackDiscountRepo.existsByTrackAndDiscount(track, discount);
+  }
   public void save(Track track) {
     trackRepo.save(track);
   }
@@ -36,6 +37,9 @@ public class TrackService {
     trackDiscountRepo.save(trackDiscount);
   }
 
+  public boolean existsByTrackDanceRole(Track track, DanceRole danceRole) {
+    return trackDanceRoleRepo.existsByTrackAndDanceRole(track, danceRole);
+  }
   public List<Track> getAll(){
     return trackRepo.findAll();
   }
@@ -56,11 +60,18 @@ public class TrackService {
     return !trackBundleRepo.findAllByBundle(bundle).isEmpty();
   }
 
+  public boolean existsByName(String TrackName) {
+    return trackRepo.existsByName(TrackName);
+  }
+
   public Track findByTrackId(Long trackId) {
     return trackRepo.findByTrackId(trackId);
   }
 
   public Track findByName(String name) {
     return trackRepo.findByName(name);
+  }
+  public Track findByInternalId(String internalId) {
+    return trackRepo.findByInternalId(internalId);
   }
 }

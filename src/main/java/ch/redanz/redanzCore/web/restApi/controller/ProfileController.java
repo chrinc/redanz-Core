@@ -1,6 +1,8 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.profile.entities.Country;
+import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
@@ -49,10 +51,15 @@ public class ProfileController {
     return ResponseEntity.ok().body(userService.getRegistration());
   }
 
+  @GetMapping("/languages")
+  public List<Language> getLanguages() {
+    return languageService.findAll();
+  }
+
   @PostMapping(path = "/user/registration")
   public long register(@RequestBody UserResponse request) {
     userRegistrationService.register(request);
-    return userService.getUser(request.getEmail()).getUserId();
+    return userService.getUser(request.getUsername()).getUserId();
   }
 
   @GetMapping(path = "/user/registration/confirm")
@@ -145,6 +152,13 @@ public class ProfileController {
     profileService.registerProfile(userId, personResponse, link, headerLink);
   }
 
+  @GetMapping(path = "/persons")
+  public List<Person> persons(
+    @RequestParam("userId") Long userId
+  ) {
+    return profileService.getPersons();
+  }
+
   @PostMapping(path = "/person/update")
   public void updatePerson(
     @RequestParam("userId") Long userId,
@@ -152,6 +166,17 @@ public class ProfileController {
   ) {
     try {
       profileService.updateProfile(userId, personResponse);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/person/remove")
+  public void removePerson(
+    @RequestParam("personId") Long personId
+  ) {
+    try {
+      profileService.remove(personService.findByPersonId(personId));
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }

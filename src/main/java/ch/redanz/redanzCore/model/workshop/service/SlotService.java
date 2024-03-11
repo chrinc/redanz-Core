@@ -1,9 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.EventTypeSlot;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventTypeSlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.SlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TypeSlotRepo;
@@ -25,6 +22,28 @@ public class SlotService {
     slotRepo.save(slot);
   }
 
+  public boolean foodSlotExists(
+    Slot slot, Food food
+  ) {
+    return  typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot("food", food.getFoodId(), slot);
+  }
+
+  public TypeSlot findByTypeObjectIdAndSlot(
+    String type
+    ,Long typeObjectId
+    ,Slot slot
+  ) {
+    return typeSlotRepo.findByTypeAndTypeObjectIdAndSlot(
+      type,typeObjectId, slot
+    );
+  }
+  public boolean existsByName(String name) {
+    return slotRepo.existsByName(name);
+  }
+  public boolean typeSlotExists(String type, Long objectTypeId, Slot slot) {
+    return typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot(type, objectTypeId,  slot);
+  }
+
   public void save(TypeSlot typeSlot) {
     typeSlotRepo.save(typeSlot);
   }
@@ -33,17 +52,29 @@ public class SlotService {
     return getAllSlots("volunteer", event);
   }
 
+  public class EventTypeSlotComparator implements Comparator<EventTypeSlot> {
+    @Override
+    public int compare(EventTypeSlot eventTypeSlot1, EventTypeSlot eventTypeSlot2) {
+      return Integer.compare(eventTypeSlot1.getSeqNr(), eventTypeSlot2.getSeqNr());
+    }
+  }
   public List<Object> getFoodSlots(Event event) {
     List<Object> foodSlots = new ArrayList<>();
-    typeSlotRepo.findAllByType("food").forEach(
-      typeSlot -> {
-        HashMap<String, Object> foodSlot = new HashMap<>();
-        foodSlot.put("food", foodService.findByFoodId(typeSlot.getTypeObjectId()));
-        foodSlot.put("slot", typeSlot.getSlot());
-        if (eventHasTypeSlot(event, typeSlot)) {
-          foodSlots.add(foodSlot);
+    List<EventTypeSlot> eventTypeSlots = new ArrayList<>();
+    eventTypeSlotRepo.findAllByEvent(event).forEach(
+      eventTypeSlot -> {
+        if (typeSlotRepo.findAllByType("food").contains(eventTypeSlot.getTypeSlot())) {
+          eventTypeSlots.add(eventTypeSlot);
         }
-      });
+      }
+    );
+    Collections.sort(eventTypeSlots, new EventTypeSlotComparator());
+    eventTypeSlots.forEach(eventTypeSlot -> {
+      HashMap<String, Object> foodSlot = new HashMap<>();
+      foodSlot.put("food", foodService.findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
+      foodSlot.put("slot", eventTypeSlot.getTypeSlot().getSlot());
+      foodSlots.add(foodSlot);
+    });
     return foodSlots;
   }
   public boolean eventHasTypeSlot(Event event, TypeSlot typeSlot) {
@@ -79,7 +110,20 @@ public class SlotService {
     );
   }
 
-  private List<Slot> getAllSlots(String type, Event event) {
+  public List<Slot> getAllSlots(Event event) {
+    List<Slot> slots = new ArrayList<>();
+    typeSlotRepo.findAll().forEach(
+      typeSlot -> {
+        if (eventHasTypeSlot(event, typeSlot)) {
+          slots.add(typeSlot.getSlot());
+        }
+      }
+    );
+    slots.sort(Comparator.comparing(Slot::getSlotId));
+    return slots;
+  }
+
+  public List<Slot> getAllSlots(String type, Event event) {
     List<Slot> slots = new ArrayList<>();
     typeSlotRepo.findAllByType(type).forEach(
       typeSlot -> {

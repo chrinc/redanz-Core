@@ -14,16 +14,17 @@ import java.util.Locale;
 @Slf4j
 @Getter
 public enum EventConfig {
-  EVENT2023(
-  "redAnz Workshop"
+  REDANZ_EVENT(
+  "Redanz Workshop"
   , 350
-  , LocalDate.parse("2023-08-01")
-  , LocalDate.parse("2023-08-10")
-    ,ZonedDateTime.parse("2023-06-01T11:00:00.000+01:00[Europe/Paris]")
+  , LocalDate.parse("2025-11-01")
+  , LocalDate.parse("2025-11-04")
+    ,ZonedDateTime.parse("2023-07-29T11:00:00.000+01:00[Europe/Paris]")
   ,true
     ,false
-  ,"Summer Dance Workshop"
-  );
+  ,"Weekend Dance Workshop"
+    ,"redanzWorkshop");
+
   private final String name;
   private final Integer capacity;
   private final LocalDate dateFrom;
@@ -32,8 +33,9 @@ public enum EventConfig {
   private final Boolean active;
   private final Boolean archived;
   private final String description;
+  private final String internalId;
 
-  EventConfig(String name, Integer capacity, LocalDate dateFrom, LocalDate dateTo, ZonedDateTime registrationStart, boolean active, boolean archived, String description) {
+  EventConfig(String name, Integer capacity, LocalDate dateFrom, LocalDate dateTo, ZonedDateTime registrationStart, boolean active, boolean archived, String description, String internalId) {
     this.name = name;
     this.capacity = capacity;
     this.dateFrom = dateFrom;
@@ -42,23 +44,39 @@ public enum EventConfig {
     this.active = active;
     this.archived = archived;
     this.description = description;
+    this.internalId = internalId;
   }
 
   public static void setup(EventService eventService) {
 
     for (EventConfig eventConfig : EventConfig.values()) {
-      eventService.save(
-        new Event(
-          eventConfig.getName(),
-          eventConfig.getCapacity(),
-          eventConfig.getDateFrom(),
-          eventConfig.getDateTo(),
-          eventConfig.getRegistrationStart(),
-          eventConfig.getActive(),
-          eventConfig.getArchived(),
-          eventConfig.getDescription()
-        )
-      );
+      if (!eventService.existsByName(eventConfig.name)) {
+        eventService.save(
+          new Event(
+            eventConfig.name,
+            eventConfig.capacity,
+            eventConfig.dateFrom,
+            eventConfig.dateTo,
+            eventConfig.registrationStart,
+            eventConfig.active,
+            eventConfig.archived,
+            eventConfig.description,
+            eventConfig.internalId
+          )
+        );
+      } else {
+        Event event = eventService.findByName(eventConfig.name);
+        event.setEventTo(eventConfig.dateTo);
+        event.setEventFrom(eventConfig.dateFrom);
+        event.setActive(eventConfig.active);
+        event.setCapacity(eventConfig.capacity);
+        event.setArchived(eventConfig.archived);
+        event.setDescription(eventConfig.description);
+        event.setRegistrationStart(eventConfig.registrationStart);
+        event.setInternalId(eventConfig.internalId);
+        eventService.save(event);
+      }
+
     }
   }
 }

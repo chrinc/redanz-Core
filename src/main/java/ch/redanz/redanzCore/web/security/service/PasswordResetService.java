@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.web.security.service;
 
 import ch.redanz.redanzCore.model.profile.entities.User;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.web.security.PasswordResetToken;
 import ch.redanz.redanzCore.web.security.repository.PasswordResetRepo;
@@ -19,8 +20,10 @@ public class PasswordResetService {
   @Autowired
   Environment environment;
 
+
   private final UserService userService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final PersonService personService;
 
   private final PasswordResetRepo passwordResetRepo;
   public void save(PasswordResetToken passwordResetToken) {
@@ -44,6 +47,10 @@ public class PasswordResetService {
   public void updatePassword(User user, String password){
     String encodedPassword = bCryptPasswordEncoder.encode(password);
     user.setPassword(encodedPassword);
+
+    if (personService.userHasPerson(user)) {
+      user.setEnabled(true);
+    }
     userService.save(user);
   }
 

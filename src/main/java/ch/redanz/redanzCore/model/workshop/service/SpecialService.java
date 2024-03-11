@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -19,18 +21,22 @@ public class SpecialService {
     specialRepo.save(special);
   }
 
-  public List<Special> findByEvent(Event event) {
+  public Set<Special> findByEvent(Event event) {
     return specialRepo.findAllByEvent(event).orElse(null);
   }
-  public List<Special> findByBundle(Bundle bundle) {
+  public Set<Special> findByBundle(Bundle bundle) {
     return specialRepo.findAllByBundle(bundle).orElse(null);
   }
 
-  public List<Special> findByEventOrBundle(Event event, Bundle bundle) {
-    List<Special> allSpecials;
+  public boolean existsByName(String name) {
+    return specialRepo.existsByName(name);
+  }
+  public Set<Special> findByEventOrBundle(Event event) {
+    Set<Special> allSpecials;
     allSpecials = findByEvent(event);
-
-    allSpecials.addAll(findByBundle(bundle));
+    event.getEventBundles().forEach(eventBundle -> {
+      allSpecials.addAll(findByBundle(eventBundle.getBundle()));
+    });
     return allSpecials;
   }
   public Special findByName(String name) {

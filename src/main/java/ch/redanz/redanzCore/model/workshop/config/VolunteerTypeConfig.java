@@ -12,22 +12,23 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum VolunteerTypeConfig {
-  FOUR_HOURS("LABEL-VOL-TYPE-FOUR-HOURS-NAME", "LABEL-VOL-TYPE-FOUR-HOURS-DESC"),
-  FIVE_HOURS("LABEL-VOL-TYPE-FIVE-HOURS-NAME", "LABEL-VOL-TYPE-FIVE-HOURS-DESC"),
+  TWO_HOURS("LABEL-VOL-TYPE-TWO-HOURS-NAME", "LABEL-VOL-TYPE-TWO-HOURS-DESC"),
+  SIX_HOURS("LABEL-VOL-TYPE-SIX-HOURS-NAME", "LABEL-VOL-TYPE-SIX-HOURS-DESC"),
   NO_PREFS("LABEL-VOL-TYPE-NO-PREF-NAME", "LABEL-VOL-TYPE-NO-PREF-DESC");
 
   private final String name;
   private final String description;
 
   public static void setup(VolunteerService volunteerService) {
-
     for (VolunteerTypeConfig volunteerTypeConfig : VolunteerTypeConfig.values()) {
-      volunteerService.saveVolunteerType(
-        new VolunteerType(
-          volunteerTypeConfig.getName(),
-          volunteerTypeConfig.getDescription()
-        )
-      );
+      if (!volunteerService.existsByName(volunteerTypeConfig.getName())) {
+        volunteerService.saveVolunteerType(
+          new VolunteerType(
+            volunteerTypeConfig.getName(),
+            volunteerTypeConfig.getDescription()
+          )
+        );
+      }
     }
   }
 }

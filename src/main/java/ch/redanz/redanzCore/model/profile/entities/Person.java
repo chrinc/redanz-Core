@@ -28,6 +28,9 @@ public class Person implements Serializable {
 
   @Column(name = "last_name")
   private String lastName;
+
+  private String email;
+
   private String street;
 
   @Column(name = "postal_code")
@@ -46,6 +49,8 @@ public class Person implements Serializable {
   private LocalDateTime updateTimestamp;
   private String mobile;
 
+  private boolean active;
+
   public Person() {
   }
 
@@ -57,7 +62,9 @@ public class Person implements Serializable {
     String postalCode,
     String city,
     Country country,
-    Language personLang
+    Language personLang,
+    String email,
+    boolean active
   ) {
     this.user = user;
     this.firstName = firstName;
@@ -67,14 +74,31 @@ public class Person implements Serializable {
     this.city = city;
     this.country = country;
     this.personLang = personLang;
+    this.email = email;
+    this.active = active;
   }
 
-  public Person(User user, String firstName, String lastName, String street, String postalCode, String city) {
+  public Person(User user, String firstName, String lastName, String street, String postalCode, String city, String email, boolean active) {
     this.user = user;
     this.firstName = firstName;
     this.lastName = lastName;
     this.street = street;
     this.postalCode = postalCode;
     this.city = city;
+    this.email = email;
+    this.active = active;
+  }
+
+  public Person(String firstName, String lastName, String street, String postalCode, String city, Country country, String email, String mobile, Language language, boolean active) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.street = street;
+    this.postalCode = postalCode;
+    this.city = city;
+    this.email = email;
+    this.mobile = mobile;
+    this.personLang = language;
+    this.country = country;
+    this.active = active;
   }
 }

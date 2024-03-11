@@ -18,10 +18,12 @@ public enum TypeSlotConfig {
   VOLUNTEER_SLOT_FRIDAY_EVENING("volunteer", SlotConfig.SLOT_FRIDAY_EVENING        , null),
   VOLUNTEER_SLOT_SUNDAY_EVENING_AFTER_PARTY("volunteer", SlotConfig.SLOT_SUNDAY_EVENING_AFTER_PARTY , null),
 
-  FOOD_SLOT_FRIDAY  ("food", SlotConfig.SLOT_FRIDAY_EVENING   , FoodConfig.FOOD_VEDA),
-  FOOD_SLOT_VEDA_SATURDAY("food", SlotConfig.SLOT_SATURDAY_LUNCH , FoodConfig.FOOD_VEDA),
-//  FOOD_SLOT_SOUP_SATURDAY("food", SlotConfig.SLOT_SATURDAY_LUNCH , FoodConfig.FOOD_SOUP),
-  FOOD_SLOT_SOUP_SUNDAY("food", SlotConfig.SLOT_SUNDAY_EVENING , FoodConfig.FOOD_SOUP),
+  FOOD_SLOT_SATURDAY("food", SlotConfig.SLOT_SATURDAY_LUNCH , FoodConfig.FOOD_BUFFET),
+  FOOD_SLOT_SUNDAY  ("food", SlotConfig.SLOT_SUNDAY_LUNCH   , FoodConfig.FOOD_ASIAN),
+
+  PARTY_FRI( "party"    , SlotConfig.SLOT_FRIDAY     ,null),
+  PARTY_SAT(   "party"    , SlotConfig.SLOT_SATURDAY , null),
+  PARTY_SUN( "party"    , SlotConfig.SLOT_SUNDAY     , null),
 
   ACCOMMODATION_SLOT_THURSDAY( "accommodation"    , SlotConfig.SLOT_THURSDAY    , null),
   ACCOMMODATION_SLOT_FRIDAY(   "accommodation"    , SlotConfig.SLOT_FRIDAY      , null),
@@ -37,20 +39,38 @@ public enum TypeSlotConfig {
       if (typeSlotConfig.getTypeConfig() != null && Objects.equals(typeSlotConfig.getTypeConfig().getClass(), FoodConfig.class)) {
         assert typeSlotConfig.getTypeConfig() instanceof FoodConfig;
         FoodConfig foodConfig = (FoodConfig) typeSlotConfig.getTypeConfig();
-        slotService.save(
-          new TypeSlot(
-            typeSlotConfig.getType(),
+
+        if (
+          !slotService.foodSlotExists(
             slotService.findByName(typeSlotConfig.getSlotConfig().getName()),
-            foodService.findByName(foodConfig.getName()).getFoodId()
+            foodService.findByName(foodConfig.getName())
           )
-        );
+        ) {
+
+          slotService.save(
+            new TypeSlot(
+              typeSlotConfig.getType(),
+              slotService.findByName(typeSlotConfig.getSlotConfig().getName()),
+              foodService.findByName(foodConfig.getName()).getFoodId()
+            )
+          );
+        }
       } else {
-        slotService.save(
-          new TypeSlot(
-            typeSlotConfig.getType(),
-            slotService.findByName(typeSlotConfig.getSlotConfig().getName())
+
+        if (!slotService.typeSlotExists(
+          typeSlotConfig.getType()
+          ,null
+          , slotService.findByName(typeSlotConfig.getSlotConfig().getName()
           )
-        );
+        ))
+        {
+          slotService.save(
+            new TypeSlot(
+              typeSlotConfig.getType(),
+              slotService.findByName(typeSlotConfig.getSlotConfig().getName())
+            )
+          );
+        }
       }
     }
   }

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DanceRoleRepo extends JpaRepository<DanceRole, Long> {
   DanceRole findByName(String name);
-
+  Boolean existsByName(String name);
   DanceRole findByDanceRoleId(Long danceRoleId);
+  DanceRole findByInternalId(String internalId);
 }

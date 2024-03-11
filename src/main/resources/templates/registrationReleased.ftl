@@ -23,9 +23,9 @@
         <p>
             ${details} <a href=${link}> ${account}.</a>
         </p>
-        <p>${see_you}</p>
-        ${regards}<br>
-        ${team}
+        <p>${regards} <br>
+            ${team}
+        </p>
     </div>
 </div>
 </body>

@@ -1,13 +1,16 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.VolunteerRegistration;
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Food;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import ch.redanz.redanzCore.service.log.ErrorLogType;
 import com.google.gson.JsonArray;
@@ -17,8 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +36,7 @@ public class FoodRegistrationService {
   private final SlotService slotService;
   private final WorkflowStatusService workflowStatusService;
   private final EventService eventService;
+  private final OutTextService outTextService;
 
   public void save(Registration registration, Food food, Slot slot) {
     foodRegistrationRepo.save(
@@ -38,6 +46,32 @@ public class FoodRegistrationService {
         slot
       )
     );
+  }
+
+  public Set<Registration> getRegistrationsByEvent(Event event) {
+    List<FoodRegistration> foodRegistrations
+      = foodRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
+
+    Set<Registration> registrations = foodRegistrations.stream()
+      .map(FoodRegistration::getRegistration)
+      .filter(Registration::getActive)
+      .collect(Collectors.toSet());
+
+    return registrations;
+  }
+
+  public String getReportFoodSlots(Registration registration, Language language) {
+    AtomicReference<String> slots = new AtomicReference<>();
+    foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
+      String slotOutText = outTextService.getOutTextByKeyAndLangKey(foodRegistration.getSlot().getName(), language.getLanguageKey()).getOutText();
+      String foodOutText = outTextService.getOutTextByKeyAndLangKey(foodRegistration.getFood().getName(), language.getLanguageKey()).getOutText();
+      if (slots.get() == null)
+        slots.set(slotOutText);
+      else {
+        slots.set(slots.get() + ", " + slotOutText);
+      }
+    });
+    return slots.get() == null ? "" : slots.toString();
   }
 
   public List<FoodRegistration> foodRegistrations(Registration registration, JsonObject foodRegistrationRequest) {
@@ -74,12 +108,6 @@ public class FoodRegistrationService {
     );
   }
   public int countFoodSlotDone(Food food, Slot slot, Event event){
-    // log.info("inc@countFoodSlotDone,  food: " + food.getName());
-    // log.info("inc@countFoodSlotDone,  slot: " + slot.getName());
-    // log.info("inc@countFoodSlotDone,  event: " + event.getName());
-    // log.info("inc@countFoodSlotDone,  count: " + foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-    //   food, slot, workflowStatusService.getDone(), event
-    // ));
     return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
       food, slot, workflowStatusService.getDone(), event
     );
@@ -87,8 +115,7 @@ public class FoodRegistrationService {
   public int countFoodSlotConfirmingAndDone(Food food, Slot slot, Event event) {
     return countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
   }
-
-  public int countFoodSlotSubmittedReleasedAndDone(Food food, Slot slot, Event event) {
+  public int countFoodSlotSubmittedConfirmingAndDone(Food food, Slot slot, Event event) {
     return countFoodSlotSubmitted(food, slot, event) + countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
   }
 
@@ -129,5 +156,27 @@ public class FoodRegistrationService {
 
   public List<FoodRegistration> getAllByRegistration(Registration registration) {
     return foodRegistrationRepo.findAllByRegistration(registration);
+  }
+
+  public List<String> countFoodSlotSubmittedAsList(Food food, Slot slot, Event event){
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotSubmitted(food, slot, event)));
+    return foodList;
+
+  }
+  public List<String>  countFoodSlotConfirmingAsList(Food food, Slot slot, Event event){
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotConfirming(food, slot, event)));
+    return foodList;
+  }
+  public List<String> countFoodSlotDoneAsList(Food food, Slot slot, Event event){
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotDone(food, slot, event)));
+    return foodList;
+  }
+  public List<String> countFoodSlotSubmittedConfirmingAndDoneAsList(Food food, Slot slot, Event event) {
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotSubmitted(food, slot, event) + countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event)));
+    return foodList;
   }
 }

@@ -8,6 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @AllArgsConstructor
 public class UserResponse {
-  private final String email;
+  private final String username;
   private final String password;
 }

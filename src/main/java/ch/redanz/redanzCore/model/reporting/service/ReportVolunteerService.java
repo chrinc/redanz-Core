@@ -25,17 +25,16 @@ public class ReportVolunteerService {
       Registration registration = volunteerRegistration.getRegistration();
       volunteers.add(
         new ResponseVolunteer(
-          registration.getParticipant().getUser().getUserId()
+          registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
           , registration.getParticipant().getFirstName()
           , registration.getParticipant().getLastName()
-          , registration.getParticipant().getUser().getEmail()
+          , registration.getParticipant().getEmail()
           , registration.getParticipant().getMobile()
-          , volunteerRegistration.getType().getDescription()
+          , volunteerRegistration.getType() == null ? null : volunteerRegistration.getType().getDescription()
           , volunteerService.getSlots(volunteerRegistration, language)
           , volunteerRegistration.getIntro()
           , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
-
         )
       );
 
