@@ -10,7 +10,6 @@ Necessary tools for testing and development
 
 ##### What Todo
 - https://start.spring.io/
-
 - Setup Domain Classes in Project (e.g. registration / )
 - Setup MySQL Configuration (in resources/application.properties)
 - setup [cores](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) 
@@ -96,10 +95,17 @@ Necessary tools for testing and development
    - attach to a screen: `screen -r redanz.spring`
    - detach `Ctrl + A Ctrl + D`
  - Start Spring on Server:
--- clean inst all:
-`mvn clean install`
+-- clean inst all: `mvn clean install`
 --spring.profiles.active=prod --redanz.master.password=
 ``java -jar $snapshot --spring.profiles.active=prod --redanz.master.password=$pass``
 `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
-
  - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
+ - Create a Cronjob for
+   - sql-db backup
+   - renew certbot certificates
+   - List all jobs: `crontab -l`
+   - Edit Cronjobs: `crontab -e` 
+ - Renew Certificates
+   - show all Certificats: `certbot certificates`
+   - certbot certonly --force-renew -d model.redanz.ch
+
