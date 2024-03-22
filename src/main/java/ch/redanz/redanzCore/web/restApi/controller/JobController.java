@@ -7,7 +7,7 @@ import ch.redanz.redanzCore.model.registration.jobs.EODReminderJob;
 import ch.redanz.redanzCore.model.registration.service.CheckInService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

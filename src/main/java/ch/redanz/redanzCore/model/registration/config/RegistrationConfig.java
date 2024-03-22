@@ -8,7 +8,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.config.*;
-import ch.redanz.redanzCore.model.workshop.service.*;
+import ch.redanz.redanzCore.model.workshop.repository.service.*;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

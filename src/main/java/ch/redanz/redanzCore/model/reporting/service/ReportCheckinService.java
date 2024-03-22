@@ -1,18 +1,15 @@
 package ch.redanz.redanzCore.model.reporting.service;
 
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
-import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
-import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.reporting.response.ResponseCheckIn;
 import ch.redanz.redanzCore.model.workshop.config.LanguageConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
+import ch.redanz.redanzCore.model.workshop.repository.service.PrivateClassService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 

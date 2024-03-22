@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

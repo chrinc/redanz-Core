@@ -3,7 +3,7 @@ package ch.redanz.redanzCore.model.registration.jobs;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Component
 @Slf4j

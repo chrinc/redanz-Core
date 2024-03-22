@@ -5,7 +5,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseVolunteer;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
+import ch.redanz.redanzCore.model.workshop.repository.service.OutTextService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

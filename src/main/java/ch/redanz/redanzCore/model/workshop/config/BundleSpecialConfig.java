@@ -1,12 +1,9 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Special;
-import ch.redanz.redanzCore.model.workshop.service.BundleService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.SpecialService;
-import lombok.AllArgsConstructor;
+import ch.redanz.redanzCore.model.workshop.repository.service.BundleService;
+import ch.redanz.redanzCore.model.workshop.repository.service.SpecialService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +29,7 @@ public enum BundleSpecialConfig {
   public static void setup(SpecialService specialService, BundleService bundleService) {
     Map<Long, List<Special>> bundleSpecialsMap = new HashMap<>();
     for (BundleSpecialConfig bundleSpecialConfig : BundleSpecialConfig.values()) {
-      Bundle bundle = bundleService.findByInternalId(bundleSpecialConfig.bundleConfig.getInternalId());
+      Bundle bundle = bundleService.findByName(bundleSpecialConfig.bundleConfig.getName());
       Special special = specialService.findByName(bundleSpecialConfig.specialConfig.getName());
       if (bundleSpecialsMap.containsKey(bundle.getBundleId())) {
         bundleSpecialsMap.get(bundle.getBundleId()).add(special);

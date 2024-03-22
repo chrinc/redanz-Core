@@ -2,7 +2,7 @@ package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.OutText;
 import ch.redanz.redanzCore.model.workshop.entities.OutTextId;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
+import ch.redanz.redanzCore.model.workshop.repository.service.OutTextService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

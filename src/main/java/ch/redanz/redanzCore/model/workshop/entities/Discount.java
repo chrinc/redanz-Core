@@ -9,7 +9,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @AllArgsConstructor
@@ -36,5 +38,29 @@ public class Discount implements Serializable {
     this.discount = discount;
     this.description = description;
     this.capacity = capacity;
+  }
+
+  public static List<Map<String, String>> schema() {
+    return new ArrayList<>() {
+      {
+        add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                   put("label", "id");}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "label");  put("required", "true");      put("label", "Name");}});
+        add(new HashMap<>() {{put("key", "discount");             put("type", "double"); put("required", "true");      put("label", "Discount");}});
+        add(new HashMap<>() {{put("key", "description");          put("type", "label");  put("required", "false");     put("label", "Description");}});
+        add(new HashMap<>() {{put("key", "capacity");             put("type", "number"); put("required", "false");     put("label", "Capacity");}});
+      }
+    };
+  }
+
+  public Map<String, String> dataMap() {
+    return new HashMap<>() {
+      {
+        put("id", String.valueOf(discountId));
+        put("name", name);
+        put("discount", String.valueOf(discount));
+        put("description", description);
+        put("capacity", String.valueOf(capacity));
+      }
+    };
   }
 }

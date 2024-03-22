@@ -69,56 +69,13 @@ public class Track implements Serializable {
   public static List<Map<String, String>> schema() {
     return new ArrayList<>() {
       {
-        add(new HashMap<>() {{
-          put("key", "eventId");
-          put("type", "id");
-          put("label", "EventId");
-        }});
-        add(new HashMap<>() {{
-          put("key", "bundleId");
-          put("type", "id");
-          put("label", "BundleId");
-        }});
-        add(new HashMap<>() {{
-          put("key", "trackId");
-          put("type", "id");
-          put("label", "TrackId");
-        }});
-        add(new HashMap<>() {{
-          put("key", "name");
-          put("type", "text");
-          put("label", "Name");
-        }});
-        add(new HashMap<>() {{
-          put("key", "capacity");
-          put("type", "number");
-          put("label", "Capacity");
-        }});
-        add(new HashMap<>() {{
-          put("key", "partnerRequired");
-          put("type", "boolean");
-          put("label", "Partner Required");
-        }});
-        add(new HashMap<>() {{
-          put("key", "danceLevel");
-          put("type", "text");
-          put("label", "Dance Level");
-        }});
-        add(new HashMap<>() {{
-          put("key", "description");
-          put("type", "text");
-          put("label", "Description");
-        }});
-        add(new HashMap<>() {{
-          put("key", "isEdit");
-          put("type", "isEdit");
-          put("label", "");
-        }});
-        add(new HashMap<>() {{
-          put("key", "internalId");
-          put("type", "internalId");
-          put("label", "Internal Id");
-        }});
+        add(new HashMap<>() {{ put("key", "bundleId");        put("type", "id");                                          put("label", "BundleId"); }});
+        add(new HashMap<>() {{ put("key", "id");              put("type", "id");                                          put("label", "Track Id"); }});
+        add(new HashMap<>() {{ put("key", "name");            put("type", "text");             put("required", "true");   put("label", "Name");     }});
+        add(new HashMap<>() {{ put("key", "capacity");        put("type", "number");           put("required", "true");   put("label", "Capacity"); }});
+        add(new HashMap<>() {{ put("key", "partnerRequired"); put("type", "bool");             put("required", "true");   put("labelTrue", "Partner required"); put("labelFalse", "No Partner Required"); }});
+        add(new HashMap<>() {{ put("key", "description");     put("type", "text");             put("required", "false");  put("label", "Description"); }});
+        add(new HashMap<>() {{ put("key", "discounts");       put("type", "multiselect");      put("required", "false");  put("label", "Discounts");           put("list", null);}});
       }
     };
   }
@@ -126,12 +83,12 @@ public class Track implements Serializable {
   public Map<String, String> dataMap() {
     return new HashMap<>() {
       {
-        put("trackId", Long.toString(trackId));
+        put("id", Long.toString(trackId));
         put("name", name);
         put("capacity", String.valueOf(capacity));
         put("partnerRequired", String.valueOf(partnerRequired));
-        put("danceLevel", String.valueOf(requiredDanceLevel));
         put("description", description);
+        put("discounts", null);
       }
     };
   }

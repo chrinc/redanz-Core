@@ -6,7 +6,7 @@ import ch.redanz.redanzCore.model.registration.entities.Guest;
 import ch.redanz.redanzCore.model.registration.repository.GuestRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.model.workshop.repository.service.SlotService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;

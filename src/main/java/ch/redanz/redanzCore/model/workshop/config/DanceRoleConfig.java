@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
-import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
+import ch.redanz.redanzCore.model.workshop.repository.service.DanceRoleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

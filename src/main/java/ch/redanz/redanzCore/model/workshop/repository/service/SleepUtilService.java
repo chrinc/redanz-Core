@@ -1,4 +1,4 @@
-package ch.redanz.redanzCore.model.workshop.service;
+package ch.redanz.redanzCore.model.workshop.repository.service;
 
 import ch.redanz.redanzCore.model.workshop.entities.SleepUtil;
 import ch.redanz.redanzCore.model.workshop.repository.SleepUtilRepository;

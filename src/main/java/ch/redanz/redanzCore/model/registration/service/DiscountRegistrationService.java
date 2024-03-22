@@ -7,7 +7,9 @@ import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRe
 import ch.redanz.redanzCore.model.workshop.config.DiscountConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Discount;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.*;
+import ch.redanz.redanzCore.model.workshop.repository.service.DiscountService;
+import ch.redanz.redanzCore.model.workshop.repository.service.OutTextService;
+import ch.redanz.redanzCore.model.workshop.repository.service.TrackService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;

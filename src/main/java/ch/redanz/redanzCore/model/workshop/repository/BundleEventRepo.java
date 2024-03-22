@@ -12,5 +12,6 @@ import java.util.List;
 @Repository
 public interface BundleEventRepo extends JpaRepository<EventBundle, BundleTrackId> {
   List<EventBundle> findAllByEvent(Event event);
-  Boolean existsByEventAndBundle(Event event, Bundle bunde);
+  Boolean existsByEventAndBundle(Event event, Bundle bundle);
+  EventBundle findByEventAndBundle(Event event, Bundle bundle);
 }

@@ -5,7 +5,7 @@ import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationMatchingRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

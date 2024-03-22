@@ -7,7 +7,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
+import ch.redanz.redanzCore.model.workshop.repository.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import com.google.gson.JsonObject;
 import freemarker.template.Configuration;

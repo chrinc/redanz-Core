@@ -10,5 +10,7 @@ import java.util.Optional;
 
 public interface OutTextRepo extends JpaRepository<OutText, OutTextId> {
   Optional<OutText> findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(String outTextKey, String languageKey);
+  List<OutText> findAllByOutTextIdOutTextKey(String outTextKey);
   List<OutText> findAllByType(String type);
+  List<OutText> findAllByOutTextIdOutTextLanguageKeyAndType(String languageKey, String type);
 }

@@ -2,7 +2,7 @@ package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.DanceLevel;
 import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
-import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
+import ch.redanz.redanzCore.model.workshop.repository.service.PrivateClassService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -2,13 +2,12 @@ package ch.redanz.redanzCore.web.restApi.controller;
 
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonParser;
 import freemarker.template.Configuration;
@@ -240,6 +239,7 @@ public class RegistrationController {
     @RequestBody String jsonObject
   ) {
     try {
+      log.info("inc@start");
       Event event = eventService.findByEventId(eventId);
       registrationService.updateSoldOut(event);
 

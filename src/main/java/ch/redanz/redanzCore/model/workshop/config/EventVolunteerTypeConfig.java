@@ -3,7 +3,7 @@ package ch.redanz.redanzCore.model.workshop.config;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.VolunteerType;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

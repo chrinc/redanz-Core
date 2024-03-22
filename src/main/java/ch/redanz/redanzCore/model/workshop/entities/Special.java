@@ -6,6 +6,10 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -39,5 +43,31 @@ public class Special implements Serializable {
   public Special(String name, String description) {
     this.name = name;
     this.description = description;
+  }
+
+  public static List<Map<String, String>> schema() {
+    return new ArrayList<>() {
+      {
+        add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                put("label", "id");}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "label");  put("required", "true");   put("label", "Name");}});
+        add(new HashMap<>() {{put("key", "price");                put("type", "double"); put("required", "true");   put("label", "Price");}});
+        add(new HashMap<>() {{put("key", "description");          put("type", "label");  put("required", "false");  put("label", "Description");}});
+        add(new HashMap<>() {{put("key", "capacity");             put("type", "number"); put("required", "true");   put("label", "Capacity");}});
+        add(new HashMap<>() {{put("key", "url");                  put("type", "label");  put("required", "false");  put("label", "url");}});
+      }
+    };
+  }
+
+  public Map<String, String> dataMap() {
+    return new HashMap<>() {
+      {
+        put("id", String.valueOf(specialId));
+        put("name", name);
+        put("price", String.valueOf(price));
+        put("description", description);
+        put("capacity", String.valueOf(capacity));
+        put("url", url);
+      }
+    };
   }
 }

@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
-import ch.redanz.redanzCore.model.registration.entities.CheckIn;
 import ch.redanz.redanzCore.model.registration.entities.Guest;
 import ch.redanz.redanzCore.model.registration.service.CheckInService;
 import ch.redanz.redanzCore.model.registration.service.GuestService;
@@ -10,8 +9,8 @@ import ch.redanz.redanzCore.model.reporting.service.*;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.SlotService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

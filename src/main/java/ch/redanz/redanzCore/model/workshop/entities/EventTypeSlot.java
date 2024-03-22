@@ -25,12 +25,11 @@ public class EventTypeSlot implements Serializable {
   @JoinColumn(name = "type_slot_id")
   private TypeSlot typeSlot;
 
-  @ManyToOne()
+  @ManyToOne
   @JsonIgnore
   @MapsId("eventId")
   @JoinColumn(name = "event_id")
   private Event event;
-
 
   @Column(name = "seq_nr")
   private Integer seqNr;

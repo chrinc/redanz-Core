@@ -15,7 +15,7 @@ public class BundleTrack implements Serializable {
   @EmbeddedId
   private final BundleTrackId bundleTrackId = new BundleTrackId();
 
-  @ManyToOne
+  @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
   @MapsId("bundleId")
   @JsonIgnore
   @JoinColumn(name = "bundle_id")
@@ -32,7 +32,6 @@ public class BundleTrack implements Serializable {
   public BundleTrack(Track track, Bundle bundle) {
     this.track = track;
     this.bundle = bundle;
-//    bundle.addTrackBundle(this);
   }
 
   public Track getTrack() {

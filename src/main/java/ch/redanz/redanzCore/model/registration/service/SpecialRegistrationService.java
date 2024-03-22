@@ -1,17 +1,16 @@
 package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
-import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.repository.PrivateClassRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.SpecialRegistrationRepo;
 import ch.redanz.redanzCore.model.workshop.entities.*;
-import ch.redanz.redanzCore.model.workshop.service.DanceRoleService;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
-import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
-import ch.redanz.redanzCore.model.workshop.service.SpecialService;
+import ch.redanz.redanzCore.model.workshop.repository.service.DanceRoleService;
+import ch.redanz.redanzCore.model.workshop.repository.service.OutTextService;
+import ch.redanz.redanzCore.model.workshop.repository.service.PrivateClassService;
+import ch.redanz.redanzCore.model.workshop.repository.service.SpecialService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;

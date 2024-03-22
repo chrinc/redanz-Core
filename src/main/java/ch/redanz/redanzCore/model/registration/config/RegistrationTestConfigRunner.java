@@ -2,10 +2,8 @@ package ch.redanz.redanzCore.model.registration.config;
 
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.jobs.EODMatchingJob;
-import ch.redanz.redanzCore.model.registration.jobs.EODReleaseJob;
 import ch.redanz.redanzCore.model.registration.service.*;
-import ch.redanz.redanzCore.model.workshop.service.*;
+import ch.redanz.redanzCore.model.workshop.repository.service.*;
 import freemarker.template.Configuration;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

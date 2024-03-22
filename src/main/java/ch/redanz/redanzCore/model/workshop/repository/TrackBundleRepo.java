@@ -14,4 +14,5 @@ public interface TrackBundleRepo extends JpaRepository<BundleTrack, BundleTrackI
 
   List<BundleTrack> findAllByBundle(Bundle bundle);
   boolean existsByBundleAndTrack(Bundle bundle, Track track);
+  BundleTrack findByBundleAndTrack(Bundle bundle, Track track);
 }

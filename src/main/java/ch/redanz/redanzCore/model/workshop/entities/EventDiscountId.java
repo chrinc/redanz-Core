@@ -1,8 +1,16 @@
 package ch.redanz.redanzCore.model.workshop.entities;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
-
+@Embeddable
+@Getter
+@Setter
+@NoArgsConstructor
 public class EventDiscountId implements Serializable {
   private Long discountId;
   private Long eventId;

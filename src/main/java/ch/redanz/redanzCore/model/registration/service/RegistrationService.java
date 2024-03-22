@@ -12,7 +12,7 @@ import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
-import ch.redanz.redanzCore.model.workshop.service.*;
+import ch.redanz.redanzCore.model.workshop.repository.service.*;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.service.log.ErrorLogType;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -396,8 +396,8 @@ public class RegistrationService {
 
   @Transactional
   public Registration updateRegistrationRequest(Long personId, Event event, JsonObject request) throws IOException, TemplateException {
-    // log.info("inc@updateRegistration, userId: {}", userId);
-    // log.info("inc@updateRegistration, request: {}", request);
+     log.info("inc@updateRegistration, personId: {}", personId);
+     log.info("inc@updateRegistration, request: {}", request);
     boolean isNewRegistration = false;
     // ignore if user already has a registration
     Registration registration;

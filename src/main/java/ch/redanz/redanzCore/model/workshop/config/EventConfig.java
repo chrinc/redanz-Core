@@ -1,15 +1,12 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Locale;
 
 @Slf4j
 @Getter
@@ -19,11 +16,20 @@ public enum EventConfig {
   , 350
   , LocalDate.parse("2025-11-01")
   , LocalDate.parse("2025-11-04")
-    ,ZonedDateTime.parse("2023-07-29T11:00:00.000+01:00[Europe/Paris]")
+    ,ZonedDateTime.parse("2023-07-29T14:09:00.000+01:00[Europe/Paris]")
   ,true
     ,false
-  ,"Weekend Dance Workshop"
-    ,"redanzWorkshop");
+  ,"Weekend Dance Workshop", true, true, true),
+
+  REDANZ_EVENT_TEST(
+  "Redanz Workshop test"
+  , 350
+  , LocalDate.parse("2025-11-07")
+  , LocalDate.parse("2025-11-14")
+    ,ZonedDateTime.parse("2023-07-29T08:00:00.000+01:00[Europe/Paris]")
+  ,false
+    ,false
+  ,"Weekend Dance Workshop Test", true, true, true);
 
   private final String name;
   private final Integer capacity;
@@ -33,9 +39,11 @@ public enum EventConfig {
   private final Boolean active;
   private final Boolean archived;
   private final String description;
-  private final String internalId;
+  private final Boolean hosting;
+  private final Boolean volunteering;
+  private final Boolean scholarship;
 
-  EventConfig(String name, Integer capacity, LocalDate dateFrom, LocalDate dateTo, ZonedDateTime registrationStart, boolean active, boolean archived, String description, String internalId) {
+  EventConfig(String name, Integer capacity, LocalDate dateFrom, LocalDate dateTo, ZonedDateTime registrationStart, boolean active, boolean archived, String description, Boolean hosting, Boolean volunteering, Boolean scholarship) {
     this.name = name;
     this.capacity = capacity;
     this.dateFrom = dateFrom;
@@ -44,7 +52,9 @@ public enum EventConfig {
     this.active = active;
     this.archived = archived;
     this.description = description;
-    this.internalId = internalId;
+    this.hosting = hosting;
+    this.volunteering = volunteering;
+    this.scholarship = scholarship;
   }
 
   public static void setup(EventService eventService) {
@@ -61,7 +71,9 @@ public enum EventConfig {
             eventConfig.active,
             eventConfig.archived,
             eventConfig.description,
-            eventConfig.internalId
+            eventConfig.hosting,
+            eventConfig.volunteering,
+            eventConfig.scholarship
           )
         );
       } else {
@@ -73,7 +85,9 @@ public enum EventConfig {
         event.setArchived(eventConfig.archived);
         event.setDescription(eventConfig.description);
         event.setRegistrationStart(eventConfig.registrationStart);
-        event.setInternalId(eventConfig.internalId);
+        event.setHosting(eventConfig.hosting);
+        event.setVolunteering(eventConfig.volunteering);
+        event.setVolunteering(eventConfig.scholarship);
         eventService.save(event);
       }
 

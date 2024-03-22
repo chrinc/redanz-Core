@@ -10,9 +10,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Map;
 
 @Entity
-@Slf4j
 @Getter
 @Setter
 @AllArgsConstructor

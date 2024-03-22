@@ -1,8 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.EventBundle;
-import ch.redanz.redanzCore.model.workshop.service.BundleService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.BundleService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

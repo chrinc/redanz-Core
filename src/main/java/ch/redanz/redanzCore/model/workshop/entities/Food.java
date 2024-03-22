@@ -5,6 +5,10 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -26,5 +30,29 @@ public class Food implements Serializable {
     this.name = name;
     this.price = price;
     this.description = description;
+  }
+
+  public static List<Map<String, String>> schema() {
+    return new ArrayList<>() {
+      {
+        add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                 put("label", "id");}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "label");   put("required", "true");   put("label", "Name");}});
+        add(new HashMap<>() {{put("key", "price");                put("type", "double");  put("required", "true");   put("label", "Price");}});
+        add(new HashMap<>() {{put("key", "description");          put("type", "label");   put("required", "true");   put("label", "Description");}});
+        add(new HashMap<>() {{put("key", "slot");                 put("type", "list");    put("required", "true");   put("label", "Slot"); put("list", null);}});
+      }
+    };
+  }
+
+  public Map<String, String> dataMap() {
+    return new HashMap<>() {
+      {
+        put("id", String.valueOf(foodId));
+        put("name", name);
+        put("price", String.valueOf(price));
+        put("description", description);
+        put("slot", null);
+      }
+    };
   }
 }

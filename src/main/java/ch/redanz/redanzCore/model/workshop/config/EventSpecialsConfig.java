@@ -1,13 +1,9 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
-import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
 import ch.redanz.redanzCore.model.workshop.entities.Special;
-import ch.redanz.redanzCore.model.workshop.service.DiscountService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.SpecialService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.SpecialService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

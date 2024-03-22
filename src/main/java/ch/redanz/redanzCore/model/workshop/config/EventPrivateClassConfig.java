@@ -1,9 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.*;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.model.workshop.repository.service.EventService;
+import ch.redanz.redanzCore.model.workshop.repository.service.PrivateClassService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

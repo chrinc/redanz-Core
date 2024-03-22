@@ -1,8 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.TrackDiscount;
-import ch.redanz.redanzCore.model.workshop.service.DiscountService;
-import ch.redanz.redanzCore.model.workshop.service.TrackService;
+import ch.redanz.redanzCore.model.workshop.repository.service.DiscountService;
+import ch.redanz.redanzCore.model.workshop.repository.service.TrackService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

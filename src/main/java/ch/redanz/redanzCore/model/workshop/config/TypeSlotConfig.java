@@ -1,8 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
-import ch.redanz.redanzCore.model.workshop.service.FoodService;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.model.workshop.repository.service.FoodService;
+import ch.redanz.redanzCore.model.workshop.repository.service.SlotService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
