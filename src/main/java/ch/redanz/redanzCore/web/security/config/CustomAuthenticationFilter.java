@@ -1,4 +1,4 @@
-package ch.redanz.redanzCore.web.security.config.config;
+package ch.redanz.redanzCore.web.security.config;
 
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.auth0.jwt.JWT;

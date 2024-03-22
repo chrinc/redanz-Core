@@ -7,7 +7,7 @@ import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.ProfileService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
-import ch.redanz.redanzCore.web.security.config.config.JWTConfig;
+import ch.redanz.redanzCore.web.security.config.JWTConfig;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
