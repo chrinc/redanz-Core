@@ -2,35 +2,29 @@ package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.entities.Track;
 import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
-import ch.redanz.redanzCore.model.workshop.service.TrackService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Slf4j
 @Getter
 @AllArgsConstructor
 public enum BundleConfig {
-  EXTRA_FUN_PASS("Extra FUN Pass", 330, OutTextConfig.LABEL_EXTRAFUN_DESC_EN.getOutTextKey(), 120, false, "extra_fun_pass", 1, null, "#ffaa4d"),
-  FUN_PASS("FUN Pass", 250, OutTextConfig.LABEL_FUN_DESC_EN.getOutTextKey(), 90, false, "fun_pass", 2, null, "#FF3EB5"),
-  PARTYPASS("Party Pass", 100, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 62, false, "party_pass", 4, null, "#9DE7D7"),
-  PARTY_SUN("Sunday Party Ticket", 40, OutTextConfig.LABEL_PARTY_SUN_DESC_EN.getOutTextKey(), 18, true, "party_sunday",5, List.of(SlotConfig.SLOT_SUNDAY), "#ff0000"),
-  FRIDAY_SPECIAL("Friday Special", 90, OutTextConfig.LABEL_FRIDAY_PACKAGE_DESC_EN.getOutTextKey(), 15, false, "friday_special",3, null, "#74D1EA");
+  FULL_PASS("Full Pass", 330, OutTextConfig.LABEL_FULLPASS_DESC_EN.getOutText(), 120, false, 1, null, "#ffaa4d"),
+  HALF_PASS("Half Pass", 250, OutTextConfig.LABEL_HALFPASS_DESC_EN.getOutTextKey(), 90, false, 2, null, "#FF3EB5"),
+  PARTYPASS("Party Pass", 100, OutTextConfig.LABEL_PARTYPASS_DESC_EN.getOutTextKey(), 50, false, 4, null, "#9DE7D7")
+  ;
 
   private final String name;
   private final Integer price;
   private final String description;
   private final Integer capacity;
   private final Boolean simpleTicket;
-  private final String internalId;
   private final Integer seqNr;
   private final List<SlotConfig> partySlots;
   private final String color;
@@ -56,7 +50,6 @@ public enum BundleConfig {
             bundleConfig.getDescription(),
             bundleConfig.getCapacity(),
             bundleConfig.getSimpleTicket(),
-            bundleConfig.getInternalId(),
             bundleConfig.getSeqNr(),
             partySlots,
             bundleConfig.color
@@ -68,7 +61,6 @@ public enum BundleConfig {
         bundle.setDescription(bundleConfig.getDescription());
         bundle.setPrice(bundleConfig.getPrice());
         bundle.setSimpleTicket(bundleConfig.simpleTicket);
-        bundle.setInternalId(bundleConfig.internalId);
         bundle.setSeqNr(bundleConfig.seqNr);
         bundle.setPartySlots(partySlots);
         bundle.setColor(bundleConfig.color);

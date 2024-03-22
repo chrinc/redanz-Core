@@ -1,11 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
-import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
-import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
 import ch.redanz.redanzCore.model.workshop.entities.Special;
-import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.SpecialService;
 import lombok.Getter;
@@ -19,7 +15,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 public enum EventSpecialsConfig {
-  EVENT2023_SPECIAL(EventConfig.EVENT2023, SpecialConfig.SPECIAL_FRI_SPECIAL)
+  EVENT2023_SPECIAL(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_FRI_SPECIAL)
   ;
 
   private final EventConfig eventConfig;

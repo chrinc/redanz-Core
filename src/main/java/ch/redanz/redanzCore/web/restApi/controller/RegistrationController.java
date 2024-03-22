@@ -2,7 +2,6 @@ package ch.redanz.redanzCore.web.restApi.controller;
 
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.registration.service.*;
@@ -240,6 +239,7 @@ public class RegistrationController {
     @RequestBody String jsonObject
   ) {
     try {
+      log.info("inc@start");
       Event event = eventService.findByEventId(eventId);
       registrationService.updateSoldOut(event);
 

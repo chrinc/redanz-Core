@@ -7,17 +7,20 @@ import ch.redanz.redanzCore.model.workshop.repository.TypeSlotRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class SlotService {
   TypeSlotRepo typeSlotRepo;
-  FoodService foodService;
   SlotRepo slotRepo;
   EventTypeSlotRepo eventTypeSlotRepo;
   OutTextService outTextService;
+
   public void save(Slot slot) {
     slotRepo.save(slot);
   }
@@ -37,11 +40,27 @@ public class SlotService {
       type,typeObjectId, slot
     );
   }
+
   public boolean existsByName(String name) {
     return slotRepo.existsByName(name);
   }
   public boolean typeSlotExists(String type, Long objectTypeId, Slot slot) {
     return typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot(type, objectTypeId,  slot);
+  }
+
+  @Transactional
+  public void delete(TypeSlot typeSlot) {
+    typeSlotRepo.deleteById(typeSlot.getTypeSlotId());
+  }
+
+  public void delete(Slot slot) {
+
+    try {
+      slotRepo.delete(slot);
+      log.info("inc after delete Slot: {}", slot.getSlotId());
+    } catch (Exception exception){
+      log.info("inc catches exception: {}", exception);
+    }
   }
 
   public void save(TypeSlot typeSlot) {
@@ -52,48 +71,17 @@ public class SlotService {
     return getAllSlots("volunteer", event);
   }
 
-  public class EventTypeSlotComparator implements Comparator<EventTypeSlot> {
-    @Override
-    public int compare(EventTypeSlot eventTypeSlot1, EventTypeSlot eventTypeSlot2) {
-      return Integer.compare(eventTypeSlot1.getSeqNr(), eventTypeSlot2.getSeqNr());
-    }
-  }
-  public List<Object> getFoodSlots(Event event) {
-    List<Object> foodSlots = new ArrayList<>();
-    List<EventTypeSlot> eventTypeSlots = new ArrayList<>();
-    eventTypeSlotRepo.findAllByEvent(event).forEach(
-      eventTypeSlot -> {
-        if (typeSlotRepo.findAllByType("food").contains(eventTypeSlot.getTypeSlot())) {
-          eventTypeSlots.add(eventTypeSlot);
-        }
-      }
-    );
-    Collections.sort(eventTypeSlots, new EventTypeSlotComparator());
-    eventTypeSlots.forEach(eventTypeSlot -> {
-      HashMap<String, Object> foodSlot = new HashMap<>();
-      foodSlot.put("food", foodService.findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
-      foodSlot.put("slot", eventTypeSlot.getTypeSlot().getSlot());
-      foodSlots.add(foodSlot);
-    });
-    return foodSlots;
-  }
   public boolean eventHasTypeSlot(Event event, TypeSlot typeSlot) {
     return eventTypeSlotRepo.findAllByEventAndTypeSlot(event, typeSlot).isPresent();
   }
-  public List<List<Object>> getFoodSlotsPairsByEvent(Event event) {
-    List<List<Object>> foodSlots = new ArrayList<>();
-    List<EventTypeSlot> eventTypeSlots;
-    eventTypeSlots = eventTypeSlotRepo.findAllByEvent(event);
-    eventTypeSlots.forEach(eventTypeSlot -> {
-      if (eventTypeSlot.getTypeSlot().getType().equals("food")) {
-        List<Object> foodSlot = new ArrayList<>();
-        foodSlot.add(foodService.findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
-        foodSlot.add(eventTypeSlot.getTypeSlot().getSlot());
-        foodSlots.add(foodSlot);
-      }
-    });
-    return foodSlots;
+
+  public List<EventTypeSlot> findAllByEvent (Event event){
+    return eventTypeSlotRepo.findAllByEvent(event);
   }
+  public List<TypeSlot> findAllByType (String type){
+    return typeSlotRepo.findAllByType(type);
+  }
+
   public List<Slot> getAccommodationSlots(Event event) {
     return getAllSlots("accommodation", event);
   }
@@ -103,10 +91,17 @@ public class SlotService {
   public Slot findByName(String name) {
     return slotRepo.findByName(name);
   }
-  public TypeSlot findByTypeAndSlotName(String type, String slot) {
+  public TypeSlot findByTypeAndSlotName(String type, String slotName) {
     return typeSlotRepo.findByTypeAndSlot(
       type,
-      slotRepo.findByName(slot)
+      slotRepo.findByName(slotName)
+    );
+  }
+
+  public TypeSlot findByTypeAndSlot(String type, Slot slot) {
+    return typeSlotRepo.findByTypeAndSlot(
+      type,
+      slot
     );
   }
 
@@ -134,5 +129,44 @@ public class SlotService {
     );
     slots.sort(Comparator.comparing(Slot::getSlotId));
     return slots;
+  }
+
+  public List<Slot> getAllSlots(String type) {
+    return typeSlotRepo.findAllByType(type).stream()
+      .filter(typeSlot -> typeSlot.getType().equals(type))
+      .map(TypeSlot::getSlot)
+      .sorted(Comparator.comparing(Slot::getSeqNr))
+      .collect(Collectors.toList());
+  }
+
+  public List<Map<String, String>> getAllSlots() {
+    List<Map<String, String>> slots = new ArrayList<>();
+
+    slotRepo.findAll().forEach(slot -> {
+      Map<String, String> slotData = slot.dataMap();
+      slots.add(slotData);
+    });
+
+    return slots;
+  }
+
+  public boolean existsEventSlotType(Event event, TypeSlot typeSlot) {
+    return eventTypeSlotRepo.existsByEventAndTypeSlot(event, typeSlot);
+  }
+
+  public void updateTypeSlot(String type, Slot slot, Long typeObjectId) {
+    if (!typeSlotRepo.existsByTypeAndTypeObjectIdAndSlot(type, typeObjectId, slot)) {
+      typeSlotRepo.save(
+        new TypeSlot(
+          type,
+          slot,
+          typeObjectId
+        )
+      );
+    }
+  };
+
+  public void save (EventTypeSlot eventTypeSlot) {
+    this.eventTypeSlotRepo.save(eventTypeSlot);
   }
 }

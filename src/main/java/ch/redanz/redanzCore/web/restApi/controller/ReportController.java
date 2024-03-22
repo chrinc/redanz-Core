@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
-import ch.redanz.redanzCore.model.registration.entities.CheckIn;
 import ch.redanz.redanzCore.model.registration.entities.Guest;
 import ch.redanz.redanzCore.model.registration.service.CheckInService;
 import ch.redanz.redanzCore.model.registration.service.GuestService;

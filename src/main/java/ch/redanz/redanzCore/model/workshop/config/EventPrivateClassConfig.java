@@ -3,7 +3,6 @@ package ch.redanz.redanzCore.model.workshop.config;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +16,10 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum EventPrivateClassConfig {
-  EVENT2023_ELZE(EventConfig.EVENT2023, PrivateClassConfig.ELZE),
-  EVENT2023_HECTOR_SONJA(EventConfig.EVENT2023, PrivateClassConfig.SONJA_HECTOR),
-  EVENT2023_BARA(EventConfig.EVENT2023, PrivateClassConfig.BARA),
-  EVENT2023_CLAUDIA(EventConfig.EVENT2023, PrivateClassConfig.CLAUDIA)
+  EVENT_ELZE(EventConfig.REDANZ_EVENT, PrivateClassConfig.ELZE),
+  EVENT_HECTOR_SONJA(EventConfig.REDANZ_EVENT, PrivateClassConfig.SONJA_HECTOR),
+  EVENT_BARA(EventConfig.REDANZ_EVENT, PrivateClassConfig.BARA),
+  EVENT_CLAUDIA(EventConfig.REDANZ_EVENT, PrivateClassConfig.CLAUDIA)
   ;
 
   private final EventConfig eventConfig;

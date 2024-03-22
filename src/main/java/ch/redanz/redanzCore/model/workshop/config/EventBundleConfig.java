@@ -9,11 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum EventBundleConfig {
-  EVENT2023_EXTRA_FUN(EventConfig.EVENT2023, BundleConfig.EXTRA_FUN_PASS),
-  EVENT2023_FUN(EventConfig.EVENT2023, BundleConfig.FUN_PASS),
-  EVENT2023_PARTY(EventConfig.EVENT2023, BundleConfig.PARTYPASS),
-  EVENT2023_FRI_SPECIAL(EventConfig.EVENT2023, BundleConfig.FRIDAY_SPECIAL),
-  EVENT2023_SUN_PARTY(EventConfig.EVENT2023, BundleConfig.PARTY_SUN)
+  EVENT_FULL(EventConfig.REDANZ_EVENT, BundleConfig.FULL_PASS),
+  EVENT_HALF(EventConfig.REDANZ_EVENT, BundleConfig.HALF_PASS),
+  EVENT_PARTY(EventConfig.REDANZ_EVENT, BundleConfig.PARTYPASS);
   ;
 
   private final EventConfig event;

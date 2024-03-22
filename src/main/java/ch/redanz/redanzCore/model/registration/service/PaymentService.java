@@ -10,7 +10,9 @@ import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationPaymentRepo;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
-import ch.redanz.redanzCore.model.workshop.service.*;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.service.FoodService;
+import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -23,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service

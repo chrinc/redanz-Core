@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
-import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;

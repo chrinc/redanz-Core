@@ -1,24 +1,18 @@
 package ch.redanz.redanzCore.model.reporting.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
-import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
-import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseSpecials;
-import ch.redanz.redanzCore.model.reporting.response.ResponseVolunteer;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.FoodService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
-import ch.redanz.redanzCore.model.workshop.service.SpecialService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

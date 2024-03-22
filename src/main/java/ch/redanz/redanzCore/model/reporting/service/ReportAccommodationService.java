@@ -4,7 +4,6 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.HostingService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseAccommodation;
-import ch.redanz.redanzCore.model.reporting.response.ResponseVolunteer;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.AccommodationService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;

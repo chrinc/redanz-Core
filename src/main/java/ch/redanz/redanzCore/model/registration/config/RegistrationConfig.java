@@ -24,9 +24,9 @@ import java.util.Map;
 public enum RegistrationConfig {
   NORMA_REGISTRATION  (
     UserConfig.NORMA_USER,
-    EventConfig.EVENT2023,
-    BundleConfig.EXTRA_FUN_PASS,
-    TrackConfig.FUN_FREE_CHOICE,
+    EventConfig.REDANZ_EVENT,
+    BundleConfig.FULL_PASS,
+    TrackConfig.INTERMEDIATE,
     DanceRoleConfig.FOLLOWER,
     List.of(DiscountConfig.EARLY_BIRD),
     null,
@@ -34,9 +34,9 @@ public enum RegistrationConfig {
   ),
   WILLIAM_REGISTRATION(
     UserConfig.WILLIAM_USER,
-    EventConfig.EVENT2023,
-    BundleConfig.EXTRA_FUN_PASS,
-    TrackConfig.FUN_FREE_CHOICE,
+    EventConfig.REDANZ_EVENT,
+    BundleConfig.HALF_PASS,
+    TrackConfig.INTERMEDIATE,
     DanceRoleConfig.FOLLOWER,
     List.of(
       DiscountConfig.STUDENT,
@@ -49,30 +49,8 @@ public enum RegistrationConfig {
     ),
     100
   ),
-//  ARLYNE_REGISTRATION(
-//    UserConfig.ARLYNE_USER,
-//    EventConfig.EVENT2023,
-//    BundleConfig.LEVELPASS,
-//    TrackConfig.FUN_TRACK,
-//    DanceRoleConfig.FOLLOWER,
-//    List.of(DiscountConfig.STUDENT, DiscountConfig.EARLY_BIRD),
-//    List.of(
-//      Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_FRIDAY_EVENING)
-//    ),
-//    120
-//  ),
-//  NAOMI_REGISTRATION(
-//    UserConfig.NAOMI_USER,
-//    EventConfig.EVENT2023,
-//    BundleConfig.LEVELPASS,
-//    TrackConfig.FUN_TRACK,
-//    DanceRoleConfig.SWITCH,
-//    List.of(DiscountConfig.EARLY_BIRD),
-//    null,
-//    11
-//  ),
   ESTHER_REGISTRATION(UserConfig.ESTHER_USER,
-    EventConfig.EVENT2023,
+    EventConfig.REDANZ_EVENT,
     BundleConfig.PARTYPASS,
     null,
     null,
@@ -80,24 +58,12 @@ public enum RegistrationConfig {
     null,
     0
   ),
-//  EDDIE_REGISTRATION(
-//    UserConfig.EDDIE_USER
-//    ,EventConfig.EVENT2023
-//    ,BundleConfig.LEVELPASS
-//    ,TrackConfig.FUN_TRACK
-//    ,DanceRoleConfig.SWITCH
-//    ,List.of(
-//      DiscountConfig.EARLY_BIRD
-//     ,DiscountConfig.STUDENT
-//     ,DiscountConfig.ABROAD)
-//    ,null
-//  , 50
-//  ),
+
   OLIVER_REGISTRATION(
     UserConfig.OLIVER_USER
-    , EventConfig.EVENT2023
-    , BundleConfig.FUN_PASS
-    , TrackConfig.FUN_FREE_CHOICE
+    , EventConfig.REDANZ_EVENT
+    , BundleConfig.HALF_PASS
+    , TrackConfig.INTERMEDIATE
     , DanceRoleConfig.FOLLOWER
     , List.of(
     DiscountConfig.STUDENT
@@ -108,9 +74,9 @@ public enum RegistrationConfig {
   ),
   HARRY_REGISTRATION(
     UserConfig.HARRY_USER
-    ,EventConfig.EVENT2023
-    ,BundleConfig.FUN_PASS
-    ,TrackConfig.FUN_FREE_CHOICE
+    ,EventConfig.REDANZ_EVENT
+    ,BundleConfig.FULL_PASS
+    ,TrackConfig.INTERMEDIATE
     ,DanceRoleConfig.SWITCH
     ,List.of(DiscountConfig.STUDENT
     ,DiscountConfig.ABROAD
@@ -119,24 +85,11 @@ public enum RegistrationConfig {
   , 0
   ),
 
-//  BILLY_REGISTRATION(UserConfig.BILLY_USER,
-//    EventConfig.EVENT2023,
-//    BundleConfig.LEVELPASS,
-//    TrackConfig.FUN_TRACK,
-//    DanceRoleConfig.SWITCH,
-//    List.of(
-//      DiscountConfig.STUDENT,
-//      DiscountConfig.ABROAD,
-//      DiscountConfig.EARLY_BIRD
-//    ),
-//    null,
-//    0
-//  ),
   FRANKY_REGISTRATION(
     UserConfig.FRANKY_USER,
-    EventConfig.EVENT2023,
-    BundleConfig.EXTRA_FUN_PASS,
-    TrackConfig.FUN_FREE_CHOICE,
+    EventConfig.REDANZ_EVENT,
+    BundleConfig.HALF_PASS,
+    TrackConfig.INTERMEDIATE,
     DanceRoleConfig.LEADER,
     List.of(
       DiscountConfig.EARLY_BIRD
@@ -145,9 +98,9 @@ public enum RegistrationConfig {
     20),
   CLAUDIA_REGISTRATION(
     UserConfig.CLAUDIA_USER,
-    EventConfig.EVENT2023,
-    BundleConfig.FUN_PASS,
-    TrackConfig.FUN_FREE_CHOICE,
+    EventConfig.REDANZ_EVENT,
+    BundleConfig.FULL_PASS,
+    TrackConfig.INTERMEDIATE,
     DanceRoleConfig.SWITCH,
     List.of(
       DiscountConfig.EARLY_BIRD

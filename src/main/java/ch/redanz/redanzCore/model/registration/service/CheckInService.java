@@ -6,7 +6,6 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.CheckInRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.entities.TypeSlot;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;

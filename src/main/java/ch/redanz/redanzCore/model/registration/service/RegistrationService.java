@@ -396,8 +396,8 @@ public class RegistrationService {
 
   @Transactional
   public Registration updateRegistrationRequest(Long personId, Event event, JsonObject request) throws IOException, TemplateException {
-    // log.info("inc@updateRegistration, userId: {}", userId);
-    // log.info("inc@updateRegistration, request: {}", request);
+     log.info("inc@updateRegistration, personId: {}", personId);
+     log.info("inc@updateRegistration, request: {}", request);
     boolean isNewRegistration = false;
     // ignore if user already has a registration
     Registration registration;

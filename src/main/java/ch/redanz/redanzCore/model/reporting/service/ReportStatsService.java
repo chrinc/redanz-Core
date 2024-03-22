@@ -6,7 +6,6 @@ import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseStats;
-import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Food;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
@@ -32,6 +31,8 @@ public class ReportStatsService {
   private final DiscountRegistrationService discountRegistrationService;
   private final SpecialService specialService;
   private final SpecialRegistrationService specialRegistrationService;
+  private final FoodService foodService;
+  private final EventService eventService;
 
   public List<ResponseStats> getStatsReport(Language language, Event event) {
     List<ResponseStats> stats = new ArrayList<>();
@@ -51,7 +52,7 @@ public class ReportStatsService {
       );
     });
     // log.info("bundles: " );
-    trackService.getAllByEvent(event).forEach(track -> {
+    eventService.getAllTracksByEvent(event).forEach(track -> {
       stats.add(
         new ResponseStats(
           "Track"
@@ -90,7 +91,7 @@ public class ReportStatsService {
        ,event.getCapacity()
       )
     );
-    slotService.getFoodSlotsPairsByEvent(event).forEach(foodSlot -> {
+    foodService.getFoodSlotsPairsByEvent(event).forEach(foodSlot -> {
       Food food = (Food) foodSlot.get(0);
       Slot slot = (Slot) foodSlot.get(1);
 

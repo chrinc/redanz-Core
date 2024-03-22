@@ -1,13 +1,9 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
-import ch.redanz.redanzCore.model.profile.config.PersonConfig;
-import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
-import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Component

@@ -15,9 +15,9 @@ import java.util.Map;
 @Slf4j
 @Getter
 public enum EventVolunteerTypeConfig {
-  EVENT_TWO_HOURS(EventConfig.EVENT2023, VolunteerTypeConfig.TWO_HOURS),
-  EVENT_SIX_HOURS(EventConfig.EVENT2023, VolunteerTypeConfig.SIX_HOURS),
-  EVENT_NO_PREF_HOURS(EventConfig.EVENT2023, VolunteerTypeConfig.NO_PREFS);
+  EVENT_TWO_HOURS(EventConfig.REDANZ_EVENT, VolunteerTypeConfig.TWO_HOURS),
+  EVENT_SIX_HOURS(EventConfig.REDANZ_EVENT, VolunteerTypeConfig.SIX_HOURS),
+  EVENT_NO_PREF_HOURS(EventConfig.REDANZ_EVENT, VolunteerTypeConfig.NO_PREFS);
 
   private final EventConfig eventConfig;
   private final VolunteerTypeConfig volunteerTypeConfig;

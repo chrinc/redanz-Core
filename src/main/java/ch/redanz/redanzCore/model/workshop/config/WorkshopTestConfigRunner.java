@@ -67,7 +67,6 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       PrivateClassConfig.setup(privateClassService);
       EventPrivateClassConfig.setup(privateClassService, eventService);
       EventSpecialsConfig.setup(specialService, eventService);
-      BundleSpecialConfig.setup(specialService, bundleService);
     }
   }
 }

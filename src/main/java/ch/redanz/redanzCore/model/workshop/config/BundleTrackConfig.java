@@ -9,11 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public enum BundleTrackConfig {
-//  LEVEL_ADVANCED(BundleConfig.LEVELPASS, TrackConfig.LINDY_ADVANCED),
-//  LEVEL_INTERMEDIATE(BundleConfig.LEVELPASS, TrackConfig.LINDY_INTERMEDIATE),
-//  LEVEL_BEGINNER(BundleConfig.LEVELPASS, TrackConfig.LINDY_BEGINNER),
-  EXTRA_FUN_TRACK(BundleConfig.EXTRA_FUN_PASS, TrackConfig.FUN_FREE_CHOICE),
-  FUN_TRACK(BundleConfig.FUN_PASS, TrackConfig.FUN_FREE_CHOICE);
+  LEVEL_ADVANCED(BundleConfig.FULL_PASS, TrackConfig.ADVANCED),
+  LEVEL_INTERMEDIATE(BundleConfig.FULL_PASS, TrackConfig.INTERMEDIATE),
+  LEVEL_NO_LEVEL(BundleConfig.FULL_PASS, TrackConfig.NO_LEVEL);
 
   private final BundleConfig bundle;
   private final TrackConfig track;
@@ -25,12 +23,12 @@ public enum BundleTrackConfig {
 
   public static void setup(BundleService bundleService, TrackService trackService) {
     for (BundleTrackConfig bundleTrackConfig : BundleTrackConfig.values()) {
-      if (!bundleService.bundleTrackExists(bundleService.findByInternalId(bundleTrackConfig.getBundle().getInternalId()), trackService.findByInternalId(bundleTrackConfig.getTrack().getInternalId())))
+      if (!bundleService.bundleTrackExists(bundleService.findByName(bundleTrackConfig.getBundle().getName()), trackService.findByName(bundleTrackConfig.getTrack().getName())))
       {
         bundleService.save(
           new BundleTrack(
-            trackService.findByInternalId(bundleTrackConfig.getTrack().getInternalId()),
-            bundleService.findByInternalId(bundleTrackConfig.getBundle().getInternalId())
+            trackService.findByName(bundleTrackConfig.getTrack().getName()),
+            bundleService.findByName(bundleTrackConfig.getBundle().getName())
           )
         );
       }

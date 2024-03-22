@@ -43,9 +43,6 @@ public class Bundle implements Serializable {
 
   private String name;
 
-  @Column(name = "internal_id")
-  private String internalId;
-
   private double price;
   private String description;
   private Integer capacity;
@@ -72,7 +69,6 @@ public class Bundle implements Serializable {
     String description,
     Integer capacity,
     Boolean simpleTicket,
-    String internalId,
     Integer seqNr,
     List<Slot> partySlots,
     String color
@@ -82,7 +78,6 @@ public class Bundle implements Serializable {
     this.description = description;
     this.capacity = capacity;
     this.simpleTicket = simpleTicket;
-    this.internalId = internalId;
     this.seqNr = seqNr;
     this.partySlots = partySlots;
     this.color = color;
@@ -91,62 +86,18 @@ public class Bundle implements Serializable {
   public static List<Map<String, String>> schema() {
     return new ArrayList<>() {
       {
-        add(new HashMap<>() {{
-          put("key", "eventId");
-          put("type", "id");
-          put("label", "EventId");
-        }});
-        add(new HashMap<>() {{
-          put("key", "bundleId");
-          put("type", "id");
-          put("label", "BundleId");
-        }});
-        add(new HashMap<>() {{
-          put("key", "name");
-          put("type", "text");
-          put("label", "Name");
-        }});
-        add(new HashMap<>() {{
-          put("key", "price");
-          put("type", "number");
-          put("label", "Price");
-        }});
-        add(new HashMap<>() {{
-          put("key", "capacity");
-          put("type", "number");
-          put("label", "Capacity");
-        }});
-        add(new HashMap<>() {{
-          put("key", "simpleTicket");
-          put("type", "boolean");
-          put("label", "simpleTicket");
-        }});
-        add(new HashMap<>() {{
-          put("key", "description");
-          put("type", "text");
-          put("label", "Description");
-        }});
-        add(new HashMap<>() {{
-          put("key", "isEdit");
-          put("type", "isEdit");
-          put("label", "");
-        }});
-        add(new HashMap<>() {{
-          put("key", "internalId");
-          put("type", "internalId");
-          put("label", "Internal ID");
-        }});
-
-        add(new HashMap<>() {{
-          put("key", "color");
-          put("type", "color");
-          put("label", "Wrist Band Color");
-        }});
-        add(new HashMap<>() {{
-          put("key", "seqNr");
-          put("type", "seqNr");
-          put("label", "Sequence Number");
-        }});
+        add(new HashMap<>() {{put("key", "eventId");                  put("type", "id");                                    put("label", "EventId");          }});
+        add(new HashMap<>() {{put("key", "id");                       put("type", "id");                                    put("label", "Bundle Id");        }});
+        add(new HashMap<>() {{put("key", "name");                     put("type", "text");      put("required", "true");    put("label", "Name");             }});
+        add(new HashMap<>() {{put("key", "price");                    put("type", "number");    put("required", "true");    put("label", "Price");            }});
+        add(new HashMap<>() {{put("key", "capacity");                 put("type", "number");    put("required", "true");    put("label", "Capacity");         }});
+        add(new HashMap<>() {{put("key", "simpleTicket");             put("type", "boolean");                               put("label", "simpleTicket");     }});
+        add(new HashMap<>() {{put("key", "description");              put("type", "label");     put("required", "true");    put("label", "Description");      }});
+        add(new HashMap<>() {{put("key", "simpleTicket");             put("type", "bool");                                  put("labelTrue", "Simple Ticket"); put("labelFalse", "Regular Bundle"); }});
+        add(new HashMap<>() {{put("key", "color");                    put("type", "color");     put("required", "false");   put("label", "Wrist Band Color"); }});
+        add(new HashMap<>() {{put("key", "seqNr");                    put("type", "number");    put("required", "true");    put("label", "Sequence Number");  }});
+        add(new HashMap<>() {{put("key", "track");                    put("type", "attribute");                             put("label", "Tracks");}});
+//        add(new HashMap<>() {{put("key", "bundle");                   put("type", "list");    put("required", "true");      put("label", "Bundles"); put("list", null);}});
       }
     };
   }
@@ -154,12 +105,13 @@ public class Bundle implements Serializable {
   public Map<String, String> dataMap() {
     return new HashMap<>() {
       {
-        put("bundleId", Long.toString(bundleId));
+        put("id", Long.toString(bundleId));
         put("name", name);
         put("price", String.valueOf(price));
         put("capacity", String.valueOf(capacity));
         put("description", description);
         put("simpleTicket", simpleTicket.toString());
+        put("color", color);
         put("seqNr", String.valueOf(seqNr));
       }
     };

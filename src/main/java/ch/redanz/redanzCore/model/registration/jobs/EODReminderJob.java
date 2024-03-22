@@ -1,6 +1,5 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
-import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Component
 @Slf4j

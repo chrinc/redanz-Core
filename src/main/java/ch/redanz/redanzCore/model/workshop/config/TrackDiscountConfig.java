@@ -11,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum TrackDiscountConfig {
-  DISCOUNT_FUN_ABROAD(TrackConfig.FUN_FREE_CHOICE, DiscountConfig.ABROAD),
-  DISCOUNT_FUN_STUDENT(TrackConfig.FUN_FREE_CHOICE, DiscountConfig.STUDENT)
+  DISCOUNT_FUN_ABROAD(TrackConfig.INTERMEDIATE, DiscountConfig.ABROAD),
+  DISCOUNT_FUN_STUDENT(TrackConfig.INTERMEDIATE, DiscountConfig.STUDENT)
 
 //  DISCOUNT_LINDY_ADVANCED_ABROAD(TrackConfig.LINDY_ADVANCED, DiscountConfig.ABROAD),
 //  DISCOUNT_LINDY_ADVANCED_STUDENT(TrackConfig.LINDY_ADVANCED, DiscountConfig.STUDENT),
@@ -30,7 +30,7 @@ public enum TrackDiscountConfig {
     for (TrackDiscountConfig trackDiscountConfig : TrackDiscountConfig.values()) {
       if (
         !trackService.trackDiscountExists(
-          trackService.findByInternalId(trackDiscountConfig.trackConfig.getInternalId())
+          trackService.findByName(trackDiscountConfig.trackConfig.getName())
           ,discountService.findByName(trackDiscountConfig.discountConfig.getName())
           )
       ) {

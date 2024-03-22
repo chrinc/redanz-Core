@@ -11,14 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum TrackConfig {
-  FUN_FREE_CHOICE("FUN Free Choice", "", 998, true, null, "fun_free_choice");
+  ADVANCED("Advanced Track", "", 998, true, null),
+  INTERMEDIATE("Intermediate Track", "", 998, true, null),
+  NO_LEVEL("No Level Track", "", 998, true, null);
 
   private final String name;
   private final String description;
   private final Integer capacity;
   private final Boolean partnerRequired;
   private final DanceLevel requiredDanceLevel;
-  private final String internalId;
 
   public static void setup(TrackService trackService) {
     for (TrackConfig trackConfig : TrackConfig.values()) {
@@ -29,8 +30,7 @@ public enum TrackConfig {
             trackConfig.description,
             trackConfig.capacity,
             trackConfig.partnerRequired,
-            trackConfig.requiredDanceLevel,
-            trackConfig.internalId
+            trackConfig.requiredDanceLevel
           )
         );
       } else {
@@ -39,7 +39,6 @@ public enum TrackConfig {
         track.setCapacity(trackConfig.capacity);
         track.setPartnerRequired(trackConfig.partnerRequired);
         track.setRequiredDanceLevel(trackConfig.requiredDanceLevel);
-        track.setInternalId(trackConfig.internalId);
         trackService.save(track);
       }
     }

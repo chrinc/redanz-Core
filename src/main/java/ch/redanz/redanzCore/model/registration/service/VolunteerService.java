@@ -1,14 +1,12 @@
 package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
-import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.VolunteerRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.VolunteerSlotRegistrationRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.SleepUtil;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.entities.VolunteerType;
 import ch.redanz.redanzCore.model.workshop.repository.VolunteerTypeRepo;

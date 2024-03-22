@@ -6,7 +6,6 @@ import ch.redanz.redanzCore.model.registration.service.DonationRegistrationServi
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseDonation;
-import ch.redanz.redanzCore.model.reporting.response.ResponseVolunteer;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import lombok.AllArgsConstructor;

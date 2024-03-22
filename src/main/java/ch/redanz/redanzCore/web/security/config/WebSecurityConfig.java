@@ -78,12 +78,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowCredentials(true);
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://stirit.redanz.ch","https://redanz.ch", "https://register.stirit.ch"));
+    configuration.setAllowedOrigins(Arrays.asList("https://registration.stirit.ch", "https://model.redanz.ch", "https://redanz.ch"));
     configuration.addAllowedOriginPattern(CorsConfiguration.ALL);
     configuration.setAllowedMethods(List.of(CorsConfiguration.ALL));
     configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//    source.registerCorsConfiguration("*", configuration);
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }

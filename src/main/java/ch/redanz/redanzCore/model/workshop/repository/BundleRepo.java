@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BundleRepo extends JpaRepository<Bundle, Long> {
   Bundle findByName(String name);
-  Bundle findByInternalId(String internalId);
   Boolean existsByName(String name);
   Bundle findByBundleId(Long bundleId);
 }
