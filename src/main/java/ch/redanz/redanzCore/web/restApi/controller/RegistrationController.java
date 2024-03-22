@@ -239,7 +239,6 @@ public class RegistrationController {
     @RequestBody String jsonObject
   ) {
     try {
-      log.info("inc@start");
       Event event = eventService.findByEventId(eventId);
       registrationService.updateSoldOut(event);
 

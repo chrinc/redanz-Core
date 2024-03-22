@@ -34,26 +34,17 @@ public class EmailController {
     try {
       JsonObject jsonEmail = JsonParser.parseString(emailContent).getAsJsonObject();
       Boolean allWithBundle =
-        jsonEmail.get("allWithBundle") != null ?
-          (
-            !jsonEmail.get("allWithBundle").isJsonNull() ?
-              jsonEmail.get("allWithBundle").getAsBoolean() : false
-          )
-          : false;
+        jsonEmail.get("allWithBundle") != null && (
+          !jsonEmail.get("allWithBundle").isJsonNull() && jsonEmail.get("allWithBundle").getAsBoolean()
+        );
       Boolean allWithLang =
-        jsonEmail.get("allWithLang") != null ?
-          (
-            !jsonEmail.get("allWithLang").isJsonNull() ?
-              jsonEmail.get("allWithLang").getAsBoolean() : false
-          )
-          : false;
+        jsonEmail.get("allWithLang") != null && (
+          !jsonEmail.get("allWithLang").isJsonNull() && jsonEmail.get("allWithLang").getAsBoolean()
+        );
       Boolean allStatus =
-        jsonEmail.get("allStatus") != null ?
-          (
-            !jsonEmail.get("allStatus").isJsonNull() ?
-              jsonEmail.get("allStatus").getAsBoolean() : false
-          )
-          : false;
+        jsonEmail.get("allStatus") != null && (
+          !jsonEmail.get("allStatus").isJsonNull() && jsonEmail.get("allStatus").getAsBoolean()
+        );
 
       Registration registration = registrationService.findByRegistrationId(registrationId);
 

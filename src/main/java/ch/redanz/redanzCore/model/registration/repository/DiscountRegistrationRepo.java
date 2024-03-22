@@ -13,7 +13,6 @@ import java.util.Optional;
 public interface DiscountRegistrationRepo extends JpaRepository<DiscountRegistration, Long> {
   List<DiscountRegistration> findAllByRegistration(Registration registration);
   Optional<DiscountRegistration> findAllByRegistrationAndDiscount(Registration registration, Discount discount);
-//  void deleteAllByRegistration(Registration registration);
   void deleteAllByRegistrationAndDiscount(Registration registration, Discount discount);
   int countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(Discount discount, WorkflowStatus workflowStatus, Event event);
 }

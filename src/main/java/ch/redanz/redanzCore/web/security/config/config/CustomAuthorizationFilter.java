@@ -1,4 +1,4 @@
-package ch.redanz.redanzCore.web.security.config;
+package ch.redanz.redanzCore.web.security.config.config;
 
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.service.PersonService;

@@ -1,4 +1,4 @@
-package ch.redanz.redanzCore.web.security.config;
+package ch.redanz.redanzCore.web.security.config.config;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
