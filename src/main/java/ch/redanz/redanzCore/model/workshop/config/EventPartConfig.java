@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.config;
 
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
 import ch.redanz.redanzCore.model.workshop.entities.EventPart;
 import ch.redanz.redanzCore.model.workshop.service.EventPartService;
 import lombok.AllArgsConstructor;
@@ -56,12 +57,18 @@ public enum EventPartConfig {
 
     public static void setup(EventPartService eventPartService) {
       for (EventPartConfig eventPartConfig : EventPartConfig.values()) {
-        eventPartService.save(
-          new EventPart(
-            eventPartConfig.getEventPartKey(),
-            eventPartConfig.getName()
-          )
-        );
+        if (!eventPartService.existsByKey(eventPartConfig.getEventPartKey())) {
+          eventPartService.save(
+            new EventPart(
+              eventPartConfig.getEventPartKey(),
+              eventPartConfig.getName()
+            )
+          );
+        } else {
+          EventPart eventPart = eventPartService.findByKey(eventPartConfig.getEventPartKey());
+          eventPart.setName(eventPartConfig.name);
+          eventPartService.save(eventPart);
+        }
       }
     }
   }

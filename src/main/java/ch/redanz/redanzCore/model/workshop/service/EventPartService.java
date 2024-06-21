@@ -51,17 +51,17 @@ public class EventPartService {
       .filter(map -> key.equals(map.get("key")))
       .forEach(map -> map.put("hide", "true"));
   }
+  public boolean existsByKey(String eventPartKey) {
+    return eventPartRepo.existsByEventPartKey(eventPartKey);
+  }
 
   public List<Map<String, String>> getEventPartInfoSchema(EventPartInfo eventPartInfo) {
-    log.info("inc@getEventPartInfoSchema 1");
     List<Map<String, String>> eventPartInfoSchema = EventPartInfo.schema();
     eventPartInfoSchema.stream()
       .filter(map -> "title".equals(map.get("type")) && "plural".equals(map.get("key")))
       .forEach(map -> map.put("label", eventPartInfo.getEventPart().getName()));
-    log.info("inc@getEventPartInfoSchema 2");
 
     if (!eventPartInfo.isTitleActive()) {hideSchemaItem(eventPartInfoSchema, "title");}
-    log.info("inc@getEventPartInfoSchema 3" );
     if (!eventPartInfo.isTitleExistActive()) {hideSchemaItem(eventPartInfoSchema, "titleExist");}
     if (!eventPartInfo.isInvalidActive()) {hideSchemaItem(eventPartInfoSchema, "invalid");}
     if (!eventPartInfo.isSubtitleActive()) {hideSchemaItem(eventPartInfoSchema, "subtitle");}
@@ -70,7 +70,6 @@ public class EventPartService {
     if (!eventPartInfo.isHintLinkActive()) {hideSchemaItem(eventPartInfoSchema, "hintLink");}
     if (!eventPartInfo.isHint2Active()) {hideSchemaItem(eventPartInfoSchema, "hint2");}
     if (!eventPartInfo.isHint2LinkActive()) {hideSchemaItem(eventPartInfoSchema, "hint2Link");}
-    log.info("inc@getEventPartInfoSchema 4");
 
     return eventPartInfoSchema;
   }

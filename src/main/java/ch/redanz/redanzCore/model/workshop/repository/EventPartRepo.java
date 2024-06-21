@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface EventPartRepo extends JpaRepository<EventPart, Long> {
   EventPart findByName(String name);
   EventPart findByEventPartKey(String eventPartKey);
+  boolean existsByEventPartKey(String eventPartKey);
 }
