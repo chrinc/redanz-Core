@@ -80,12 +80,13 @@ public class EventController {
     @RequestParam("eventId") Long eventId,
     @RequestParam("eventPartKey") String eventPartKey
   ) {
-//    log.info(eventPartKey);
-    return eventPartService.getEventPartInfoSchema(
-      eventPartService.findByEventAndEventPart(eventService.findByEventId(eventId)
-        , eventPartService.findByKey(eventPartKey)
-      )
+    log.info(eventPartKey);
+    log.info(eventId.toString());
+    EventPartInfo eventPartInfo = eventPartService.findByEventAndEventPart(
+      eventService.findByEventId(eventId)
+      ,eventPartService.findByKey(eventPartKey)
     );
+    return eventPartService.getEventPartInfoSchema(eventPartInfo);
   }
 
   @GetMapping(path = "/data/eventPartInfo")

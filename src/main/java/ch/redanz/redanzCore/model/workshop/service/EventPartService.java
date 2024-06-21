@@ -34,6 +34,8 @@ public class EventPartService {
     eventPartInfoRepo.save(eventPartInfo);
   }
   public EventPartInfo findByEventAndEventPart(Event event, EventPart eventPart) {
+    log.info("findByEventAndEventPart, event: " + event.getName());
+    log.info("findByEventAndEventPart, event: " + eventPart.getEventPartKey());
     return eventPartInfoRepo.findByEventAndEventPart(event, eventPart);
   }
 
@@ -51,18 +53,15 @@ public class EventPartService {
   }
 
   public List<Map<String, String>> getEventPartInfoSchema(EventPartInfo eventPartInfo) {
+    log.info("inc@getEventPartInfoSchema 1");
     List<Map<String, String>> eventPartInfoSchema = EventPartInfo.schema();
-//    eventPartInfoSchema.stream()
-//      .filter(map -> "title".equals(map.get("type") && "singular".equals(map.get("key"))))
-//      .map(map -> map.put("label", eventPartInfo.getEventPart().getName()));
     eventPartInfoSchema.stream()
       .filter(map -> "title".equals(map.get("type")) && "plural".equals(map.get("key")))
       .forEach(map -> map.put("label", eventPartInfo.getEventPart().getName()));
-//    eventPartInfoSchema.forEach(stringStringMap -> {
-//
-//    })
+    log.info("inc@getEventPartInfoSchema 2");
 
     if (!eventPartInfo.isTitleActive()) {hideSchemaItem(eventPartInfoSchema, "title");}
+    log.info("inc@getEventPartInfoSchema 3" );
     if (!eventPartInfo.isTitleExistActive()) {hideSchemaItem(eventPartInfoSchema, "titleExist");}
     if (!eventPartInfo.isInvalidActive()) {hideSchemaItem(eventPartInfoSchema, "invalid");}
     if (!eventPartInfo.isSubtitleActive()) {hideSchemaItem(eventPartInfoSchema, "subtitle");}
@@ -71,6 +70,7 @@ public class EventPartService {
     if (!eventPartInfo.isHintLinkActive()) {hideSchemaItem(eventPartInfoSchema, "hintLink");}
     if (!eventPartInfo.isHint2Active()) {hideSchemaItem(eventPartInfoSchema, "hint2");}
     if (!eventPartInfo.isHint2LinkActive()) {hideSchemaItem(eventPartInfoSchema, "hint2Link");}
+    log.info("inc@getEventPartInfoSchema 4");
 
     return eventPartInfoSchema;
   }

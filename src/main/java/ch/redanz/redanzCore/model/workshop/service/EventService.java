@@ -314,7 +314,10 @@ public class EventService {
 
   public List<Map<String, String>> getBundlesData(Event event) {
     List<Map<String, String>> bundlesData = new ArrayList<>();
-    event.getEventBundles().forEach(
+    Set<EventBundle> eventBundlesSet = event.getEventBundles();
+    List<EventBundle> eventBundlesList = new ArrayList<>(eventBundlesSet);
+    eventBundlesList.sort(Comparator.comparingInt(eventBundle -> eventBundle.getBundle().getSeqNr()));
+    eventBundlesList.forEach(
       eventBundle -> {
         // bundle data
         Map<String, String> bundleData = eventBundle.getBundle().dataMap();
@@ -326,6 +329,7 @@ public class EventService {
         bundleData.put("track", bundleService.bundleEventTrackIds(eventBundle.getBundle()).toString());
         bundlesData.add(bundleData);
       });
+
     return bundlesData;
   }
 
