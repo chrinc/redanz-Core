@@ -69,6 +69,7 @@ public class ProfileService {
     if (person.getUser() != null) {
       userService.delete(person.getUser());
       person.setUser(null);
+      person.setEmail(null);
     }
 
     person.setActive(false);
