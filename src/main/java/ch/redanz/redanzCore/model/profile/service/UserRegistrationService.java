@@ -56,8 +56,7 @@ public class UserRegistrationService {
 
   @Transactional
   public String confirmToken(String token) {
-    String baseUrl = environment.getProperty("link.email.confirmed");
-
+    String baseUrl = "/email/confirmed";
     ConfirmationToken confirmationToken = confirmationTokenService
       .getToken(token)
       .orElseThrow(() ->
@@ -84,7 +83,6 @@ public class UserRegistrationService {
     userService.enableUser(
       confirmationToken.getUser().getUsername()
     );
-
     return
       baseUrl
         + "/" + OutTextConfig.LABEL_EMAIL_CONFIRMED_EN.getOutTextKey().toLowerCase()

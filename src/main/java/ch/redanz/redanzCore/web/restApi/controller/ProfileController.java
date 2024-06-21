@@ -18,14 +18,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -63,12 +64,29 @@ public class ProfileController {
   }
 
   @GetMapping(path = "/user/registration/confirm")
-  public ResponseEntity<Void> confirm(@RequestParam("token") String token) {
-    String link = userRegistrationService.confirmToken(token);
-    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(
-      Objects.requireNonNull(link)
-    )).build();
+  public String confirm(@RequestParam("token") String token) {
+    try {
+      String link = userRegistrationService.confirmToken(token);
+      log.info("link");
+      log.info(link);
+      return link;
+    } catch (ApiRequestException apiRequestException) {
+      log.info("inc@apiRequestException");
+      log.info(apiRequestException.getMessage());
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      log.info("inc@exception");
+      log.info(exception.getMessage());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
+//  @GetMapping(path = "/user/registration/confirm")
+//  public ResponseEntity<Void> confirm(@RequestParam("token") String token) {
+//    String link = userRegistrationService.confirmToken(token);
+//    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(
+//      Objects.requireNonNull(link)
+//    )).build();
+//  }
 
   @GetMapping(path = "/country/all")
   public List<Country> getAllCountries() {
