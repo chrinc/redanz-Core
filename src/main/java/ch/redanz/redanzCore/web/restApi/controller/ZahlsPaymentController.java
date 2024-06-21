@@ -5,7 +5,7 @@ import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.registration.service.PaymentService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonParser;
@@ -32,6 +32,7 @@ public class ZahlsPaymentController {
     @RequestParam("registrationId") Long registrationId
   ) {
     try {
+
       return paymentService.getPaymentDetails(
         registrationService.findByRegistrationId(registrationId)
       );
@@ -42,12 +43,13 @@ public class ZahlsPaymentController {
 
   @GetMapping("/payment-confirmation")
   public ResponseEntity<Boolean> getPaymentConfirmation(
-    @RequestParam Long userId
+    @RequestParam Long userId,
+    @RequestParam Long registrationId
   ) {
     try {
       return
         ResponseEntity.ok().body(paymentService.awaitPaymentConfirmation(
-            registrationService.getRegistration(userId, eventService.getCurrentEvent(), RegistrationType.PARTICIPANT)
+            registrationService.getRegistration(userId, registrationService.findByRegistrationId(registrationId).getEvent(), RegistrationType.PARTICIPANT)
           )
         );
     } catch (TimeoutException timeoutException) {

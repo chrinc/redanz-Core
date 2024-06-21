@@ -6,7 +6,7 @@ import ch.redanz.redanzCore.model.registration.service.CheckInService;
 import ch.redanz.redanzCore.model.registration.service.GuestService;
 import ch.redanz.redanzCore.model.reporting.response.*;
 import ch.redanz.redanzCore.model.reporting.service.*;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
@@ -59,31 +59,31 @@ public class ReportController {
       eventService.findByEventId(eventId)
     );
   }
-
-  @GetMapping(path = "/registration/all")
-  public List<ResponseRegistration> getAllRegistrationsReport() {
-    return reportRegistrationService.getAllRegistrationsReport();
-  }
-
-  @GetMapping(path = "/registration/open")
-  public List<ResponseRegistration> getOpenRegistrationsReport() {
-    return reportRegistrationService.getOpenRegistrationsReport();
-  }
-
-  @GetMapping(path = "/registration/confirming")
-  public List<ResponseRegistration> getConfirmingRegistrationsReport() {
-    return reportRegistrationService.getConfirmingRegistrationsReport();
-  }
-
-  @GetMapping(path = "/registration/submitted")
-  public List<ResponseRegistration> getSubmittedRegistrationsReport() {
-    return reportRegistrationService.getSubmittedRegistrationsReport();
-  }
-
-  @GetMapping(path = "/registration/done")
-  public List<ResponseRegistration> getDoneRegistrationsReport() {
-    return reportRegistrationService.getDoneRegistrationsReport();
-  }
+//
+//  @GetMapping(path = "/registration/all")
+//  public List<ResponseRegistration> getAllRegistrationsReport() {
+//    return reportRegistrationService.getAllRegistrationsReport();
+//  }
+//
+//  @GetMapping(path = "/registration/open")
+//  public List<ResponseRegistration> getOpenRegistrationsReport() {
+//    return reportRegistrationService.getOpenRegistrationsReport();
+//  }
+//
+//  @GetMapping(path = "/registration/confirming")
+//  public List<ResponseRegistration> getConfirmingRegistrationsReport() {
+//    return reportRegistrationService.getConfirmingRegistrationsReport();
+//  }
+//
+//  @GetMapping(path = "/registration/submitted")
+//  public List<ResponseRegistration> getSubmittedRegistrationsReport() {
+//    return reportRegistrationService.getSubmittedRegistrationsReport();
+//  }
+//
+//  @GetMapping(path = "/registration/done")
+//  public List<ResponseRegistration> getDoneRegistrationsReport() {
+//    return reportRegistrationService.getDoneRegistrationsReport();
+//  }
 
   @GetMapping(path = "/registration/details")
   public List<ResponseRegistrationDetails> getRegistrationDetailsReport(

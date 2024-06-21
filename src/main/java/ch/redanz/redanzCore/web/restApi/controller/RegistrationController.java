@@ -5,14 +5,16 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.registration.service.*;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonParser;
 import freemarker.template.Configuration;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +36,7 @@ public class RegistrationController {
   private final GuestService guestService;
   private final CheckInService checkInService;
   private final RegistrationEmailService registrationEmailService;
+  private final ErrorLogService errorLogService;
 
   @Autowired
   Configuration mailConfig;
@@ -45,9 +48,12 @@ public class RegistrationController {
     @RequestParam("eventId") Long eventId
   ) {
     try {
-      return registrationService.getRegistrationResponse(personId, eventId);
-//      return registrationService.getRegistrationResponse(personId, eventId, RegistrationType.PARTICIPANT);
+//      return null;
+      RegistrationResponse response = registrationService.getRegistrationResponse(personId, eventId);
+      Hibernate.initialize(response.getWorkflowStatus());
+      return response;
     } catch (Exception exception) {
+      errorLogService.addLog("/registration", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -60,6 +66,7 @@ public class RegistrationController {
     try {
       return registrationService.getNewRegistrationResponse(eventId);
     } catch (Exception exception) {
+      errorLogService.addLog("/registration/new", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -72,6 +79,7 @@ public class RegistrationController {
     try {
       return registrationService.getAllUserRegistrationResponses(personId);
     } catch (Exception exception) {
+      errorLogService.addLog("/AllUserRegistrations", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -84,6 +92,7 @@ public class RegistrationController {
     try {
       return registrationService.getUserActiveRegistrationResponses(personId);
     } catch (Exception exception) {
+      errorLogService.addLog("/UserActiveRegistrations", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -97,6 +106,7 @@ public class RegistrationController {
     try {
       return registrationService.getUserInactiveRegistrationResponses(personId);
     } catch (Exception exception) {
+      errorLogService.addLog("/UserInactiveRegistrations", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -113,6 +123,7 @@ public class RegistrationController {
         registrationService.findByRegistrationId(registrationId2)
       );
     } catch (Exception exception) {
+      errorLogService.addLog("/manual-match", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -127,6 +138,7 @@ public class RegistrationController {
         registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-release", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -140,6 +152,7 @@ public class RegistrationController {
         registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-cancel", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -154,6 +167,7 @@ public class RegistrationController {
         registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-delete", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -168,6 +182,7 @@ public class RegistrationController {
         registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-delete/host", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -182,6 +197,7 @@ public class RegistrationController {
         registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-delete/hostee", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -195,6 +211,7 @@ public class RegistrationController {
         registrationService.findByRegistrationId(registrationId)
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-delete/volunteer", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -212,6 +229,7 @@ public class RegistrationController {
         workflowStatusService.getConfirming()
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-confirming", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -227,6 +245,7 @@ public class RegistrationController {
         workflowStatusService.getSubmitted()
       );
     } catch (Exception exception) {
+      errorLogService.addLog("manual-submitted", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -239,7 +258,7 @@ public class RegistrationController {
     @RequestBody String jsonObject
   ) {
     try {
-      log.info("inc@start");
+//      log.info("inc@start");
       Event event = eventService.findByEventId(eventId);
       registrationService.updateSoldOut(event);
 
@@ -251,22 +270,32 @@ public class RegistrationController {
 
       );
 
+//      log.info("bfr automatch");
+
       // match
       if (baseParService.doAutoMatch()) {
+//        log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
+//        log.info("bfr doMatching");
         registrationMatchingService.doMatching(registration);
       }
 
+//      log.info("bfr release");
       // release
       if (baseParService.doAutoRelease()) {
+//      log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
+//      log.info("bfr doRelease");
         registrationReleaseService.doRelease(registration);
+//      log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
       }
 
     } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("registrationUpdate", apiRequestException.getMessage());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
+      errorLogService.addLog("registrationUpdate", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
   }
@@ -289,8 +318,10 @@ public class RegistrationController {
       );
 
     } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("staffUpdateApi", apiRequestException.toString());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
+      errorLogService.addLog("StaffUpdate", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
   }
@@ -316,27 +347,11 @@ public class RegistrationController {
       Event event = eventService.findByEventId(eventId);
       guestService.updateGuestListRequest(JsonParser.parseString(guestsJsonObject).getAsJsonArray(), event);
     } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
+      errorLogService.addLog("GuestsUpdateApi", apiRequestException.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
-    }
-  }
-
-  @PostMapping(path = "/guest/update")
-  @Transactional
-  public void guestUpdate(
-    @RequestParam("personId") Long personId,
-    @RequestParam("eventId") Long eventId,
-    @RequestBody String guestJsonObject
-  ) {
-    try {
-      // log.info("update guest List");
-      Event event = eventService.findByEventId(eventId);
-      guestService.updateGuestRequest(JsonParser.parseString(guestJsonObject).getAsJsonObject(), event);
-    } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+      errorLogService.addLog("GuestsUpdate", exception.toString());
+      throw new ApiRequestException(exception.getMessage());
     }
   }
 
@@ -352,8 +367,10 @@ public class RegistrationController {
       Event event = eventService.findByEventId(eventId);
       guestService.removeGuest(JsonParser.parseString(guestJsonObject).getAsJsonObject(), event);
     } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("GuestsRemoveApi", apiRequestException.toString());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
+      errorLogService.addLog("GuestsRemove", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
   }
@@ -369,8 +386,10 @@ public class RegistrationController {
       Event event = eventService.findByEventId(eventId);
       checkInService.checkInRequest(JsonParser.parseString(guestJsonObject).getAsJsonObject());
     } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("CheckInApi", apiRequestException.toString());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
+      errorLogService.addLog("CheckIn", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
   }

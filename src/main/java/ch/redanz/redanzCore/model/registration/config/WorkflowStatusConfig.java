@@ -2,7 +2,7 @@ package ch.redanz.redanzCore.model.registration.config;
 
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

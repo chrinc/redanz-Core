@@ -15,7 +15,8 @@ import java.util.Map;
 public class RegistrationResponse {
   private Long registrationId;
   private Long personId;
-  private Event event;
+  private Long eventId;
+//  private Event event;
   private Long bundleId;
   private Long trackId;
   private Long danceRoleId;
@@ -31,19 +32,31 @@ public class RegistrationResponse {
   private List<SpecialRegistration> specialRegistrations;
   private List<PrivateClassRegistration> privateClassRegistrations;
 
-  public RegistrationResponse(Long registrationId, Long personId, Event event, Long bundleId) {
+  public RegistrationResponse(Long registrationId, Long personId
+//    , Event event
+    , Long eventId
+    , Long bundleId) {
     this.registrationId = registrationId;
     this.personId = personId;
-    this.event = event;
+//    this.event = event;
+    this.eventId = eventId;
     this.bundleId = bundleId;
   }
-  public RegistrationResponse(Long personId, Event event) {
+  public RegistrationResponse(Long personId
+//    , Event event
+    , Long eventId
+  ) {
     this.personId = personId;
-    this.event = event;
+    this.eventId = eventId;
+//    this.event = event;
 //    this.workflowStatus = workflowStatus;
   }
 
-  public RegistrationResponse(Event event) {
-    this.event = event;
+  public RegistrationResponse(
+//    Event event
+    Long eventId
+  ) {
+//    this.event = event;
+    this.eventId = eventId;
   }
 }

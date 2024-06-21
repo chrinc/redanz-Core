@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.response;
 
+import ch.redanz.redanzCore.model.workshop.entities.EventFoodSlot;
 import ch.redanz.redanzCore.model.workshop.entities.SleepUtil;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,7 +18,7 @@ import java.util.List;
 public class AccommodationResponse {
   private List<Slot> hostSlots;
   private List<Slot> hosteeSlots;
-  private List<Object> foodSlots;
+  private Set<EventFoodSlot> foodSlots;
   private List<SleepUtil> hostSleepUtils;
   private List<SleepUtil> hosteeSleepUtils;
 }

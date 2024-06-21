@@ -1,6 +1,6 @@
 package ch.redanz.redanzCore.web.security.config;
 
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

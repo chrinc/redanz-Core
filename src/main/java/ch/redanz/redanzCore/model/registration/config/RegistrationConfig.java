@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.registration.config;
 
+import ch.redanz.redanzCore.model.profile.config.PersonConfig;
 import ch.redanz.redanzCore.model.profile.config.UserConfig;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
@@ -8,6 +9,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.config.*;
+import ch.redanz.redanzCore.model.workshop.configTest.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -25,7 +27,7 @@ public enum RegistrationConfig {
   NORMA_REGISTRATION  (
     UserConfig.NORMA_USER,
     EventConfig.REDANZ_EVENT,
-    BundleConfig.FULL_PASS,
+    BundleConfig.HALF_PASS,
     TrackConfig.INTERMEDIATE,
     DanceRoleConfig.FOLLOWER,
     List.of(DiscountConfig.EARLY_BIRD),
@@ -44,14 +46,14 @@ public enum RegistrationConfig {
       DiscountConfig.EARLY_BIRD
     ),
     List.of(
-      Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_FRIDAY_EVENING),
-      Map.of(FoodConfig.FOOD_VEDA, SlotConfig.SLOT_SATURDAY_LUNCH)
+      Map.of(FoodConfig.FOOD_VARIETY, SlotConfig.SLOT_SATURDAY_LUNCH),
+      Map.of(FoodConfig.FOOD_ORIENTAL, SlotConfig.SLOT_SUNDAY_LUNCH)
     ),
     100
   ),
   ESTHER_REGISTRATION(UserConfig.ESTHER_USER,
     EventConfig.REDANZ_EVENT,
-    BundleConfig.PARTYPASS,
+    BundleConfig.PARTY_PASS,
     null,
     null,
     null,
@@ -62,7 +64,7 @@ public enum RegistrationConfig {
   OLIVER_REGISTRATION(
     UserConfig.OLIVER_USER
     , EventConfig.REDANZ_EVENT
-    , BundleConfig.HALF_PASS
+    , BundleConfig.FULL_PASS
     , TrackConfig.INTERMEDIATE
     , DanceRoleConfig.FOLLOWER
     , List.of(
@@ -95,11 +97,12 @@ public enum RegistrationConfig {
       DiscountConfig.EARLY_BIRD
     ),
     null,
-    20),
+    20
+),
   CLAUDIA_REGISTRATION(
     UserConfig.CLAUDIA_USER,
     EventConfig.REDANZ_EVENT,
-    BundleConfig.FULL_PASS,
+    BundleConfig.HALF_PASS,
     TrackConfig.INTERMEDIATE,
     DanceRoleConfig.SWITCH,
     List.of(
@@ -107,7 +110,7 @@ public enum RegistrationConfig {
     ), null,
     160
   );
-
+;
   private final UserConfig userConfig;
   private final EventConfig eventConfig;
   private final BundleConfig bundleConfig;

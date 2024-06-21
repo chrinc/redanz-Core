@@ -3,7 +3,7 @@ package ch.redanz.redanzCore.web.restApi.controller;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

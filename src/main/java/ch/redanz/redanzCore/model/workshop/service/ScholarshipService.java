@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.VolunteerTypeRepo;
@@ -72,6 +73,10 @@ public class ScholarshipService {
         add(new HashMap<>() {{put("key", "id");               put("type", "id");            put("label", "id");}});
         add(new HashMap<>() {{put("key", "scholarship");      put("type", "bool");          put("labelTrue", "Enable Scholarship"); put("labelFalse", "Disable Scholarship");}});
         add(new HashMap<>() {{put("key", "count");            put("type", "single");}});
+        add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "solidarityFund");                          put("label", OutTextConfig.LABEL_SOLIDARITYFUND_INFO_EN.getOutTextKey());}});
+        add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_SOLIDARITY_FUND_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{put("key", "singular");            put("type", "title");         put("label", OutTextConfig.LABEL_SOLIDARITY_FUND_EN.getOutTextKey()); }});
+
       }
     };
   }

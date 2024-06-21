@@ -2,6 +2,8 @@ package ch.redanz.redanzCore.model.registration.config;
 
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
+import ch.redanz.redanzCore.model.registration.jobs.EODMatchingJob;
+import ch.redanz.redanzCore.model.registration.jobs.EODReleaseJob;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import freemarker.template.Configuration;
@@ -38,6 +40,9 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final FoodRegistrationService foodRegistrationService;
   private final DonationRegistrationService donationRegistrationService;
 
+  private final EODMatchingJob eodMatchingJob;
+  private final EODReleaseJob eodReleaseJob;
+
   @Autowired
   Configuration mailConfig;
 
@@ -49,6 +54,7 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
       ,foodService, slotService, foodRegistrationService, donationRegistrationService
     );
 
+
     RegistrationMatchingConfig.setup(
       eventService, registrationService, personService, userService, registrationMatchingService
     );
@@ -57,6 +63,9 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
       eventService, registrationService, personService, userService, workflowStatusService, WorkflowStatusConfig.SUBMITTED,
       workflowTransitionService
     );
+
+//    eodMatchingJob.runMatching();
+//    eodReleaseJob.runRelease();
 
   }
 }

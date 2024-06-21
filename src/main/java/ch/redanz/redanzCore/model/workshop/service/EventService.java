@@ -1,13 +1,14 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
-import ch.redanz.redanzCore.model.workshop.repository.BundleEventRepo;
-import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
+import ch.redanz.redanzCore.model.workshop.repository.*;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -17,83 +18,314 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class EventService {
   private final EventRepo eventRepo;
-  private final BundleEventRepo bundleEventRepo;
+  private final EventBundleRepo eventBundleRepo;
   private final BundleService bundleService;
   private final OutTextService outTextService;
+  private final DiscountService discountService;
+  private final FoodService foodService;
+  private final SpecialService specialService;
+  private final PrivateClassService privateClassService;
+  private final AccommodationService accommodationService;
+  private final VolunteeringService volunteeringService;
+  private final EventTypeSlotService eventTypeSlotService;
+  private final SlotService slotService;
+  private final EventPrivateClassRepo eventPrivateClassRepo;
+  private final EventSpecialRepo eventSpecialRepo;
+  private final EventDiscountRepo eventDiscountRepo;
+  private final EventFoodSlotRepo eventFoodSlotRepo;
+  private final EventTrackRepo eventTrackRepo;
+  private final TrackService trackService;
+  private final EventPartInfoRepo eventPartInfoRepo;
+  private final EventPartService eventPartService;
 
   public EventBundle findByEventAndBundle(Event event, Bundle bundle) {
-    return bundleEventRepo.findByEventAndBundle(event, bundle);
+    return eventBundleRepo.findByEventAndBundle(event, bundle);
   }
+
+  public EventDiscount findByEventAndDiscount(Event event, Discount discount) {
+    return eventDiscountRepo.findByEventAndDiscount(event, discount);
+  }
+
+  public EventPrivateClass findByEventAndPrivate(Event event, PrivateClass privateClass) {
+    return eventPrivateClassRepo.findByEventAndPrivateClass(event, privateClass);
+  }
+
+  public EventSpecial findByEventAndSpecial(Event event, Special special) {
+    return eventSpecialRepo.findByEventAndSpecial(event, special);
+  }
+  public EventTrack findByEventAndTrack(Event event, Track track) {
+    return eventTrackRepo.findByEventAndTrack(event, track);
+  }
+
+  public EventFoodSlot findEventFoodSlotByEventAndFood(Event event, Food food, Slot slot) {
+    return eventFoodSlotRepo.findByEventAndFoodAndSlot(event, food, slot);
+  }
+
+
   public void save(Event event) {
     eventRepo.save(event);
   }
+
   public boolean eventBundleExists(Event event, Bundle bundle) {
-    return bundleEventRepo.existsByEventAndBundle(event, bundle);
+    return eventBundleRepo.existsByEventAndBundle(event, bundle);
+  }
+  public boolean eventTrackExists(Event event, Track track) {
+    return eventTrackRepo.existsByEventAndTrack(event, track);
   }
 
   public void save(EventBundle eventBundle) {
-    bundleEventRepo.save(eventBundle);
+    eventBundleRepo.save(eventBundle);
   }
+
+  public void save(EventTrack eventTrack) {
+    eventTrackRepo.save(eventTrack);
+  }
+
+  public void save(EventDiscount eventDiscount) {
+    eventDiscountRepo.save(eventDiscount);
+  }
+
+  public void save(EventPrivateClass eventPrivateClass) {
+    eventPrivateClassRepo.save(eventPrivateClass);
+  }
+  public void save (EventPartInfo eventPartInfo) {
+    eventPartInfoRepo.save(eventPartInfo);
+  }
+
+  public void save(EventSpecial eventSpecial) {
+    eventSpecialRepo.save(eventSpecial);
+  }
+
+  public void save(EventFoodSlot eventFoodSlot) {
+    eventFoodSlotRepo.save(eventFoodSlot);
+  }
+
   public List<Event> getAllEvents() {
-    return eventRepo.findAllByArchived(false);
+    return eventRepo.findAllByArchivedOrderByEventIdDesc(false);
   }
-  public Event getCurrentEvent() {
-    return eventRepo.findDistinctFirstByActive(true);
-  }
+
+//  public Event getCurrentEvent() {
+//    return eventRepo.findDistinctFirstByActive(true);
+//  }
+
   public Event getById(Long eventId) {
     return eventRepo.findByEventId(eventId);
   }
+
   public List<Event> getActiveEvents() {
     return eventRepo.findAllByActiveAndArchived(true, false);
   }
+  public List<Event> getActiveEventsFuture() {
+    List<Event> activeFutureEvents = new ArrayList<>();
+    eventRepo.findAllByActiveAndArchived(true, false).forEach(event -> {
+      if (event.getEventTo().isAfter(LocalDate.now())) {
+        activeFutureEvents.add(event);
+      }
+    });
+    return activeFutureEvents;
+  }
+
   public List<Event> getInactiveEvents() {
     return eventRepo.findAllByActiveAndArchived(false, false);
   }
+
   public Event findByEventId(Long eventId) {
     return eventRepo.findByEventId(eventId);
   }
+
   public Event findByName(String name) {
     return eventRepo.findByName(name);
   }
+
   public List<Event> findAll() {
     return eventRepo.findAll();
   }
+
   public boolean existsByName(String name) {
     return eventRepo.existsByName(name);
   }
-  public List<Map<String, String>> getEventSchema(){
-    return Event.schema();
-  }
-  public List<Map<String, String>> getEventsData(List<Event> eventList){
-    List<Map<String, String>> eventData = new ArrayList<>();
-    eventList.forEach(event -> {
-      eventData.add(event.dataMap());
-    });
-    return eventData;
+
+  public List<Map<String, String>> getFoodSlotsMap() {
+    return eventFoodSlotRepo.findAll().stream()
+      .map(EventFoodSlot::dataMap)
+      .collect(Collectors.toList());
   }
 
-  public List<Map<String, String>> getBundleSchema(){
-    return Bundle.schema();
+  public List<Map<String, String>> getEventSchema() {
+    List<Map<String, String>> eventSchema = Event.schema();
+    eventSchema.forEach(item -> {
+      switch (item.get("key")) {
+        case "discounts":
+          item.put("list", discountService.getDiscountsMap().toString());
+          break;
+        case "foodSlots":
+          item.put("list", getFoodSlotsMap().toString());
+          break;
+        case "specials":
+          item.put("list", specialService.getSpecialsMap().toString());
+          break;
+        case "privates":
+          item.put("list", privateClassService.getPrivatesMap().toString());
+          break;
+      }
+    });
+    return eventSchema;
   }
-  public List<Map<String, String>> getBundlesData(List<Event> eventList){
-    List<Map<String, String>> bundlesData = new ArrayList<>();
+
+  public List<Map<String, String>> getSchemaStaticData() {
+    return new ArrayList<>() {
+      {
+        add(new HashMap<>() {{
+          put("key", "volunteerType");
+          put("type", "attribute");
+          put("label", "Volunteer Types");
+        }});
+        add(new HashMap<>() {{
+          put("key", "singular");
+          put("type", "title");
+          put("label", OutTextConfig.LABEL_STATIC_DATA_EN.getOutTextKey());
+        }});
+        add(new HashMap<>() {{
+          put("key", "plural");
+          put("type", "title");
+          put("label", OutTextConfig.LABEL_STATIC_DATA_EN.getOutTextKey());
+        }});
+        add(new HashMap<>() {{
+          put("key", "special");
+          put("type", "attribute");
+          put("label", "Specials");
+        }});
+        add(new HashMap<>() {{
+          put("key", "private");
+          put("type", "attribute");
+          put("label", "Private Classes");
+        }});
+        add(new HashMap<>() {{
+          put("key", "slot");
+          put("type", "attribute");
+          put("label", "Slots");
+        }});
+        add(new HashMap<>() {{
+          put("key", "food");
+          put("type", "attribute");
+          put("label", "Food");
+        }});
+        add(new HashMap<>() {{
+          put("key", "discount");
+          put("type", "attribute");
+          put("label", "Discount");
+        }});
+        add(new HashMap<>() {{
+          put("key", "name");
+          put("type", "title");
+          put("label", OutTextConfig.LABEL_STATIC_DATA_EN.getOutTextKey());
+        }});
+        add(new HashMap<>() {{
+          put("key", "count");
+          put("type", "single");
+        }});
+        add(new HashMap<>() {{
+          put("key", "noAction");
+          put("type", "noAction");
+        }});
+      }
+    };
+  }
+
+  public List<Long> eventDiscountIdList(Event event) {
+    return event.getEventDiscounts().stream()
+      .map(eventDiscount -> eventDiscount.getEventDiscountId())
+      .collect(Collectors.toList());
+  }
+
+  public List<Long> eventSpecialIdList(Event event) {
+    return event.getEventSpecials().stream()
+      .map(eventSpecial -> eventSpecial.getSpecial().getSpecialId())
+      .collect(Collectors.toList());
+  }
+
+  public List<Long> eventPrivateIdList(Event event) {
+    return event.getEventPrivates().stream()
+      .map(eventPrivateClass -> eventPrivateClass.getEventPrivateClassId())
+      .collect(Collectors.toList());
+  }
+
+  public List<Long> eventTypeSlotIdList(Event event, String type) {
+    return event.getEventTypeSlots().stream()
+      .filter(eventTypeSlot -> eventTypeSlot.getTypeSlot().getType().equals(type))
+      .map(eventTypeSlot -> eventTypeSlot.getTypeSlot().getTypeSlotId())
+      .collect(Collectors.toList());
+  }
+
+  public List<Long> eventFoodSlotIdList(Event event) {
+    return event.getEventFoodSlots().stream()
+      .map(eventFoodSlot -> eventFoodSlot.getEventFoodSlotId())
+      .collect(Collectors.toList());
+  }
+
+  public List<Map<String, String>> getEventsData(List<Event> eventList) {
+    List<Map<String, String>> eventsData = new ArrayList<>();
     eventList.forEach(event -> {
-      event.getEventBundles().forEach(eventBundle -> {
+      Map<String, String> eventData = event.dataMap();
+      eventData.put("discounts", eventDiscountIdList(event).toString());
+      eventData.put("foodSlots", eventFoodSlotIdList(event).toString());
+      eventData.put("specials", eventSpecialIdList(event).toString());
+      eventData.put("privates", eventPrivateIdList(event).toString());
+      eventsData.add(eventData);
+    });
+    return eventsData;
+  }
+
+  public List<Map<String, String>> getStaticData() {
+    List<Map<String, String>> staticDataList = new ArrayList<>();
+    Map<String, String> staticData = new HashMap<>();
+    staticDataList.add(staticData);
+    return staticDataList;
+
+  }
+
+  public List<Map<String, String>> getBundleSchema(Event event) {
+    List<Map<String, String>> bundleSchema = Bundle.schema();
+    bundleSchema.forEach(item -> {
+      switch (item.get("key")) {
+        case "partySlots":
+          item.put("list", slotService.typeSlotDataMap("party").toString());
+          break;
+        case "bundleSpecial":
+          item.put("list", eventSpecialData(event).toString());
+          break;
+        case "track":
+          item.put("list", eventTrackData(event).toString());
+          break;
+
+      }
+    });
+    log.info(bundleSchema.toString());
+
+    return bundleSchema;
+  }
+
+  public List<Map<String, String>> getBundlesData(Event event) {
+    List<Map<String, String>> bundlesData = new ArrayList<>();
+    event.getEventBundles().forEach(
+      eventBundle -> {
         // bundle data
         Map<String, String> bundleData = eventBundle.getBundle().dataMap();
 
         // add event info
         bundleData.put("eventId", Long.toString(event.getEventId()));
-
+        bundleData.put("partySlots", bundleService.partySlotIds(eventBundle.getBundle()).toString());
+        bundleData.put("bundleSpecial", bundleService.bundleEventSpecialIds(eventBundle.getBundle()).toString());
+        bundleData.put("track", bundleService.bundleEventTrackIds(eventBundle.getBundle()).toString());
         bundlesData.add(bundleData);
       });
-    });
     return bundlesData;
   }
 
@@ -108,28 +340,132 @@ public class EventService {
     return field;
   }
 
-  public Set<Track> getAllTracksByEvent(Event event){
-    List<Bundle> bundles = bundleService.getAllByEvent(event);
-    Set<Track> tracks = new HashSet<>();
+  public Field getEventPrivateField(String key) {
+    Field field;
+    try {
+      field = EventPrivateClass.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
 
-    bundles.forEach(bundle -> {
-      bundle.getBundleTracks().forEach(bundleTrack -> {
-        tracks.add(bundleTrack.getTrack());
-      });
-    });
+  public Field getEventSpecialField(String key) {
+    Field field;
+    try {
+      field = EventSpecial.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
 
-    return tracks;
+  public Field getEventDiscountField(String key) {
+    Field field;
+    try {
+      field = EventDiscount.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
+
+  public Field getEventPartInfoField(String key) {
+    Field field;
+    try {
+      field = EventPartInfo.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
+
+  public Field getEventFoodSlotField(String key) {
+    Field field;
+    try {
+      field = EventFoodSlot.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
+
+  public List<Track> getAllTracksByEvent(Event event) {
+    return event.getEventTracks().stream()
+      .map(EventTrack::getTrack)
+      .collect(Collectors.toList());
+  }
+
+  public void updateEventPartInfo(JsonObject request) {
+    EventPartInfo eventPartInfo = eventPartInfoRepo.findByEventPartInfoId(request.get("id").getAsLong());
+
+    EventPartInfo.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+        try {
+          switch (type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                if (outTextKey != null) {
+                  field = getEventPartInfoField(key);
+                  field.set(eventPartInfo, outTextKey);
+                }
+              }
+
+              break;
+            case "text":
+              field = getEventPartInfoField(key);
+              field.set(eventPartInfo, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getEventPartInfoField(key);
+              field.set(eventPartInfo, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getEventPartInfoField(key);
+              field.set(eventPartInfo, request.get(key).isJsonNull() ? null : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+
+            case "bool":
+              field = getEventPartInfoField(key);
+              field.set(eventPartInfo, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(eventPartInfo);
   }
 
   public void updateEvent(JsonObject request) throws IOException, TemplateException {
-     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-     Event event;
-
-     Long eventId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    Event event;
+    boolean newEvent = false;
+    List<Discount> newDiscounts = new ArrayList<>();
+    List<Special> newSpecials = new ArrayList<>();
+    Long eventId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
 
     if (eventId == null || eventId == 0) {
       event = new Event();
+      newEvent = true;
     } else {
       event = findByEventId(eventId);
     }
@@ -139,14 +475,16 @@ public class EventService {
         String key = stringStringMap.get("key");
         String type = stringStringMap.get("type");
         Field field;
-
         try {
-          switch(type) {
+          switch (type) {
             case "label":
               if (request.get("label") != null && request.get("label").isJsonArray()) {
                 String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
-                field =  getField(key);
-                field.set(event, outTextKey);
+
+                if (outTextKey != null) {
+                  field = getField(key);
+                  field.set(event, outTextKey);
+                }
               }
 
               break;
@@ -168,7 +506,7 @@ public class EventService {
             case "date":
               field = getField(key);
 
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateString = request.get(key).getAsString();
 
               // Parse the string into a LocalDate object
@@ -181,15 +519,15 @@ public class EventService {
             case "datetime":
               field = getField(key);
               // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(key).getAsString() retrieves the date string
-              String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
-              String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
+              String dateTimeDateString = request.get(key + "_date").getAsString().substring(0, 10);
+              String dateTimeTimeString = request.get(key + "_time").isJsonNull() ? "12:00" : request.get(key + "_time").getAsString();
               ZoneId zoneId = ZoneId.of("Europe/Zurich");
               LocalDateTime dateTime = LocalDateTime.parse(dateTimeDateString + " " + dateTimeTimeString, dateTimeFormatter);
 
               // hack hack hack, need fix plus Days
               ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zoneId).plusDays(1);
-              field.set(event, request.get(key).isJsonNull() ? null : zonedDateTime);
+              field.set(event, zonedDateTime);
               break;
 
             case "bool":
@@ -197,8 +535,770 @@ public class EventService {
               field.set(event, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
               break;
 
+            case "multiselect":
+            case "multiselectInfo":
+              if (request.get(key) != null && request.get(key).isJsonArray()) {
+                request.get(key).getAsJsonArray().forEach(item -> {
+                  log.info(item.toString());
+
+                  switch (key) {
+                    case "specials":
+                      newSpecials.add(specialService.findBySpecialId(item.getAsLong()));
+                      break;
+                    case "discounts":
+                      newDiscounts.add(discountService.findByDiscountId(item.getAsLong()));
+                      break;
+                  }
+                });
+              }
+              break;
             default:
-            // Nothing will happen here
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(event);
+    if (newEvent) {eventPartService.newBaseEventPartInfo(event);};
+  }
+
+
+  public void updateEventPrivate(JsonObject request, Event event) throws IOException, TemplateException {
+    EventPrivateClass eventPrivateClass;
+    Long eventPrivateId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+
+    if (eventPrivateId == null || eventPrivateId == 0) {
+      eventPrivateClass = new EventPrivateClass();
+    } else {
+      eventPrivateClass = eventPrivateClassRepo.findByEventPrivateClassId(eventPrivateId);
+    }
+
+    eventPrivateClass.setEvent(event);
+    EventPrivateClass.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+
+        try {
+          switch (type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                if (outTextKey != null) {
+                  field = getEventPrivateField(key);
+                  field.set(eventPrivateClass, outTextKey);
+                }
+              }
+              break;
+            case "text":
+              field = getEventPrivateField(key);
+
+              field.set(eventPrivateClass, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getEventPrivateField(key);
+              field.set(eventPrivateClass, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getEventPrivateField(key);
+              field.set(eventPrivateClass, request.get(key).isJsonNull() ? null : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+
+            case "list":
+              log.info(key);
+              field = getEventPrivateField(key);
+              log.info(
+                request.get(key).isJsonNull() ? null : request.get(key).getAsString());
+              log.info(privateClassService.findByPrivateClassId(
+                request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
+              ).toString());
+              field.set(eventPrivateClass, privateClassService.findByPrivateClassId(
+                request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
+              ));
+              break;
+
+
+            case "bool":
+              field = getEventPrivateField(key);
+              field.set(eventPrivateClass, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(eventPrivateClass);
+  }
+
+  public void updateEventSpecial(JsonObject request, Event event) throws IOException, TemplateException {
+    EventSpecial eventSpecial;
+    Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    if (eventSpecialId == null || eventSpecialId == 0) {
+      eventSpecial = new EventSpecial();
+    } else {
+      eventSpecial = eventSpecialRepo.findByEventSpecialId(eventSpecialId);
+    }
+
+    eventSpecial.setEvent(event);
+    EventSpecial.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        log.info(key);
+        log.info(type);
+
+        Field field;
+
+        try {
+          switch (type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                if (outTextKey != null) {
+                  field = getEventSpecialField(key);
+                  field.set(eventSpecial, outTextKey);
+                }
+              }
+              break;
+            case "text":
+              field = getEventSpecialField(key);
+
+              field.set(eventSpecial, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getEventSpecialField(key);
+              field.set(eventSpecial, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getEventSpecialField(key);
+              field.set(eventSpecial, request.get(key).isJsonNull() ? 0 : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+            case "list":
+
+              field = getEventSpecialField(key);
+              field.set(eventSpecial, specialService.findBySpecialId(
+                request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
+              ));
+              break;
+
+            case "bool":
+              field = getEventSpecialField(key);
+              field.set(eventSpecial, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(eventSpecial);
+  }
+
+  public void updateEventDiscount(JsonObject request, Event event) throws IOException, TemplateException {
+    EventDiscount eventDiscount;
+    Long eventDiscountId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+
+    if (eventDiscountId == null || eventDiscountId == 0) {
+      eventDiscount = new EventDiscount();
+    } else {
+      eventDiscount = eventDiscountRepo.findByEventDiscountId(eventDiscountId);
+    }
+
+    eventDiscount.setEvent(event);
+    EventDiscount.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+
+        try {
+          switch (type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                if (outTextKey != null) {
+                  field = getEventDiscountField(key);
+                  field.set(eventDiscount, outTextKey);
+                }
+              }
+              break;
+            case "text":
+              field = getEventDiscountField(key);
+
+              field.set(eventDiscount, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getEventDiscountField(key);
+              field.set(eventDiscount, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getEventDiscountField(key);
+              field.set(eventDiscount, request.get(key).isJsonNull() ? null : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+            case "list":
+              field = getEventDiscountField(key);
+              field.set(eventDiscount, discountService.findByDiscountId(
+                request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
+              ));
+              break;
+
+            case "bool":
+              field = getEventDiscountField(key);
+              field.set(eventDiscount, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(eventDiscount);
+  }
+
+  public void updateEventFoodSlot(JsonObject request, Event event) throws IOException, TemplateException {
+    EventFoodSlot eventFoodSlot;
+    Long eventFoodSlotId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+
+    if (eventFoodSlotId == null || eventFoodSlotId == 0) {
+      eventFoodSlot = new EventFoodSlot();
+    } else {
+      eventFoodSlot = eventFoodSlotRepo.findByEventFoodSlotId(eventFoodSlotId);
+    }
+
+    eventFoodSlot.setEvent(event);
+    EventFoodSlot.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+
+        try {
+          switch (type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                if (outTextKey != null) {
+                  field = getEventFoodSlotField(key);
+                  field.set(eventFoodSlot, outTextKey);
+                }
+              }
+              break;
+            case "text":
+              field = getEventFoodSlotField(key);
+
+              field.set(eventFoodSlot, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getEventFoodSlotField(key);
+              field.set(eventFoodSlot, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getEventFoodSlotField(key);
+              field.set(eventFoodSlot, request.get(key).isJsonNull() ? null : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+            case "list":
+              field = getEventFoodSlotField(key);
+              Long listId = request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString());
+
+              switch (key) {
+                case "food":
+                  field.set(eventFoodSlot, foodService.findByFoodId(listId));
+                  break;
+                case "slot":
+                  field.set(eventFoodSlot, slotService.findBySlotId(listId));
+                  break;
+              }
+              break;
+
+            case "bool":
+              field = getEventFoodSlotField(key);
+              field.set(eventFoodSlot, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(eventFoodSlot);
+  }
+
+  @Transactional
+  public void archiveEvent(Event event) {
+    event.setArchived(true);
+    event.setActive(false);
+    save(event);
+  }
+  @Transactional
+  public void delete(Event event, Track track) {
+    List<EventTrack> eventTracks = new ArrayList<>(event.getEventTracks());
+    eventTracks.forEach(
+      eventTrack -> {
+        if (eventTrack.getTrack().equals(track)) {
+          event.getEventTracks().remove(eventTrack);
+          trackService.delete(eventTrack.getTrack());
+          delete(eventTrack);
+        }
+      });
+    save(event);
+  }
+
+  @Transactional
+  public void deleteEvent(Event event) {
+    Set<EventBundle> eventBundles = new HashSet<>(event.getEventBundles());
+    eventBundles.forEach(
+      eventBundle -> {
+      event.getEventBundles().remove(eventBundle);
+      bundleService.deleteBundle(eventBundle.getBundle());
+      delete(eventBundle);
+    });
+    save(event);
+
+    List<EventTrack> eventTracks = new ArrayList<>(event.getEventTracks());
+    eventTracks.forEach(
+      eventTrack -> {
+        event.getEventTracks().remove(eventTrack);
+        trackService.delete(eventTrack.getTrack());
+        delete(eventTrack);
+      });
+    save(event);
+
+    List<EventFoodSlot> eventFoodSlots = new ArrayList<>(event.getEventFoodSlots());
+    eventFoodSlots.forEach(
+      eventFoodSlot -> {
+        event.getEventFoodSlots().remove(eventFoodSlot);
+        delete(eventFoodSlot);
+      });
+    save(event);
+
+    List<EventPrivateClass> eventPrivateClasses = new ArrayList<>(event.getEventPrivates());
+    eventPrivateClasses.forEach(
+      eventPrivateClass -> {
+        event.getEventPrivates().remove(eventPrivateClass);
+        delete(eventPrivateClass);
+      });
+    save(event);
+
+    event.setVolunteerTypes(new ArrayList<>());
+    save(event);
+
+    List<EventSpecial> eventSpecials = new ArrayList<>(event.getEventSpecials());
+    eventSpecials.forEach(
+      eventSpecial -> {
+        event.getEventSpecials().remove(eventSpecial);
+        delete(eventSpecial);
+      });
+    save(event);
+
+    List<EventDiscount> eventDiscounts = new ArrayList<>(event.getEventDiscounts());
+    eventDiscounts.forEach(
+      eventDiscount -> {
+        event.getEventDiscounts().remove(eventDiscount);
+        delete(eventDiscount);
+      });
+    save(event);
+
+    List<EventTypeSlot> eventTypeSlots = new ArrayList<>(event.getEventTypeSlots());
+    eventTypeSlots.forEach(
+      eventTypeSlot -> {
+        event.getEventTypeSlots().remove(eventTypeSlot);
+        delete(eventTypeSlot);
+      });
+    save(event);
+
+    eventRepo.delete(event);
+  }
+
+  public void deleteEventFoodSlot(JsonObject request) {
+    Long eventFoodSlotId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    EventFoodSlot eventFoodSlot = eventFoodSlotRepo.findByEventFoodSlotId(eventFoodSlotId);
+    delete(eventFoodSlot);
+  }
+
+  public void deleteEventPrivate(JsonObject request) {
+    Long eventPrivateId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    delete(eventPrivateClassRepo.findByEventPrivateClassId(eventPrivateId));
+  }
+
+  public void deleteEventSpecial(JsonObject request) {
+    Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    delete(eventSpecialRepo.findByEventSpecialId(eventSpecialId));
+  }
+  public void deleteEventDiscount(JsonObject request) {
+    Long eventDiscountId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    delete(eventDiscountRepo.findByEventDiscountId(eventDiscountId));
+  }
+
+  public void delete(EventBundle eventBundle) {
+    eventBundleRepo.delete(eventBundle);
+  }
+
+  public void delete(EventTrack eventTrack) {
+    eventTrackRepo.delete(eventTrack);
+  }
+  public void delete(EventTypeSlot eventTypeSlot) {
+    eventTypeSlotService.delete(eventTypeSlot);
+  }
+
+  public void delete(EventPrivateClass eventPrivate) {
+    eventPrivateClassRepo.delete(eventPrivate);
+  }
+
+  public void delete(EventDiscount eventDiscount) {
+    eventDiscountRepo.delete(eventDiscount);
+  }
+
+  public void delete(EventSpecial eventSpecial) {
+    eventSpecialRepo.delete(eventSpecial);
+  }
+  public void delete(EventFoodSlot eventFoodSlot) {
+    eventFoodSlotRepo.delete(eventFoodSlot);
+  }
+
+  public void clone(Event baseEvent) {
+    List<VolunteerType> newVolunteertypes = new ArrayList<>(baseEvent.getVolunteerTypes());
+    Event newEvent = new Event(
+      baseEvent.getName() + " [clone]",
+      baseEvent.getCapacity(),
+      baseEvent.getEventFrom(),
+      baseEvent.getEventTo(),
+      baseEvent.getRegistrationStart(),
+      false, // inactive by default
+      false, // not archived by default
+      baseEvent.getDescription(),
+      baseEvent.isHosting(),
+      baseEvent.isVolunteering(),
+      baseEvent.isScholarship(),
+      newVolunteertypes,
+      true
+    );
+    save(newEvent);
+
+    // Copy Type Slots
+    baseEvent.getEventTypeSlots().forEach(
+      baseEventTypeSlot -> {
+        slotService.save(new EventTypeSlot(
+          baseEventTypeSlot.getTypeSlot(),
+          newEvent,
+          baseEventTypeSlot.getSeqNr()
+        ));
+      });
+
+    // Clone Private Classes
+    baseEvent.getEventPrivates().forEach(eventPrivateClass -> {
+      EventPrivateClass newPrivateClass = new EventPrivateClass(
+        eventPrivateClass.getPrivateClass(),
+        newEvent,
+        eventPrivateClass.getPrice(),
+        false, // initialize not sold out
+        eventPrivateClass.getCapacity()
+      );
+      save(newPrivateClass);
+    });
+
+     // Clone Specials
+     Set<EventSpecial> eventSpecials = new HashSet<>();
+     baseEvent.getEventSpecials().forEach(eventSpecial -> {
+       eventSpecials.add(new EventSpecial(
+         eventSpecial.getSpecial(),
+         newEvent,
+         eventSpecial.getPrice(),
+         false, // initialize not sold out
+         eventSpecial.getCapacity(),
+         eventSpecial.getUrl()
+       )
+       );
+     });
+     newEvent.setEventSpecials(eventSpecials);
+
+     // Clone Discounts
+     Set<EventDiscount> eventDiscounts = new HashSet<>();
+     baseEvent.getEventDiscounts().forEach(eventDiscount -> {
+       eventDiscounts.add(
+         new EventDiscount(
+         eventDiscount.getDiscount(),
+         newEvent,
+         eventDiscount.getDiscountAmount(),
+         eventDiscount.getCapacity()
+         )
+       );
+     });
+     newEvent.setEventDiscounts(eventDiscounts);
+
+    // Clone Food
+     Set<EventFoodSlot> eventFoodSlots = new HashSet<>();
+     baseEvent.getEventFoodSlots().forEach(eventFoodSlot -> {
+       eventFoodSlots.add(new EventFoodSlot(
+         eventFoodSlot.getFood(),
+         eventFoodSlot.getSlot(),
+         newEvent,
+         eventFoodSlot.getPrice(),
+         eventFoodSlot.getSeqNr()
+       )
+       );
+     });
+     newEvent.setEventFoodSlots(eventFoodSlots);
+     save(newEvent);
+
+     // Clone Tracks
+     Map<Bundle, Set<EventTrack>> baseBundleNewEventTrackList = new HashMap<>();
+     Set<Bundle> baseBundles = baseEvent.getEventBundles().stream().map(EventBundle::getBundle)
+       .collect(Collectors.toSet());
+    baseBundles.forEach(bundle -> {
+      baseBundleNewEventTrackList.put(bundle, new HashSet<>());
+    });
+
+    newEvent.setEventTracks(new HashSet<>());
+    baseEvent.getEventTracks().forEach(baseEventTrack -> {
+      Track baseTrack = baseEventTrack.getTrack();
+      Track newTrack = trackService.clone(newEvent, baseTrack);
+      save(newEvent);
+      Set<Bundle> baseBundlesWithTrack = baseEvent.getEventBundles().stream()
+        .filter(eventBundle -> eventBundle.getBundle().getEventTracks().contains(baseEventTrack))
+        .map(EventBundle::getBundle).collect(Collectors.toSet());
+      baseBundlesWithTrack.forEach(baseBundleWithTrack -> {
+        baseBundleNewEventTrackList.put(
+          baseBundleWithTrack,
+          newEvent.getEventTracks().stream().filter(
+            eventTrack -> eventTrack.getTrack().equals(newTrack)
+          ).collect(Collectors.toSet()));
+      });
+    });
+
+    save(newEvent);
+
+    // Clone Bundles
+    Set<EventBundle> eventBundles = new HashSet<>();
+    baseEvent.getEventBundles().forEach(
+      eventBundle -> {
+        Bundle baseBundle = eventBundle.getBundle();
+
+        Bundle newBundle =  bundleService.clone(newEvent, baseBundle, baseBundleNewEventTrackList.get(baseBundle));
+        eventBundles.add(new EventBundle(newBundle, newEvent));
+      });
+    newEvent.setEventBundles(eventBundles);
+    save(newEvent);
+
+    // clone eventPartInfo
+    eventPartService.clone(baseEvent, newEvent);
+
+  }
+
+  public List<EventPrivateClass> findPrivateClassesByEvent(Event event) {
+    List<EventPrivateClass> eventPrivateClasses = new ArrayList<>(event.getEventPrivates());
+    return eventPrivateClasses;
+
+  }
+
+  public List<EventPrivateClass> findPrivateClassesByEventAndBundle(Event event, Bundle bundle) {
+    if (bundle.getSimpleTicket()) {
+      return new ArrayList<>();
+    } else {
+      return findPrivateClassesByEvent(event);
+    }
+  }
+
+  public List<EventSpecial> findSpecialsByEvent(Event event) {
+    List<EventSpecial> eventSpecials = new ArrayList<>(event.getEventSpecials());
+    return eventSpecials;
+  }
+
+  public List<EventSpecial> findSpecialsByEventAndBundle(Event event, Bundle bundle) {
+    if (bundle.getSimpleTicket()) {
+      return new ArrayList<>();
+    } else {
+      return findSpecialsByEvent(event);
+    }
+  }
+
+  public List<Map<String, String>> eventPrivateSchema() {
+    List<Map<String, String>> eventPrivateSchema = EventPrivateClass.schema();
+    eventPrivateSchema.forEach(item -> {
+      switch (item.get("key")) {
+        case "privateClass":
+          item.put("list", privateClassService.getAllPrivates().toString());
+          break;
+      }
+    });
+    return eventPrivateSchema;
+  }
+
+  public List<Map<String, String>> eventSpecialSchema() {
+    List<Map<String, String>> eventSpecialSchema = EventSpecial.schema();
+    eventSpecialSchema.forEach(item -> {
+      switch (item.get("key")) {
+        case "special":
+          item.put("list", specialService.getAllSpecials().toString());
+          break;
+      }
+    });
+    return eventSpecialSchema;
+  }
+
+  public List<Map<String, String>> eventDiscountSchema() {
+    List<Map<String, String>> eventDiscountSchema = EventDiscount.schema();
+    eventDiscountSchema.forEach(item -> {
+      switch (item.get("key")) {
+        case "discount":
+          item.put("list", discountService.getAllDiscounts().toString());
+          break;
+      }
+    });
+    return eventDiscountSchema;
+  }
+
+  public List<Long> eventPrivatesIds(Event event) {
+    return event.getEventPrivates().stream()
+      .map(EventPrivateClass::getEventPrivateClassId)
+      .collect(Collectors.toList());
+  }
+
+  public List<Map<String, String>> eventPrivateData(Event event) {
+    List<Map<String, String>> eventPrivateDataList = new ArrayList<>();
+    event.getEventPrivates().forEach(
+      eventPrivate -> {
+        Map<String, String> eventPrivateData = eventPrivate.dataMap();
+        eventPrivateData.put("eventId", Long.toString(event.getEventId()));
+        eventPrivateData.put("id", Long.toString(eventPrivate.getEventPrivateClassId()));
+        eventPrivateData.put("privateClass", Long.toString(eventPrivate.getPrivateClass().getPrivateClassId()));
+        eventPrivateData.put("capacity", String.valueOf(eventPrivate.getCapacity()));
+        eventPrivateData.put("price", String.valueOf(eventPrivate.getPrice()));
+        eventPrivateDataList.add(eventPrivateData);
+      });
+    log.info(eventPrivateDataList.toString());
+
+    return eventPrivateDataList;
+  }
+
+  public List<Map<String, String>> eventSpecialData(Event event) {
+    List<Map<String, String>> eventSpecialDataList = new ArrayList<>();
+    event.getEventSpecials().forEach(
+      eventSpecial -> {
+        Map<String, String> eventSpecialData = eventSpecial.dataMap();
+        eventSpecialData.put("eventId", Long.toString(event.getEventId()));
+        eventSpecialData.put("id", Long.toString(eventSpecial.getEventSpecialId()));
+        eventSpecialData.put("special", Long.toString(eventSpecial.getSpecial().getSpecialId()));
+        eventSpecialData.put("name", eventSpecial.getSpecial().getName());
+        eventSpecialData.put("capacity", String.valueOf(eventSpecial.getCapacity()));
+        eventSpecialData.put("price", String.valueOf(eventSpecial.getPrice()));
+        eventSpecialDataList.add(eventSpecialData);
+      });
+    return eventSpecialDataList;
+  }
+  public List<Map<String, String>> eventTrackData(Event event) {
+    List<Map<String, String>> eventTrackDataList = new ArrayList<>();
+    log.info("eventTrackData: {}", event.getEventTracks().size());
+    event.getEventTracks().forEach(
+      eventTrack -> {
+        Map<String, String> eventTrackData = eventTrack.dataMap();
+        eventTrackData.put("eventId", Long.toString(event.getEventId()));
+        eventTrackData.put("id", Long.toString(eventTrack.getEventTrackId()));
+        eventTrackData.put("track", Long.toString(eventTrack.getTrack().getTrackId()));
+        eventTrackData.put("name", eventTrack.getTrack().getName());
+        eventTrackDataList.add(eventTrackData);
+      });
+    return eventTrackDataList;
+  }
+
+  public List<Map<String, String>> eventDiscountData(Event event) {
+    List<Map<String, String>> eventDiscountDataList = new ArrayList<>();
+    event.getEventDiscounts().forEach(
+      eventDiscount -> {
+        Map<String, String> eventDiscountData = eventDiscount.dataMap();
+        eventDiscountData.put("eventId", Long.toString(event.getEventId()));
+        eventDiscountData.put("id", Long.toString(eventDiscount.getEventDiscountId()));
+        eventDiscountData.put("discount", Long.toString(eventDiscount.getDiscount().getDiscountId()));
+        eventDiscountData.put("name", eventDiscount.getDiscount().getName());
+        eventDiscountData.put("capacity", String.valueOf(eventDiscount.getCapacity()));
+        eventDiscountData.put("discountAmount", String.valueOf(eventDiscount.getDiscountAmount()));
+        eventDiscountDataList.add(eventDiscountData);
+      });
+    return eventDiscountDataList;
+  }
+
+  public boolean hasEventSpecial(Event event, Special special) {
+    return eventSpecialRepo.existsByEventAndSpecial(event, special);
+  }
+
+  public List<Map<String, String>> getTermsSchema() {
+    return new ArrayList<>() {
+      {
+        add(new HashMap<>() {{put("key", "id");               put("type", "id");           put("label", "id");}});
+        add(new HashMap<>() {{put("key", "requireTerms");     put("type", "bool");         put("labelTrue", "Enable Terms"); put("labelFalse", "Disable Terms");}});
+        add(new HashMap<>() {{put("key", "eventPartInfo");    put("type", "partInfo");     put("eventPartKey", "terms");    put("label", OutTextConfig.LABEL_TERMS_INFO_EN.getOutTextKey());}});
+        add(new HashMap<>() {{put("key", "plural");           put("type", "title");        put("label", OutTextConfig.LABEL_TERMS_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{put("key", "singular");         put("type", "title");        put("label", OutTextConfig.LABEL_TERMS_EN.getOutTextKey()); }});
+
+      }
+
+    };
+  }
+
+  public Map<String, String> termsDataMap(Event event) {
+    return new HashMap<>() {
+      {
+        put("id", String.valueOf(event.getEventId()));
+        put("requireTerms", String.valueOf(event.isRequireTerms()));
+      }
+    };
+  }
+
+  public List<Map<String, String>> getTermsData(Event event) {
+    List<Map<String, String>> termsData = new ArrayList<>();
+    termsData.add(termsDataMap(event));
+//    log.info("termsdata:");
+//    log.info(termsData.toString());
+    return termsData;
+  }
+
+  public void updateTerms(JsonObject request, Event event) throws IOException, TemplateException {
+    getTermsSchema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+
+        try {
+          switch(type) {
+            case "bool":
+              field = getField(key);
+              field.set(event, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            default:
+              // Nothing will happen here
           }
         } catch (IllegalAccessException e) {
           throw new RuntimeException(e);
@@ -206,21 +1306,14 @@ public class EventService {
       }
     );
 
-    save(event);
+    eventRepo.save(event);
+  }
+
+  public void deleteTerms(JsonObject request, Event event) {
+    event.setRequireTerms(false);
+    eventRepo.save(event);
   }
 
 
-  public void deleteEvent(JsonObject request) {
-     Long eventId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-     Event event = findByEventId(eventId);
-     eventRepo.delete(event);
-  }
-
-  public void deleteEventBundle(JsonObject request) {
-    Long bundleId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    Bundle bundle = bundleService.findByBundleId(bundleId);
-    EventBundle eventBundle = findByEventAndBundle(findByEventId(request.get("eventId").getAsLong()), bundle);
-    bundleEventRepo.delete(eventBundle);
-  }
 
 }

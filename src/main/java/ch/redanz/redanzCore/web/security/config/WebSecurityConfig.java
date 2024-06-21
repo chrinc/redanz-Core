@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.web.security.config;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.service.log.ErrorLogService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final RegistrationService registrationService;
   private final PersonService personService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final ErrorLogService errorLogService;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -44,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.cors();
     http.csrf().disable();
     http.addFilter(customAuthenticationFilter);
-    http.addFilterBefore(new CustomAuthorizationFilter(userService, registrationService, personService), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(new CustomAuthorizationFilter(userService, registrationService, personService, errorLogService), UsernamePasswordAuthenticationFilter.class);
     http.formLogin().failureHandler(authenticationFailureHandler());
   }
 

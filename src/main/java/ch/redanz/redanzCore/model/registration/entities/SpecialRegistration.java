@@ -29,10 +29,10 @@ public class SpecialRegistration {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "special_id")
-  private Special specialId;
+  private Special special;
 
-  public SpecialRegistration(Registration registration, Special specialId) {
+  public SpecialRegistration(Registration registration, Special special) {
     this.registration = registration;
-    this.specialId = specialId;
+    this.special = special;
   }
 }

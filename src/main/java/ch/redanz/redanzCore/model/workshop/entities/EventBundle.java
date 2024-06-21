@@ -15,17 +15,17 @@ import java.io.Serializable;
 @Table(name = "event_bundle")
 public class EventBundle implements Serializable {
 
-  @EmbeddedId
-  private final EventBundleId eventBundleId = new EventBundleId();
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "event_bundle_id")
+  private Long eventBundleId;
 
-  @ManyToOne
-  @MapsId("bundleId")
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "bundle_id")
   private Bundle bundle;
 
-  @ManyToOne()
+  @ManyToOne(fetch = FetchType.LAZY)
   @JsonIgnore
-  @MapsId("eventId")
   @JoinColumn(name = "event_id")
   private Event event;
 

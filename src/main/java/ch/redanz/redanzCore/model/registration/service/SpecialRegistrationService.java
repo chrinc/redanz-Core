@@ -48,7 +48,7 @@ public class SpecialRegistrationService {
   public String getReportSpecials(Registration registration, Language language) {
     AtomicReference<String> specials = new AtomicReference<>();
     specialRegistrationRepo.findAllByRegistration(registration).forEach(specialsRegistration -> {
-      String specialOutText = outTextService.getOutTextByKeyAndLangKey(specialsRegistration.getSpecialId().getName(), language.getLanguageKey()).getOutText();
+      String specialOutText = outTextService.getOutTextByKeyAndLangKey(specialsRegistration.getSpecial().getName(), language.getLanguageKey()).getOutText();
       if (specials.get() == null)
         specials.set(specialOutText);
       else {
@@ -81,7 +81,7 @@ public class SpecialRegistrationService {
   public List<SpecialRegistration> specialRegistrations(Registration registration, JsonObject specialRegistrationRequest) {
     List<SpecialRegistration> specialRegistrations = new ArrayList<>();
 
-    // log.info(specialRegistrationRequest.toString());
+//     log.info(specialRegistrationRequest.toString());
 
     // log.info("inc@specialRegistrations");
     if (specialRegistrationRequest.get("specialRegistrations") != null
@@ -93,15 +93,24 @@ public class SpecialRegistrationService {
       JsonArray specialRequests = specialRegistrationRequest
         .get("specialRegistrations")
         .getAsJsonArray();
-      // log.info(specialRegistrationRequest.get("specialRegistrations").toString());
+//       log.info(specialRegistrationRequest.get("specialRegistrations").toString());
       specialRequests.forEach(specialRequest -> {
         if (specialRequest.getAsJsonObject().get("checked") != null
           && specialRequest.getAsJsonObject().get("checked").getAsBoolean()
         ) {
+//          log.info(specialRequest.toString());
           specialRegistrations.add(
             new SpecialRegistration(
               registration,
-              specialService.findBySpecialId(specialRequest.getAsJsonObject().get("specialId").getAsLong())
+              specialService
+                .findBySpecialId(
+                  specialRequest
+                    .getAsJsonObject()
+                    .get("special")
+                    .getAsJsonObject()
+                    .get("specialId")
+                    .getAsLong()
+                )
             )
           );
         }
@@ -112,7 +121,6 @@ public class SpecialRegistrationService {
   }
 
   public List<PrivateClassRegistration> privateClassRegistration(Registration registration, JsonObject privateClassRegistrationRequest) {
-    // log.info("inc@privateClassRegistration");
     List<PrivateClassRegistration> privateClassRegistrations = new ArrayList<>();
     if (privateClassRegistrationRequest.get("privateClassRegistrations") != null
       && !privateClassRegistrationRequest.get("privateClassRegistrations").isJsonNull()
@@ -122,14 +130,17 @@ public class SpecialRegistrationService {
         .get("privateClassRegistrations")
         .getAsJsonArray();
 
-      // log.info("inc@bfr privateClassRequests:");
-      // log.info("inc@bfr privateClassRequests:" + privateClassRequests);
       privateClassRequests.forEach(privateClassRequest -> {
-        // log.info("inc@bfr privateClassId:" + privateClassRequest.getAsJsonObject().get("privateClassId").getAsLong());
         privateClassRegistrations.add(
           new PrivateClassRegistration(
             registration,
-            privateClassService.findByPrivateClassId(privateClassRequest.getAsJsonObject().get("privateClassId").getAsLong())
+            privateClassService
+              .findByPrivateClassId(
+                privateClassRequest
+                 .getAsJsonObject()
+                 .get("privateClass")
+                 .getAsJsonObject()
+                 .get("privateClassId").getAsLong())
           )
         );
       });
@@ -142,7 +153,7 @@ public class SpecialRegistrationService {
     AtomicBoolean hasSpecialRegistration = new AtomicBoolean(false);
     specialRegistrations.forEach(specialRegistration -> {
       if (
-        specialRegistration.getSpecialId() == special) {
+        specialRegistration.getSpecial() == special) {
         hasSpecialRegistration.set(true);
       }
     });
@@ -162,22 +173,41 @@ public class SpecialRegistrationService {
 
 
   public int countSpecialsDone(Special special, Event event) {
-    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getDone(), event);
+    return specialRegistrationRepo.countAllBySpecialAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getDone(), event);
   }
   public int countSpecialsSubmitted(Special special, Event event) {
-    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getSubmitted(), event);
+    return specialRegistrationRepo.countAllBySpecialAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getSubmitted(), event);
   }
   public int countSpecialsConfirming(Special special, Event event) {
-    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getConfirming(), event);
+    return specialRegistrationRepo.countAllBySpecialAndRegistration_WorkflowStatusAndRegistrationEvent(special, workflowStatusService.getConfirming(), event);
   }
   public int countSpecialsDone(Special special, Event event, DanceRole danceRole) {
-    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getDone(), event, danceRole);
+    return specialRegistrationRepo.countAllBySpecialAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getDone(), event, danceRole);
   }
   public int countSpecialsSubmitted(Special special, Event event, DanceRole danceRole) {
-    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getSubmitted(), event, danceRole);
+    return specialRegistrationRepo.countAllBySpecialAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getSubmitted(), event, danceRole);
   }
   public int countSpecialsConfirming(Special special, Event event, DanceRole danceRole) {
-    return specialRegistrationRepo.countAllBySpecialIdAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getConfirming(), event, danceRole);
+    return specialRegistrationRepo.countAllBySpecialAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(special, workflowStatusService.getConfirming(), event, danceRole);
+  }
+
+  public int countPrivatesDone(PrivateClass privateClass, Event event) {
+    return privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatusAndRegistrationEvent(privateClass, workflowStatusService.getDone(), event);
+  }
+  public int countPrivatesSubmitted(PrivateClass privateClass, Event event) {
+    return privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatusAndRegistrationEvent(privateClass, workflowStatusService.getSubmitted(), event);
+  }
+  public int countPrivatesConfirming(PrivateClass privateClass, Event event) {
+    return privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatusAndRegistrationEvent(privateClass, workflowStatusService.getConfirming(), event);
+  }
+  public int countPrivatesDone(PrivateClass privateClass, Event event, DanceRole danceRole) {
+    return privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(privateClass, workflowStatusService.getDone(), event, danceRole);
+  }
+  public int countPrivatesSubmitted(PrivateClass privateClass, Event event, DanceRole danceRole) {
+    return privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(privateClass, workflowStatusService.getSubmitted(), event, danceRole);
+  }
+  public int countPrivatesConfirming(PrivateClass privateClass, Event event, DanceRole danceRole) {
+    return privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(privateClass, workflowStatusService.getConfirming(), event, danceRole);
   }
   public int countSpecialRegistrations(Special special, Event event) {
     return
@@ -197,21 +227,28 @@ public class SpecialRegistrationService {
        + countSpecialsDone(special, event);
   }
 
-  public int countPrivateClassRegistrations(PrivateClass privateClass) {
+  public int countPrivateClassRegistrations(Event event, PrivateClass privateClass) {
     return
-         privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatus(privateClass, workflowStatusService.getSubmitted())
-       + privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatus(privateClass, workflowStatusService.getConfirming())
-       + privateClassRegistrationRepo.countAllByPrivateClassAndRegistration_WorkflowStatus(privateClass, workflowStatusService.getDone());
+         privateClassRegistrationRepo.countAllByRegistration_EventAndPrivateClassAndRegistration_WorkflowStatus(event, privateClass, workflowStatusService.getSubmitted())
+       + privateClassRegistrationRepo.countAllByRegistration_EventAndPrivateClassAndRegistration_WorkflowStatus(event, privateClass, workflowStatusService.getConfirming())
+       + privateClassRegistrationRepo.countAllByRegistration_EventAndPrivateClassAndRegistration_WorkflowStatus(event, privateClass, workflowStatusService.getDone());
   }
 
-  public void soldOut(PrivateClass privateClass, boolean soldOut) {
-    privateClass.setSoldOut(soldOut);
-    privateClassService.save(privateClass);
+  public int countPrivateClassRegistrations(PrivateClass privateClass, Event event, DanceRole danceRole) {
+    return
+      countPrivatesSubmitted(privateClass, event, danceRole)
+        + countPrivatesConfirming(privateClass, event, danceRole)
+        + countPrivatesDone(privateClass, event, danceRole);
   }
-  public void soldOut(Special special, boolean soldOut) {
-    special.setSoldOut(soldOut);
-    specialService.save(special);
-  }
+
+//  public void soldOut(PrivateClass privateClass, boolean soldOut) {
+//    privateClass.setSoldOut(soldOut);
+//    privateClassService.save(privateClass);
+//  }
+//  public void soldOut(Special special, boolean soldOut) {
+//    special.setSoldOut(soldOut);
+//    specialService.save(special);
+//  }
 
   public void updateSpecialRegistrationRequest(Registration registration, JsonObject request) {
     List<SpecialRegistration> requestSpecialRegistrations = specialRegistrations(registration, request);
@@ -221,15 +258,15 @@ public class SpecialRegistrationService {
     // log.info("specialRegistrations: " + specialRegistrations.size());
     // delete in current if not in request
     specialRegistrations.forEach(specialRegistration -> {
-      if (!hasSpecialRegistration(requestSpecialRegistrations, specialRegistration.getSpecialId())){
-        specialRegistrationRepo.deleteAllByRegistrationAndSpecialId(registration, specialRegistration.getSpecialId());
+      if (!hasSpecialRegistration(requestSpecialRegistrations, specialRegistration.getSpecial())){
+        specialRegistrationRepo.deleteAllByRegistrationAndSpecial(registration, specialRegistration.getSpecial());
       }
     });
 
     // add new from request
     requestSpecialRegistrations.forEach(specialRegistration -> {
-      if (!hasSpecialRegistration(specialRegistrations, specialRegistration.getSpecialId())){
-        save(registration, specialRegistration.getSpecialId());
+      if (!hasSpecialRegistration(specialRegistrations, specialRegistration.getSpecial())){
+        save(registration, specialRegistration.getSpecial());
       }
     });
   }
@@ -295,6 +332,21 @@ public class SpecialRegistrationService {
     return count;
   }
 
+  public List<String> countPrivateRegistrationsAndSplitRoles(PrivateClass privateClass, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countPrivateClassRegistrations(event, privateClass)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countPrivateClassRegistrations(privateClass, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
   public List<String> countSpecialsDoneAndSplitRoles(Special special, Event event) {
     StringBuilder countPartBuilder = new StringBuilder();
     List<String> count = new ArrayList<>();
@@ -304,6 +356,21 @@ public class SpecialRegistrationService {
         formatCountToString(
           countPartBuilder.toString()
           ,countSpecialsDone(special, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countPrivatesDoneAndSplitRoles(PrivateClass privateClass, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countPrivatesDone(privateClass, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countPrivatesDone(privateClass, event, danceRole)
           ,danceRole.getName() + ": "));
     });
     count.add(countPartBuilder.toString());
@@ -324,6 +391,22 @@ public class SpecialRegistrationService {
     count.add(countPartBuilder.toString());
     return count;
   }
+
+  public List<String> countPrivatesSubmittedAndSplitRoles(PrivateClass privateClass, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countPrivatesSubmitted(privateClass, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countPrivatesSubmitted(privateClass, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
   public List<String> countSpecialsConfirmingAndSplitRoles(Special special, Event event) {
     StringBuilder countPartBuilder = new StringBuilder();
     List<String> count = new ArrayList<>();
@@ -333,6 +416,21 @@ public class SpecialRegistrationService {
         formatCountToString(
           countPartBuilder.toString()
           ,countSpecialsConfirming(special, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countPrivatesConfirmingAndSplitRoles(PrivateClass privateClass, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countPrivatesConfirming(privateClass, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countPrivatesConfirming(privateClass, event, danceRole)
           ,danceRole.getName() + ": "));
     });
     count.add(countPartBuilder.toString());

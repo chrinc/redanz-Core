@@ -5,13 +5,13 @@ import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationMatchingRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -20,7 +20,6 @@ public class RegistrationMatchingService {
 
   private final RegistrationMatchingRepo registrationMatchingRepo;
   private final WorkflowStatusService workflowStatusService;
-  private final EventService eventService;
 
   public void save(RegistrationMatching registrationMatching) {
     registrationMatchingRepo.save(registrationMatching);
@@ -34,11 +33,18 @@ public class RegistrationMatchingService {
     return registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNull();
   }
 
-  public List<RegistrationMatching> findRegistration2ISNullSubmittedCurrent(){
-    return registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNullAndRegistration1WorkflowStatusAndRegistration1Event(
+//  public List<RegistrationMatching> findRegistration2ISNullSubmittedCurrent(){
+//    return registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNullAndRegistration1WorkflowStatusAndRegistration1Event(
+//      workflowStatusService.getSubmitted(),
+//      eventService.getCurrentEvent()
+//    );
+//  }
+  public List<RegistrationMatching> findRegistration2ISNullSubmitted(Event event){
+    List<RegistrationMatching> myList = registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNullAndRegistration1WorkflowStatusAndRegistration1Event(
       workflowStatusService.getSubmitted(),
-      eventService.getCurrentEvent()
+      event
     );
+    return myList;
   }
 
   void cleanupMatchingRequest(Registration registration, boolean totalCleanup) {
@@ -103,10 +109,17 @@ public class RegistrationMatchingService {
     save(registrationMatching2);
   }
 
-  public RegistrationMatching lookupMatch (RegistrationMatching baseMatcher) {
-    List<RegistrationMatching> registrationMatchings = findRegistration2ISNullSubmittedCurrent();
+  public RegistrationMatching lookupMatch (RegistrationMatching baseMatcher, Event event) {
+    List<RegistrationMatching> registrationMatchings = findRegistration2ISNullSubmitted(event);
     boolean baseMatcherHasPartnerEmail = baseMatcher.getPartnerEmail() != null;
-
+//    registrationMatchings.forEach(lookupMatcher -> {
+//      log.info("inc baseMatcher.equals(lookupMatcher) {}", baseMatcher.equals(lookupMatcher));
+//      log.info("inc registrationMatch {}", registrationIsMatch(baseMatcher.getRegistration1(), lookupMatcher.getRegistration1()));
+//      log.info("inc workflowMatch {}", workflowIsMatch(baseMatcher.getRegistration1(), lookupMatcher.getRegistration1()));
+//      log.info("inc email {}", baseMatcherHasPartnerEmail && lookupMatcher.getPartnerEmail() != null);
+//      log.info("inc emailMatch {}", isEmailMatch(baseMatcher, lookupMatcher));
+//      log.info("inc emailMatch 2 {}", !baseMatcherHasPartnerEmail && lookupMatcher.getPartnerEmail() == null);
+//    });
     return registrationMatchings.stream().filter(lookupMatcher ->
 
       // exclude self comparison
@@ -134,7 +147,7 @@ public class RegistrationMatchingService {
   public void doMatching(Registration registration) {
     if (findByRegistration1(registration).isPresent()){
       RegistrationMatching baseMatcher = findByRegistration1(registration).get();
-      RegistrationMatching lookupMatcher = lookupMatch(baseMatcher);
+      RegistrationMatching lookupMatcher = lookupMatch(baseMatcher, registration.getEvent());
 
       if (lookupMatcher != null) {
         updateRegistrationMatching(baseMatcher, lookupMatcher);
@@ -163,22 +176,70 @@ public class RegistrationMatchingService {
   }
 
   private boolean registrationIsMatch(Registration baseRegistration, Registration lookupRegistration) {
+//    log.info("registrationIsMatch, baseRegistration Bundle: {}", baseRegistration.getBundle().getName());
+//    log.info("registrationIsMatch, lookupRegistration Bundle: {}", lookupRegistration.getBundle().getName());
+//    log.info("registrationIsMatch, baseRegistration BundleId: {}", baseRegistration.getBundle().getBundleId());
+//    log.info("registrationIsMatch, lookupRegistration BundleId: {}", lookupRegistration.getBundle().getBundleId());
+//    log.info("registrationIsMatch, bundleMatch: {}", baseRegistration.getBundle().getBundleId().equals(lookupRegistration.getBundle().getBundleId()));
+//    log.info("registrationIsMatch, bundleMatch: {}", baseRegistration.getBundle().equals(lookupRegistration.getBundle()));
+//    log.info("registrationIsMatch, not Sold Out: {}", !baseRegistration.getBundle().isSoldOut());
+//    log.info("registrationIsMatch, track not sold out: {}", baseRegistration.getTrack().isSoldOut());
+//    log.info("registrationIsMatch, danceRoles do not match: {}", !baseRegistration.getDanceRole().equals(lookupRegistration.getDanceRole()));
     return
       (
         // check bundles
-        baseRegistration.getBundle().equals(lookupRegistration.getBundle()) &&
-          !baseRegistration.getBundle().isSoldOut() &&
-          baseRegistration.getTrack().equals(lookupRegistration.getTrack()) &&
-          !baseRegistration.getTrack().isSoldOut() &&
+        baseRegistration.getBundle().getBundleId().equals(lookupRegistration.getBundle().getBundleId())
+          && !baseRegistration.getBundle().isSoldOut()
+
+          // check tracks
+          && (
+               baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId())
+
+           // with own partner, different Tracks are allowed
+           || baseRegistration.getTrack().getOwnPartnerRequired()
+          )
+          && !baseRegistration.getTrack().isSoldOut() &&
           (
             // check dance roles
-            !baseRegistration.getDanceRole().equals(lookupRegistration.getDanceRole())
+            !baseRegistration.getDanceRole().getDanceRoleId().equals(lookupRegistration.getDanceRole().getDanceRoleId())
               ||
               (
                 baseRegistration.getDanceRole().equals(lookupRegistration.getDanceRole()) &&
                   baseRegistration.getDanceRole().getName().equals(DanceRoleConfig.SWITCH.getName())
               )
+
+              // exception own partner required
+              || baseRegistration.getTrack().getOwnPartnerRequired()
           )
       );
   }
+
+  public void doMatching(Event event) {
+    List<RegistrationMatching> registrationMatchings = findRegistration2ISNullSubmitted(event);
+    Map<RegistrationMatching, RegistrationMatching> matchingPairs = new HashMap<>();
+
+    registrationMatchings.forEach(
+      baseMatcher -> {
+        RegistrationMatching lookupMatcher = lookupMatch(baseMatcher, event);
+
+        if (lookupMatcher != null
+          && !matchingPairs.containsKey(lookupMatcher) && !matchingPairs.containsValue(baseMatcher)
+          && !matchingPairs.containsKey(baseMatcher) && !matchingPairs.containsValue(lookupMatcher)
+        ) {
+            matchingPairs.put(baseMatcher, lookupMatcher);
+          }
+
+      }
+    );
+
+    onFoundMatch(matchingPairs);
+  }
+
+  private void onFoundMatch(Map<RegistrationMatching, RegistrationMatching> matchingPairs) {
+    matchingPairs.forEach((baseMatching, lookupMatching) -> {
+      updateRegistrationMatching(baseMatching, lookupMatching);
+    });
+  }
+
+
 }

@@ -4,9 +4,10 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.config.DiscountConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Discount;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
+import ch.redanz.redanzCore.model.workshop.repository.EventDiscountRepo;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.TrackService;
@@ -30,6 +31,7 @@ public class DiscountRegistrationService {
   private final WorkflowStatusService workflowStatusService;
   private final TrackService trackService;
   private final OutTextService outTextService;
+  private final EventDiscountRepo eventDiscountRepo;
 
   public void save(Registration registration, Discount discount) {
     discountRegistrationRepo.save(
@@ -39,32 +41,57 @@ public class DiscountRegistrationService {
       )
     );
   }
-  public void saveEarlyBird(Registration registration, int currentRegistrationCount) {
-    // log.info("inc@save early bird, bundleHasTrack: " + trackService.bundleHasTrack(registration.getBundle()));
-    if (trackService.bundleHasTrack(registration.getBundle())
-      && currentRegistrationCount < DiscountConfig.EARLY_BIRD.getCapacity()
-      && !discountRegistrationRepo.findAllByRegistrationAndDiscount(registration, discountService.findByName(DiscountConfig.EARLY_BIRD.getName())).isPresent()
-    )
-    discountRegistrationRepo.save(
-      new DiscountRegistration(
-        registration,
-        discountService.findByName(DiscountConfig.EARLY_BIRD.getName())
-      )
-    );
+
+//  public List<DiscountRegistration> discountRegistrationsCapacity(Registration registration) {
+//    List<DiscountRegistration> discountRegistrations = new ArrayList<>();
+//    discountRegistrationRepo.findAllByRegistration(registration).forEach(
+//      discountRegistration -> {
+//        EventDiscount eventDiscount = eventDiscountRepo.findByEventAndDiscount(
+//          registration.getEvent(), discountRegistration.getDiscount()
+//        );
+//        if (eventDiscountRepo.existsByEventDiscountIdAndCapacityNotNull(eventDiscount.getEventDiscountId()))  {
+//          discountRegistrations.add(discountRegistration);
+//        }
+//      });
+//    return discountRegistrations;
+//  }
+
+
+  public void saveCapacityDiscount(Registration registration) {
+//    log.info(eventDiscount.getDiscount().getName());
+//    log.info(registration.getBundle().getName());
+//    log.info(String.valueOf(trackService.bundleHasTrack(registration.getBundle())));
+    if (trackService.bundleHasTrack(registration.getBundle())) {
+      registration.getTrack().getEventDiscounts().forEach(eventDiscount -> {
+        if (
+          eventDiscountRepo.existsByEventDiscountIdAndCapacityNotNull(eventDiscount.getEventDiscountId())
+          && !discountRegistrationRepo.existsByRegistrationAndDiscount(registration, eventDiscount.getDiscount())
+          && countDiscountSubmittedConfirmingDone(eventDiscount.getDiscount(), registration.getEvent()) < eventDiscount.getCapacity()
+        ) {
+          discountRegistrationRepo.save(
+            new DiscountRegistration(
+              registration,
+              eventDiscount.getDiscount()
+            )
+          );
+        }
+      });
+    }
   }
 
-  public List<DiscountRegistration> discountRegistrationsExceptEarlyBird(Registration registration) {
-    List<DiscountRegistration> discountRegistrations =  discountRegistrationRepo.findAllByRegistration(registration);
-    if (discountRegistrationRepo.findAllByRegistrationAndDiscount(registration, discountService.findByName(DiscountConfig.EARLY_BIRD.getName())).isPresent()) {
-      discountRegistrations.remove(discountRegistrations.indexOf(
-          discountRegistrationRepo
-            .findAllByRegistrationAndDiscount(
-              registration,
-              discountService.findByName(DiscountConfig.EARLY_BIRD.getName())
-            ).get()
-        )
-      );
-    }
+  public List<DiscountRegistration> discountRegistrationsNoCapacity(Registration registration) {
+    List<DiscountRegistration> discountRegistrations = new ArrayList<>();
+    discountRegistrationRepo.findAllByRegistration(registration).forEach(
+      discountRegistration -> {
+
+        EventDiscount eventDiscount = eventDiscountRepo.findByEventAndDiscount(
+          registration.getEvent(), discountRegistration.getDiscount()
+        );
+      if (eventDiscountRepo.existsByEventDiscountIdAndCapacityIsNull(eventDiscount.getEventDiscountId()))  {
+        discountRegistrations.add(discountRegistration);
+      }
+    });
+
     return discountRegistrations;
   }
 
@@ -77,22 +104,23 @@ public class DiscountRegistrationService {
         .getAsJsonArray();
 
       discountRequests.forEach(discount -> {
+        Discount newDiscount = null;
         if (discount.getAsJsonObject().get("checked") == null) {
-          discountRegistrations.add(
-            new DiscountRegistration(
-              registration,
-              discountService.findByDiscountId(discount.getAsJsonObject().get("discountId").getAsLong())
-            )
-          );
-        } else
-          if (discount.getAsJsonObject().get("checked").getAsBoolean()) {
-            discountRegistrations.add(
-              new DiscountRegistration(
-                registration,
-                discountService.findByDiscountId(discount.getAsJsonObject().get("discount").getAsJsonObject().get("discountId").getAsLong())
-              )
-            );
-          }
+          newDiscount = discountService.findByDiscountId(discount.getAsJsonObject().get("discountId").getAsLong());
+        } else if (discount.getAsJsonObject().get("checked").getAsBoolean()) {
+          newDiscount = discountService.findByDiscountId(discount.getAsJsonObject().get("discount").getAsJsonObject().get("discountId").getAsLong());
+        }
+        if (
+          newDiscount != null
+            && eventDiscountRepo.existsByEventDiscountIdAndCapacityIsNull(
+            eventDiscountRepo.findByEventAndDiscount(registration.getEvent(), newDiscount).getEventDiscountId()
+          )
+        ) {
+          discountRegistrations.add(new DiscountRegistration(
+            registration,
+            newDiscount
+          ));
+        }
       });
     }
     return discountRegistrations;
@@ -111,18 +139,23 @@ public class DiscountRegistrationService {
 
   public void updateDiscountRegistrationRequest(Registration registration, JsonObject request) {
     List<DiscountRegistration> requestDiscountRegistrations = discountRegistrations(registration, request);
-    List<DiscountRegistration> discountRegistrations = discountRegistrationsExceptEarlyBird(registration);
+//    log.info("requestDiscountRegistrations, size {}", requestDiscountRegistrations.size());
+    List<DiscountRegistration> discountRegistrationsNoCapacity = discountRegistrationsNoCapacity(registration);
+//    log.info("discountRegistrationsNoCapacity, size {}", discountRegistrationsNoCapacity.size());
+
 
     // delete in current if not in request
-    discountRegistrations.forEach(discountRegistration -> {
+    discountRegistrationsNoCapacity.forEach(
+      discountRegistration -> {
       if (!hasDiscountRegistration(requestDiscountRegistrations, discountRegistration.getDiscount())){
         discountRegistrationRepo.deleteAllByRegistrationAndDiscount(registration, discountRegistration.getDiscount());
       }
     });
 
     // add new from request
-    requestDiscountRegistrations.forEach(discountRegistration -> {
-      if (!hasDiscountRegistration(discountRegistrations, discountRegistration.getDiscount())){
+    requestDiscountRegistrations.forEach(
+      discountRegistration -> {
+      if (!hasDiscountRegistration(discountRegistrationsNoCapacity, discountRegistration.getDiscount())){
         save(registration, discountRegistration.getDiscount());
       }
     });
@@ -161,6 +194,13 @@ public class DiscountRegistrationService {
   }
   public int countDiscountConfirmingAndDone(Discount discount, Event event) {
     return countDiscountConfirming(discount, event) + countDiscountDone(discount, event);
+  }
+
+
+  public int countDiscountSubmittedConfirmingDone(Discount discount, Event event) {
+    return countDiscountConfirmingAndDone(discount, event)
+      + countDiscountDone(discount, event)
+      ;
   }
 
   public List<String> countDiscountSubmittedAsList(Discount discount, Event event){

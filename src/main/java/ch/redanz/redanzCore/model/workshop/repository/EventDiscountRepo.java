@@ -2,19 +2,14 @@ package ch.redanz.redanzCore.model.workshop.repository;
 
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface EventDiscountRepo extends JpaRepository<EventDiscount, EventDiscountId> {
+public interface EventDiscountRepo extends JpaRepository<EventDiscount, Long> {
   List<EventDiscount> findAllByEvent(Event event);
+  EventDiscount findByEventDiscountId(Long eventDiscountId);
   boolean existsByEventAndDiscount(Event event, Discount discount);
   EventDiscount findByEventAndDiscount(Event event, Discount discount);
-
-  @Override
-  @Modifying
-  @Query("delete from EventDiscount t where t.eventDiscountId = ?1")
-  void deleteById(EventDiscountId eventDiscountId);
-
+  boolean existsByEventDiscountIdAndCapacityIsNull(Long eventDiscountId);
+  boolean existsByEventDiscountIdAndCapacityNotNull(Long eventDiscountId);
 }

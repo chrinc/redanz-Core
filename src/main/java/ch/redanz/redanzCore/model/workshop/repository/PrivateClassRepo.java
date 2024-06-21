@@ -17,11 +17,11 @@ public interface PrivateClassRepo extends  JpaRepository<PrivateClass, Long> {
   boolean existsByName(String name);
 
 
-  @Query("SELECT s FROM Event e JOIN e.privateClasses s WHERE e = :event")
-  Optional<List<PrivateClass>> findAllByEvent(@Param("event") Event event);
+//  @Query("SELECT s FROM Event e JOIN e.privateClasses s WHERE e = :event")
+//  Optional<List<PrivateClass>> findAllByEvent(@Param("event") Event event);
 
-  @Override
-  @Modifying
-  @Query("delete from PrivateClass t where t.privateClassId = ?1")
-  void deleteById(Long aLong);
+//  @Override
+//  @Modifying
+//  @Query("delete from PrivateClass t where t.privateClassId = ?1")
+//  void deleteById(Long aLong);
 }

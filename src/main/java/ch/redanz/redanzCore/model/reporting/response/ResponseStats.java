@@ -19,4 +19,5 @@ public class ResponseStats {
   private List<String> countConfirming;
   private List<String> countDone;
   private Integer maxCount;
+//  private String itemAttribute;
 }

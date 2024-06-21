@@ -1,7 +1,5 @@
 package ch.redanz.redanzCore.model.registration.service;
 
-import ch.redanz.redanzCore.model.profile.service.PersonService;
-import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationPayment;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
@@ -9,7 +7,10 @@ import ch.redanz.redanzCore.model.registration.repository.DonationRegistrationRe
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationPaymentRepo;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.*;
+import ch.redanz.redanzCore.model.workshop.repository.EventDiscountRepo;
+import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
@@ -40,11 +41,11 @@ public class PaymentService {
   private final DiscountRegistrationRepo discountRegistrationRepo;
   private final PrivateClassService privateClassService;
   private final SpecialRegistrationService specialRegistrationService;
-  private final PersonService personService;
-  private final UserService userService;
   private final EventService eventService;
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationPaymentRepo registrationPaymentRepo;
+  private final BundleService bundleService;
+  private final EventDiscountRepo eventDiscountRepo;
 
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
@@ -88,37 +89,56 @@ public class PaymentService {
 
     // specials
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
-      totalAmount.addAndGet((int) specialRegistration.getSpecialId().getPrice());
-      String description = specialRegistration.getSpecialId().getDescription() == null ? "": specialRegistration.getSpecialId().getDescription();
+      Special special = specialRegistration.getSpecial();
+      double price = 0.0;
+//      log.info(String.valueOf(eventService.hasEventSpecial(specialRegistration.getRegistration().getEvent(), special)));
+      if (eventService.hasEventSpecial(specialRegistration.getRegistration().getEvent(), special)) {
+        EventSpecial eventSpecial = eventService.findByEventAndSpecial(registration.getEvent(), special);
+        price = eventSpecial.getPrice();
+      }
+
+      totalAmount.addAndGet((int) price);
       specials.add(
         List.of(
-          specialRegistration.getSpecialId().getName(),
-          description,
-          String.valueOf((int) specialRegistration.getSpecialId().getPrice())
+          special.getName(),
+          special.getDescription(),
+          String.valueOf((int) price)
         )
       );
+//      log.info(String.valueOf(specials));
     });
 
     // private class
     privateClassService.findAllByRegistrations(registration).forEach(privateClassRegistration -> {
-      totalAmount.addAndGet((int) privateClassRegistration.getPrivateClass().getPrice());
+      PrivateClass privateClass = privateClassRegistration.getPrivateClass();
+      EventPrivateClass eventPrivateClass = eventService.findByEventAndPrivate(registration.getEvent(), privateClass);
+      totalAmount.addAndGet((int) eventPrivateClass.getPrice());
+
       privateClasses.add(
         List.of(
-          privateClassRegistration.getPrivateClass().getName(),
-          privateClassRegistration.getPrivateClass().getDescription(),
-          String.valueOf((int) privateClassRegistration.getPrivateClass().getPrice())
+          privateClass.getName(),
+          privateClass.getDescription(),
+          String.valueOf(eventPrivateClass.getPrice())
         )
       );
     });
 
     // food
     foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
-      totalAmount.addAndGet((int) foodRegistration.getFood().getPrice());
+      totalAmount.addAndGet((int) eventService.findEventFoodSlotByEventAndFood(
+         registration.getEvent()
+        ,foodRegistration.getFood()
+        ,foodRegistration.getSlot()
+      ).getPrice());
       foodSlots.add(
         List.of(
           foodRegistration.getFood().getName(),
           foodRegistration.getSlot().getName(),
-          String.valueOf((int) foodRegistration.getFood().getPrice())
+          String.valueOf((int) eventService.findEventFoodSlotByEventAndFood(
+            registration.getEvent()
+            ,foodRegistration.getFood()
+            ,foodRegistration.getSlot()
+          ).getPrice())
         )
       );
     });
@@ -134,14 +154,17 @@ public class PaymentService {
         )
       );
     }
-    discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
-      int discount = (int) discountRegistration.getDiscount().getDiscount();
-      totalAmount.addAndGet(discount * (-1));
-      discounts.add(
-        List.of(
-          discountRegistration.getDiscount().getName(),
-          String.valueOf(discount)
-        )
+
+    // discounts
+    discountRegistrationRepo.findAllByRegistration(registration).forEach(
+      discountRegistration -> {
+        int discount = (int) eventDiscountRepo.findByEventAndDiscount(registration.getEvent(), discountRegistration.getDiscount()).getDiscountAmount();
+        totalAmount.addAndGet(discount * (-1));
+        discounts.add(
+          List.of(
+            discountRegistration.getDiscount().getName(),
+            String.valueOf(discount)
+          )
       );
     });
 
@@ -167,25 +190,33 @@ public class PaymentService {
 
     // specials
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
-      totalAmount.addAndGet((int) specialRegistration.getSpecialId().getPrice());
+      if (eventService.hasEventSpecial(registration.getEvent(), specialRegistration.getSpecial())) {
+        totalAmount.addAndGet((int) eventService.findByEventAndSpecial(registration.getEvent(), specialRegistration.getSpecial()).getPrice());
+      }
     });
 
     // private class
     privateClassService.findAllByRegistrations(registration).forEach(privateClassRegistration -> {
-      totalAmount.addAndGet((int) privateClassRegistration.getPrivateClass().getPrice());
+      totalAmount.addAndGet((int) eventService.findByEventAndPrivate(registration.getEvent(), privateClassRegistration.getPrivateClass()).getPrice());
     });
 
     // food
     foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
-      totalAmount.addAndGet((int) foodRegistration.getFood().getPrice());
+      totalAmount.addAndGet((int) eventService.findEventFoodSlotByEventAndFood(
+        registration.getEvent()
+        ,foodRegistration.getFood()
+        ,foodRegistration.getSlot()
+      ).getPrice());
     });
 
     // donation
     if (donationRegistrationRepo.findByRegistration(registration) != null) {
       totalAmount.addAndGet((int) donationRegistrationRepo.findByRegistration(registration).getAmount());
     }
+
+    // discount
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
-      int discount = (int) discountRegistration.getDiscount().getDiscount();
+      int discount = (int) eventDiscountRepo.findByEventAndDiscount(registration.getEvent(), discountRegistration.getDiscount()).getDiscountAmount();
       totalAmount.addAndGet(discount * (-1));
     });
 

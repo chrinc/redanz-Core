@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.entities;
 
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,19 +26,13 @@ public class Discount implements Serializable {
   @Column(name = "discount_id")
   private Long discountId;
   private String name;
-  private double discount;
-  private Integer capacity;
   private String description;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "discount")
-  @JsonIgnore
-  private List<TrackDiscount> trackDiscounts = new ArrayList<>();
-
-  public Discount(String name, double discount, String description, Integer capacity) {
+  public Discount(String name
+    , String description
+  ) {
     this.name = name;
-    this.discount = discount;
     this.description = description;
-    this.capacity = capacity;
   }
 
   public static List<Map<String, String>> schema() {
@@ -45,9 +40,10 @@ public class Discount implements Serializable {
       {
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                   put("label", "id");}});
         add(new HashMap<>() {{put("key", "name");                 put("type", "label");  put("required", "true");      put("label", "Name");}});
-        add(new HashMap<>() {{put("key", "discount");             put("type", "double"); put("required", "true");      put("label", "Discount");}});
         add(new HashMap<>() {{put("key", "description");          put("type", "label");  put("required", "false");     put("label", "Description");}});
-        add(new HashMap<>() {{put("key", "capacity");             put("type", "number"); put("required", "false");     put("label", "Capacity");}});
+//        add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "discount");                          put("label", "Bundle Info");}});
+        add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_DISCOUNTS_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{put("key", "singular");            put("type", "title");         put("label", OutTextConfig.LABEL_DISCOUNT_EN.getOutTextKey()); }});
       }
     };
   }
@@ -57,9 +53,7 @@ public class Discount implements Serializable {
       {
         put("id", String.valueOf(discountId));
         put("name", name);
-        put("discount", String.valueOf(discount));
         put("description", description);
-        put("capacity", String.valueOf(capacity));
       }
     };
   }

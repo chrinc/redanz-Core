@@ -6,7 +6,7 @@ import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import com.google.gson.JsonObject;

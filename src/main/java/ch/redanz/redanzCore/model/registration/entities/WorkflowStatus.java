@@ -26,7 +26,6 @@ public class WorkflowStatus implements Serializable {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "workflowStatus")
   @JsonIgnore
-//    @Expose(serialize = false, deserialize = false)
   private List<WorkflowTransition> transitionList;
 
   public WorkflowStatus() {

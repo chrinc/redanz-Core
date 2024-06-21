@@ -1,7 +1,8 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
-import ch.redanz.redanzCore.model.registration.service.*;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationReleaseService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import freemarker.template.Configuration;
 import lombok.AllArgsConstructor;
@@ -33,12 +34,12 @@ public class EODReleaseJob {
   public void runRelease() {
     if (baseParService.doEODRelease()) {
       log.info("Job: runRelease");
-      Event currentEvent = eventService.getCurrentEvent();
-
-      registrationService.getAllSubmittedRegistrations(currentEvent).forEach(registration -> {
-        registrationReleaseService.doRelease(registration);
+      eventService.getActiveEventsFuture().forEach(event -> {
+        registrationService.getAllSubmittedRegistrations(event).forEach(registration -> {
+          registrationReleaseService.doRelease(registration);
+        });
+        registrationService.updateSoldOut(event);
       });
-      registrationService.updateSoldOut(currentEvent);
     }
   }
 }

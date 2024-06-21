@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
@@ -56,7 +57,6 @@ public class AccommodationService {
   }
 
   public void updateHosting(JsonObject request, Event event) throws IOException, TemplateException {
-    log.info("inc@updateHosting, request: {}", request);
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     Set<Slot> newHostingDays = new HashSet<>();
@@ -66,16 +66,16 @@ public class AccommodationService {
         String key = stringStringMap.get("key");
         String type = stringStringMap.get("type");
         Field field;
-        log.info("key, {}", key);
-        log.info("type, {}", type);
-
         try {
           switch(type) {
             case "label":
               if (request.get("label") != null && request.get("label").isJsonArray()) {
                 String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
-                field =  getField(key);
-                field.set(event, outTextKey);
+
+                if (outTextKey != null) {
+                  field = getField(key);
+                  field.set(event, outTextKey);
+                }
               }
               break;
             case "text":
@@ -104,7 +104,7 @@ public class AccommodationService {
             case "date":
               field = getField(key);
 
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateString = request.get(key).getAsString();
 
               // Parse the string into a LocalDate object
@@ -117,7 +117,7 @@ public class AccommodationService {
             case "datetime":
               field = getField(key);
               // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
               String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
               ZoneId zoneId = ZoneId.of("Europe/Zurich");
@@ -134,7 +134,6 @@ public class AccommodationService {
               break;
 
             case "multiselect":
-              log.info("key, {}", key);
 
               if (request.get(key) != null && request.get(key).isJsonArray()) {
                 request.get(key).getAsJsonArray().forEach(item -> {
@@ -188,6 +187,23 @@ public class AccommodationService {
           add(new HashMap<>() {{put("key", "hosting");       put("type", "bool");                                   put("labelTrue", "Enable Hosting"); put("labelFalse", "Disable Hosting");}});
           add(new HashMap<>() {{put("key", "hostingDays");   put("type", "multiselect");  put("required", "false"); put("label", "Hosting Days");  put("list", getHostingDays().toString());}});
           add(new HashMap<>() {{put("key", "count");         put("type", "single");}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "accommodation");  put("label", OutTextConfig.LABEL_ACCOMMODATION_INFO_EN.getOutTextKey());}});
+//          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "host");           put("label", OutTextConfig.LABEL_HOST_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostYes");        put("label", OutTextConfig.LABEL_HOSTYES_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostCount");      put("label", OutTextConfig.LABEL_HOSTCOUNT_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostDays");       put("label", OutTextConfig.LABEL_HOSTDAYS_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostSpots");      put("label", OutTextConfig.LABEL_HOSTSPOTS_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostComment");    put("label", OutTextConfig.LABEL_HOSTCOMMENT_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hosteeYes");    put("label", OutTextConfig.LABEL_HOSTEEYES_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hosteeShare");    put("label", OutTextConfig.LABEL_HOSTEESHARE_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hosteeShareBeds");    put("label", OutTextConfig.LABEL_HOSTEESHAREBEDS_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hosteeSharePerson");    put("label", OutTextConfig.LABEL_HOSTEESHAREPERSON_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hosteeDays");    put("label", OutTextConfig.LABEL_HOSTEEDAYS_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hosteeSpots");    put("label", OutTextConfig.LABEL_HOSTEESPOTS_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hosteeComments");    put("label", OutTextConfig.LABEL_HOSTEECOMMENTS_INFO_EN.getOutTextKey());}});
+          add(new HashMap<>() {{put("key", "plural");         put("type", "title");           put("label", OutTextConfig.LABEL_ACCOMMODATION_EN.getOutTextKey()); }});
+          add(new HashMap<>() {{put("key", "singular");         put("type", "title");           put("label", OutTextConfig.LABEL_ACCOMMODATION_EN.getOutTextKey()); }});
+
         }
       };
   }
@@ -209,6 +225,10 @@ public class AccommodationService {
     });
 
     return hostingData;
+  }
+
+  public List<EventTypeSlot> eventHostingList (Event event) {
+    return eventTypeSlotService.findByEventAndType(event, "accommodation");
   }
 
   public Map<String, String> dataMap(Event event) {

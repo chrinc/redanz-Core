@@ -37,7 +37,7 @@ public class ResponseCheckIn {
     return new ArrayList<>() {
       {
 //        add(new HashMap<>() {{
-//          put("key", "checkInId");
+//          put("eventPartKey", "checkInId");
 //          put("type", "id");
 //          put("label", "Check In Id");
 //        }});
@@ -82,7 +82,7 @@ public class ResponseCheckIn {
         }});
 
 //        add(new HashMap<>() {{
-//          put("key", "slot");
+//          put("eventPartKey", "slot");
 //          put("type", "text");
 //          put("label", "Slot");
 //        }});

@@ -38,23 +38,22 @@ public class EODReminderJob {
 
     if (baseParService.doEODReminder()) {
       log.info("Job: runReminder");
+      eventService.getActiveEventsFuture().forEach(event -> {
+        registrationService.getAllConfirmingRegistrations(event).forEach(registration -> {
+          LocalDateTime releasedAt = registration.getWorkflowStatusDate();
+          LocalDateTime deadline = LocalDateTime.now().minusDays(
+            baseParService.reminderAfterDays()
+          );
 
-      Event currentEvent = eventService.getCurrentEvent();
-
-      registrationService.getAllConfirmingRegistrations(currentEvent).forEach(registration -> {
-        LocalDateTime releasedAt = registration.getWorkflowStatusDate();
-        LocalDateTime deadline = LocalDateTime.now().minusDays(
-          baseParService.reminderAfterDays()
-        );
-
-        RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-        if (releasedAt.isBefore(deadline) && registrationEmail.getReminderSentDate() == null) {
-          try {
-            registrationEmailService.sendReminderEmail(registration, registrationEmail);
-          } catch (IOException | TemplateException e) {
-            throw new RuntimeException(e);
+          RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
+          if (releasedAt.isBefore(deadline) && registrationEmail.getReminderSentDate() == null) {
+            try {
+              registrationEmailService.sendReminderEmail(registration, registrationEmail);
+            } catch (IOException | TemplateException e) {
+              throw new RuntimeException(e);
+            }
           }
-        }
+        });
       });
     }
   }

@@ -4,15 +4,17 @@ package ch.redanz.redanzCore.web.restApi.controller;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
+import ch.redanz.redanzCore.web.security.exception.HasRegistrationException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +39,13 @@ public class EventController {
   private final PersonService personService;
   private final FoodService foodService;
   private final DiscountService discountService;
+  private final EventRegistrationService eventRegistrationService;
+  private final EventTypeSlotService eventTypeSlotService;
+  private final EventPartService eventPartService;
 
   @GetMapping(path = "/schema/event")
   public List<Map<String, String>> getEventSchema() {
+//    log.info("inc@getEventSchema");
     return eventService.getEventSchema();
   }
 
@@ -56,81 +62,275 @@ public class EventController {
   }
 
   @GetMapping(path = "/schema/bundle")
-  public List<Map<String, String>> getBundleSchema() {
-    return eventService.getBundleSchema();
+  public List<Map<String, String>> getBundleSchema(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.getBundleSchema(eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/data/bundle")
   public List<Map<String, String>> getBundleData(
     @RequestParam("eventId") Long eventId
   ) {
-    return eventService.getBundlesData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+    return eventService.getBundlesData(eventService.findByEventId(eventId));
   }
 
-  @GetMapping(path = "/data/bundle/all")
-  public List<Map<String, String>> getAllBundleData() {
-    return eventService.getBundlesData(eventService.getAllEvents());
+  @GetMapping(path = "/schema/eventPartInfo")
+  public List<Map<String, String>> getEventPartInfoSchema(
+    @RequestParam("eventId") Long eventId,
+    @RequestParam("eventPartKey") String eventPartKey
+  ) {
+//    log.info(eventPartKey);
+    return eventPartService.getEventPartInfoSchema(
+      eventPartService.findByEventAndEventPart(eventService.findByEventId(eventId)
+        , eventPartService.findByKey(eventPartKey)
+      )
+    );
   }
+
+  @GetMapping(path = "/data/eventPartInfo")
+  public List<Map<String, String>> getEventPartInfoData(
+    @RequestParam("eventId") Long eventId,
+    @RequestParam("eventPartKey") String eventPartKey
+  ) {
+//    log.info("evnPartData");
+//    log.info("eventPartKey");
+    log.info(eventPartKey);
+    return eventPartService.getEventPartInfoData(
+      eventPartService.findByEventAndEventPart(eventService.findByEventId(eventId)
+        , eventPartService.findByKey(eventPartKey)
+      )
+    );
+  }
+
 
   @GetMapping(path = "/schema/track")
   public List<Map<String, String>> getTrackSchema(
-    @RequestParam("eventId") Long eventId) {
+    @RequestParam("eventId") Long eventId
+  ) {
     return trackService.getTrackSchema(eventService.findByEventId(eventId));
   }
 
+  @GetMapping(path = "/schema/trackDanceRole")
+  public List<Map<String, String>> getTrackDanceRoleSchema(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return trackService.getTrackDanceRoleSchema();
+  }
+
+  @GetMapping(path = "/data/trackDanceRole")
+  public List<Map<String, String>> getTrackDanceRoleData(
+    @RequestParam("trackId") Long trackId,
+    @RequestParam("eventId") Long eventId
+  ) {
+    return trackService.getTrackDanceRoleData(trackService.findByTrackId(trackId));
+  }
+
+
   @GetMapping(path = "/data/track")
   public List<Map<String, String>> getTrackData(
-    @RequestParam("bundleId") Long bundleId
-  ) {
-    return trackService.getTracksData(new ArrayList<>(){{ add(bundleService.findByBundleId(bundleId)); }});
-  }
-
-  @GetMapping(path = "/schema/discount")
-  public List<Map<String, String>> getDiscountSchema() {
-    return discountService.getDiscountSchema();
-  }
-
-  @GetMapping(path = "/data/discount")
-  public List<Map<String, String>> getDiscountData(
     @RequestParam("eventId") Long eventId
   ) {
-    return discountService.getDiscountData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+    return trackService.getTracksData(eventService.findByEventId(eventId));
   }
 
-  @GetMapping(path = "/schema/special")
-  public List<Map<String, String>> getSpecialSchema() {
-    return specialService.getSpecialSchema();
-  }
-
-  @GetMapping(path = "/data/special")
-  public List<Map<String, String>> getSpecialData(
+  @GetMapping(path = "/schema/foodSlot")
+  public List<Map<String, String>> getFoodSlotSchema(
     @RequestParam("eventId") Long eventId
   ) {
-    return specialService.getSpecialData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+    return foodService.getFoodSlotSchema();
   }
 
-  @GetMapping(path = "/schema/private")
-  public List<Map<String, String>> getPrivateSchema() {
-    return privateClassService.getPrivateSchema();
-  }
-
-  @GetMapping(path = "/data/private")
-  public List<Map<String, String>> getPrivateData(
+  @GetMapping(path = "/data/foodSlot")
+  public List<Map<String, String>> getFoodSlotData(
     @RequestParam("eventId") Long eventId
   ) {
-    return privateClassService.getPrivateData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+    return foodService.getFoodData(eventService.findByEventId(eventId));
   }
 
-  @GetMapping(path = "/schema/food")
-  public List<Map<String, String>> getFoodSchema() {
-    return foodService.getFoodSchema();
-  }
-
-  @GetMapping(path = "/data/food")
-  public List<Map<String, String>> getFoodData(
+  @GetMapping(path = "/schema/eventPrivate")
+  public List<Map<String, String>> getEventPrivateSchema(
     @RequestParam("eventId") Long eventId
   ) {
-    return foodService.getFoodData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+    return eventService.eventPrivateSchema();
+  }
+
+  @PostMapping(path = "/eventPrivate/delete")
+  @Transactional
+  public void deleteEventPrivate(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject privateObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.deleteEventPrivate(
+        privateObject
+      );
+
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/schema/eventSpecial")
+  public List<Map<String, String>> getEventSpecialeSchema(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.eventSpecialSchema();
+  }
+
+  @GetMapping(path = "/schema/eventDiscount")
+  public List<Map<String, String>> getEventDiscountSchema(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.eventDiscountSchema();
+  }
+
+  @PostMapping(path = "/eventSpecial/delete")
+  @Transactional
+  public void deleteEventSpecial(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject specialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.deleteEventSpecial(
+        specialObject
+      );
+
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/eventDiscount/delete")
+  @Transactional
+  public void deleteEventDiscount(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject specialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.deleteEventDiscount(
+        specialObject
+      );
+
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/trackDanceRole/delete")
+  @Transactional
+  public void deleteTrackDanceRole(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject specialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      trackService.deleteTrackDanceRole(
+        specialObject
+      );
+
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+
+  @PostMapping(path = "/eventPrivate/upsert")
+  @Transactional
+  public void upsertEventPrivate(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject jsonEventPrivateObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.updateEventPrivate(
+        jsonEventPrivateObject,
+        eventService.findByEventId(jsonEventPrivateObject.get("eventId").getAsLong())
+      );
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/eventSpecial/upsert")
+  @Transactional
+  public void upsertEventSpecial(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject jsonEventSpecialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.updateEventSpecial(
+        jsonEventSpecialObject,
+        eventService.findByEventId(jsonEventSpecialObject.get("eventId").getAsLong())
+      );
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/trackDanceRole/upsert")
+  @Transactional
+  public void upsertTrackDanceRole(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject jsonEventSpecialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      trackService.updateTrackDanceRole(
+        jsonEventSpecialObject
+      );
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+  @PostMapping(path = "/eventDiscount/upsert")
+  @Transactional
+  public void upsertEventDiscount(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject jsonEventDiscountObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.updateEventDiscount(
+        jsonEventDiscountObject,
+        eventService.findByEventId(jsonEventDiscountObject.get("eventId").getAsLong())
+      );
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/data/eventPrivate")
+  public List<Map<String, String>> getEventPrivateData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.eventPrivateData(eventService.findByEventId(eventId));
+  }
+
+  @GetMapping(path = "/data/eventSpecial")
+  public List<Map<String, String>> getEventSpecialData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.eventSpecialData(eventService.findByEventId(eventId));
+  }
+
+  @GetMapping(path = "/data/eventDiscount")
+  public List<Map<String, String>> getEventDiscountData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.eventDiscountData(eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/schema/hosting")
@@ -159,6 +359,19 @@ public class EventController {
     return volunteeringService.getVolunteerData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
   }
 
+  @GetMapping(path = "/schema/requireTerms")
+  public List<Map<String, String>> getTermsSchema(
+    @RequestParam("eventId") Long eventId) {
+    return eventService.getTermsSchema();
+  }
+
+  @GetMapping(path = "/data/requireTerms")
+  public List<Map<String, String>> getTermsData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.getTermsData(eventService.findByEventId(eventId));
+  }
+
   @GetMapping(path = "/schema/scholarship")
   public List<Map<String, String>> getScholarshipSchema() {
     return scholarshipService.getScholarshipSchema();
@@ -173,12 +386,13 @@ public class EventController {
 
   @GetMapping(path = "/all")
   public List<Event> getAllEvents() {
+//    log.info(eventService.getAllEvents().toString());
     return eventService.getAllEvents();
   }
 
   @GetMapping(path = "/byId")
   @Transactional
-  public Event getUserActiveRegistration(
+  public Event getEventById(
     @RequestParam("eventId") Long eventId
   ) {
     try {
@@ -188,10 +402,10 @@ public class EventController {
     }
   }
 
-  @GetMapping(path = "/current")
-  public Event getCurrentEvent() {
-    return eventService.getCurrentEvent();
-  }
+//  @GetMapping(path = "/current")
+//  public Event getCurrentEvent() {
+//    return eventService.getCurrentEvent();
+//  }
 
   @GetMapping(path = "/active")
   public List<Event> getActivEvents() {
@@ -260,27 +474,31 @@ public class EventController {
     return accommodationService.getResponse(eventService.findByEventId(eventId));
   }
 
-  @GetMapping(path = "/special/all")
-  public Set<Special> getSpecials(
+  @GetMapping(path = "/eventSpecials")
+  public List<EventSpecial> getEventSpecials(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.findSpecialsByEvent(eventService.findByEventId(eventId));
+  }
+
+  @GetMapping(path = "/bundleSpecials")
+  public Set<EventSpecial> getBundleSpecials(
     @RequestParam("bundleId") Long bundleId
   ) {
-    // log.info("inc@special/all, bundleId: " + bundleId);
-    if (bundleId == null) {
-      return specialService.findByEventOrBundle(eventService.getCurrentEvent());
-    } else {
-      return specialService.findByBundle(bundleService.findByBundleId(bundleId));
-    }
+    return bundleService.findSpecialsByBundle(bundleService.findByBundleId(bundleId));
   }
+
   @GetMapping(path = "/privateClasses/all")
-  public List<PrivateClass> getPrivateClasses(
+  public List<EventPrivateClass> getPrivateClasses(
     @RequestParam("bundleId") Long bundleId,
     @RequestParam("eventId") Long eventId
   ) {
-    List<PrivateClass> privateClasses;
+    List<EventPrivateClass> privateClasses;
+    Event event = eventService.findByEventId(eventId);
     if (bundleId == null) {
-      privateClasses =  privateClassService.findByEvent(eventService.findByEventId(eventId));
+      privateClasses =  eventService.findPrivateClassesByEvent(event);
     } else {
-      privateClasses =  privateClassService.findByEventAndBundle(eventService.findByEventId(eventId), bundleService.findByBundleId(bundleId));
+      privateClasses =  eventService.findPrivateClassesByEventAndBundle(event, bundleService.findByBundleId(bundleId));
     }
     return privateClasses;
   }
@@ -324,10 +542,18 @@ public class EventController {
   ) {
     try {
       // update
-      eventService.deleteEvent(
-        JsonParser.parseString(jsonObject).getAsJsonObject()
-      );
-
+      JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+      Long eventId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+      Event event = eventService.findByEventId(eventId);
+      if (eventRegistrationService.hasActiveRegistration(event)) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_REGISTRATION_GE.getOutTextKey());
+      } else if (eventRegistrationService.hasRegistration(event)) {
+        eventService.archiveEvent(event);
+      } else {
+        eventService.deleteEvent(event);
+      }
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -361,13 +587,18 @@ public class EventController {
     try {
 
       JsonObject bundleObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      bundleService.deleteBundle(
-        bundleObject
+      Bundle bundle = bundleService.findByBundleId(bundleObject.get("id").getAsLong());
+      eventService.delete(
+        eventService.findByEventAndBundle(
+          eventService.findByEventId(bundleObject.get("eventId").getAsLong())
+          ,bundle
+        )
       );
 
-      eventService.deleteEventBundle(
-        bundleObject
+      bundleService.deleteBundle(
+        bundle
       );
+
 
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
@@ -386,9 +617,26 @@ public class EventController {
     try {
       trackService.updateTrack(
         jsonTrackObject,
-        bundleService.findByBundleId(jsonTrackObject.get("bundleId").getAsLong())
+        eventService.findByEventId(jsonTrackObject.get("eventId").getAsLong())
       );
 
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/eventPartInfo/upsert")
+  @Transactional
+  public void upsertEventInfo(
+    @RequestBody String jsonObject
+  ) {
+    JsonObject jsonTrackObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+    try {
+      eventService.updateEventPartInfo(
+        jsonTrackObject
+      );
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -402,15 +650,11 @@ public class EventController {
     @RequestBody String jsonObject
   ) {
     try {
-      // update
-      trackService.deleteTrack(
-        JsonParser.parseString(jsonObject).getAsJsonObject()
-      );
-
-      bundleService.deleteBundleTrack(
-        JsonParser.parseString(jsonObject).getAsJsonObject()
-      );
-
+      JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+      Track track = trackService.findByTrackId(request.get("id").getAsLong());
+      Event event = eventService.findByEventId(request.get("eventId").getAsLong());
+      eventService.delete(event, track);
+//      trackService.delete(track);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -418,19 +662,17 @@ public class EventController {
     }
   }
 
-  @PostMapping(path = "/food/upsert")
+  @PostMapping(path = "/foodSlot/upsert")
   @Transactional
-  public void upsertFood(
+  public void upsertFoodSlot(
     @RequestBody String jsonObject
   ) {
     try {
-
       JsonObject jsonFoodObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      foodService.updateFood(
+      eventService.updateEventFoodSlot(
         jsonFoodObject,
         eventService.findByEventId(jsonFoodObject.get("eventId").getAsLong())
       );
-
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -438,17 +680,16 @@ public class EventController {
     }
   }
 
-  @PostMapping(path = "/food/delete")
+  @PostMapping(path = "/foodSlot/delete")
   @Transactional
-  public void deleteFood(
+  public void deleteFoodSlot(
     @RequestBody String jsonObject
   ) {
     try {
       // update
       JsonObject jsonFoodObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      foodService.deleteFood(
-        jsonFoodObject,
-        eventService.findByEventId(jsonFoodObject.get("eventId").getAsLong())
+      eventService.deleteEventFoodSlot(
+        jsonFoodObject
       );
 
     } catch (ApiRequestException apiRequestException) {
@@ -464,111 +705,16 @@ public class EventController {
     @RequestBody String jsonObject
   ) {
     try {
-
-      JsonObject jsonDiscountObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      discountService.updateDiscount(
-        jsonDiscountObject,
-        eventService.findByEventId(jsonDiscountObject.get("eventId").getAsLong())
-      );
-
-    } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
-    }
-  }
-
-  @PostMapping(path = "/discount/delete")
-  @Transactional
-  public void deleteDiscount(
-    @RequestBody String jsonObject
-  ) {
-    try {
-      // update
-      JsonObject jsonDiscountObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      discountService.deleteDiscount(
-        jsonDiscountObject,
-        eventService.findByEventId(jsonDiscountObject.get("eventId").getAsLong())
-      );
-
-    } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
-    }
-  }
-
-  @PostMapping(path = "/special/upsert")
-  @Transactional
-  public void upsertSpecial(
-    @RequestBody String jsonObject
-  ) {
-    try {
-
-      JsonObject jsonSpecialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      specialService.updateSpecial(
-        jsonSpecialObject,
-        eventService.findByEventId(jsonSpecialObject.get("eventId").getAsLong())
-      );
-
-    } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
-    }
-  }
-
-  @PostMapping(path = "/special/delete")
-  @Transactional
-  public void deleteSpecial(
-    @RequestBody String jsonObject
-  ) {
-    try {
-      JsonObject jsonSpecialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      specialService.deleteSpecial(
-        jsonSpecialObject,
-        eventService.findByEventId(jsonSpecialObject.get("eventId").getAsLong())
-      );
-
-    } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
-    }
-  }
-
-  @PostMapping(path = "/private/upsert")
-  @Transactional
-  public void upsertPrivate(
-    @RequestBody String jsonObject
-  ) {
-    try {
-
-      JsonObject jsonPrivateObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      privateClassService.updatePrivates(
-        jsonPrivateObject,
-        eventService.findByEventId(jsonPrivateObject.get("eventId").getAsLong())
-      );
-
-    } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
-    }
-  }
-
-  @PostMapping(path = "/private/delete")
-  @Transactional
-  public void deletePrivate(
-    @RequestBody String jsonObject
-  ) {
-    try {
-      JsonObject jsonPrivateObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      privateClassService.deletePrivates(
-        jsonPrivateObject,
-        eventService.findByEventId(jsonPrivateObject.get("eventId").getAsLong())
-      );
-
+      JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+      Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+//      log.info(id.toString());
+      if (id != null && id != 0 && eventRegistrationService.discountIsUsedAndHasRegistration(discountService.findByDiscountId(id))) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
+      } else {
+        discountService.update(request);
+      }
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -693,4 +839,75 @@ public class EventController {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
     }
   }
+
+  @GetMapping(path = "/event/clone")
+  @Transactional
+  public void cloneEvent(
+    @RequestParam("eventId") Long eventId
+  ) {
+    eventService.clone(eventService.findByEventId(eventId));
+  }
+
+  @GetMapping(path = "/bundle/clone")
+  @Transactional
+  public void cloneBundle (
+    @RequestParam("eventId") Long eventId,
+    @RequestParam("typeId") Long bundleId
+  ) {
+    Bundle newBundle = bundleService.clone(eventService.findByEventId(eventId), bundleService.findByBundleId(bundleId), null);
+    EventBundle newEventBundle = new EventBundle(
+      newBundle,
+      eventService.findByEventId(eventId)
+    );
+    eventService.save(newEventBundle);
+  }
+
+  @GetMapping(path = "/track/clone")
+  @Transactional
+  public void cloneTrack (
+    @RequestParam("eventId") Long eventId,
+    @RequestParam("typeId") Long trackId
+  ) {
+    trackService.clone(eventService.findByEventId(eventId), trackService.findByTrackId(trackId));
+  }
+
+  @PostMapping(path = "/requireTerms/upsert")
+  @Transactional
+  public void upsertTerms(
+    @RequestBody String jsonObject
+  ) {
+    try {
+
+      JsonObject jsonTermsObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.updateTerms(
+        jsonTermsObject,
+        eventService.findByEventId(jsonTermsObject.get("id").getAsLong())
+      );
+
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/requireTerms/delete")
+  @Transactional
+  public void deleteTerms(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject jsonTermsObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.deleteTerms(
+        jsonTermsObject,
+        eventService.findByEventId(jsonTermsObject.get("id").getAsLong())
+      );
+
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
 }

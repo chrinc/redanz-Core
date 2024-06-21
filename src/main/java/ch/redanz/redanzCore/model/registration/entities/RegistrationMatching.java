@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Entity
 @Slf4j
-@ToString
+@ToString(exclude = {"registration1", "registration2"})
 @Getter
 @Setter
 @Table(name="registration_matching")
@@ -21,12 +21,12 @@ public class RegistrationMatching implements Serializable {
     @Column(name="matching_id")
     private Long matchingId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "registration_1_id", nullable = false)
     private Registration registration1;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "registration_2_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registration_2_id")
     private Registration registration2;
 
     @Column(name="partnerEmail")

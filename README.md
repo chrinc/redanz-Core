@@ -1,8 +1,3 @@
-    ## **Demo Application Angular**
-
-Kotlin Project MAS 2021 Mobile Applications / ZHAW: <br>
-[https://github.zhaw.ch/ineicch1/skulls]()
-
 ## RedanzCore
 #### **Bootstrap**
 Necessary tools for testing and development

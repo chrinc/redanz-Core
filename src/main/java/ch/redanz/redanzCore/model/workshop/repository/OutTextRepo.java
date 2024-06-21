@@ -13,4 +13,6 @@ public interface OutTextRepo extends JpaRepository<OutText, OutTextId> {
   List<OutText> findAllByOutTextIdOutTextKey(String outTextKey);
   List<OutText> findAllByType(String type);
   List<OutText> findAllByOutTextIdOutTextLanguageKeyAndType(String languageKey, String type);
+//  Boolean existsByOutText(String outText);
+//  OutText findAllByOutText(String outText);
 }

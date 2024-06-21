@@ -10,7 +10,7 @@ import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
@@ -52,7 +52,7 @@ public class RegistrationService {
   private final SpecialRegistrationService specialRegistrationService;
   private final SpecialService specialService;
   private final ErrorLogService errorLogService;
-  private final PrivateClassService privateClassService;
+//  private final PrivateClassService privateClassService;
   private final LanguageService languageService;
   private final CountryService countryService;
 
@@ -90,17 +90,17 @@ public class RegistrationService {
         }
       }
 
-      specialService.findByEventOrBundle(event).forEach(special -> {
-        specialRegistrationService.soldOut(
-          special
-         ,specialRegistrationService.countSpecialRegistrations(special, event) >= special.getCapacity()
-        );
-      });
+      // Private Class
+      event.getEventSpecials().forEach(
+        eventSpecial -> {
+          eventSpecial.setSoldOut(
+            eventSpecial.getCapacity()
+              <= specialRegistrationService.countSpecialRegistrations(eventSpecial.getSpecial(), event));
+        });
 
       // Tracks
-      if (!bundle.getBundleTracks().isEmpty()) {
-        bundle.getBundleTracks().forEach(bundleTrack -> {
-          Track track = bundleTrack.getTrack();
+        bundle.getEventTracks().forEach(eventTrack -> {
+          Track track = eventTrack.getTrack();
           if (countTracksDone(track, event) >= track.getCapacity()) {
             if (!track.isSoldOut()) {
               track.setSoldOut(true);
@@ -113,27 +113,23 @@ public class RegistrationService {
             }
           }
         });
-      }
     });
 
     // Private Class
-    privateClassService.findByEvent(event).forEach(privateClass -> {
-        specialRegistrationService.soldOut(
-          privateClass
-          ,specialRegistrationService.countPrivateClassRegistrations(privateClass) >= privateClass.getCapacity()
+    event.getEventPrivates().forEach(
+      eventPrivateClass -> {
+        eventPrivateClass.setSoldOut(
+          eventPrivateClass.getCapacity()
+          <= specialRegistrationService.countPrivateClassRegistrations(event, eventPrivateClass.getPrivateClass()));
+    });
+
+    event.getEventSpecials().forEach(
+      eventSpecial -> {
+        eventSpecial.setSoldOut(
+          eventSpecial.getCapacity()
+          <= specialRegistrationService.countSpecialRegistrations(eventSpecial.getSpecial(), event)
         );
     });
-
-    event.getSpecials().forEach(special -> {
-      specialRegistrationService.soldOut(
-        special,
-        specialRegistrationService.countSpecialRegistrations(special, event) >= special.getCapacity()
-      );
-    });
-  }
-
-  public List<Registration> findAllCurrentEvent() {
-    return registrationRepo.findAllByEventAndActiveAndRegistrationType(eventService.getCurrentEvent(), true, RegistrationType.PARTICIPANT);
   }
 
   public List<Registration> findAllByEvent(Event event) {
@@ -144,9 +140,9 @@ public class RegistrationService {
     return workflowStatusService.findAll();
   }
 
-  public int countAll(Event event) {
-    return registrationRepo.countAllByEventAndActiveAndRegistrationType(
-      event, true, RegistrationType.PARTICIPANT
+  public int countActive(Event event) {
+    return registrationRepo.countAllByEventAndActive(
+      event, true
     );
   }
   public int countSubmittedConfirmingAndDone(Event event) {
@@ -164,6 +160,10 @@ public class RegistrationService {
     return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(
       workflowStatusService.getConfirming(), true, event, RegistrationType.PARTICIPANT
     );
+  }
+
+  public int countByEvent(Event event) {
+    return registrationRepo.countAllByEvent(event);
   }
   public int countDone(Event event) {
     return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(
@@ -396,26 +396,25 @@ public class RegistrationService {
 
   @Transactional
   public Registration updateRegistrationRequest(Long personId, Event event, JsonObject request) throws IOException, TemplateException {
-     log.info("inc@updateRegistration, personId: {}", personId);
-     log.info("inc@updateRegistration, request: {}", request);
     boolean isNewRegistration = false;
     // ignore if user already has a registration
     Registration registration;
     RegistrationRequest registrationRequest = new RegistrationRequest(
-      request.get("event").getAsJsonObject().get("eventId").getAsLong(),
+//      request.get("event").getAsJsonObject().get("eventId").getAsLong(),
+      event.getEventId(),
       request.get("bundleId").getAsLong(),
       request.get("trackId").isJsonNull() ? null : request.get("trackId").getAsLong(),
       (request.get("danceRoleId") == null || request.get("danceRoleId").isJsonNull()) ? null : request.get("danceRoleId").getAsLong(),
       (request.get("partnerEmail") == null || request.get("partnerEmail").isJsonNull()) ? null : request.get("partnerEmail").getAsString()
     );
 
-    // log.info("inc@updateRegistration, after registrationRequest");
+//     log.info("inc@updateRegistration, after registrationRequest");
     if (findByParticipantAndEvent(
       personService.findByPersonId(personId),
       event,
       RegistrationType.PARTICIPANT
     ).isPresent()) {
-        // log.info("inc@updateRegistration, update Registration");
+//         log.info("inc@updateRegistration, update Registration");
         // update Registration
         registration = findByParticipantAndEvent(
           personService.findByPersonId(personId),
@@ -429,42 +428,46 @@ public class RegistrationService {
     else {
       try {
         isNewRegistration = true;
-        // log.info("inc@updateRegistration, isNewRegistration");
+//         log.info("inc@updateRegistration, isNewRegistration");
         saveNewRegistration(registrationRequest, personId, RegistrationType.PARTICIPANT);
       } catch (Exception exception) {
         errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for personId: " + personId + ", request: " + request);
         throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
       }
-      // log.info("inc@updateRegistration, bfr findByParticipantAndEvent");
+//       log.info("inc@updateRegistration, bfr findByParticipantAndEvent");
       registration = findByParticipantAndEvent(
         personService.findByPersonId(personId),
         event,
         RegistrationType.PARTICIPANT
       ).get();
-      // log.info("inc@updateRegistration, after findByParticipantAndEvent");
-      discountRegistrationService.saveEarlyBird(registration, countAll(event));
-      // log.info("inc@updateRegistration, after early bird");
+
     }
 
-    // log.info("inc@updateRegistration, bfr food");
+    discountRegistrationService.saveCapacityDiscount(registration);
+
+//     log.info("inc@updateRegistration, bfr food");
     foodRegistrationService.updateFoodRegistrationRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr discount");
+//     log.info("inc@updateRegistration, bfr discount");
     discountRegistrationService.updateDiscountRegistrationRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr special Reg");
+//     log.info("inc@updateRegistration, bfr special Reg");
     specialRegistrationService.updateSpecialRegistrationRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr privateClass Reg");
+//     log.info("inc@updateRegistration, bfr privateClass Reg");
     specialRegistrationService.updatePrivateClassRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr Host");
+//     log.info("inc@updateRegistration, bfr Host");
     hostingService.updateHostRegistrationRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr Hostee");
+//     log.info("inc@updateRegistration, bfr Hostee");
     hostingService.updateHosteeRegistrationRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr Volunteer");
+//     log.info("inc@updateRegistration, bfr Volunteer");
     volunteerService.updateVolunteerRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr Scholarship");
+//     log.info("inc@updateRegistration, bfr Scholarship");
     donationRegistrationService.updateScholarshipRequest(registration, request);
-    // log.info("inc@updateRegistration, bfr Donation");
+//     log.info("inc@updateRegistration, bfr Donation");
     donationRegistrationService.updateDonationRequest(registration, request);
+//    log.info("inc@updateRegistration, bfr matching");
     registrationMatchingService.updateMatchingRequest(registration, registrationRequest);
+//    log.info("inc@updateRegistration, after matching");
+
+//    log.info("inc@updateRegistration, isNewRegistration {}", isNewRegistration);
     if (isNewRegistration) {
       try {
         workflowTransitionService.setWorkflowStatus(
@@ -609,19 +612,23 @@ public class RegistrationService {
     ).get();
   }
   public RegistrationResponse getRegistrationResponse(Registration registration) {
+    log.info("inc@getRegistrationResponse");
     RegistrationResponse registrationResponse = new RegistrationResponse(
       registration.getRegistrationId(),
       registration.getParticipant().getPersonId(),
-      registration.getEvent(),
+      registration.getEvent().getEventId(),
+//      registration.getEvent(),
       registration.getBundle() != null ? registration.getBundle().getBundleId() : null
     );
-
-    registrationResponse.setEvent(registration.getEvent());
+    log.info("inc@getRegistrationResponse, bfr set event");
+//    registrationResponse.setEvent(registration.getEvent());
+    registrationResponse.setEventId(registration.getEvent().getEventId());
     registrationResponse.setRegistrationId(registration.getRegistrationId());
     if (registration.getBundle() != null) {
       registrationResponse.setBundleId(registration.getBundle().getBundleId());
     }
 
+    log.info("inc@getRegistrationResponse, bfr track");
     // track
     if (registration.getTrack() != null) {
       registrationResponse.setTrackId(registration.getTrack().getTrackId());
@@ -639,14 +646,14 @@ public class RegistrationService {
     }
 
     // workflow Status
-    WorkflowTransition workflowTransition = workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration);
-    registrationResponse.setWorkflowStatus(workflowTransition.getWorkflowStatus());
+    registrationResponse.setWorkflowStatus(registration.getWorkflowStatus());
 
     // Food Registration
     registrationResponse.setFoodRegistrations(
       foodRegistrationService.getAllByRegistration(registration)
     );
 
+    log.info("inc@getRegistrationResponse, bfr host");
     // Host Registration
     registrationResponse.setHostRegistration(
       hostingService.getHostRegistration(registration)
@@ -667,6 +674,7 @@ public class RegistrationService {
       donationRegistrationService.getScholarshipRegistration(registration)
     );
 
+    log.info("inc@getRegistrationResponse, bfr donation");
     // Donation Registration
     registrationResponse.setDonationRegistration(
       donationRegistrationService.getDonationRegistration(registration)
@@ -682,10 +690,13 @@ public class RegistrationService {
       specialRegistrationService.findAllByRegistration(registration)
     );
 
+    log.info("inc@getRegistrationResponse, bfr private Class");
     // Private Classes
     registrationResponse.setPrivateClassRegistrations(
       specialRegistrationService.findAllPrivateClassesByRegistration(registration)
     );
+
+    log.info("inc@getRegistrationResponse, bfr return, {}", registrationResponse);
     return registrationResponse;
   }
 
@@ -706,21 +717,20 @@ public class RegistrationService {
         );
     }
 
-//    log.info("registrationType: {}", registrationType);
-    log.info("personId: {}", personId);
-    log.info("eventId: {}", eventId);
-    log.info("registrationOptional.isPresent(): {}", registrationOptional.isPresent());
     if (registrationOptional.isPresent()) {
       Registration registration = registrationOptional.get();
       RegistrationResponse registrationResponse = getRegistrationResponse(registration);
+      log.info("inc@bfr return response");
       return registrationResponse;
     } else {
-      return new RegistrationResponse(personId, eventService.findByEventId(eventId));
+//      return new RegistrationResponse(personId, eventService.findByEventId(eventId));
+      return new RegistrationResponse(personId, eventId);
     }
   }
 
   public RegistrationResponse getNewRegistrationResponse(Long eventId) {
-      return new RegistrationResponse(eventService.findByEventId(eventId));
+//      return new RegistrationResponse(eventService.findByEventId(eventId));
+      return new RegistrationResponse(eventId);
   }
 
   public List<RegistrationResponse> getAllUserRegistrationResponses(Long personId) {
@@ -735,6 +745,8 @@ public class RegistrationService {
         registrationResponses.add(getRegistrationResponse(registration));
       });
     }
+    log.info("bfr return responses");
+    log.info("bfr return registrationResponses {}", registrationResponses);
     return registrationResponses;
   }
 

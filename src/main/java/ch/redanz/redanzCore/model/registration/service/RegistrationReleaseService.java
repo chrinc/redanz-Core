@@ -24,7 +24,7 @@ public class RegistrationReleaseService {
          isRelease(registration)
      //  && !releasedRegistrations.contains(registration)
     ) {
-      // log.info("registration firstName: {}", registration.getParticipant().getFirstName());
+       log.info("registration firstName: {}", registration.getParticipant().getFirstName());
       try {
 
         // release partner first
@@ -52,7 +52,7 @@ public class RegistrationReleaseService {
 
   private boolean isRelease(Registration registration) {
     return
-      registration.getWorkflowStatus().equals(workflowStatusService.getSubmitted()) &&
+      registration.getWorkflowStatus().getWorkflowStatusId().equals(workflowStatusService.getSubmitted().getWorkflowStatusId()) &&
       isMatchingOK(registration) &&
         isCapacityOK(registration)
       ;
@@ -67,8 +67,8 @@ public class RegistrationReleaseService {
   private boolean isCapacityOK (Registration registration) {
     return
       registrationService.countConfirmingAndDone(
-        eventService.getCurrentEvent()
-      ) < eventService.getCurrentEvent().getCapacity() &&
+        registration.getEvent()
+      ) < registration.getEvent().getCapacity() &&
         registrationService.countBundlesConfirmingAndDone(
           registration.getBundle(), registration.getEvent()
         ) < registration.getBundle().getCapacity() &&

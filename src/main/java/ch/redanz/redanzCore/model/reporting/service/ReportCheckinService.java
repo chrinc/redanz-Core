@@ -3,7 +3,7 @@ package ch.redanz.redanzCore.model.reporting.service;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.reporting.response.ResponseCheckIn;
-import ch.redanz.redanzCore.model.workshop.config.LanguageConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.LanguageConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
 import lombok.AllArgsConstructor;

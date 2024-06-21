@@ -1,13 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.registration.service.PaymentService;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
-import ch.redanz.redanzCore.service.payment.CreatePayment;
-import ch.redanz.redanzCore.service.payment.CreatePaymentResponse;
-import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
-import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCreateParams;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

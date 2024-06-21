@@ -6,20 +6,23 @@ import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.VolunteerRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.VolunteerSlotRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.entities.VolunteerType;
+import ch.redanz.redanzCore.model.workshop.entities.*;
+import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.VolunteerTypeRepo;
+import ch.redanz.redanzCore.model.workshop.service.EventRegistrationService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,6 +39,7 @@ public class VolunteerService {
   private final OutTextService outTextService;
   private final EventService eventService;
   private final VolunteerTypeRepo volunteerTypeRepo;
+  private final EventRepo eventRepo;
 
   public boolean existsByName(String name) {
     return volunteerTypeRepo.existsByName(name);
@@ -157,18 +161,11 @@ public class VolunteerService {
   }
 
   public void updateVolunteerRegistration(Registration registration, JsonObject volunteerRegistration) {
-//     log.info("inc@updateVolunteerReg ");
-//     log.info(volunteerRegistration.toString());
-//     log.info(volunteerRegistration.get("typeId").toString());
     Long typeId = volunteerRegistration.get("typeId").isJsonNull() ? null : volunteerRegistration.get("typeId").getAsLong();
     String intro = volunteerRegistration.get("intro") == null  || volunteerRegistration.get("intro").isJsonNull() ? null : volunteerRegistration.get("intro").getAsString();
     String mobile = volunteerRegistration.get("mobile") == null  || volunteerRegistration.get("mobile").isJsonNull() ? null : volunteerRegistration.get("mobile").getAsString();
-//    log.info("inc@updateVolunteerReg typeId: {}", typeId);
-//    log.info("inc@updateVolunteerReg intro: {}", intro);
-//    log.info("inc@updateVolunteerReg mobile: {}", mobile);
     VolunteerRegistration existingVolunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
 
-//    log.info("inc@updateVolunteerReg existingVolunteerRegistration: {}", existingVolunteerRegistration);
     if (existingVolunteerRegistration != null) {
 
       // update existing registration
@@ -253,6 +250,123 @@ public class VolunteerService {
     VolunteerRegistration volunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
     volunteerSlotRegistrationRepo.deleteAllByVolunteerRegistration(volunteerRegistration);
     volunteerRegistrationRepo.deleteAllByRegistration(registration);
+  }
+
+  public List<Map<String, String>> getVolunteerTypeSchema() {
+    return VolunteerType.schema();
+  }
+  public List<Map<String, String>> getVolunteerTypeData() {
+    List<Map<String, String>> volunteerTypesData = new ArrayList<>();
+    volunteerTypeRepo.findAll().forEach(volunteerType -> {
+      // discount data
+      Map<String, String> volunteerTypeData = volunteerType.dataMap();
+      volunteerTypesData.add(volunteerTypeData);
+    });
+    return volunteerTypesData;
+  }
+
+  public void delete (VolunteerType volunteerType) {
+    outTextService.delete(volunteerType.getName());
+    outTextService.delete(volunteerType.getDescription());
+    volunteerTypeRepo.delete(volunteerType);
+  }
+
+  public boolean isUsed(VolunteerType volunteerType) {
+    AtomicBoolean isUsed = new AtomicBoolean(false);
+    eventRepo.findAll().forEach(event -> {
+      if(event.getVolunteerTypes().contains(volunteerType)
+      ) {
+        isUsed.set(true);
+      };
+    });
+    return isUsed.get();
+  }
+
+  public Field getField(String key) {
+    Field field;
+    try {
+      field = VolunteerType.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
+
+  public void updateVolunteerType(JsonObject request) throws IOException, TemplateException {
+    log.info(request.toString());
+    Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    VolunteerType volunteerType;
+
+    if (id == null || id == 0) {
+      volunteerType = new VolunteerType();
+      log.info("new type");
+    } else {
+      log.info("find existing type");
+      volunteerType = findVolunteerTypeById(id);
+    }
+
+    VolunteerType.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+
+        try {
+          log.info(key);
+          log.info(type);
+          switch(type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                log.info(outTextKey);
+                if (outTextKey != null) {
+                  field = getField(key);
+                  log.info("after get field");
+                  field.set(volunteerType, outTextKey);
+                  log.info("after set field");
+                }
+              }
+
+              log.info("after set field");
+              break;
+            case "text":
+              field = getField(key);
+              field.set(volunteerType, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getField(key);
+              field.set(volunteerType, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getField(key);
+              field.set(volunteerType, request.get(key).isJsonNull() ? null : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+            case "color":
+              field = getField(key);
+              field.set(volunteerType, request.get(key).isJsonNull() ? null :
+                request.get(key).getAsJsonObject().isJsonNull() ? request.get(key).getAsString() :
+                  request.get(key).getAsJsonObject().get("hex").getAsString());
+              break;
+
+            case "bool":
+              field = getField(key);
+              field.set(volunteerType, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    saveVolunteerType(volunteerType);
   }
 
 }

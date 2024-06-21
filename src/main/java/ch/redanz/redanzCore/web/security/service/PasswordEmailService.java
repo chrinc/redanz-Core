@@ -5,7 +5,7 @@ import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import freemarker.template.Configuration;

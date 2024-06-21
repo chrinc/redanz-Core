@@ -97,7 +97,7 @@ public class CheckIn implements Serializable {
           put("label", "Registration");
         }});
 //        add(new HashMap<>() {{
-//          put("key", "slot");
+//          put("eventPartKey", "slot");
 //          put("type", "id");
 //          put("label", "Slot");
 //        }});

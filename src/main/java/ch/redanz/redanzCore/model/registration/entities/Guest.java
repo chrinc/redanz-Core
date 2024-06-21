@@ -114,7 +114,7 @@ public class Guest implements Serializable {
           put("elemLabel", "firstName");
         }});
 //        add(new HashMap<>() {{
-//          put("key", "person");
+//          put("eventPartKey", "person");
 //          put("type", "id");
 //          put("label", "Person");
 //        }});

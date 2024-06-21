@@ -55,6 +55,7 @@ public class User implements Serializable, UserDetails {
   @Column(name = "user_role")
   @Enumerated(EnumType.STRING)
   private UserRole userRole;
+
   @JsonIgnore
   private Boolean locked = false;
   @JsonIgnore

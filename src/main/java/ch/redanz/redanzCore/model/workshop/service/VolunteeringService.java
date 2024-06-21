@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.VolunteerTypeRepo;
@@ -121,7 +122,11 @@ public class VolunteeringService {
         add(new HashMap<>() {{put("key", "volunteering");     put("type", "bool");         put("labelTrue", "Enable Volunteering"); put("labelFalse", "Disable Volunteering");}});
         add(new HashMap<>() {{put("key", "volunteerSlots");   put("type", "multiselect");  put("required", "false");                put("label", "Special Volunteer Slots");   put("list", getVolunteerSlots().toString());}});
         add(new HashMap<>() {{put("key", "volunteerTypes");   put("type", "multiselect");  put("required", "true");                 put("label", "Volunteer Types");  put("list", getVolunteerTypes().toString());}});
+        add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "volunteer");                          put("label", OutTextConfig.LABEL_VOLUNTEER_INFO_EN.getOutTextKey());}});
         add(new HashMap<>() {{put("key", "count");            put("type", "single");}});
+        add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_VOLUNTEERING_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{put("key", "singular");            put("type", "title");         put("label", OutTextConfig.LABEL_VOLUNTEERING_EN.getOutTextKey()); }});
+
       }
     };
   }
@@ -151,6 +156,12 @@ public class VolunteeringService {
     });
     return volunteerData;
   }
+
+
+  public List<EventTypeSlot> eventVolunteerList (Event event) {
+    return eventTypeSlotService.findByEventAndType(event, "volunteer");
+  }
+
 
   public Map<String, String> dataMap(Event event) {
     return new HashMap<>() {

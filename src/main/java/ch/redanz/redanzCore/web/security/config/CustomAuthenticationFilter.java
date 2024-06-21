@@ -75,7 +75,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     long MINUTES_300 = 300 * 60 * 1000L;
     User user = (User) authentication.getPrincipal();
     Algorithm algorithm = Algorithm.HMAC256(JWTConfig.getJwtSecret().getBytes());
-
+//    log.info(user.getAuthorities().toString());
     String access_token = JWT.create()
       .withSubject(user.getUsername())
       .withExpiresAt(

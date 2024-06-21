@@ -1,9 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
 import ch.redanz.redanzCore.model.workshop.entities.*;
-import ch.redanz.redanzCore.model.workshop.repository.TrackBundleRepo;
+import ch.redanz.redanzCore.model.workshop.repository.EventTrackRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TrackDanceRoleRepo;
-import ch.redanz.redanzCore.model.workshop.repository.TrackDiscountRepo;
 import ch.redanz.redanzCore.model.workshop.repository.TrackRepo;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
@@ -27,35 +26,25 @@ import java.util.stream.Collectors;
 public class TrackService {
 
   private final TrackRepo trackRepo;
-  private final TrackBundleRepo trackBundleRepo;
-  private final TrackDanceRoleRepo trackDanceRoleRepo;
-  private final TrackDiscountRepo trackDiscountRepo;
   private final DiscountService discountService;
   private final OutTextService outTextService;
-  public boolean trackDiscountExists(Track track, Discount discount) {
-    return trackDiscountRepo.existsByTrackAndDiscount(track, discount);
-  }
+  private final EventTrackRepo eventTrackRepo;
+  private final DanceRoleService danceRoleService;
+  private final TrackDanceRoleRepo trackDanceRoleRepo;
+
   public void save(Track track) {
     trackRepo.save(track);
   }
-
   public void save(TrackDanceRole trackDanceRole) {
     trackDanceRoleRepo.save(trackDanceRole);
   }
 
-  public void save(TrackDiscount trackDiscount) {
-    trackDiscountRepo.save(trackDiscount);
-  }
-
-  public boolean existsByTrackDanceRole(Track track, DanceRole danceRole) {
-    return trackDanceRoleRepo.existsByTrackAndDanceRole(track, danceRole);
-  }
   public List<Track> getAll(){
     return trackRepo.findAll();
   }
 
   public boolean bundleHasTrack(Bundle bundle) {
-    return !trackBundleRepo.findAllByBundle(bundle).isEmpty();
+    return !bundle.getEventTracks().isEmpty();
   }
 
   public boolean existsByName(String TrackName) {
@@ -82,11 +71,12 @@ public class TrackService {
     return field;
   }
 
-  public void updateTrack(JsonObject request, Bundle bundle) throws IOException, TemplateException {
+  public void updateTrack(JsonObject request, Event event) throws IOException, TemplateException {
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     Track track;
-    List<Discount> newDiscounts = new ArrayList<>();
+    List<EventDiscount> newEventDiscounts = new ArrayList<>();
+//    Set<TrackDanceRole> newTrackDanceRoles = new HashSet<>();
     Long trackId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
     boolean trackIsNew = false;
 
@@ -108,8 +98,11 @@ public class TrackService {
             case "label":
               if (request.get("label") != null && request.get("label").isJsonArray()) {
                 String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
-                field =  getField(key);
-                field.set(track, outTextKey);
+
+                if (outTextKey != null) {
+                  field = getField(key);
+                  field.set(track, outTextKey);
+                }
               }
               break;
             case "text":
@@ -138,7 +131,7 @@ public class TrackService {
             case "date":
               field = getField(key);
 
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateString = request.get(key).getAsString();
 
               // Parse the string into a LocalDate object
@@ -151,7 +144,7 @@ public class TrackService {
             case "datetime":
               field = getField(key);
               // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
               String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
               ZoneId zoneId = ZoneId.of("Europe/Zurich");
@@ -168,12 +161,23 @@ public class TrackService {
               break;
 
             case "multiselect":
-              log.info("key, {}", key);
+            case "multiselectText":
+//              log.info(eventPartKey);
 
               if (request.get(key) != null && request.get(key).isJsonArray()) {
-                request.get(key).getAsJsonArray().forEach(item -> {
-                  newDiscounts.add(discountService.findByDiscountId(item.getAsLong()));
-                });
+                switch (key) {
+                  case "discounts":
+                    request.get(key).getAsJsonArray().forEach(item -> {
+                      newEventDiscounts.add(discountService.findByEventDiscountId(item.getAsLong()));
+                    });
+                    break;
+//                  case "danceRoles":
+//                    request.get(eventPartKey).getAsJsonArray().forEach(item -> {
+//                      newTrackDanceRoles.add(trackDanceRoleRepo.findByTrackDanceRoleId(item.getAsLong()));
+//                    });
+//                    break;
+
+                }
               }
               break;
 
@@ -185,51 +189,141 @@ public class TrackService {
         }
       }
     );
+    track.setEventDiscounts(newEventDiscounts);
+//    track.setTrackDanceRoles(newTrackDanceRoles);
+
     save(track);
+//    newDanceRoles.forEach(
+//      danceRole -> {
+//    });
 
     if (trackIsNew) {
-      trackBundleRepo.save(
-        new BundleTrack(
-          track, bundle
+      eventTrackRepo.save(
+        new EventTrack(
+          track, event
         )
       );
     };
-
-    List<Discount> existingDiscounts = trackDiscountRepo.findAllByTrack(track)
-      .stream()
-      .map(TrackDiscount::getDiscount)
-      .collect(Collectors.toList());
-
-    Set<Discount> newDiscountsSet = new HashSet<>(newDiscounts);
-
-    // Save new discounts
-    newDiscounts.stream()
-      .filter(discount -> !existingDiscounts.contains(discount))
-      .forEach(discount -> save(new TrackDiscount(discount, track)));
-
-    // Remove existing discounts not in new discounts
-    existingDiscounts.stream()
-      .filter(existingDiscount -> !newDiscountsSet.contains(existingDiscount))
-      .forEach(existingDiscount -> {
-        TrackDiscountId trackDiscountId = trackDiscountRepo.findByDiscountAndTrack(existingDiscount, track).getTrackDiscountId();
-        trackDiscountRepo.deleteById(trackDiscountId);
-      });
   }
 
-  public void deleteTrack(JsonObject request) {
-    Long trackId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    Track track = findByTrackId(trackId);
+
+  public Field getTrackDanceRoleField(String key) {
+    Field field;
+    try {
+      field = TrackDanceRole.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
+
+  public void updateTrackDanceRole(JsonObject request) throws IOException, TemplateException {
+    log.info(request.toString());
+    Long trackDanceRoleId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    TrackDanceRole trackDanceRole;
+    if (trackDanceRoleId == null || trackDanceRoleId == 0) {
+      trackDanceRole = new TrackDanceRole();
+      trackDanceRole.setTrack(findByTrackId(request.get("trackId").isJsonNull() ? null : request.get("trackId").getAsLong()));
+    } else {
+      trackDanceRole = trackDanceRoleRepo.findByTrackDanceRoleId(trackDanceRoleId);
+    }
+
+    TrackDanceRole.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+
+        try {
+          switch(type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                if (outTextKey != null) {
+                  field = getTrackDanceRoleField(key);
+                  field.set(trackDanceRole, outTextKey);
+                }
+              }
+              break;
+            case "text":
+              field = getTrackDanceRoleField(key);
+              field.set(trackDanceRole, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getTrackDanceRoleField(key);
+              field.set(trackDanceRole, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getTrackDanceRoleField(key);
+              field.set(trackDanceRole, request.get(key).isJsonNull() ? null : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+
+            case "color":
+              field = getTrackDanceRoleField(key);
+              field.set(trackDanceRole, request.get(key).isJsonNull() ? null :
+                request.get(key).getAsJsonObject().isJsonNull() ? request.get(key).getAsString() :
+                  request.get(key).getAsJsonObject().get("hex").getAsString());
+              break;
+
+            case "bool":
+              field = getTrackDanceRoleField(key);
+              field.set(trackDanceRole, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            case "listText":
+              field = getTrackDanceRoleField(key);
+              switch (key) {
+                case "danceRole":
+                  log.info(request.get(key).getAsString());
+                  field.set(trackDanceRole, danceRoleService.findByDanceRoleId(
+                    request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
+                  ));
+                  break;
+              }
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(trackDanceRole);
+  }
+
+
+  public void delete(Track track) {
+    track.getTrackDanceRoles().forEach(trackDanceRole -> delete(trackDanceRole));
+    track.setEventDiscounts(new ArrayList<>());
     trackRepo.delete(track);
   }
 
+  public void delete(TrackDanceRole trackDanceRole) {
+    trackDanceRole.setDanceRole(null);
+    trackDanceRoleRepo.delete(trackDanceRole);
+  }
 
-  public List<Long> trackDiscountIdList(Track track){
-    List<Long> trackIdList = new ArrayList<>();
-    trackDiscountRepo.findAllByTrack(track).forEach(trackDiscount -> {
-      trackIdList.add(trackDiscount.getDiscount().getDiscountId());
+
+  public List<Long> trackEventDiscountIdList(Track track){
+    List<Long> trackEventDiscountIdList = new ArrayList<>();
+    track.getEventDiscounts().forEach(eventDiscount -> {
+      trackEventDiscountIdList.add(eventDiscount.getEventDiscountId());
     });
 
-    return trackIdList;
+    return trackEventDiscountIdList;
+  }
+
+  public List<Long> trackDanceRoleIdList(Track track){
+    return track.getTrackDanceRoles().stream()
+      .map(TrackDanceRole::getTrackDanceRoleId)
+      .collect(Collectors.toList());
   }
 
 
@@ -237,23 +331,92 @@ public class TrackService {
     List<Map<String, String>> trackSchema = Track.schema();
     trackSchema.forEach(item -> {
       if (item.get("key").equals("discounts")) {
-        item.put("list", discountService.getDiscounts(event).toString());
+        item.put("list", discountService.getDiscountsMap(event).toString());
+      }
+      if (item.get("key").equals("danceRoles")) {
+        item.put("list", danceRoleService.getDanceRolesMap().toString());
       }
     });
     return trackSchema;
   }
-  public List<Map<String, String>> getTracksData(List<Bundle> bundles){
-    List<Map<String, String>> tracksData = new ArrayList<>();
-    bundles.forEach(bundle -> {
-      bundle.getBundleTracks().forEach(
-        bundleTrack -> {
-          Map<String, String> trackData = bundleTrack.getTrack().dataMap();
-          trackData.put("bundleId", Long.toString(bundle.getBundleId()));
-          trackData.put("discounts", trackDiscountIdList(bundleTrack.getTrack()).toString());
-          tracksData.add(trackData);
-        });
+  public List<Map<String, String>> getTrackDanceRoleSchema(){
+    List<Map<String, String>> trackDanceRoleSchema = TrackDanceRole.schema();
+    trackDanceRoleSchema.forEach(item -> {
+      switch (item.get("key")) {
+        case "danceRole":
+          item.put("list", danceRoleService.getDanceRolesMap().toString());
+          break;
+      }
     });
+    return trackDanceRoleSchema;
+  }
+
+  public List<Map<String, String>> getTrackDanceRoleData(Track track) {
+    List<Map<String, String>> trackDanceRolesData = new ArrayList<>();
+    track.getTrackDanceRoles().forEach(
+      trackDanceRole -> {
+        Map<String, String> trackDanceRoleData = trackDanceRole.dataMap();
+//        trackDanceRoleData.put("danceRole", Long.toString(trackDanceRole.getTrackDanceRoleId()));
+//        trackDanceRoleData.put("danceRoles", trackEventDiscountIdList(eventTrack.getTrack()).toString());
+        trackDanceRolesData.add(trackDanceRoleData);
+      });
+    return trackDanceRolesData;
+  }
+
+  public List<Map<String, String>> getTracksData(Event event) {
+    List<Map<String, String>> tracksData = new ArrayList<>();
+    event.getEventTracks().forEach(
+      eventTrack -> {
+        Map<String, String> trackData = eventTrack.getTrack().dataMap();
+        trackData.put("eventId", Long.toString(event.getEventId()));
+        trackData.put("discounts", trackEventDiscountIdList(eventTrack.getTrack()).toString());
+//        trackData.put("danceRoles", trackDanceRoleIdList(eventTrack.getTrack()).toString());
+        tracksData.add(trackData);
+      });
     return tracksData;
   }
+
+  public Track clone(Event newEvent, Track baseTrack) {
+    Track newTrack = new Track(
+      baseTrack.getName(),
+      baseTrack.getDescription(),
+      baseTrack.getCapacity(),
+      baseTrack.getPartnerRequired(),
+      baseTrack.getOwnPartnerRequired(),
+      baseTrack.getRequiredDanceLevel()
+    );
+
+    // clone EventDiscounts
+    List<EventDiscount>  newEventDiscounts = new ArrayList<>(newEvent.getEventDiscounts());
+    Set<Discount> oldDiscounts = baseTrack.getEventDiscounts().stream()
+      .map(EventDiscount::getDiscount)
+      .collect(Collectors.toSet());
+
+    newEventDiscounts.stream()
+      .filter(eventDiscount -> oldDiscounts.contains(eventDiscount.getDiscount()))
+      .collect(Collectors.toList());
+    newTrack.setEventDiscounts(newEventDiscounts);
+
+    // clone Dance Roles
+    Set<TrackDanceRole>  newTrackDanceRoles = new HashSet<>(baseTrack.getTrackDanceRoles());
+    Set<DanceRole> oldDanceRoles = baseTrack.getTrackDanceRoles().stream()
+      .map(TrackDanceRole::getDanceRole)
+      .collect(Collectors.toSet());
+    newTrackDanceRoles.stream().filter(trackDanceRole -> oldDanceRoles.contains(trackDanceRole.getDanceRole()))
+        .collect(Collectors.toSet());
+    newTrack.setTrackDanceRoles(newTrackDanceRoles);
+
+    // clone EventTracks
+    newEvent.getEventTracks().add(new EventTrack(newTrack, newEvent));
+
+    save(newTrack);
+    return newTrack;
+  }
+
+  public void deleteTrackDanceRole(JsonObject request) {
+    Long trackDanceRole = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    delete(trackDanceRoleRepo.findByTrackDanceRoleId(trackDanceRole));
+  }
+
 
 }

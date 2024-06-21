@@ -4,7 +4,8 @@ import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -36,6 +37,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
   private final UserService userService;
   private final RegistrationService registrationService;
   private final PersonService personService;
+  private final ErrorLogService errorLogService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -66,19 +68,12 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           Long requestUserId = request.getParameter("userId") == null ? null : Long.valueOf(request.getParameter("userId"));
           Long requestPersonId = request.getParameter("personId") == null ? null : Long.valueOf(request.getParameter("personId"));
           Long requestRegistrationId = request.getParameter("registrationId") == null ? null : Long.valueOf(request.getParameter("registrationId"));
-//          authorities.stream().forEach(simpleGrantedAuthority -> {
-//              log.info("simpleGrantedAuthority: {}", simpleGrantedAuthority.getAuthority());
-//          });
-//          log.info("requestUserId: {}", requestUserId);
-//          log.info("userService.getUser(username).getUserId(): {}", userService.getUser(username).getUserId());
-//          log.info("requestPersonId: {}", requestPersonId);
-//          log.info("personService.findByUser(userService.getUser(username)).getPersonId(): {}", personService.findByUser(userService.getUser(username)).getPersonId());
-//          log.info("requestRegistrationId: {}", requestRegistrationId);
-//          if (requestRegistrationId != null) {
-//          log.info("user PersonId: {}", personService.findByUser(userService.getUser(username)).getPersonId());
-//          log.info("getParticipant().getPersonId(): {}", registrationService.findByRegistrationId(requestRegistrationId).getParticipant().getPersonId());
-//          }
 
+//          log.info("inc@auth,  request.getServletPath() {}",  request.getServletPath());
+//          log.info("inc@auth, requestUserId {}", requestUserId);
+//          log.info("inc@auth, requestPersonId {}", requestPersonId);
+//          log.info("inc@auth, requestRegistrationId {}", requestRegistrationId);
+//          log.info("inc@auth, username {}", username);
           if (
                (requestUserId != null && !Objects.equals(userService.getUser(username).getUserId(), requestUserId))
             || (requestPersonId != null && !Objects.equals(personService.findByUser(userService.getUser(username)).getPersonId(), requestPersonId))
@@ -90,7 +85,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
               )
             )
           ) {
-
             authorities.stream().filter(
               auth ->
                    auth.getAuthority().equals(UserRole.ORGANIZER.name())
@@ -115,6 +109,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                );
           }
           if (request.getServletPath().startsWith("/core-api/app/jobs")) {
+            authorities.forEach(simpleGrantedAuthority -> {
+//              log.info(simpleGrantedAuthority.getAuthority());
+            });
              authorities.stream().filter(
                auth ->
                     auth.getAuthority().equals(UserRole.ORGANIZER.name())
@@ -130,8 +127,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);
           filterChain.doFilter(request, response);
         } catch (Exception exception) {
-          log.info(exception.getMessage());
-          log.info(exception.toString());
+          errorLogService.addLog("AUTH", exception.getMessage());
           response.setHeader("error", exception.getMessage());
           response.setStatus(FORBIDDEN.value());
           Map<String, String> error = new HashMap<>();

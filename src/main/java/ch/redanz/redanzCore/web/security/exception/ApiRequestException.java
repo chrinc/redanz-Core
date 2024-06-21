@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 
 public class ApiRequestException extends RuntimeException{
     HttpStatus httpStatus;
-    public ApiRequestException(String message, HttpStatus httpStatus
-    ) {
+    public ApiRequestException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }

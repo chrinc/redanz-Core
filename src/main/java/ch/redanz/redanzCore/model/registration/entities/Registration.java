@@ -28,30 +28,30 @@ public class Registration implements Serializable {
   @Column(name = "registration_id")
   private Long registrationId;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="participant_id")
   private Person participant;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="event_id")
   private Event event;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="bundle_id")
   private Bundle bundle;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="track_id")
   private Track track;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="current_workflow_status_id")
   private WorkflowStatus workflowStatus;
 
   @Column(name = "current_transition_date")
   private LocalDateTime workflowStatusDate;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="dance_role_id")
   private DanceRole danceRole;
 

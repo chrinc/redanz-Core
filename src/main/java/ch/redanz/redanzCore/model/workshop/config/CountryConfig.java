@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.workshop.config;
 import ch.redanz.redanzCore.model.profile.entities.Country;
 import ch.redanz.redanzCore.model.profile.service.CountryService;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @AllArgsConstructor
 public enum CountryConfig {
-
   COUNTRY_AF("Afghanistan","af", OutTextConfig.LABEL_COUNTRY_AF_EN),
   COUNTRY_AL("Albania","al", OutTextConfig.LABEL_COUNTRY_AL_EN),
   COUNTRY_DZ("Algeria","dz", OutTextConfig.LABEL_COUNTRY_DZ_EN),

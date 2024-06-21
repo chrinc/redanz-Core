@@ -3,7 +3,7 @@ package ch.redanz.redanzCore.model.profile.service;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.service.email.EmailValidator;
 import ch.redanz.redanzCore.web.security.ConfirmationToken;
 import ch.redanz.redanzCore.web.security.PasswordResetToken;
@@ -38,8 +38,8 @@ public class UserRegistrationService {
     if (!isValidEmail) {
       throw new IllegalStateException("email not valid");
     }
-
-//    log.info("request {}");
+//
+//    log.info("request {}", request);
 //    log.info(request.toString());
 //    log.info(request.getUsername());
 //    log.info(request.getPassword());

@@ -1,5 +1,7 @@
 package ch.redanz.redanzCore.model.profile.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,6 +55,14 @@ public class Person implements Serializable {
 
   public Person() {
   }
+
+//  @JsonCreator
+//  public UserResponse(
+//    @JsonProperty("username") String username,
+//    @JsonProperty("password") String password) {
+//    this.username = username;
+//    this.password = password;
+//  }
 
   public Person(
     User user,

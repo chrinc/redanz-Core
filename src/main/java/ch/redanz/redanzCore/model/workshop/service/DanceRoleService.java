@@ -1,11 +1,14 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
 import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.repository.DanceRoleRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -32,5 +35,13 @@ public class DanceRoleService {
 
   public List<DanceRole> all() {
     return danceRoleRepo.findAll();
+  }
+
+  public List<Map<String, String>> getDanceRolesMap() {
+    List<Map<String, String>> danceRoles = new ArrayList<>();
+    danceRoleRepo.findAll().forEach(danceRole -> {
+      danceRoles.add(danceRole.dataMap());
+    });
+    return danceRoles;
   }
 }

@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
 import ch.redanz.redanzCore.model.workshop.entities.*;
+import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.FoodRepo;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
@@ -10,12 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @Slf4j
@@ -26,9 +23,13 @@ public class FoodService {
   private final OutTextService outTextService;
   private final SlotService slotService;
   private final EventTypeSlotService eventTypeSlotService;
+  private final EventRepo eventRepo;
+
+
   public void save(Food food) {
     foodRepo.save(food);
   }
+
   public List<Food> findAll() {
     return foodRepo.findAll();
   }
@@ -56,22 +57,18 @@ public class FoodService {
     return field;
   }
 
-  public void updateFood(JsonObject request, Event event) throws IOException, TemplateException {
-    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    Food food;
-
+  public void update(JsonObject request) throws IOException, TemplateException {
     Long foodId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    boolean foodIsNew = false;
+    Food food;
 
     if (foodId == null || foodId == 0) {
       food = new Food();
-      foodIsNew = true;
     } else {
       food = findByFoodId(foodId);
     }
+    log.info(request.toString());
+    log.info(Food.schema().toString());
 
-    Long slotId;
 
     Food.schema().forEach(
       stringStringMap -> {
@@ -79,8 +76,6 @@ public class FoodService {
         String type = stringStringMap.get("type");
         Field field;
 
-        log.info("type: {}", type);
-        log.info("key: {}", key);
         try {
           switch(type) {
             case "label":
@@ -113,33 +108,6 @@ public class FoodService {
                   request.get(key).getAsJsonObject().get("hex").getAsString());
               break;
 
-            case "date":
-              field = getField(key);
-
-              // Assuming request.get(key).getAsString() retrieves the date string
-              String dateString = request.get(key).getAsString();
-
-              // Parse the string into a LocalDate object
-              // hack hack hack, need fix
-              LocalDate localDate = LocalDate.parse(dateString.substring(0, 10), dateFormatter).plusDays(1);
-
-              field.set(food, request.get(key).isJsonNull() ? null : localDate);
-              break;
-
-            case "datetime":
-              field = getField(key);
-              // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(key).getAsString() retrieves the date string
-              String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
-              String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
-              ZoneId zoneId = ZoneId.of("Europe/Zurich");
-              LocalDateTime dateTime = LocalDateTime.parse(dateTimeDateString + " " + dateTimeTimeString, dateTimeFormatter);
-
-              // hack hack hack, need fix plus Days
-              ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zoneId).plusDays(1);
-              field.set(food, request.get(key).isJsonNull() ? null : zonedDateTime);
-              break;
-
             case "bool":
               field = getField(key);
               field.set(food, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
@@ -154,18 +122,11 @@ public class FoodService {
       }
     );
     save(food);
-    Slot slot = slotService.findBySlotId(request.get("slot").getAsLong());
-    slotService.updateTypeSlot("food", slot, food.getFoodId());
-    TypeSlot typeSlot = slotService.findByTypeObjectIdAndSlot("food", food.getFoodId(), slot);
-    eventTypeSlotService.updateEventTypeSlot(typeSlot, event, 1);
-
   }
 
-  public void deleteFood(JsonObject request, Event event) {
-    Long foodId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    Long slotId = request.get("slot").isJsonNull() ? null : request.get("slot").getAsLong();
-    Food food = findByFoodId(foodId);
-    TypeSlot typeSlot = slotService.findByTypeObjectIdAndSlot("food", foodId, slotService.findBySlotId(slotId));
+
+  public void delete(Food food, Slot slot, Event event) {
+    TypeSlot typeSlot = slotService.findByTypeObjectIdAndSlot("food", food.getFoodId(), slot);
 
     // delete event type slot
     eventTypeSlotService.delete((eventTypeSlotService.findByEventAndTypeSlot(event, typeSlot)));
@@ -174,6 +135,12 @@ public class FoodService {
     slotService.delete(typeSlot);
 
     // delete food
+    delete(food);
+  }
+
+  public void delete(Food food) {
+    outTextService.delete(food.getName());
+    outTextService.delete(food.getDescription());
     foodRepo.delete(food);
   }
 
@@ -199,50 +166,72 @@ public class FoodService {
     }
   }
 
-  public List<Object> getFoodSlots(Event event) {
-    List<Object> foodSlots = new ArrayList<>();
-    List<EventTypeSlot> eventTypeSlots = new ArrayList<>();
-    slotService.findAllByEvent(event).forEach(
-      eventTypeSlot -> {
-        if (slotService.findAllByType("food").contains(eventTypeSlot.getTypeSlot())) {
-          eventTypeSlots.add(eventTypeSlot);
-        }
-      }
-    );
-    Collections.sort(eventTypeSlots, new EventTypeSlotComparator());
-    eventTypeSlots.forEach(eventTypeSlot -> {
-      HashMap<String, Object> foodSlot = new HashMap<>();
-      foodSlot.put("food", findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
-      foodSlot.put("slot", eventTypeSlot.getTypeSlot().getSlot());
-      foodSlots.add(foodSlot);
-    });
-    return foodSlots;
+  public Set<EventFoodSlot> getFoodSlots(Event event) {
+    return event.getEventFoodSlots();
   }
 
-  public List<Map<String, String>> getFoodSchema(){
-    List<Map<String, String>> foodSchema = Food.schema();
+  public List<Map<String, String>> getFoodSlotSchema() {
+    List<Map<String, String>> foodSchema = EventFoodSlot.schema();
     foodSchema.forEach(item -> {
-      if (item.get("key").equals("slot")) {
-        item.put("list", slotService.getAllSlots().toString());
+      switch (item.get("key")) {
+        case "slot":
+          item.put("list", slotService.getAllSlots().toString());
+          break;
+        case "food":
+          item.put("list", getFoodData().toString());
+          break;
       }
     });
     return foodSchema;
   }
-  public List<Map<String, String>> getFoodData(List<Event> events){
-    List<Map<String, String>> foodDataList = new ArrayList<>();
-    events.forEach(event -> {
-      event.getEventTypeSlots().forEach(
 
-        eventTypeSlot -> {
-          if (eventTypeSlot.getTypeSlot().getType().equals("food")) {
-            Food food = findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId());
-            Map<String, String> foodData = food.dataMap();
-            foodData.put("eventId", Long.toString(event.getEventId()));
-            foodData.put("slot", Long.toString(eventTypeSlot.getTypeSlot().getSlot().getSlotId()));
-            foodDataList.add(foodData);
-          }
-        });
+  public List<Map<String, String>> getFoodData(Event event) {
+    List<Map<String, String>> foodDataList = new ArrayList<>();
+
+    event.getEventFoodSlots().forEach(
+      eventFoodSlot -> {
+          Food food = eventFoodSlot.getFood();
+          Map<String, String> foodData = food.dataMap();
+          foodData.put("eventId", Long.toString(event.getEventId()));
+          foodData.put("slot", Long.toString(eventFoodSlot.getSlot().getSlotId()));
+          foodData.put("food", Long.toString(eventFoodSlot.getFood().getFoodId()));
+          foodData.put("id", Long.toString(eventFoodSlot.getEventFoodSlotId()));
+          foodData.put("price", Double.toString(eventFoodSlot.getPrice()));
+          foodData.put("seqNr", Integer.toString(eventFoodSlot.getSeqNr()));
+          foodDataList.add(foodData);
+      });
+    return foodDataList;
+  }
+
+  public List<Map<String, String>> getFoodData() {
+    List<Map<String, String>> foodDataList = new ArrayList<>();
+    foodRepo.findAll().forEach(food -> {
+      // discount data
+      Map<String, String> foodData = food.dataMap();
+      foodDataList.add(foodData);
     });
     return foodDataList;
+  }
+
+  public List<Map<String, String>> getFoodSchema() {
+    return Food.schema();
+  }
+
+
+//  public List<EventTypeSlot> eventFoodList(Event event) {
+//    return eventTypeSlotService.findByEventAndType(event, "food");
+//  }
+  public boolean isUsed(Food food) {
+    AtomicBoolean isUsed = new AtomicBoolean(false);
+    eventRepo.findAll().forEach(event -> {
+      event.getEventTypeSlots().forEach(eventTypeSlot -> {
+        if (eventTypeSlot.getTypeSlot().getType().equals("food")
+          && eventTypeSlot.getTypeSlot().getTypeObjectId().equals(food.getFoodId())
+        ) {
+          isUsed.set(true);
+        }
+      });
+    });
+    return isUsed.get();
   }
 }

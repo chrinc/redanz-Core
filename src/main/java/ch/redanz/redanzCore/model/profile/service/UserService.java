@@ -3,7 +3,7 @@ package ch.redanz.redanzCore.model.profile.service;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.repository.TestUserRepo;
 import ch.redanz.redanzCore.model.profile.repository.UserRepo;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.web.security.ConfirmationToken;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
@@ -61,6 +61,7 @@ public class UserService implements UserDetailsService {
   }
 
   public boolean userIsTester(User user) {
+//    log.info(user.getUsername().replace(".", ""));
     return testUserRepo.existsByUsernameIgnoreCase(user.getUsername().replace(".", ""));
   }
   public boolean usernameIsTester(String username) {

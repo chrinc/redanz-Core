@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.workshop.entities.OutText;
 import ch.redanz.redanzCore.model.workshop.entities.OutTextId;
 import ch.redanz.redanzCore.model.workshop.repository.OutTextRepo;
@@ -13,7 +14,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,8 +34,8 @@ public class OutTextService {
 
   public boolean outTextExists(String key, String langKey) {
     return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey).isPresent();
-
   }
+
 
   public OutText getOutTextByKeyAndLangKey(String key, String langKey) {
     return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey).get();
@@ -92,8 +95,28 @@ public class OutTextService {
     return labelMap.get();
   }
 
+  public boolean hasLabel(JsonArray labelArray, String key) {
+    AtomicBoolean hasLabel = new AtomicBoolean(false);
+    labelArray.forEach(jsonElement -> {
+      if (!jsonElement.isJsonNull() && jsonElement.isJsonObject()) {
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        if (jsonObject.has("key")) {
+          if (jsonObject.get("key").getAsString().equals(key)) {
+            hasLabel.set(true);
+          }
+        }
+      }
+    });
+    return hasLabel.get();
+  }
+
   public String updateLabelArray(JsonArray labelArray, String key) {
     String newLabelKey = "LABEL-USER-GEN-" + System.currentTimeMillis();
+    boolean hasLabel = hasLabel(labelArray, key);
+    if (!hasLabel(labelArray, key)) {
+      return null;
+    }
+
     JsonObject labelMap = getLabelMap(labelArray, key);
     String outTextKey = key;
     List<OutText> outTexts = new ArrayList<>();
@@ -107,9 +130,8 @@ public class OutTextService {
       outTextGe.setOutText(labelMap.get("GE").getAsString());
       outTexts.add(outTextGe);
     } else {
-      log.info("create new label");
-      log.info("create new label, key: {}", newLabelKey);
       outTextKey = newLabelKey;
+      log.info(outTextKey);
       outTexts.add(
         new OutText(
           new OutTextId(
@@ -129,54 +151,45 @@ public class OutTextService {
         )
       );
     }
-    log.info("create new label, bfr save:");
     saveAll(outTexts);
-
     return outTextKey;
   }
+
+  public String newFrontLoginOutText(Map<Language, String> outTextMap) {
+    String newLabelKey = "LABEL-AUTO-GEN-" + System.currentTimeMillis();
+    saveAll(outTextMap.entrySet().stream()
+      .map(entry -> new OutText(
+        new OutTextId(newLabelKey, entry.getKey().getLanguageKey()),
+        entry.getValue(),
+        "FRONT_LOGIN"
+      ))
+      .collect(Collectors.toList()));
+    return newLabelKey;
+  }
+
+  public void delete(String key) {
+    outTextRepo.findAllByOutTextIdOutTextKey(key).forEach(outText -> {
+      outTextRepo.delete(outText);
+    });
+  }
+
+  public String clone(String key) {
+    if (key == null) {
+      return null;
+    }
+
+    String newKey = "LABEL-USER-GEN-" + System.currentTimeMillis();
+    outTextRepo.findAllByOutTextIdOutTextKey(key).forEach(baseOutText -> {
+      OutText newOutText = new OutText(
+        new OutTextId(
+          newKey, baseOutText.getOutTextId().getOutTextLanguageKey()
+        ),
+        baseOutText.getOutText(),
+        baseOutText.getType()
+      );
+      save(newOutText);
+    });
+    return newKey;
+  }
+
 }
-//  }  public String updateLabelArray(JsonArray labelArray) {
-//    log.info(labelArray.toString());
-//    String newLabelKey = "LABEL-USER-GEN-" + System.currentTimeMillis();
-//    labelArray.forEach(label -> {
-//      JsonObject labelMap = label.getAsJsonObject();
-//      String outTextKey = labelMap.get("key").getAsString();
-//      List<OutText> outTexts = new ArrayList<>();
-//
-//      if (outTextExists(outTextKey, "EN")) {
-//        OutText outTextEn = getOutTextByKeyAndLangKey(outTextKey, "EN");
-//        outTextEn.setOutText(labelMap.get("EN").getAsString());
-//        outTexts.add(outTextEn);
-//        save(outTextEn);
-//        OutText outTextGe = getOutTextByKeyAndLangKey(outTextKey, "GE");
-//        outTextGe.setOutText(labelMap.get("GE").getAsString());
-//        outTexts.add(outTextGe);
-//      } else {
-//        log.info("create new label");
-//        log.info("create new label, key: {}", newLabelKey);
-//        outTextKey = newLabelKey;
-//        outTexts.add(
-//          new OutText(
-//            new OutTextId(
-//              newLabelKey,"EN"
-//            ),
-//            labelMap.get("EN").getAsString(),
-//            "FRONT_LOGIN"
-//          )
-//        );
-//        outTexts.add(
-//          new OutText(
-//            new OutTextId(
-//              newLabelKey,"GE"
-//            ),
-//            labelMap.get("GE").getAsString(),
-//            "FRONT_LOGIN"
-//          )
-//        );
-//      }
-//      log.info("create new label, bfr save:");
-//      saveAll(outTexts);
-//    });
-//
-//      return outTextKey;
-//  }

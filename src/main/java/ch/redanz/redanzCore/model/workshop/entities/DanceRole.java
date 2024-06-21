@@ -1,13 +1,14 @@
 package ch.redanz.redanzCore.model.workshop.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Slf4j
@@ -26,10 +27,10 @@ public class DanceRole {
   @Column(name = "internal_id")
   private String internalId;
 
-
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "danceRole")
-  @JsonIgnore
-  private List<TrackDanceRole> trackDanceRoles = new ArrayList<>();
+//
+//  @OneToMany(cascade = CascadeType.ALL, mappedBy = "danceRole")
+//  @JsonIgnore
+//  private List<TrackDanceRole> trackDanceRoles = new ArrayList<>();
 
   public DanceRole() {
   }
@@ -39,6 +40,24 @@ public class DanceRole {
     this.description = description;
     this.internalId = internalId;
     this.abbreviation = abbreviation;
+  }
+
+  public static List<Map<String, String>> schema() {
+    return new ArrayList<>() {
+      {
+        add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                   put("label", "id");}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "text");  put("required", "true");      put("label", "Name");}});
+      }
+    };
+  }
+
+  public Map<String, String> dataMap() {
+    return new HashMap<>() {
+      {
+        put("id", String.valueOf(danceRoleId));
+        put("name", name);
+      }
+    };
   }
 }
 

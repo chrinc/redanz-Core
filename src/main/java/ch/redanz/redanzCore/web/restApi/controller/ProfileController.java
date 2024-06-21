@@ -7,7 +7,7 @@ import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
 import ch.redanz.redanzCore.model.profile.service.*;
-import ch.redanz.redanzCore.model.workshop.config.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;

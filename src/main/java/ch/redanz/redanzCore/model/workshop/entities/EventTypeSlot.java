@@ -34,9 +34,7 @@ public class EventTypeSlot implements Serializable {
   @Column(name = "seq_nr")
   private Integer seqNr;
 
-
-  public EventTypeSlot() {
-  }
+  public EventTypeSlot() {}
 
   public EventTypeSlot(TypeSlot typeSlot, Event event, Integer seqNr) {
     this.typeSlot = typeSlot;

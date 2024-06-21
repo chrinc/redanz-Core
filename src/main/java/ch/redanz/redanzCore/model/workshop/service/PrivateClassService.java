@@ -4,9 +4,7 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.PrivateClassRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.entities.Bundle;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.PrivateClassRepo;
 import com.google.gson.JsonObject;
@@ -22,10 +20,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -37,6 +33,7 @@ public class PrivateClassService {
   private final PrivateClassRegistrationRepo privateClassRegistrationRepo;
   private final OutTextService outTextService;
   private final EventRepo eventRepo;
+
   public boolean existsByName(String name) {
     return privateClassRepo.existsByName(name);
   }
@@ -60,16 +57,21 @@ public class PrivateClassService {
     return privates.get() == null ? "" : privates.toString();
   }
 
-  public List<PrivateClass> findByEvent(Event event) {
-    return privateClassRepo.findAllByEvent(event).isPresent() ?
-      privateClassRepo.findAllByEvent(event).get() :
-      null;
+//  public List<PrivateClass> findByEvent(Event event) {
+//    List<PrivateClass> privateClasses = new ArrayList<>();
+//    event
+//    return privateClassRepo.findAllByEvent(event).isPresent() ?
+//      privateClassRepo.findAllByEvent(event).get() :
+//      null;
+//  }
+  public List<PrivateClass> findAll() {
+    return privateClassRepo.findAll();
   }
 
-  public List<PrivateClass> findByEventAndBundle(Event event, Bundle bundle) {
-    if (bundle.getSimpleTicket()) {return new ArrayList<>();}
-    else { return findByEvent(event);}
-  }
+//  public List<PrivateClass> findByEventAndBundle(Event event, Bundle bundle) {
+//    if (bundle.getSimpleTicket()) {return new ArrayList<>();}
+//    else { return findByEvent(event);}
+//  }
 
   public List<PrivateClassRegistration> findAllByRegistrations(Registration registration) {
     return privateClassRegistrationRepo.findAllByRegistration(registration);
@@ -102,17 +104,14 @@ public class PrivateClassService {
     return field;
   }
 
-  public void updatePrivates(JsonObject request, Event event) throws IOException, TemplateException {
-    log.info("inc@updatePrivates, request: {}", request);
+  public void update(JsonObject request) throws IOException, TemplateException {
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     PrivateClass privateClass;
-    boolean isNew = false;
     Long privateId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
 
     if (privateId == null || privateId == 0) {
       privateClass = new PrivateClass();
-      isNew = true;
     } else {
       privateClass = findByPrivateClassId(privateId);
     }
@@ -128,8 +127,11 @@ public class PrivateClassService {
             case "label":
               if (request.get("label") != null && request.get("label").isJsonArray()) {
                 String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
-                field =  getField(key);
-                field.set(privateClass, outTextKey);
+
+                if (outTextKey != null) {
+                  field = getField(key);
+                  field.set(privateClass, outTextKey);
+                }
               }
               break;
             case "text":
@@ -158,7 +160,7 @@ public class PrivateClassService {
             case "date":
               field = getField(key);
 
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateString = request.get(key).getAsString();
 
               // Parse the string into a LocalDate object
@@ -171,7 +173,7 @@ public class PrivateClassService {
             case "datetime":
               field = getField(key);
               // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
               String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
               ZoneId zoneId = ZoneId.of("Europe/Zurich");
@@ -196,40 +198,72 @@ public class PrivateClassService {
       }
     );
     save(privateClass);
-    if (isNew) {
-      List<PrivateClass> newPrivateClassList = event.getPrivateClasses();
-      newPrivateClassList.add(privateClass);
-      event.setPrivateClasses(newPrivateClassList);
-      eventRepo.save(event);
-    }
   }
 
-  public void deletePrivates(JsonObject request, Event event) {
-    Long privateId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    List<PrivateClass> privateList = event.getPrivateClasses();
-    privateList.remove(findByPrivateClassId(privateId));
-    eventRepo.save(event);
-    privateClassRepo.deleteById(privateId);
+  public void delete(PrivateClass privateClass) {
+    outTextService.delete(privateClass.getDescription());
+    privateClassRepo.delete(privateClass);
   }
 
   public List<Map<String, String>> getPrivateSchema() {
     return PrivateClass.schema();
   }
-  public List<Map<String, String>> getPrivateData(List<Event> eventList) {
+  public List<Map<String, String>> getPrivateData() {
     List<Map<String, String>> privatesData = new ArrayList<>();
-    eventList.forEach(event -> {
-      event.getPrivateClasses().forEach(privateClass -> {
+    privateClassRepo.findAll().forEach(privateClass -> {
         // discount data
         Map<String, String> privateData = privateClass.dataMap();
-
-        // add event info
-        privateData.put("eventId", Long.toString(event.getEventId()));
-
         privatesData.add(privateData);
+    });
+    return privatesData;
+  }
+
+  public List<Map<String, String>> getAllPrivates() {
+    List<Map<String, String>> privates = new ArrayList<>();
+
+    findAll().forEach(privateClass -> {
+      Map<String, String> privatesData = privateClass.eventDataMap();
+      privates.add(privatesData);
+    });
+    return privates;
+  }
+
+
+  public List<Map<String, String>> getEventPrivateSchema() {
+    List<Map<String, String>> eventPrivatesSchema = PrivateClass.eventSchema();
+    eventPrivatesSchema.forEach(item -> {
+      item.put("list",getAllPrivates().toString());
+    });
+    return eventPrivatesSchema;
+  }
+
+//  public List<Map<String, String>> getEventPrivateData(Event event) {
+//    List<Map<String, String>> privatesData = new ArrayList<>();
+//    event.getEventPrivates().forEach(eventPrivateClass -> {
+//      HashMap<String, String> privateClassData = new HashMap<>();
+//      privateClassData.put("id", eventPrivateClass.getEventPrivateClassId().toString());
+//      privatesData.add(privateClassData);
+//      privatesData.add(privateClass.eventDataMap());
+//    });
+//    return privatesData;
+//  }
+
+  public List<Map<String, String>> getPrivatesMap() {
+    return privateClassRepo.findAll().stream()
+      .map(PrivateClass::eventDataMap)
+      .collect(Collectors.toList());
+  }
+
+  public boolean isUsed(PrivateClass privateClass) {
+    AtomicBoolean isUsed = new AtomicBoolean(false);
+    eventRepo.findAll().forEach(event -> {
+      event.getEventPrivates().forEach(eventPrivateClass -> {
+        if (eventPrivateClass.getPrivateClass().equals(privateClass)) {
+          isUsed.set(true);
+        }
       });
     });
-
-    return privatesData;
+    return isUsed.get();
   }
 
 }

@@ -3,7 +3,7 @@ package ch.redanz.redanzCore.model.workshop.service;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.DiscountRepo;
 import ch.redanz.redanzCore.model.workshop.repository.EventDiscountRepo;
-import ch.redanz.redanzCore.model.workshop.repository.TrackDiscountRepo;
+import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -18,32 +18,35 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class DiscountService {
   private final DiscountRepo discountRepo;
-  private final EventDiscountRepo eventDiscountRepo;
-  private final TrackDiscountRepo trackDiscountRepo;
   private final OutTextService outTextService;
+  private final EventRepo eventRepo;
+  private final EventDiscountRepo eventDiscountRepo;
   public void save(Discount discount) {
     discountRepo.save(discount);
   }
-  public void save(EventDiscount eventDiscount) {
-    eventDiscountRepo.save(eventDiscount);
-  }
+
   public Discount findByDiscountId(Long discountId) {
     return discountRepo.findDiscountByDiscountId(discountId);
+  }
+
+  public EventDiscount findByEventDiscountId(Long eventDiscountID) {
+    return eventDiscountRepo.findByEventDiscountId(eventDiscountID);
   }
   public boolean existsByName(String name) {
     return discountRepo.existsByName(name);
   }
-  public boolean eventDiscountExists(Event event, Discount discount) {
-    return eventDiscountRepo.existsByEventAndDiscount(event, discount);
-  }
+
   public Discount findByName(String name) {
     return discountRepo.findDiscountByName(name);
   }
@@ -51,10 +54,13 @@ public class DiscountService {
   public List<Discount> findAll() {
     return discountRepo.findAll();
   }
-  public List<Discount> findAllByEvent(Event event) {
-    List<Discount> discounts = new ArrayList<>();
-    eventDiscountRepo.findAllByEvent(event).forEach(eventDiscount -> {
-      discounts.add(eventDiscount.getDiscount());
+
+
+  public List<Map<String, String>> getAllDiscounts() {
+    List<Map<String, String>> discounts = new ArrayList<>();
+
+    findAll().forEach(discount -> {
+      discounts.add(discount.dataMap());
     });
     return discounts;
   }
@@ -70,17 +76,15 @@ public class DiscountService {
     return field;
   }
 
-  public void updateDiscount(JsonObject request, Event event) throws IOException, TemplateException {
+  public void update(JsonObject request) throws IOException, TemplateException {
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     Discount discount;
-    boolean discountIsNew = false;
 
     Long discountId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
 
     if (discountId == null || discountId == 0) {
       discount = new Discount();
-      discountIsNew = true;
     } else {
       discount = findByDiscountId(discountId);
     }
@@ -96,8 +100,11 @@ public class DiscountService {
             case "label":
               if (request.get("label") != null && request.get("label").isJsonArray()) {
                 String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
-                field =  getField(key);
-                field.set(discount, outTextKey);
+
+                if (outTextKey != null) {
+                  field = getField(key);
+                  field.set(discount, outTextKey);
+                }
               }
               break;
             case "text":
@@ -126,7 +133,7 @@ public class DiscountService {
             case "date":
               field = getField(key);
 
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateString = request.get(key).getAsString();
 
               // Parse the string into a LocalDate object
@@ -139,7 +146,7 @@ public class DiscountService {
             case "datetime":
               field = getField(key);
               // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(key).getAsString() retrieves the date string
+              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
               String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
               ZoneId zoneId = ZoneId.of("Europe/Zurich");
@@ -164,55 +171,74 @@ public class DiscountService {
       }
     );
     save(discount);
-
-    if (discountIsNew) {
-      eventDiscountRepo.save(
-        new EventDiscount(
-          discount,
-          event
-        )
-      );
-    }
   }
 
   public void deleteDiscount(JsonObject request, Event event) {
     Long discountId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
     Discount discount = findByDiscountId(discountId);
-    eventDiscountRepo.deleteById(eventDiscountRepo.findByEventAndDiscount(event, discount).getEventDiscountId());
+    delete(discount);
+  }
+
+  public void delete(Discount discount) {
+    outTextService.delete(discount.getDescription());
+    outTextService.delete(discount.getName());
     discountRepo.delete(discount);
   }
 
-  public List<Map<String, String>> getDiscounts(Event event) {
-    List<Map<String, String>> discounts = new ArrayList<>();
+//  public void delete(TrackDiscount trackDiscount) {
+//    trackDiscountRepo.delete(trackDiscount);
+//  }
 
-    eventDiscountRepo.findAllByEvent(event).forEach(eventDiscount -> {
-      Map<String, String> discountData = eventDiscount.getDiscount().dataMap();
-      discounts.add(discountData);
+  public List<Map<String, String>> getEventDiscountsMap(Event event) {
+    List<Map<String, String>> eventDiscounts = new ArrayList<>();
+    event.getEventDiscounts().forEach(eventDiscount -> {
+      Map<String, String> eventDiscountData = eventDiscount.dataMap();
+      eventDiscounts.add(eventDiscountData);
     });
 
+    return eventDiscounts;
+  }
+
+  public List<Map<String, String>> getDiscountsMap(Event event) {
+    List<Map<String, String>> discounts = new ArrayList<>();
+    event.getEventDiscounts().forEach(eventDiscount -> {
+      Map<String, String> discount = eventDiscount.dataMap();
+      discount.put("discount", eventDiscount.getDiscount().dataMap().toString());
+      discount.put("name", eventDiscount.getDiscount().getName());
+      discounts.add(discount);
+    });
     return discounts;
+  }
+
+  public List<Map<String, String>> getDiscountsMap() {
+    return discountRepo.findAll().stream()
+      .map(Discount::dataMap)
+      .collect(Collectors.toList());
   }
 
   public List<Map<String, String>> getDiscountSchema(){
     return Discount.schema();
   }
-  public List<Map<String, String>> getDiscountData(List<Event> eventList){
-    log.info("inc get event discounts start");
+  public List<Map<String, String>> getDiscountData(){
     List<Map<String, String>> discountsData = new ArrayList<>();
-    eventList.forEach(event -> {
-      event.getEventDiscounts().forEach(eventDiscount -> {
-        // discount data
-        Map<String, String> discountData = eventDiscount.getDiscount().dataMap();
-
-        // add event info
-        discountData.put("eventId", Long.toString(event.getEventId()));
-
-        discountsData.add(discountData);
-      });
+    discountRepo.findAll().forEach(discount -> {
+      Map<String, String> discountData = discount.dataMap();
+      discountsData.add(discountData);
     });
 
-    log.info("inc return data");
     return discountsData;
+  }
+
+  public boolean isUsed(Discount discount) {
+    AtomicBoolean isUsed = new AtomicBoolean(false);
+    eventRepo.findAll().forEach(event -> {
+      event.getEventTypeSlots().forEach(eventTypeSlot -> {
+        if (eventTypeSlot.getTypeSlot().getSlot().equals(discount)) {
+          isUsed.set(true);
+        }
+      });
+    });
+    return isUsed.get();
   }
 
 }
