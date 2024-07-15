@@ -240,8 +240,10 @@ public class RegistrationController {
     @RequestParam("registrationId") Long registrationId
   ) {
     try {
+      Registration registration = registrationService.findByRegistrationId(registrationId);
+      registrationMatchingService.removePartnerRegistration(registration);
       workflowTransitionService.setWorkflowStatus(
-        registrationService.findByRegistrationId(registrationId),
+        registration,
         workflowStatusService.getSubmitted()
       );
     } catch (Exception exception) {
@@ -263,13 +265,13 @@ public class RegistrationController {
       registrationService.updateSoldOut(event);
 
       // update
+//      log.info("inc@update Registration 1");
       Registration registration = registrationService.updateRegistrationRequest(
         personId,
         event,
         JsonParser.parseString(jsonObject).getAsJsonObject()
-
       );
-
+//      log.info("inc@update Registration 2");
 //      log.info("bfr automatch");
 
       // match
@@ -280,6 +282,7 @@ public class RegistrationController {
         registrationMatchingService.doMatching(registration);
       }
 
+//      log.info("inc@update Registration 3");
 //      log.info("bfr release");
       // release
       if (baseParService.doAutoRelease()) {
@@ -290,6 +293,7 @@ public class RegistrationController {
 //      log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
       }
+//      log.info("inc@update Registration 4");
 
     } catch (ApiRequestException apiRequestException) {
       errorLogService.addLog("registrationUpdate", apiRequestException.getMessage());
@@ -298,6 +302,7 @@ public class RegistrationController {
       errorLogService.addLog("registrationUpdate", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
+//      log.info("inc@update Registration 5");
   }
 
   @PostMapping(path = "/staff/update")

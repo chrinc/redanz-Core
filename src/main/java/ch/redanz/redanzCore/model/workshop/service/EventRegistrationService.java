@@ -107,7 +107,6 @@ public class EventRegistrationService {
         isUsed.set(true);
       };
     });
-    log.info(String.valueOf(isUsed.get()));
     return isUsed.get();
   }
 

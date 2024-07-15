@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.repository.DanceRoleRepo;
@@ -31,6 +32,10 @@ public class DanceRoleService {
 
   public DanceRole findByName(String name) {
     return danceRoleRepo.findByName(name);
+  }
+
+  public DanceRole getSwitchDanceRole(){
+    return findByName(DanceRoleConfig.SWITCH.getName());
   }
 
   public List<DanceRole> all() {

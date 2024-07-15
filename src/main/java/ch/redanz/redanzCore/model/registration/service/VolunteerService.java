@@ -294,15 +294,12 @@ public class VolunteerService {
   }
 
   public void updateVolunteerType(JsonObject request) throws IOException, TemplateException {
-    log.info(request.toString());
     Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
     VolunteerType volunteerType;
 
     if (id == null || id == 0) {
       volunteerType = new VolunteerType();
-      log.info("new type");
     } else {
-      log.info("find existing type");
       volunteerType = findVolunteerTypeById(id);
     }
 
@@ -313,23 +310,17 @@ public class VolunteerService {
         Field field;
 
         try {
-          log.info(key);
-          log.info(type);
           switch(type) {
             case "label":
               if (request.get("label") != null && request.get("label").isJsonArray()) {
                 String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
 
-                log.info(outTextKey);
                 if (outTextKey != null) {
                   field = getField(key);
-                  log.info("after get field");
                   field.set(volunteerType, outTextKey);
-                  log.info("after set field");
                 }
               }
 
-              log.info("after set field");
               break;
             case "text":
               field = getField(key);

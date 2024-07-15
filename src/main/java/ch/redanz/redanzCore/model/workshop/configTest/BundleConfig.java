@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.workshop.configTest;
 
 import ch.redanz.redanzCore.model.workshop.config.SlotConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
+import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
@@ -50,7 +51,7 @@ public enum BundleConfig {
             bundleConfig.getName(),
             bundleConfig.getPrice(),
             bundleConfig.getDescription(),
-            bundleConfig.getCapacity(),
+//            bundleConfig.getCapacity(),
             bundleConfig.getSimpleTicket(),
             bundleConfig.getSeqNr(),
             partySlots,
@@ -60,7 +61,7 @@ public enum BundleConfig {
         );
       } else {
         Bundle bundle = bundleService.findByName(bundleConfig.name);
-        bundle.setCapacity(bundleConfig.capacity);
+//        bundle.setCapacity(bundleConfig.capacity);
         bundle.setDescription(bundleConfig.getDescription());
         bundle.setPrice(bundleConfig.getPrice());
         bundle.setSimpleTicket(bundleConfig.simpleTicket);

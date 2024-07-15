@@ -55,6 +55,12 @@ public class BaseParService {
     true; // default: true
   }
 
+  public Integer waitListLength(){
+    return baseParRepo.findAllByBaseParKey("waitListLength").isPresent() ?
+    Integer.parseInt(baseParRepo.findAllByBaseParKey("waitListLength").get().getStringValue()):
+    0; // default: true
+  }
+
   public boolean doEODReminder(){
     return baseParRepo.findAllByBaseParKey("doEODReminder").isPresent() ?
     baseParRepo.findAllByBaseParKey("doEODReminder").get().getBoolValue() :

@@ -23,11 +23,9 @@ public class ReportDonationService {private final VolunteerService volunteerServ
   private final DonationRegistrationService donationRegistrationService;
   private final WorkflowStatusService workflowStatusService;
   public List<ResponseDonation> getDonationReport(Language language, Event event) {
-    // log.info("setup donation report");
     List<ResponseDonation> responseDonation = new ArrayList<>();
     donationRegistrationService.allDonationRegistrations(event).forEach(donationRegistration -> {
       Registration registration = donationRegistration.getRegistration();
-      // log.info("donation for: " + registration.getParticipant().getFirstName());
       if (workflowStatusService.findAllRegular().contains(registration.getWorkflowStatus())) {
         responseDonation.add(
           new ResponseDonation(
@@ -44,7 +42,6 @@ public class ReportDonationService {private final VolunteerService volunteerServ
     });
     donationRegistrationService.allScholarshipRegistrations(event).forEach(scholarshipRegistration -> {
       Registration registration = scholarshipRegistration.getRegistration();
-      // log.info("scholarship for: " + registration.getParticipant().getFirstName());
       if (workflowStatusService.findAllRegular().contains(registration.getWorkflowStatus())) {
         responseDonation.add(
           new ResponseDonation(

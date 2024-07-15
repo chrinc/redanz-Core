@@ -24,7 +24,7 @@ public class RegistrationReleaseService {
          isRelease(registration)
      //  && !releasedRegistrations.contains(registration)
     ) {
-       log.info("registration firstName: {}", registration.getParticipant().getFirstName());
+//       log.info("registration firstName: {}", registration.getParticipant().getFirstName());
       try {
 
         // release partner first
@@ -68,13 +68,15 @@ public class RegistrationReleaseService {
     return
       registrationService.countConfirmingAndDone(
         registration.getEvent()
-      ) < registration.getEvent().getCapacity() &&
-        registrationService.countBundlesConfirmingAndDone(
-          registration.getBundle(), registration.getEvent()
-        ) < registration.getBundle().getCapacity() &&
-        registrationService.countTracksConfirmingAndDone(
-          registration.getTrack(), registration.getEvent()
-        ) < (registration.getTrack() == null ? 99 : registration.getTrack().getCapacity())
+      ) < registration.getEvent().getCapacity()
+//        &&
+//        registrationService.countBundlesConfirmingAndDone(
+//          registration.getBundle(), registration.getEvent()
+//        ) < registration.getBundle().getCapacity()
+//        &&
+//        registrationService.countTracksConfirmingAndDone(
+//          registration.getTrack(), registration.getEvent()
+//        ) < (registration.getTrack() == null ? 99 : registration.getTrack().getCapacity())
       ;
   }
 }

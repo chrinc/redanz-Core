@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Slf4j
+@NoArgsConstructor
 @Table(name = "event_bundle")
 public class EventBundle implements Serializable {
 
@@ -20,7 +22,7 @@ public class EventBundle implements Serializable {
   @Column(name = "event_bundle_id")
   private Long eventBundleId;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
   @JoinColumn(name = "bundle_id")
   private Bundle bundle;
 
@@ -29,12 +31,15 @@ public class EventBundle implements Serializable {
   @JoinColumn(name = "event_id")
   private Event event;
 
-  public EventBundle() {
-  }
+  private Integer capacity;
 
-  public EventBundle(Bundle bundle, Event event) {
+  @Column(name = "sold_out")
+  private boolean soldOut;
+
+  public EventBundle(Bundle bundle, Event event, Integer capacity) {
     this.bundle = bundle;
     this.event = event;
+    this.capacity = capacity;
   }
 }
 

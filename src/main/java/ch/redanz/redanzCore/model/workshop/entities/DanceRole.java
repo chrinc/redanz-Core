@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,15 +18,17 @@ import java.util.Map;
 @Table(name = "dance_role")
 public class DanceRole {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "dance_role_id")
   private Long danceRoleId;
+
   private String name;
   private String description;
   private String abbreviation;
 
   @Column(name = "internal_id")
   private String internalId;
+
 
 //
 //  @OneToMany(cascade = CascadeType.ALL, mappedBy = "danceRole")

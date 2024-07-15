@@ -30,6 +30,9 @@ public class PasswordEmailService {
   private final LanguageService languageService;
   private final PersonService personService;
   private final BaseParService baseParService;
+  private final EmailService emailService;
+
+
   @Autowired
   Environment environment;
 
@@ -42,9 +45,10 @@ public class PasswordEmailService {
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     Person person = personService.findByUser(user);
-    model.put("link", link);
+    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("loginLink", environment.getProperty("link.login") + "/" + person.getPersonLang().getLanguageKey().toLowerCase());
+
     model.put("firstName", person.getFirstName());
-    model.put("headerLink",  environment.getProperty("email.header.link"));
     Template template = mailConfig.getTemplate("resetPassword.ftl");
 
     String languageKey =
@@ -90,8 +94,8 @@ public class PasswordEmailService {
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
-    EmailService.sendEmail(
-      EmailService.getSession(),
+    emailService.sendEmail(
+//      EmailService.getSession(),
       user.getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RESET_PASSWORD_SUBJECT_EN.getOutTextKey(),

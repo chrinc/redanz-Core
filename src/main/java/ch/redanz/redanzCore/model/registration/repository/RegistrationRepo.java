@@ -49,11 +49,14 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     int countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
     int countAllByBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
     int countAllByTrackAndWorkflowStatusAndActiveAndEventAndRegistrationType(Track track, WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
+    int countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(Track track, Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
+    int countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationType(Track track, WorkflowStatus workflowStatus, DanceRole danceRole, Boolean active, Event event, RegistrationType type);
     int countAllByEventAndActiveAndRegistrationType(Event event, Boolean active, RegistrationType type);
     int countAllByEventAndActive(Event event, Boolean active);
     int countAllByWorkflowStatusAndActiveAndEventAndDanceRole(WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
     int countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
     int countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(Track track, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
+    int countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(Track track, Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
     int countAllByEventAndActiveAndDanceRole(Event event, Boolean active, DanceRole danceRole);
     int countAllByEvent(Event event);
 }

@@ -12,6 +12,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
@@ -31,7 +33,11 @@ public class ProfileService {
   private final OutTextService outTextService;
   private final LanguageService languageService;
   private final BaseParService baseParService;
+  private final EmailService emailService;
   Configuration mailConfig;
+
+  @Autowired
+  Environment environment;
 
   public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
     Person newPerson = new Person(
@@ -91,8 +97,8 @@ public class ProfileService {
   public void sendRegisteredProfileEmail(Person person, String registrationLink, String headerLink) throws IOException, TemplateException {
     String languageKey = person.getPersonLang() == null ? languageService.findLanguageByLanguageKey("GE").getLanguageKey() : person.getPersonLang().getLanguageKey();
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", headerLink);
-    model.put("link", registrationLink);
+    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("registrationLink", registrationLink);
     model.put("firstName", person.getFirstName());
     model.put("base", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN.getOutTextKey(), languageKey).getOutText());
     model.put("activate_now", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_EN.getOutTextKey(), languageKey).getOutText());
@@ -104,8 +110,8 @@ public class ProfileService {
     );
     Template template = mailConfig.getTemplate("profileReceived.ftl");
 
-    EmailService.sendEmail(
-      EmailService.getSession(),
+    emailService.sendEmail(
+//      EmailService.getSession(),
       person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CONFIRM_SUBJECT_EN.getOutTextKey(),

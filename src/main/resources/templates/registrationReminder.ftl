@@ -8,7 +8,7 @@
 <div style="background-color: #ececec;display: flex;width: 100%;">
     <div style="margin: auto;display: flex;width: 100%">
         <img style="margin: auto;max-width: 100%;"
-             src="https://stirit.ch/wp-content/uploads/assets/web_header_01.png"
+             src="${headerLink}/assets/graphics/email_header_01.png"
         >
     </div>
 </div>
@@ -25,7 +25,7 @@
             ${base02}
         </p>
         <p>
-            ${base03} ${details} <a href=${link}>${account}.</a>
+            ${base03} ${details} <a href=${loginLink}>${account}.</a>
         </p>
         <p>${regards} <br>
             ${team}

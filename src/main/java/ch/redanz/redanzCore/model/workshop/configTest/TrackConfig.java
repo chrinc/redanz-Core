@@ -11,13 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum TrackConfig {
-  ADVANCED("Advanced Track", "", 998, true, false,null),
-  INTERMEDIATE("Intermediate Track", "", 998, true, false, null),
-  NO_LEVEL("No Level Track", "", 998, true, false, null);
+  ADVANCED("Advanced Track", "", true, false,null),
+  INTERMEDIATE("Intermediate Track", "", true, false, null),
+  NO_LEVEL("No Level Track", "", true, false, null),
+  ;
 
   private final String name;
   private final String description;
-  private final Integer capacity;
+//  private final Integer capacity;
   private final Boolean partnerRequired;
   private final Boolean ownPartnerRequired;
   private final DanceLevel requiredDanceLevel;
@@ -29,7 +30,7 @@ public enum TrackConfig {
           new Track(
             trackConfig.name,
             trackConfig.description,
-            trackConfig.capacity,
+//            trackConfig.capacity,
             trackConfig.partnerRequired,
             trackConfig.ownPartnerRequired,
             trackConfig.requiredDanceLevel
@@ -38,7 +39,7 @@ public enum TrackConfig {
       } else {
         Track track = trackService.findByName(trackConfig.name);
         track.setDescription(trackConfig.description);
-        track.setCapacity(trackConfig.capacity);
+//        track.setCapacity(trackConfig.capacity);
         track.setPartnerRequired(trackConfig.partnerRequired);
         track.setOwnPartnerRequired(trackConfig.ownPartnerRequired);
         track.setRequiredDanceLevel(trackConfig.requiredDanceLevel);

@@ -32,7 +32,9 @@ public class RegistrationResponse {
   private List<SpecialRegistration> specialRegistrations;
   private List<PrivateClassRegistration> privateClassRegistrations;
 
-  public RegistrationResponse(Long registrationId, Long personId
+  public RegistrationResponse(
+    Long registrationId
+    , Long personId
 //    , Event event
     , Long eventId
     , Long bundleId) {
@@ -42,7 +44,9 @@ public class RegistrationResponse {
     this.eventId = eventId;
     this.bundleId = bundleId;
   }
-  public RegistrationResponse(Long personId
+
+  public RegistrationResponse(
+    Long personId
 //    , Event event
     , Long eventId
   ) {

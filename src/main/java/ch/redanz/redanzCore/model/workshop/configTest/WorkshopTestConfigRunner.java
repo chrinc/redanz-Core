@@ -7,6 +7,8 @@ import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.workshop.config.*;
+import ch.redanz.redanzCore.model.workshop.entities.BundleEventTrackDanceRole;
+import ch.redanz.redanzCore.model.workshop.entities.EventDanceRole;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final CountryService countryService;
   private final PrivateClassService privateClassService;
   private final EventPartService eventPartService;
+  private final BundleEventTrackService bundleEventTrackService;
 
   @Override
   public void run(String... args) {
@@ -51,12 +54,14 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       SlotConfig.setup(slotService);
 
       EventConfig.setup(eventService, discountService);
+      EventDanceRoleConfig.setup(danceRoleService, eventService);
+
       TrackConfig.setup(trackService);
       EventTrackConfig.setup(eventService, trackService);
       DiscountConfig.setup(discountService);
       EventDiscountConfig.setup(discountService, eventService);
       TrackEventDiscountConfig.setup(eventService, trackService, discountService);
-      TrackDanceRoleConfig.setup(trackService, danceRoleService);
+//      TrackDanceRoleConfig.setup(trackService, danceRoleService);
 
       SpecialConfig.setup(specialService);
       EventSpecialsConfig.setup(specialService, eventService);
@@ -64,8 +69,9 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       BundleConfig.setup(bundleService, slotService);
       EventBundleConfig.setup(bundleService, eventService);
       BundleEventSpecialConfig.setup(eventService, specialService, bundleService);
-      BundleEventTrackConfig.setup(eventService, trackService, bundleService);
+      BundleEventTrackConfig.setup(eventService, trackService, bundleService, bundleEventTrackService, danceRoleService);
       BundlePartySlotConfig.setup(slotService, bundleService);
+      BundleDanceRoleConfig.setup(bundleService, danceRoleService);
 
       PrivateClassConfig.setup(privateClassService);
       EventPrivateClassConfig.setup(privateClassService, eventService);

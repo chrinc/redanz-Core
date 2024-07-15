@@ -58,8 +58,8 @@ public class EventTypeSlotService {
     TypeSlot typeSlot;
     EventTypeSlot eventTypeSlot;
 
-    log.info("inc@updateFood");
-    log.info(request.toString());
+    // log.info("inc@updateFood");
+    // log.info(request.toString());
 
     Long foodId = request.get("food").isJsonNull() ? null : request.get("food").getAsLong();
     Long slotId = request.get("slot").isJsonNull() ? null : request.get("slot").getAsLong();

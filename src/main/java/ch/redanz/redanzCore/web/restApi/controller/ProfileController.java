@@ -67,16 +67,16 @@ public class ProfileController {
   public String confirm(@RequestParam("token") String token) {
     try {
       String link = userRegistrationService.confirmToken(token);
-      log.info("link");
-      log.info(link);
+      //log.info("link");
+      // log.info(link);
       return link;
     } catch (ApiRequestException apiRequestException) {
-      log.info("inc@apiRequestException");
-      log.info(apiRequestException.getMessage());
+      // log.info("inc@apiRequestException");
+      // log.info(apiRequestException.getMessage());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
-      log.info("inc@exception");
-      log.info(exception.getMessage());
+      // log.info("inc@exception");
+      // log.info(exception.getMessage());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }

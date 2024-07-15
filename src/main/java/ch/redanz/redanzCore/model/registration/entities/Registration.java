@@ -44,7 +44,7 @@ public class Registration implements Serializable {
   @JoinColumn(name="track_id")
   private Track track;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="current_workflow_status_id")
   private WorkflowStatus workflowStatus;
 

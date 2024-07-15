@@ -6,7 +6,10 @@ import ch.redanz.redanzCore.model.profile.service.CountryService;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.entities.*;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
+import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
@@ -27,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,81 +59,156 @@ public class RegistrationService {
 //  private final PrivateClassService privateClassService;
   private final LanguageService languageService;
   private final CountryService countryService;
+  private final BaseParService baseParService;
+  private final BundleEventTrackService bundleEventTrackService;
 
   public void update(Registration registration) {
     registrationRepo.save(registration);
   }
 
-  public void updateSoldOut(Event event){
+  public void updateSoldOut(Event event) {
+    Integer waitListLength = baseParService.waitListLength();
 
     // Event
-    if (countDone(event) >= event.getCapacity()) {
-      if (!event.isSoldOut()) {
+    if (countDone(event) >= eventService.getEventCapacity(event)) {
+      if (!eventService.getEventSoldOut(event)) {
         event.setSoldOut(true);
         eventService.save(event);
       }
     } else {
-      if (event.isSoldOut()) {
+      if (eventService.getEventSoldOut(event)) {
         event.setSoldOut(false);
         eventService.save(event);
       }
     }
 
     // Bundle
-    event.getEventBundles().forEach(eventBundle -> {
+    AtomicBoolean allBundlesSoldOut = new AtomicBoolean(true);
+    eventService.findAllEventBundles(event).forEach(eventBundle -> {
       Bundle bundle = eventBundle.getBundle();
-      if (countBundlesDone(bundle, event) >= bundle.getCapacity()) {
-        if (!bundle.isSoldOut()) {
-          bundle.setSoldOut(true);
-          bundleService.save(bundle);
+
+      if (bundleService.hasTrack(bundle)) {
+//        log.info("set Bundle: " + eventBundle.getBundle().getName() + " sold Out to false");
+        if (eventBundle.isSoldOut()) {
+          eventBundle.setSoldOut(false);
+          eventService.save(eventBundle);
         }
+
+        // Tracks
+        bundle.getBundleEventTracks().forEach(bundleEventTrack -> {
+          int trackCapacity = bundleEventTrack.getCapacity();
+          Track track = bundleEventTrack.getEventTrack().getTrack();
+          int countTracksDone = countTracksDone(track, bundle, event);
+
+          boolean trackSoldOut =
+            countTracksDone >= trackCapacity
+              || countTracksSubmittedConfirmingAndDone(track, bundle, event) >= (trackCapacity + waitListLength);
+
+//          log.info("track: " + track.getName() + " sold out?: " + trackSoldOut);
+//          log.info("because countTracksDone: " + countTracksDone);
+//          log.info(", trackCapacity: " + trackCapacity);
+//          log.info(", countTracksSubmittedConfirmingAndDone: " + countTracksSubmittedConfirmingAndDone(track, bundle, event));
+//          log.info(", trackCapacity: " +trackCapacity + " + waitListLength: " + waitListLength);
+
+          if (trackSoldOut != bundleEventTrack.isSoldOut()) {
+            bundleEventTrack.setSoldOut(trackSoldOut);
+            bundleEventTrackService.save(bundleEventTrack);
+          }
+
+          // Dance Roles
+          long noSwitchDanceRoleCount = bundleEventTrack.getBundleEventTrackDanceRoles().stream()
+            .filter(bundleEventTrackDanceRole -> !bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().equals(danceRoleService.getSwitchDanceRole()))
+            .count();
+          int danceRolesCount = noSwitchDanceRoleCount > 0 ? (int) noSwitchDanceRoleCount : 1;
+          int open = trackCapacity - countTracksDone;
+
+          bundleEventTrack.getBundleEventTrackDanceRoles().forEach(bundleEventTrackDanceRole -> {
+            int roleOpen = countTracksSubmittedAndConfirmingByDanceRole(track, event, bundleEventTrackDanceRole.getEventDanceRole().getDanceRole());
+
+            boolean danceRoleSoldOut = !bundleEventTrack.isSoldOut()
+              && bundleEventTrackDanceRole.getEventDanceRole().getDanceRole() != danceRoleService.getSwitchDanceRole()
+              && roleOpen >= (open / danceRolesCount) + waitListLength;
+
+//            log.info("danceRole: " + bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().getName() + " sold out?: " + danceRoleSoldOut);
+//            log.info("because roleOpen: " + roleOpen);
+//            log.info(", open: " + open);
+//            log.info(", danceRolesCount: " + danceRolesCount);
+//            log.info(", waitListLength: " + waitListLength);
+//            log.info(", (open / danceRolesCount) + waitListLength: " + ((open / danceRolesCount) + waitListLength));
+
+
+            if (danceRoleSoldOut != bundleEventTrackDanceRole.isSoldOut()) {
+              bundleEventTrackDanceRole.setSoldOut(danceRoleSoldOut);
+              bundleEventTrackService.save(bundleEventTrackDanceRole);
+            }
+          });
+        });
+
       } else {
-        if (bundle.isSoldOut()) {
-          bundle.setSoldOut(false);
-          bundleService.save(bundle);
+        var countBundlesDone = countBundlesDone(bundle, event);
+        boolean bundlesSoldOut =
+          // All done
+          countBundlesDone >= eventBundle.getCapacity()
+            // Wait list full
+            || countBundlesSubmittedConfirmingAndDone(bundle, event) >= (eventBundle.getCapacity() + waitListLength);
+
+        if (bundlesSoldOut != eventBundle.isSoldOut()) {
+          eventBundle.setSoldOut(bundlesSoldOut);
+          eventService.save(eventBundle);
         }
       }
 
-      // Private Class
-      event.getEventSpecials().forEach(
-        eventSpecial -> {
-          eventSpecial.setSoldOut(
-            eventSpecial.getCapacity()
-              <= specialRegistrationService.countSpecialRegistrations(eventSpecial.getSpecial(), event));
-        });
-
-      // Tracks
-        bundle.getEventTracks().forEach(eventTrack -> {
-          Track track = eventTrack.getTrack();
-          if (countTracksDone(track, event) >= track.getCapacity()) {
-            if (!track.isSoldOut()) {
-              track.setSoldOut(true);
-              trackService.save(track);
-            }
-          } else {
-            if (track.isSoldOut()) {
-              track.setSoldOut(false);
-              trackService.save(track);
-            }
+      if (bundleService.hasTrack(bundle)) {
+        AtomicBoolean allTracksSoldOut = new AtomicBoolean(true);
+        bundle.getBundleEventTracks().forEach(bundleEventTrack -> {
+          if (!bundleEventTrack.isSoldOut()) {
+            allTracksSoldOut.set(false);
           }
         });
+
+        if (allTracksSoldOut.get() != eventBundle.isSoldOut()
+        ) {
+          eventBundle.setSoldOut(allTracksSoldOut.get());
+          eventService.save(eventBundle);
+        }
+      }
+
+      if (!eventBundle.isSoldOut()) {
+        allBundlesSoldOut.set(false);
+      }
     });
+
+    if (allBundlesSoldOut.get() != event.isSoldOut()) {
+      event.setSoldOut(allBundlesSoldOut.get());
+      eventService.save(event);
+    }
 
     // Private Class
-    event.getEventPrivates().forEach(
+    eventService.findAllEventPrivates(event).forEach(
       eventPrivateClass -> {
-        eventPrivateClass.setSoldOut(
-          eventPrivateClass.getCapacity()
-          <= specialRegistrationService.countPrivateClassRegistrations(event, eventPrivateClass.getPrivateClass()));
-    });
 
-    event.getEventSpecials().forEach(
+        boolean privateClassSoldOut =
+          eventPrivateClass.getCapacity()
+            <= specialRegistrationService.countPrivateClassRegistrations(event, eventPrivateClass.getPrivateClass());
+
+        if (privateClassSoldOut != eventPrivateClass.getSoldOut()) {
+          eventPrivateClass.setSoldOut(privateClassSoldOut);
+//          eventService.save(eventBundle);
+        }
+      });
+
+    // Specials
+    eventService.findAllEventSpecials(event).forEach(
       eventSpecial -> {
-        eventSpecial.setSoldOut(
+        boolean specialSoldOut =
           eventSpecial.getCapacity()
-          <= specialRegistrationService.countSpecialRegistrations(eventSpecial.getSpecial(), event)
-        );
-    });
+            <= specialRegistrationService.countSpecialRegistrations(eventSpecial.getSpecial(), event);
+
+        if (specialSoldOut != eventSpecial.getSoldOut()) {
+          eventSpecial.setSoldOut(specialSoldOut);
+//          eventService.save(eventBundle);
+        }
+      });
   }
 
   public List<Registration> findAllByEvent(Event event) {
@@ -249,11 +328,27 @@ public class RegistrationService {
       );
   }
 
+  public int countTracksConfirming(Track track, Bundle bundle, Event event) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        track, bundle, workflowStatusService.getConfirming(), true, event, RegistrationType.PARTICIPANT
+      );
+  }
+
   public int countTracksConfirming(Track track, Event event, DanceRole danceRole) {
     if (track == null) return 0;
     return
       registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(
         track, workflowStatusService.getConfirming(), true, event, danceRole
+      );
+  }
+
+  public int countTracksConfirming(Track track, Bundle bundle, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        track, bundle, workflowStatusService.getConfirming(), true, event, danceRole
       );
   }
   public int countTracksSubmitted(Track track, Event event) {
@@ -263,11 +358,27 @@ public class RegistrationService {
         track, workflowStatusService.getSubmitted(), true, event, RegistrationType.PARTICIPANT
       );
   }
+
+  public int countTracksSubmitted(Track track, Bundle bundle, Event event) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        track, bundle, workflowStatusService.getSubmitted(), true, event, RegistrationType.PARTICIPANT
+      );
+  }
+
   public int countTracksSubmitted(Track track, Event event, DanceRole danceRole) {
     if (track == null) return 0;
     return
       registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(
         track, workflowStatusService.getSubmitted(), true, event, danceRole
+      );
+  }
+  public int countTracksSubmitted(Track track, Bundle bundle, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        track, bundle, workflowStatusService.getSubmitted(), true, event, danceRole
       );
   }
   public int countTracksDone(Track track, Event event) {
@@ -277,11 +388,37 @@ public class RegistrationService {
         track, workflowStatusService.getDone(),true, event, RegistrationType.PARTICIPANT
       );
   }
+
+  public int countTracksDone(Track track, Bundle bundle, Event event) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        track, bundle, workflowStatusService.getDone(),true, event, RegistrationType.PARTICIPANT
+      );
+  }
+
+  public int countTracksSubmittedAndConfirmingByDanceRole(Track track, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+         registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationType(
+           track, workflowStatusService.getSubmitted(), danceRole,true, event, RegistrationType.PARTICIPANT
+         )
+      +  registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationType(
+        track, workflowStatusService.getConfirming(), danceRole,true, event, RegistrationType.PARTICIPANT
+      );
+  }
   public int countTracksDone(Track track, Event event, DanceRole danceRole) {
     if (track == null) return 0;
     return
       registrationRepo.countAllByTrackAndWorkflowStatusAndActiveAndEventAndDanceRole(
         track, workflowStatusService.getDone(),true, event, danceRole
+      );
+  }
+  public int countTracksDone(Track track, Bundle bundle, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        track, bundle, workflowStatusService.getDone(),true, event, danceRole
       );
   }
   public int countTracksConfirmingAndDone(Track track, Event event) {
@@ -295,11 +432,24 @@ public class RegistrationService {
       + countTracksConfirming(track, event)
       + countTracksSubmitted(track, event);
   }
+
+  public int countTracksSubmittedConfirmingAndDone(Track track, Bundle bundle, Event event) {
+    if (track == null) return 0;
+    return countTracksDone(track, bundle, event)
+      + countTracksConfirming(track, bundle, event)
+      + countTracksSubmitted(track, bundle, event);
+  }
   public int countTracksSubmittedConfirmingAndDone(Track track, Event event, DanceRole danceRole) {
     if (track == null) return 0;
     return countTracksDone(track, event, danceRole)
       + countTracksConfirming(track, event, danceRole)
       + countTracksSubmitted(track, event, danceRole);
+  }
+  public int countTracksSubmittedConfirmingAndDone(Track track, Bundle bundle, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return countTracksDone(track, bundle, event, danceRole)
+      + countTracksConfirming(track, bundle, event, danceRole)
+      + countTracksSubmitted(track, bundle, event, danceRole);
   }
 
   public Optional<Registration> findByParticipantAndEvent(Person participant, Event event, RegistrationType registrationType) {
@@ -317,6 +467,7 @@ public class RegistrationService {
 
   public void onDelete(Registration registration) throws TemplateException, IOException {
     registration.setActive(false);
+
     update(registration);
     workflowTransitionService.setWorkflowStatus(
       registration,
@@ -444,7 +595,6 @@ public class RegistrationService {
     }
 
     discountRegistrationService.saveCapacityDiscount(registration);
-
 //     log.info("inc@updateRegistration, bfr food");
     foodRegistrationService.updateFoodRegistrationRequest(registration, request);
 //     log.info("inc@updateRegistration, bfr discount");
@@ -474,12 +624,15 @@ public class RegistrationService {
           registration
           ,workflowStatusService.getSubmitted()
         );
+//        log.info("inc@updateRegistration, after setWorkflowStatus");
         registrationEmailService.sendRegistrationSubmittedEmail(registration);
+//        log.info("inc@updateRegistration, after send Email");
       } catch (Exception exception) {
         errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Update Workflow Status for personId: " + personId + ", request: " + request);
       }
     }
 
+//    log.info("inc@updateRegistration, return");
     return registration;
   }
 
@@ -612,23 +765,19 @@ public class RegistrationService {
     ).get();
   }
   public RegistrationResponse getRegistrationResponse(Registration registration) {
-    log.info("inc@getRegistrationResponse");
+    // log.info("inc@getRegistrationResponse");
     RegistrationResponse registrationResponse = new RegistrationResponse(
       registration.getRegistrationId(),
       registration.getParticipant().getPersonId(),
       registration.getEvent().getEventId(),
-//      registration.getEvent(),
       registration.getBundle() != null ? registration.getBundle().getBundleId() : null
     );
-    log.info("inc@getRegistrationResponse, bfr set event");
-//    registrationResponse.setEvent(registration.getEvent());
     registrationResponse.setEventId(registration.getEvent().getEventId());
     registrationResponse.setRegistrationId(registration.getRegistrationId());
     if (registration.getBundle() != null) {
       registrationResponse.setBundleId(registration.getBundle().getBundleId());
     }
 
-    log.info("inc@getRegistrationResponse, bfr track");
     // track
     if (registration.getTrack() != null) {
       registrationResponse.setTrackId(registration.getTrack().getTrackId());
@@ -646,6 +795,8 @@ public class RegistrationService {
     }
 
     // workflow Status
+//    log.info(registration.getWorkflowStatus().toString());
+//    log.info(registration.getWorkflowStatus().getName());
     registrationResponse.setWorkflowStatus(registration.getWorkflowStatus());
 
     // Food Registration
@@ -653,7 +804,7 @@ public class RegistrationService {
       foodRegistrationService.getAllByRegistration(registration)
     );
 
-    log.info("inc@getRegistrationResponse, bfr host");
+    // log.info("inc@getRegistrationResponse, bfr host");
     // Host Registration
     registrationResponse.setHostRegistration(
       hostingService.getHostRegistration(registration)
@@ -674,7 +825,7 @@ public class RegistrationService {
       donationRegistrationService.getScholarshipRegistration(registration)
     );
 
-    log.info("inc@getRegistrationResponse, bfr donation");
+    // log.info("inc@getRegistrationResponse, bfr donation");
     // Donation Registration
     registrationResponse.setDonationRegistration(
       donationRegistrationService.getDonationRegistration(registration)
@@ -690,13 +841,13 @@ public class RegistrationService {
       specialRegistrationService.findAllByRegistration(registration)
     );
 
-    log.info("inc@getRegistrationResponse, bfr private Class");
+    // log.info("inc@getRegistrationResponse, bfr private Class");
     // Private Classes
     registrationResponse.setPrivateClassRegistrations(
       specialRegistrationService.findAllPrivateClassesByRegistration(registration)
     );
 
-    log.info("inc@getRegistrationResponse, bfr return, {}", registrationResponse);
+    // log.info("inc@getRegistrationResponse, bfr return, {}", registrationResponse);
     return registrationResponse;
   }
 
@@ -720,7 +871,7 @@ public class RegistrationService {
     if (registrationOptional.isPresent()) {
       Registration registration = registrationOptional.get();
       RegistrationResponse registrationResponse = getRegistrationResponse(registration);
-      log.info("inc@bfr return response");
+      // log.info("inc@bfr return response");
       return registrationResponse;
     } else {
 //      return new RegistrationResponse(personId, eventService.findByEventId(eventId));
@@ -745,8 +896,8 @@ public class RegistrationService {
         registrationResponses.add(getRegistrationResponse(registration));
       });
     }
-    log.info("bfr return responses");
-    log.info("bfr return registrationResponses {}", registrationResponses);
+    // log.info("bfr return responses");
+    // log.info("bfr return registrationResponses {}", registrationResponses);
     return registrationResponses;
   }
 
@@ -956,6 +1107,22 @@ public class RegistrationService {
     return count;
   }
 
+  public List<String> countTracksByBundleSubmittedConfirmingAndDoneAndSplitRoles(Track track, Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksSubmittedConfirmingAndDone(track, bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksSubmittedConfirmingAndDone(track, bundle, event, danceRole)
+          ,danceRole.getName() + ": "
+          ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
   public List<String> countTracksSubmittedAndSplitRoles(Track track, Event event) {
     StringBuilder countPartBuilder = new StringBuilder();
     List<String> count = new ArrayList<>();
@@ -965,6 +1132,22 @@ public class RegistrationService {
         formatCountToString(
           countPartBuilder.toString()
           ,countTracksSubmitted(track, event, danceRole)
+        ,danceRole.getName() + ": "
+          ));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countTracksByBundleSubmittedAndSplitRoles(Track track, Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksSubmitted(track, bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksSubmitted(track, bundle, event, danceRole)
         ,danceRole.getName() + ": "
           ));
     });
@@ -986,6 +1169,21 @@ public class RegistrationService {
     count.add(countPartBuilder.toString());
     return count;
   }
+
+  public List<String> countTracksByBundleConfirmingAndSplitRoles(Track track, Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksConfirming(track, bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksConfirming(track, bundle, event, danceRole)
+        ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
   public List<String> countTracksDoneAndSplitRoles(Track track, Event event) {
     StringBuilder countPartBuilder = new StringBuilder();
     List<String> count = new ArrayList<>();
@@ -1000,6 +1198,24 @@ public class RegistrationService {
     count.add(countPartBuilder.toString());
     return count;
   }
+
+  public List<String> countTracksByBundleDoneAndSplitRoles(Track track, Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+
+    count.add(String.valueOf(countTracksDone(track, bundle, event)));
+
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          , countTracksDone(track, bundle, event, danceRole)
+          , danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
   public List<String> countSubmittedConfirmingAndDoneAndSplitRoles(Event event) {
     StringBuilder countPartBuilder = new StringBuilder();
     List<String> count = new ArrayList<>();

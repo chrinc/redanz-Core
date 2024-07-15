@@ -112,14 +112,6 @@ public class RegistrationMatchingService {
   public RegistrationMatching lookupMatch (RegistrationMatching baseMatcher, Event event) {
     List<RegistrationMatching> registrationMatchings = findRegistration2ISNullSubmitted(event);
     boolean baseMatcherHasPartnerEmail = baseMatcher.getPartnerEmail() != null;
-//    registrationMatchings.forEach(lookupMatcher -> {
-//      log.info("inc baseMatcher.equals(lookupMatcher) {}", baseMatcher.equals(lookupMatcher));
-//      log.info("inc registrationMatch {}", registrationIsMatch(baseMatcher.getRegistration1(), lookupMatcher.getRegistration1()));
-//      log.info("inc workflowMatch {}", workflowIsMatch(baseMatcher.getRegistration1(), lookupMatcher.getRegistration1()));
-//      log.info("inc email {}", baseMatcherHasPartnerEmail && lookupMatcher.getPartnerEmail() != null);
-//      log.info("inc emailMatch {}", isEmailMatch(baseMatcher, lookupMatcher));
-//      log.info("inc emailMatch 2 {}", !baseMatcherHasPartnerEmail && lookupMatcher.getPartnerEmail() == null);
-//    });
     return registrationMatchings.stream().filter(lookupMatcher ->
 
       // exclude self comparison
@@ -176,29 +168,28 @@ public class RegistrationMatchingService {
   }
 
   private boolean registrationIsMatch(Registration baseRegistration, Registration lookupRegistration) {
-//    log.info("registrationIsMatch, baseRegistration Bundle: {}", baseRegistration.getBundle().getName());
-//    log.info("registrationIsMatch, lookupRegistration Bundle: {}", lookupRegistration.getBundle().getName());
-//    log.info("registrationIsMatch, baseRegistration BundleId: {}", baseRegistration.getBundle().getBundleId());
-//    log.info("registrationIsMatch, lookupRegistration BundleId: {}", lookupRegistration.getBundle().getBundleId());
-//    log.info("registrationIsMatch, bundleMatch: {}", baseRegistration.getBundle().getBundleId().equals(lookupRegistration.getBundle().getBundleId()));
-//    log.info("registrationIsMatch, bundleMatch: {}", baseRegistration.getBundle().equals(lookupRegistration.getBundle()));
-//    log.info("registrationIsMatch, not Sold Out: {}", !baseRegistration.getBundle().isSoldOut());
-//    log.info("registrationIsMatch, track not sold out: {}", baseRegistration.getTrack().isSoldOut());
-//    log.info("registrationIsMatch, danceRoles do not match: {}", !baseRegistration.getDanceRole().equals(lookupRegistration.getDanceRole()));
+//    log.info("baseRegistration.getTrack().getOwnPartnerRequired(): " + baseRegistration.getTrack().getOwnPartnerRequired());
+//    log.info("!baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId()): " + !baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId()));
     return
       (
         // check bundles
         baseRegistration.getBundle().getBundleId().equals(lookupRegistration.getBundle().getBundleId())
-          && !baseRegistration.getBundle().isSoldOut()
+//          && !baseRegistration.getBundle().isSoldOut()
 
           // check tracks
+          // @todo: update new Flag getSameTrackRequired
           && (
-               baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId())
+             !baseRegistration.getTrack().getOwnPartnerRequired()
+             && baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId())
 
-           // with own partner, different Tracks are allowed
-           || baseRegistration.getTrack().getOwnPartnerRequired()
+           // with own partner only, different Tracks are required
+           || (
+                 baseRegistration.getTrack().getOwnPartnerRequired()
+              && !baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId())
+               )
           )
-          && !baseRegistration.getTrack().isSoldOut() &&
+//          && !baseRegistration.getTrack().isSoldOut()
+          &&
           (
             // check dance roles
             !baseRegistration.getDanceRole().getDanceRoleId().equals(lookupRegistration.getDanceRole().getDanceRoleId())
@@ -239,6 +230,19 @@ public class RegistrationMatchingService {
     matchingPairs.forEach((baseMatching, lookupMatching) -> {
       updateRegistrationMatching(baseMatching, lookupMatching);
     });
+  }
+
+  public void removePartnerRegistration(Registration registration) {
+    if (registrationMatchingRepo.existsByRegistration1(registration)) {
+      RegistrationMatching registrationMatching1 = registrationMatchingRepo.findByRegistration1(registration).get();
+      registrationMatching1.setRegistration2(null);
+      save(registrationMatching1);
+    }
+    if (registrationMatchingRepo.existsByRegistration2(registration)) {
+      RegistrationMatching registrationMatching2 = registrationMatchingRepo.findByRegistration2(registration).get();
+      registrationMatching2.setRegistration2(null);
+      save(registrationMatching2);
+    }
   }
 
 

@@ -36,7 +36,7 @@ public class ScholarshipService {
   }
 
   public void updateScholarship(JsonObject request, Event event) throws IOException, TemplateException {
-    log.info("inc@updateScholarship, request: {}", request);
+    // log.info("inc@updateScholarship, request: {}", request);
     getScholarshipSchema().forEach(
       stringStringMap -> {
         String key = stringStringMap.get("key");

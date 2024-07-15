@@ -28,9 +28,19 @@ public class ReportCheckinService {
   public List<ResponseCheckIn> getCheckinReport(Event event) {
     List<ResponseCheckIn> responseCheckIns = new ArrayList<>();
 
-    checkInService.findAllByEvent(event).parallelStream().forEach(checkIn -> {
+//    checkInService.findAllByEvent(event).parallelStream().forEach(checkIn -> {
+    checkInService.findAllByEvent(event).forEach(checkIn -> {
       boolean isGuest = checkIn.getGuest() != null;
 //      if (isGuest) {
+
+//      log.info("isGuest: " + isGuest);
+//      if (!isGuest) {
+//        log.info("checkIn.getRegistration().getParticipant().getLastName(): " + checkIn.getRegistration().getParticipant().getLastName());
+//
+//        if (checkIn.getRegistration().getTrack() != null) {
+//          log.info("checkIn.getRegistration().getTrack().getName(): " + checkIn.getRegistration().getTrack().getName());
+//        }
+//      }
         responseCheckIns.add(
           new ResponseCheckIn(
             checkIn.getCheckInId(),

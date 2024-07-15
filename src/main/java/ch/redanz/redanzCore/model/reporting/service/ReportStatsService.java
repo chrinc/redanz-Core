@@ -26,42 +26,62 @@ public class ReportStatsService {
   private final OutTextService outTextService;
   private final FoodRegistrationService foodRegistrationService;
   private final DiscountRegistrationService discountRegistrationService;
-  private final SpecialService specialService;
   private final SpecialRegistrationService specialRegistrationService;
   private final FoodService foodService;
   private final EventService eventService;
-  private final TrackService trackService;
+  private final BundleEventTrackService bundleEventTrackService;
   public List<ResponseStats> getStatsReport(Language language, Event event) {
     List<ResponseStats> stats = new ArrayList<>();
+    stats.add(
+      new ResponseStats(
+        "Workshop"
+        ,event.getName()
+        ,registrationService.countSubmittedConfirmingAndDoneAndSplitRoles(event)
+        ,registrationService.countSubmittedAndSplitRoles(event)
+        ,registrationService.countConfirmingAndSplitRoles(event)
+        ,registrationService.countDoneAndSplitRoles(event)
+        ,event.getCapacity()
+        ,event.isSoldOut()
+      )
+    );
 
-    bundleService.getAllByEvent(event).forEach(bundle -> {
+    eventService.findAllEventBundles(event).forEach(eventBundle -> {
+      List<BundleEventTrack> bundleEventTracks = bundleEventTrackService.findAllByEventAndBundle(event, eventBundle.getBundle());
+      bundleEventTracks.forEach(
+        bundleEventTrack -> {
+          Track track = bundleEventTrack.getEventTrack().getTrack();
+          Bundle bundle = bundleEventTrack.getBundle();
+          stats.add(
+            new ResponseStats(
+              bundleEventTrack.getBundle().getName()
+              , track.getName()
+              , registrationService.countTracksByBundleSubmittedConfirmingAndDoneAndSplitRoles(track, bundle, event)
+              , registrationService.countTracksByBundleSubmittedAndSplitRoles(track, bundle, event)
+              , registrationService.countTracksByBundleConfirmingAndSplitRoles(track, bundle, event)
+              , registrationService.countTracksByBundleDoneAndSplitRoles(track, bundle, event)
+              , bundleEventTrack.getCapacity()
+              , eventBundle.isSoldOut() || bundleEventTrack.isSoldOut()
+            )
+          );
+        });
+    });
+
+    bundleService.getAllWithoutTracksByEvent(event).forEach(bundle -> {
       stats.add(
         new ResponseStats(
-          "Pass"
+          "Simple Pass"
           ,bundle.getName()
           ,registrationService.countBundlesSubmittedConfirmingAndDoneAndSplitRoles(bundle, event)
           ,registrationService.countBundlesSubmittedAndSplitRoles(bundle, event)
           ,registrationService.countBundlesConfirmingAndSplitRoles(bundle, event)
           ,registrationService.countBundlesDoneAndSplitRoles(bundle, event)
-           ,bundle.getCapacity()
-        )
-      );
-    });
-    eventService.getAllTracksByEvent(event).forEach(track -> {
-      stats.add(
-        new ResponseStats(
-          "Track"
-          ,track.getName()
-         ,registrationService.countTracksSubmittedConfirmingAndDoneAndSplitRoles(track, event)
-         ,registrationService.countTracksSubmittedAndSplitRoles(track, event)
-         ,registrationService.countTracksConfirmingAndSplitRoles(track, event)
-         ,registrationService.countTracksDoneAndSplitRoles(track, event)
-         ,track.getCapacity()
+          ,eventService.findByEventAndBundle(event, bundle).getCapacity()
+          ,eventService.findByEventAndBundle(event, bundle).isSoldOut()
         )
       );
     });
 
-    // EventSpecials
+    // Event Specials
     event.getEventSpecials().forEach(eventSpecial -> {
       Special special = eventSpecial.getSpecial();
       stats.add(
@@ -73,6 +93,7 @@ public class ReportStatsService {
          ,specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
          ,specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
          ,eventSpecial.getCapacity()
+         ,eventSpecial.getSoldOut()
         )
       );
     });
@@ -118,22 +139,12 @@ public class ReportStatsService {
           ,specialRegistrationService.countPrivatesSubmittedAndSplitRoles(privateClass, event)
           ,specialRegistrationService.countPrivatesConfirmingAndSplitRoles(privateClass, event)
           ,specialRegistrationService.countPrivatesDoneAndSplitRoles(privateClass, event)
-         ,eventPrivateClass.getCapacity()
+          ,eventPrivateClass.getCapacity()
+          ,eventPrivateClass.getSoldOut()
         )
       );
     });
 
-    stats.add(
-      new ResponseStats(
-        "Workshop"
-        ,event.getName()
-        ,registrationService.countSubmittedConfirmingAndDoneAndSplitRoles(event)
-        ,registrationService.countSubmittedAndSplitRoles(event)
-        ,registrationService.countConfirmingAndSplitRoles(event)
-        ,registrationService.countDoneAndSplitRoles(event)
-       ,event.getCapacity()
-      )
-    );
     foodService.getFoodSlotsPairsByEvent(event).forEach(foodSlot -> {
       Food food = (Food) foodSlot.get(0);
       Slot slot = (Slot) foodSlot.get(1);
@@ -146,36 +157,11 @@ public class ReportStatsService {
           , foodRegistrationService.countFoodSlotConfirmingAsList(food, slot, event)
           , foodRegistrationService.countFoodSlotDoneAsList(food, slot, event)
           , null
+          , false
+
         )
       );
     });
-
-//    // Track Discounts
-//    Set<Discount> discounts = new HashSet<>();
-//    event.getEventBundles().forEach(eventBundle -> {
-//        if (trackService.bundleHasTrack(eventBundle.getBundle())) {
-//          eventBundle.getBundle().getBundleTracks().forEach(bundleTrack -> {
-//            bundleTrack.getTrack().getEventDiscounts().forEach(eventDiscount -> {
-//              Discount discount = eventDiscount.getDiscount();
-//              discounts.add(discount);
-//            });
-//          });
-//        }
-//      });
-//      event.getEventDiscounts().forEach(eventDiscount -> {
-//        Discount discount = eventDiscount.getDiscount();
-//        stats.add(
-//          new ResponseStats(
-//            "Discount"
-//            , outTextService.getOutTextByKeyAndLangKey(discount.getName(), language.getLanguageKey()).getOutText()
-//            , discountRegistrationService.countDiscountSubmittedConfirmingAndDoneAsList(discount, event)
-//            , discountRegistrationService.countDiscountSubmittedAsList(discount, event)
-//            , discountRegistrationService.countDiscountConfirmingAsList(discount, event)
-//            , discountRegistrationService.countDiscountDoneAsList(discount, event)
-//            , eventDiscount.getCapacity()
-//          )
-//        );
-//      });
 
     // Track Discounts
     Set<Discount> discounts = new HashSet<>();
@@ -196,6 +182,7 @@ public class ReportStatsService {
           , discountRegistrationService.countDiscountConfirmingAsList(discount, event)
           , discountRegistrationService.countDiscountDoneAsList(discount, event)
           , eventDiscount.getCapacity()
+          , eventDiscount.getCapacity() == null ? false : discountRegistrationService.countDiscountSubmittedConfirmingAndDone(discount, event) >= eventDiscount.getCapacity()
         )
       );
     });

@@ -25,7 +25,8 @@ public enum RegistrationMatchingConfig {
   OLIVER_REGISTRATION ( UserConfig.OLIVER_USER.getUsername()  ,null , EventConfig.REDANZ_EVENT),
   HARRY_REGISTRATION  ( UserConfig.HARRY_USER.getUsername()   ,null,  EventConfig.REDANZ_EVENT),
   FRANKY_REGISTRATION ( PersonConfig.FRANKY.getEmail()  , PersonConfig.NORMA.getEmail(), EventConfig.REDANZ_EVENT),
-  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER.getUsername() ,null,  EventConfig.REDANZ_EVENT);
+  CLAUDIA_REGISTRATION( UserConfig.CLAUDIA_USER.getUsername() ,null,  EventConfig.REDANZ_EVENT),
+  ;
 
 
 //  ARLYNE_REGISTRATION ( UserConfig.ARLYNE_USER.getUsername()  ,null , EventConfig.REDANZ_WORKSHOP),

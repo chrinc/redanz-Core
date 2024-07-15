@@ -30,12 +30,15 @@ public class Bundle implements Serializable {
     inverseJoinColumns = @JoinColumn(name = "event_special_id"))
   private Set<EventSpecial> eventSpecials;
 
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-    name = "bundle_event_track",
-    joinColumns = @JoinColumn(name = "bundle_id"),
-    inverseJoinColumns = @JoinColumn(name = "event_track_id"))
-  private Set<EventTrack> eventTracks;
+//  @ManyToMany(fetch = FetchType.EAGER)
+//  @JoinTable(
+//    name = "bundle_event_track",
+//    joinColumns = @JoinColumn(name = "bundle_id"),
+//    inverseJoinColumns = @JoinColumn(name = "event_track_id"))
+//  private Set<EventTrack> eventTracks;
+
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle", fetch = FetchType.EAGER)
+  private Set<BundleEventTrack> bundleEventTracks;
 
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -46,15 +49,23 @@ public class Bundle implements Serializable {
   )
   private Set<Slot> partySlots;
 
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+    name="bundle_dance_role",
+    joinColumns = @JoinColumn(name="bundle_id"),
+    inverseJoinColumns = @JoinColumn(name="dance_role_id")
+  )
+  private Set<DanceRole> danceRoles;
+
   private String name;
 
   private double price;
   private String description;
-  private Integer capacity;
+//  private Integer capacity;
   private Boolean simpleTicket;
 
-  @Column(name = "sold_out")
-  private boolean soldOut;
+//  @Column(name = "sold_out")
+//  private boolean soldOut;
 
   private String color;
 
@@ -71,7 +82,7 @@ public class Bundle implements Serializable {
     String name,
     double price,
     String description,
-    Integer capacity,
+//    Integer capacity,
     Boolean simpleTicket,
     Integer seqNr,
     Set<Slot> partySlots,
@@ -81,7 +92,7 @@ public class Bundle implements Serializable {
     this.name = name;
     this.price = price;
     this.description = description;
-    this.capacity = capacity;
+//    this.capacity = capacity;
     this.simpleTicket = simpleTicket;
     this.seqNr = seqNr;
     this.partySlots = partySlots;
@@ -96,14 +107,15 @@ public class Bundle implements Serializable {
         add(new HashMap<>() {{put("key", "id");            put("type", "id");                                        put("label", "Bundle Id");        }});
         add(new HashMap<>() {{put("key", "name");          put("type", "text");            put("required", "true");  put("label", "Name");             }});
         add(new HashMap<>() {{put("key", "price");         put("type", "number");          put("required", "true");  put("label", "Price");            }});
-        add(new HashMap<>() {{put("key", "capacity");      put("type", "number");          put("required", "true");  put("label", "Capacity");         }});
+        add(new HashMap<>() {{put("key", "capacity");      put("type", "number");          put("required", "true");  put("label", "Capacity");      }});
         add(new HashMap<>() {{put("key", "description");   put("type", "label");           put("required", "true");  put("label", "Description");      }});
         add(new HashMap<>() {{put("key", "simpleTicket");  put("type", "bool");                                      put("labelTrue", "Simple Ticket");        put("labelFalse", "Regular Bundle"); }});
         add(new HashMap<>() {{put("key", "active");        put("type", "bool");                                      put("labelTrue", "Active");               put("labelFalse", "Inactive"); }});
         add(new HashMap<>() {{put("key", "color");         put("type", "color");           put("required", "false"); put("label", "Wrist Band Color"); }});
         add(new HashMap<>() {{put("key", "bundleSpecial"); put("type", "multiselectInfo");                           put("label", "Specials");                 put("infoKey", "price");}});
-        add(new HashMap<>() {{put("key", "track");         put("type", "multiselectText"); put("required", "false"); put("label", "Track");}});
+        add(new HashMap<>() {{put("key", "bundleEventTrack");        put("type", "attribute"); put("required", "false"); put("label", "Choose Tracks"); put("list", null);}});
         add(new HashMap<>() {{put("key", "partySlots");    put("type", "multiselect");     put("required", "false"); put("label", "Party Slots");              put("list", null);}});
+//        add(new HashMap<>() {{ put("key", "bundleDanceRole");  put("type", "multiselectText");        put("required", "false");      put("label", "Dance Roles");  put("list", null);}});
         add(new HashMap<>() {{put("key", "seqNr");         put("type", "number");          put("required", "true");  put("label", "Sequence Number");  }});
         add(new HashMap<>() {{put("key", "eventPartInfo"); put("type", "partInfo");        put("eventPartKey", "bundle");                          put("label", OutTextConfig.LABEL_BUNDLE_INFO_EN.getOutTextKey());}});
         add(new HashMap<>() {{put("key", "clone");         put("type", "action");          put("show", "true");}});
@@ -119,7 +131,7 @@ public class Bundle implements Serializable {
         put("id", Long.toString(bundleId));
         put("name", name);
         put("price", String.valueOf(price));
-        put("capacity", String.valueOf(capacity));
+        put("capacity", null);
         put("description", description);
         put("simpleTicket", simpleTicket.toString());
         put("color", color);

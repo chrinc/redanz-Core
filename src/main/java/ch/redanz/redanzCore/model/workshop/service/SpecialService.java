@@ -97,7 +97,6 @@ public class SpecialService {
       special = findBySpecialId(specialId);
     }
 
-    log.info(request.toString());
     Special.schema().forEach(
       stringStringMap -> {
         String key = stringStringMap.get("key");

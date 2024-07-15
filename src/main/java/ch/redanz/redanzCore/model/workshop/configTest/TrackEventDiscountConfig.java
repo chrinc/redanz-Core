@@ -21,7 +21,8 @@ public enum TrackEventDiscountConfig {
   INTERMEDIATE_EARLY(EventConfig.REDANZ_EVENT, TrackConfig.INTERMEDIATE, DiscountConfig.EARLY_BIRD),
 
   NO_LEVEL_ABROAD(EventConfig.REDANZ_EVENT, TrackConfig.NO_LEVEL, DiscountConfig.ABROAD),
-  NO_LEVEL_STUDENT(EventConfig.REDANZ_EVENT, TrackConfig.NO_LEVEL, DiscountConfig.STUDENT);
+  NO_LEVEL_STUDENT(EventConfig.REDANZ_EVENT, TrackConfig.NO_LEVEL, DiscountConfig.STUDENT)
+  ;
 
   private final EventConfig eventConfig;
   private final TrackConfig trackConfig;

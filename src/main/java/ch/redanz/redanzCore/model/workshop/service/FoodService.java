@@ -66,9 +66,6 @@ public class FoodService {
     } else {
       food = findByFoodId(foodId);
     }
-    log.info(request.toString());
-    log.info(Food.schema().toString());
-
 
     Food.schema().forEach(
       stringStringMap -> {

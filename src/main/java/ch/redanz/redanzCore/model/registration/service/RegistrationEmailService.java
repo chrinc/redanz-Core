@@ -7,6 +7,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import com.google.gson.JsonObject;
@@ -33,6 +34,8 @@ public class RegistrationEmailService {
   private final LanguageService languageService;
   private final BaseParService baseParService;
   private final UserService userService;
+  private final EmailService emailService;
+  private final EventService eventService;
 //  private final RegistrationService registrationService;
   @Autowired
   Environment environment;
@@ -52,7 +55,8 @@ public class RegistrationEmailService {
     Registration registration
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("link", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationSubmitted.ftl");
 
@@ -61,7 +65,6 @@ public class RegistrationEmailService {
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         registration.getParticipant().getPersonLang().getLanguageKey();
 
-    model.put("headerLink",  environment.getProperty("email.header.link"));
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_SUBMITTED_HEADER_EN.getOutTextKey(),
@@ -105,8 +108,10 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
-    EmailService.sendEmail(
-      EmailService.getSession(),
+
+//    log.info("incbfr send Email");
+    emailService.sendEmail(
+//      EmailService.getSession(),
       registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
@@ -118,9 +123,11 @@ public class RegistrationEmailService {
       ,!registration.getEvent().isActive()
       ,null
     );
+//    log.info("incbfr bfr update");
     update(
       new RegistrationEmail(registration, LocalDateTime.now())
     );
+//    log.info("incbfr after update");
   }
 
   public void sendEmailBookingConfirmation(
@@ -129,6 +136,8 @@ public class RegistrationEmailService {
     Registration registration
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
+    String lang = person.getPersonLang().getLanguageKey().toLowerCase();
+    model.put("headerLink", environment.getProperty("link.login"));
     model.put("firstName", person.getFirstName());
     Template template = mailConfig.getTemplate("registrationDone.ftl");
 
@@ -136,14 +145,11 @@ public class RegistrationEmailService {
       person.getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         person.getPersonLang().getLanguageKey();
-
-    model.put("headerLink",  environment.getProperty("email.header.link"));
-
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", eventService.findEventName(registration.getEvent()))
     );
     model.put("base",
       outTextService.getOutTextByKeyAndLangKey(
@@ -169,8 +175,8 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
-    EmailService.sendEmail(
-      EmailService.getSession(),
+    emailService.sendEmail(
+//      EmailService.getSession(),
       person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),
@@ -179,7 +185,7 @@ public class RegistrationEmailService {
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
       ,baseParService.testEmail()
-      ,!registration.getEvent().isActive()
+      ,!eventService.findIsActive(registration.getEvent())
       ,null
     );
     registrationEmail.setDoneSentDate(LocalDateTime.now());
@@ -188,7 +194,9 @@ public class RegistrationEmailService {
 
   public void sendReminderEmail(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("link", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
+
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationReminder.ftl");
 
@@ -196,8 +204,6 @@ public class RegistrationEmailService {
       registration.getParticipant().getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         registration.getParticipant().getPersonLang().getLanguageKey();
-
-    model.put("headerLink",  environment.getProperty("email.header.link"));
 
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
@@ -254,8 +260,8 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
-    EmailService.sendEmail(
-      EmailService.getSession(),
+    emailService.sendEmail(
+//      EmailService.getSession(),
       registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_SUBJECT_EN.getOutTextKey(),
@@ -274,7 +280,7 @@ public class RegistrationEmailService {
 
   public void sendCancellationEmail(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("link", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login"));
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationCancelled.ftl");
 
@@ -282,8 +288,6 @@ public class RegistrationEmailService {
       registration.getParticipant().getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         registration.getParticipant().getPersonLang().getLanguageKey();
-
-    model.put("headerLink",  environment.getProperty("email.header.link"));
 
     model.put("header",
       outTextService.getOutTextByKeyAndLangKey(
@@ -321,8 +325,8 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText().replace("{1}", registration.getEvent().getName())
     );
-    EmailService.sendEmail(
-      EmailService.getSession(),
+    emailService.sendEmail(
+//      EmailService.getSession(),
       registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_SUBJECT_EN.getOutTextKey(),
@@ -340,11 +344,11 @@ public class RegistrationEmailService {
 
   public void sendEmailConfirmation(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("link", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
+
     model.put("firstName", registration.getParticipant().getFirstName());
     Template template = mailConfig.getTemplate("registrationReleased.ftl");
-
-    model.put("headerLink",  environment.getProperty("email.header.link"));
 
     String languageKey =
       registration.getParticipant().getPersonLang() == null ?
@@ -395,8 +399,8 @@ public class RegistrationEmailService {
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
-    EmailService.sendEmail(
-      EmailService.getSession(),
+    emailService.sendEmail(
+//      EmailService.getSession(),
       registration.getParticipant().getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
@@ -432,7 +436,7 @@ public class RegistrationEmailService {
 
     registrationList.forEach(registration -> {
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink",  environment.getProperty("email.header.link"));
+    model.put("headerLink", environment.getProperty("link.login"));
     model.put("firstName", registration.getParticipant().getFirstName());
     model.put("content", content);
       Template template = null;
@@ -461,8 +465,8 @@ public class RegistrationEmailService {
     );
 
       try {
-        EmailService.sendEmail(
-          EmailService.getSession(),
+        emailService.sendEmail(
+//          EmailService.getSession(),
           registration.getParticipant().getEmail(),
           subject,
           FreeMarkerTemplateUtils.processTemplateIntoString(template, model)

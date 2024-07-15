@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +32,10 @@ public class BundleService {
     private final SlotService slotService;
     private final EventSpecialRepo eventSpecialRepo;
     private final EventTrackRepo eventTrackRepo;
+    private final EventDanceRoleRepo eventDanceRoleRepo;
+    private final DanceRoleService danceRoleService;
     private final EventRepo eventRepo;
+    private final BundleEventTrackService bundleEventTrackService;
 //    private final BundleSpecialRepo bundleSpecialRepo;
 
     public List<Bundle> getAll(){
@@ -39,6 +43,11 @@ public class BundleService {
     }
     public void save(Bundle bundle) {
         bundleRepo.save(bundle);
+    }
+
+    public void save(EventDanceRole eventDanceRole) {
+        log.info(eventDanceRole.toString());
+        eventDanceRoleRepo.save(eventDanceRole);
     }
 //    public void save(BundleSpecial bundleSpecial) {
 //        bundleSpecialRepo.save(bundleSpecial);
@@ -54,6 +63,19 @@ public class BundleService {
 
         return bundles;
     }
+
+    public List<Bundle> getAllWithoutTracksByEvent(Event event) {
+        List<EventBundle> eventBundles;
+        List<Bundle> bundles = new ArrayList<>();
+        eventBundles = eventBundleRepo.findAllByEvent(event);
+        eventBundles.forEach(eventBundle -> {
+            if (!trackService.bundleHasTrack(eventBundle.getBundle())) {
+                bundles.add(eventBundle.getBundle());
+            }
+        });
+        return bundles;
+    }
+
     public boolean existsByName(String name) {
         return bundleRepo.existsByName(name);
     }
@@ -61,13 +83,13 @@ public class BundleService {
         return bundleRepo.findByBundleId(bundleId);
     }
 
-    public void delete(Bundle bundle, Track track) {
-        Set<EventTrack> filteredEventTracks = bundle.getEventTracks().stream()
-          .filter(eventTrack -> !eventTrack.getTrack().equals(track))
-          .collect(Collectors.toSet());
-        bundle.setEventTracks(filteredEventTracks);
-        save(bundle);
-    }
+//    public void delete(Bundle bundle, Track track) {
+//        Set<EventTrack> filteredEventTracks = bundle.getBundleEventTracks().stream()
+//          .filter(eventTrack -> !eventTrack.getEventTrack().equals(track))
+//          .collect(Collectors.toSet());
+//        bundle.setEventTracks(filteredEventTracks);
+//        save(bundle);
+//    }
 
     public void delete(Bundle bundle) {
         bundleRepo.delete(bundle);
@@ -92,9 +114,11 @@ public class BundleService {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         Bundle bundle;
         boolean isNew = false;
+        AtomicInteger capacity = new AtomicInteger();
         Set<Slot> newPartySlots = new HashSet<>();
         Set<EventSpecial> newEventSpecials = new HashSet<>();
-        Set<EventTrack> newEventTracks = new HashSet<>();
+        Set<BundleEventTrack> newBundleEventTracks = new HashSet<>();
+        Set<DanceRole> newDanceRoles = new HashSet<>();
 
         Long bundleId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
 
@@ -111,8 +135,6 @@ public class BundleService {
               String type = stringStringMap.get("type");
               Field field;
               try {
-                 // log.info("key, {}", key);
-                 // log.info("type, {}", type);
                   switch(type) {
                       case "label":
                           if (request.get("label") != null && request.get("label").isJsonArray()) {
@@ -131,9 +153,15 @@ public class BundleService {
                           break;
 
                       case "number":
-                          field = getField(key);
-                          field.set(bundle, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+                          Integer numberRequest = request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString());
+                          if (key == "capacity") {
+                              capacity.set(numberRequest);
+                          } else {
+                              field = getField(key);
+                              field.set(bundle, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+                          }
                           break;
+
 
                       case "double":
                           field = getField(key);
@@ -192,10 +220,20 @@ public class BundleService {
 
                       case "multiselectText":
                           // tracks
+                             log.info(key);
                           if (request.get(key) != null && request.get(key).isJsonArray()) {
-                              request.get(key).getAsJsonArray().forEach(item -> {
-                                  newEventTracks.add(eventTrackRepo.findByEventTrackId(item.getAsLong()));
-                              });
+                             switch(key) {
+//                                 case "bundleEventTrack":
+//                                   request.get(key).getAsJsonArray().forEach(item -> {
+//                                       newBundleEventTracks.add(bundleEventTrackService.findByBundleEventTrackId(item.getAsLong()));
+//                                   });
+//                                   break;
+                                 case "bundleDanceRole":
+                                   request.get(key).getAsJsonArray().forEach(item -> {
+                                      newDanceRoles.add(danceRoleService.findByDanceRoleId(item.getAsLong()));
+                                   });
+
+                             }
                           }
                           break;
                       case "multiselectInfo":
@@ -220,16 +258,22 @@ public class BundleService {
         );
         bundle.setPartySlots(newPartySlots);
         bundle.setEventSpecials(newEventSpecials);
-        bundle.setEventTracks(newEventTracks);
+        bundle.setBundleEventTracks(newBundleEventTracks);
+        bundle.setDanceRoles(newDanceRoles);
         save(bundle);
 
         if (isNew) {
             eventBundleRepo.save(
               new EventBundle(
                 bundle,
-                event
+                event,
+                capacity.get()
               )
             );
+        } else {
+            EventBundle eventBundle = eventBundleRepo.findByEventAndBundle(event, bundle);
+            eventBundle.setCapacity(capacity.get());
+            eventBundleRepo.save(eventBundle);
         }
     }
 
@@ -237,22 +281,21 @@ public class BundleService {
     @Transactional
     public void deleteBundle(Bundle bundle) {
         outTextService.delete(bundle.getDescription());
-        bundle.setEventTracks(new HashSet<>());
+        bundle.setBundleEventTracks(new HashSet<>());
         bundle.setPartySlots(new HashSet<>());
         bundle.setEventSpecials(new HashSet<>());
         bundleRepo.delete(bundle);
     }
 
 
-    public Bundle clone(Event event, Bundle baseBundle, Set<EventTrack> eventTracks) {
+    public Bundle clone(Event event, Bundle baseBundle, Map<BundleEventTrack, EventTrack> baseBundleEventTrackNewEventTrackMap) {
 
         String description = outTextService.clone(baseBundle.getDescription());
         Set<Slot> newPartySlots = new HashSet<>(baseBundle.getPartySlots());
         Bundle newBundle = new Bundle(
-          baseBundle.getName(),
+          baseBundle.getName() + " [Clone]",
           baseBundle.getPrice(),
           description,
-          baseBundle.getCapacity(),
           baseBundle.getSimpleTicket(),
           baseBundle.getSeqNr(),
           newPartySlots,
@@ -272,18 +315,72 @@ public class BundleService {
         newBundle.setEventSpecials(newEventSpecials);
 
         // Clone Tracks
-        if (eventTracks == null) {
-            Set<EventTrack> newEventTracks = new HashSet<>(baseBundle.getEventTracks());
-            Set<Track> oldTracks = baseBundle.getEventTracks().stream()
-              .map(EventTrack::getTrack)
-              .collect(Collectors.toSet());
+        if (baseBundleEventTrackNewEventTrackMap == null) {
 
-            newEventTracks.stream()
-              .filter(eventTrack -> oldTracks.contains(eventTrack.getTrack()))
-              .collect(Collectors.toSet());
-            newBundle.setEventTracks(newEventTracks);
+            // Clone Within Event
+
+            // BundleEventTrack
+            Set<BundleEventTrack> newBundleEventTracks = new HashSet<>();
+            baseBundle.getBundleEventTracks().forEach(
+              baseBundleEventTrack -> {
+                newBundleEventTracks.add(
+                  new BundleEventTrack(newBundle, baseBundleEventTrack.getEventTrack(), baseBundleEventTrack.getCapacity())
+                );
+            });
+            newBundle.setBundleEventTracks(newBundleEventTracks);
+
+
+            // Clone Dance Roles
+            baseBundle.getBundleEventTracks().forEach(
+              baseBundleEventTrack -> {
+                  newBundle.getBundleEventTracks().forEach(
+                    newBundleEventTrack -> {
+                        if (newBundleEventTrack.getEventTrack().equals(baseBundleEventTrack.getEventTrack())) {
+                            newBundleEventTrack.setBundleEventTrackDanceRoles(
+                              new HashSet<>()
+                            );
+                            baseBundleEventTrack.getBundleEventTrackDanceRoles().forEach(bundleEventTrackDanceRole -> {
+                                newBundleEventTrack.getBundleEventTrackDanceRoles().add(new
+                                  BundleEventTrackDanceRole(newBundleEventTrack, bundleEventTrackDanceRole.getEventDanceRole())
+                                );
+                            });
+
+                        }
+                    });
+              });
+
         } else {
-            newBundle.setEventTracks(eventTracks);
+
+            // Clone across Events
+            Set<BundleEventTrack> newBundleEventTrackSet = new HashSet<>();
+            baseBundleEventTrackNewEventTrackMap.forEach(
+              (baseBundleEventTrack, newEventTrack) -> {
+
+                // BundleEventTracks
+                if (
+                  baseBundleEventTrack.getBundle().equals(baseBundle)
+                ) {
+                    BundleEventTrack newBundleEventTrack = new BundleEventTrack(newBundle, newEventTrack, baseBundleEventTrack.getCapacity());
+                    newBundleEventTrackSet.add(newBundleEventTrack);
+                    Set<BundleEventTrackDanceRole> newDanceRoles = new HashSet<>();
+                    // Dance Roles
+                    baseBundleEventTrack.getBundleEventTrackDanceRoles().forEach(baseBundleEventTrackDanceRole -> {
+                        newDanceRoles.add(
+                          new BundleEventTrackDanceRole(
+                            newBundleEventTrack,
+                            eventDanceRoleRepo.findByEventAndDanceRole(
+                              newEventTrack.getEvent(),
+                              baseBundleEventTrackDanceRole.getEventDanceRole().getDanceRole()
+                            )
+                          )
+                        );
+                    });
+                    newBundleEventTrack.setBundleEventTrackDanceRoles(newDanceRoles);
+                }
+
+
+            });
+            newBundle.setBundleEventTracks(newBundleEventTrackSet);
         }
         save(newBundle);
 
@@ -300,16 +397,70 @@ public class BundleService {
           .map(EventSpecial::getEventSpecialId)
           .collect(Collectors.toList());
     }
+    public List<Long> bundleDanceroleIds(Bundle bundle) {
+        return bundle.getDanceRoles().stream()
+          .map(DanceRole::getDanceRoleId)
+          .collect(Collectors.toList());
+    }
 
     public List<Long> bundleEventTrackIds(Bundle bundle) {
-        return bundle.getEventTracks().stream()
-          .map(EventTrack::getEventTrackId)
+        return bundle.getBundleEventTracks().stream()
+          .map(BundleEventTrack::getBundleEventTrackId)
           .collect(Collectors.toList());
     }
 
 
     public Set<EventSpecial> findSpecialsByBundle(Bundle bundle) {
         return bundle.getEventSpecials();
+    }
+
+//    public List<Map<String, String>> getEventTrackSchema(Event event){
+//        List<Map<String, String>> eventTracksSchema = EventTrack.schema();
+//        eventTracksSchema.forEach(item -> {
+//            if (item.get("key").equals("track")) {
+//                item.put("list", trackService.getTracksData(event).toString());
+//            }
+//        });
+//        return eventTracksSchema;
+//    }
+
+    public List<Map<String, String>> getBundleEventTrackSchema(Event event){
+        List<Map<String, String>> bundleEventTrackSchema = BundleEventTrack.schema();
+        bundleEventTrackSchema.forEach(item -> {
+            switch (item.get("key")) {
+                case "eventTrack":
+                    item.put("list", trackService.getEventTracksData(event).toString());
+                    break;
+                case "bundleEventTrackDanceRoles":
+                    item.put("list", getEventDanceRolesMap(event).toString());
+                    break;
+            }
+        });
+        return bundleEventTrackSchema;
+    }
+
+    public List<Map<String, String>> getEventDanceRolesMap(Event event) {
+        List<Map<String, String>> eventDanceRoles = new ArrayList<>();
+        event.getEventDanceRoles().forEach(eventDanceRole -> {
+            eventDanceRoles.add(eventDanceRole.dataMap());
+        });
+        return eventDanceRoles;
+    }
+
+
+    public List<Map<String, String>> getBundleEventTrackData(Bundle bundle) {
+        List<Map<String, String>> bundleEventTracksData = new ArrayList<>();
+        bundle.getBundleEventTracks().forEach(
+          bundleEventTrack -> {
+              Map<String, String> bundleEventTrackData = bundleEventTrack.dataMap();
+              bundleEventTrackData.put("bundleEventTrackDanceRoles", bundleEventTrackService.bundleEventTrackEventDanceRoleIds(bundleEventTrack).toString());
+              bundleEventTracksData.add(bundleEventTrackData);
+          });
+        return bundleEventTracksData;
+    }
+
+    public boolean hasTrack(Bundle bundle) {
+        return bundle.getBundleEventTracks() != null && bundle.getBundleEventTracks().size() > 0;
     }
 
 }

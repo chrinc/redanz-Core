@@ -19,6 +19,7 @@ public enum BaseParConfig {
   DOEODREMINDER("doEODReminder"  , true, null),
   REMINDERAFTERDAYS("reminderAfterDays"  , false, "14"),
   CANCELAFTERDAYS("cancelAfterDays"  , false, "3"),
+  WAITLISTLENGTH("waitListLength"  , false, "2"),
   ORGANIZERNAME("organizerName"  , false, "Red Anz");
 
   private final String baseParKey;

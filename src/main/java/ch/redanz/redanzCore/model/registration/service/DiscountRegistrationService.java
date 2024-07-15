@@ -58,9 +58,6 @@ public class DiscountRegistrationService {
 
 
   public void saveCapacityDiscount(Registration registration) {
-//    log.info(eventDiscount.getDiscount().getName());
-//    log.info(registration.getBundle().getName());
-//    log.info(String.valueOf(trackService.bundleHasTrack(registration.getBundle())));
     if (trackService.bundleHasTrack(registration.getBundle())) {
       registration.getTrack().getEventDiscounts().forEach(eventDiscount -> {
         if (
@@ -96,6 +93,7 @@ public class DiscountRegistrationService {
   }
 
   public List<DiscountRegistration> discountRegistrations(Registration registration, JsonObject discountRegistrationRequest) {
+    // log.info(discountRegistrationRequest.toString());
     List<DiscountRegistration> discountRegistrations = new ArrayList<>();
     if (discountRegistrationRequest.get("discountRegistration") != null
       && !discountRegistrationRequest.get("discountRegistration").getAsJsonArray().isEmpty()) {
@@ -198,7 +196,8 @@ public class DiscountRegistrationService {
 
 
   public int countDiscountSubmittedConfirmingDone(Discount discount, Event event) {
-    return countDiscountConfirmingAndDone(discount, event)
+    return countDiscountSubmitted(discount, event)
+      + countDiscountConfirming(discount, event)
       + countDiscountDone(discount, event)
       ;
   }

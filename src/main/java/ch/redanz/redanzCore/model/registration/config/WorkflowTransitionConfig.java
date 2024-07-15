@@ -19,11 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 public enum WorkflowTransitionConfig {
 
   // Submit
-  SUBMIT1(WorkflowStatusConfig.SUBMITTED,  UserConfig.FRANKY_USER.getUsername(), EventConfig.REDANZ_EVENT),
-  SUBMIT2(WorkflowStatusConfig.SUBMITTED,  UserConfig.NORMA_USER.getUsername(), EventConfig.REDANZ_EVENT),
-  SUBMIT4(WorkflowStatusConfig.SUBMITTED,  UserConfig.WILLIAM_USER.getUsername(), EventConfig.REDANZ_EVENT),
-  SUBMIT9(WorkflowStatusConfig.SUBMITTED,  UserConfig.ESTHER_USER.getUsername(), EventConfig.REDANZ_EVENT),
-  SUBMIT10(WorkflowStatusConfig.SUBMITTED, UserConfig.CLAUDIA_USER.getUsername(), EventConfig.REDANZ_EVENT),
+//  SUBMIT1(WorkflowStatusConfig.SUBMITTED,  UserConfig.FRANKY_USER.getUsername(), EventConfig.REDANZ_EVENT),
+//  SUBMIT2(WorkflowStatusConfig.SUBMITTED,  UserConfig.NORMA_USER.getUsername(), EventConfig.REDANZ_EVENT),
+//  SUBMIT4(WorkflowStatusConfig.SUBMITTED,  UserConfig.WILLIAM_USER.getUsername(), EventConfig.REDANZ_EVENT),
+//  SUBMIT9(WorkflowStatusConfig.SUBMITTED,  UserConfig.ESTHER_USER.getUsername(), EventConfig.REDANZ_EVENT),
+//  SUBMIT10(WorkflowStatusConfig.SUBMITTED, UserConfig.CLAUDIA_USER.getUsername(), EventConfig.REDANZ_EVENT),
   SUBMIT11(WorkflowStatusConfig.SUBMITTED, UserConfig.OLIVER_USER.getUsername(), EventConfig.REDANZ_EVENT),
   SUBMIT12(WorkflowStatusConfig.SUBMITTED, UserConfig.HARRY_USER.getUsername(), EventConfig.REDANZ_EVENT),
 

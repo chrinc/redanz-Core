@@ -34,8 +34,6 @@ public class EventPartService {
     eventPartInfoRepo.save(eventPartInfo);
   }
   public EventPartInfo findByEventAndEventPart(Event event, EventPart eventPart) {
-    log.info("findByEventAndEventPart, event: " + event.getName());
-    log.info("findByEventAndEventPart, event: " + eventPart.getEventPartKey());
     return eventPartInfoRepo.findByEventAndEventPart(event, eventPart);
   }
 

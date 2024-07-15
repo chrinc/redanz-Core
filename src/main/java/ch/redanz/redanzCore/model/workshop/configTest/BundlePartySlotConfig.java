@@ -22,7 +22,8 @@ public enum BundlePartySlotConfig {
 
   PARTY_FRI(BundleConfig.PARTY_PASS, SlotConfig.SLOT_FRIDAY),
   PARTY_SAT(BundleConfig.PARTY_PASS, SlotConfig.SLOT_SATURDAY),
-  PARTY_SUN(BundleConfig.PARTY_PASS, SlotConfig.SLOT_SUNDAY),;
+  PARTY_SUN(BundleConfig.PARTY_PASS, SlotConfig.SLOT_SUNDAY)
+  ;
 
   private final BundleConfig bundleConfig;
   private final SlotConfig slotConfig;

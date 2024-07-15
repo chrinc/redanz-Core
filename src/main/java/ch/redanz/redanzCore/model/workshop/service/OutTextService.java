@@ -131,7 +131,6 @@ public class OutTextService {
       outTexts.add(outTextGe);
     } else {
       outTextKey = newLabelKey;
-      log.info(outTextKey);
       outTexts.add(
         new OutText(
           new OutTextId(

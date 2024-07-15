@@ -54,8 +54,6 @@ public class VolunteeringService {
               break;
 
             case "multiselect":
-              log.info("key, {}", key);
-
               if (request.get(key) != null && request.get(key).isJsonArray()) {
 
                 switch(key) {

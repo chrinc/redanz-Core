@@ -44,9 +44,16 @@ public class EventService {
   private final TrackService trackService;
   private final EventPartInfoRepo eventPartInfoRepo;
   private final EventPartService eventPartService;
+  private final DanceRoleService danceRoleService;
+  private final BundleEventTrackService bundleEventTrackService;
+  private final EventDanceRoleRepo eventDanceRoleRepo;
 
   public EventBundle findByEventAndBundle(Event event, Bundle bundle) {
     return eventBundleRepo.findByEventAndBundle(event, bundle);
+  }
+
+  public EventDanceRole findByEventAndDanceRole(Event event, DanceRole danceRole) {
+    return eventDanceRoleRepo.findByEventAndDanceRole(event, danceRole);
   }
 
   public EventDiscount findByEventAndDiscount(Event event, Discount discount) {
@@ -60,8 +67,16 @@ public class EventService {
   public EventSpecial findByEventAndSpecial(Event event, Special special) {
     return eventSpecialRepo.findByEventAndSpecial(event, special);
   }
+
   public EventTrack findByEventAndTrack(Event event, Track track) {
     return eventTrackRepo.findByEventAndTrack(event, track);
+  }
+
+  public BundleEventTrack findByBundleEventAndTrack(Bundle bundle, Event event, Track track) {
+//    log.info("findByEventAndTrack: " + findByEventAndTrack(event, track));
+//    log.info("bundle: " + bundle);
+//    log.info("track: " + track);
+    return bundleEventTrackService.findByBundleAndEventTrack(bundle, findByEventAndTrack(event, track));
   }
 
   public EventFoodSlot findEventFoodSlotByEventAndFood(Event event, Food food, Slot slot) {
@@ -73,9 +88,14 @@ public class EventService {
     eventRepo.save(event);
   }
 
+  public void save(EventDanceRole eventDanceRole) {
+    eventDanceRoleRepo.save(eventDanceRole);
+  }
+
   public boolean eventBundleExists(Event event, Bundle bundle) {
     return eventBundleRepo.existsByEventAndBundle(event, bundle);
   }
+
   public boolean eventTrackExists(Event event, Track track) {
     return eventTrackRepo.existsByEventAndTrack(event, track);
   }
@@ -95,7 +115,8 @@ public class EventService {
   public void save(EventPrivateClass eventPrivateClass) {
     eventPrivateClassRepo.save(eventPrivateClass);
   }
-  public void save (EventPartInfo eventPartInfo) {
+
+  public void save(EventPartInfo eventPartInfo) {
     eventPartInfoRepo.save(eventPartInfo);
   }
 
@@ -122,13 +143,15 @@ public class EventService {
   public List<Event> getActiveEvents() {
     return eventRepo.findAllByActiveAndArchived(true, false);
   }
+
   public List<Event> getActiveEventsFuture() {
     List<Event> activeFutureEvents = new ArrayList<>();
-    eventRepo.findAllByActiveAndArchived(true, false).forEach(event -> {
-      if (event.getEventTo().isAfter(LocalDate.now())) {
-        activeFutureEvents.add(event);
-      }
-    });
+    eventRepo.findAllByActiveAndArchived(true, false).forEach(
+      event -> {
+        if (event.getEventTo().isAfter(LocalDate.now())) {
+          activeFutureEvents.add(event);
+        }
+      });
     return activeFutureEvents;
   }
 
@@ -301,13 +324,14 @@ public class EventService {
         case "bundleSpecial":
           item.put("list", eventSpecialData(event).toString());
           break;
-        case "track":
+        case "tracks":
           item.put("list", eventTrackData(event).toString());
           break;
-
+        case "bundleDanceRole":
+          item.put("list", danceRoleService.getDanceRolesMap().toString());
+          break;
       }
     });
-    log.info(bundleSchema.toString());
 
     return bundleSchema;
   }
@@ -326,7 +350,9 @@ public class EventService {
         bundleData.put("eventId", Long.toString(event.getEventId()));
         bundleData.put("partySlots", bundleService.partySlotIds(eventBundle.getBundle()).toString());
         bundleData.put("bundleSpecial", bundleService.bundleEventSpecialIds(eventBundle.getBundle()).toString());
+        bundleData.put("bundleDanceRole", bundleService.bundleDanceroleIds(eventBundle.getBundle()).toString());
         bundleData.put("track", bundleService.bundleEventTrackIds(eventBundle.getBundle()).toString());
+        bundleData.put("capacity", eventBundle.getCapacity().toString());
         bundlesData.add(bundleData);
       });
 
@@ -565,7 +591,10 @@ public class EventService {
       }
     );
     save(event);
-    if (newEvent) {eventPartService.newBaseEventPartInfo(event);};
+    if (newEvent) {
+      eventPartService.newBaseEventPartInfo(event);
+    }
+    ;
   }
 
 
@@ -616,13 +645,7 @@ public class EventService {
 
 
             case "list":
-              log.info(key);
               field = getEventPrivateField(key);
-              log.info(
-                request.get(key).isJsonNull() ? null : request.get(key).getAsString());
-              log.info(privateClassService.findByPrivateClassId(
-                request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
-              ).toString());
               field.set(eventPrivateClass, privateClassService.findByPrivateClassId(
                 request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
               ));
@@ -659,9 +682,6 @@ public class EventService {
       stringStringMap -> {
         String key = stringStringMap.get("key");
         String type = stringStringMap.get("type");
-        log.info(key);
-        log.info(type);
-
         Field field;
 
         try {
@@ -865,12 +885,14 @@ public class EventService {
     event.setActive(false);
     save(event);
   }
+
   @Transactional
   public void delete(Event event, Track track) {
     List<EventTrack> eventTracks = new ArrayList<>(event.getEventTracks());
     eventTracks.forEach(
       eventTrack -> {
         if (eventTrack.getTrack().equals(track)) {
+          bundleEventTrackService.deleteAllByEventTrack(eventTrack);
           event.getEventTracks().remove(eventTrack);
           trackService.delete(eventTrack.getTrack());
           delete(eventTrack);
@@ -884,10 +906,10 @@ public class EventService {
     Set<EventBundle> eventBundles = new HashSet<>(event.getEventBundles());
     eventBundles.forEach(
       eventBundle -> {
-      event.getEventBundles().remove(eventBundle);
-      bundleService.deleteBundle(eventBundle.getBundle());
-      delete(eventBundle);
-    });
+        event.getEventBundles().remove(eventBundle);
+        bundleService.deleteBundle(eventBundle.getBundle());
+        delete(eventBundle);
+      });
     save(event);
 
     List<EventTrack> eventTracks = new ArrayList<>(event.getEventTracks());
@@ -956,22 +978,30 @@ public class EventService {
     delete(eventPrivateClassRepo.findByEventPrivateClassId(eventPrivateId));
   }
 
+  public void deleteEventDanceRole(JsonObject request) {
+    Long eventDanceRoleId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    eventDanceRoleRepo.deleteById(eventDanceRoleId);
+  }
+
   public void deleteEventSpecial(JsonObject request) {
     Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
     delete(eventSpecialRepo.findByEventSpecialId(eventSpecialId));
   }
+
   public void deleteEventDiscount(JsonObject request) {
     Long eventDiscountId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
     delete(eventDiscountRepo.findByEventDiscountId(eventDiscountId));
   }
 
   public void delete(EventBundle eventBundle) {
+    eventBundle.getEvent().getEventBundles().remove(eventBundle);
     eventBundleRepo.delete(eventBundle);
   }
 
   public void delete(EventTrack eventTrack) {
     eventTrackRepo.delete(eventTrack);
   }
+
   public void delete(EventTypeSlot eventTypeSlot) {
     eventTypeSlotService.delete(eventTypeSlot);
   }
@@ -987,6 +1017,7 @@ public class EventService {
   public void delete(EventSpecial eventSpecial) {
     eventSpecialRepo.delete(eventSpecial);
   }
+
   public void delete(EventFoodSlot eventFoodSlot) {
     eventFoodSlotRepo.delete(eventFoodSlot);
   }
@@ -1032,92 +1063,106 @@ public class EventService {
       save(newPrivateClass);
     });
 
-     // Clone Specials
-     Set<EventSpecial> eventSpecials = new HashSet<>();
-     baseEvent.getEventSpecials().forEach(eventSpecial -> {
-       eventSpecials.add(new EventSpecial(
-         eventSpecial.getSpecial(),
-         newEvent,
-         eventSpecial.getPrice(),
-         false, // initialize not sold out
-         eventSpecial.getCapacity(),
-         eventSpecial.getUrl()
-       )
-       );
-     });
-     newEvent.setEventSpecials(eventSpecials);
+    // Clone Specials
+    Set<EventSpecial> eventSpecials = new HashSet<>();
+    baseEvent.getEventSpecials().forEach(eventSpecial -> {
+      eventSpecials.add(new EventSpecial(
+          eventSpecial.getSpecial(),
+          newEvent,
+          eventSpecial.getPrice(),
+          false, // initialize not sold out
+          eventSpecial.getCapacity(),
+          eventSpecial.getUrl()
+        )
+      );
+    });
+    newEvent.setEventSpecials(eventSpecials);
 
-     // Clone Discounts
-     Set<EventDiscount> eventDiscounts = new HashSet<>();
-     baseEvent.getEventDiscounts().forEach(eventDiscount -> {
-       eventDiscounts.add(
-         new EventDiscount(
-         eventDiscount.getDiscount(),
-         newEvent,
-         eventDiscount.getDiscountAmount(),
-         eventDiscount.getCapacity()
-         )
-       );
-     });
-     newEvent.setEventDiscounts(eventDiscounts);
+    // Clone Discounts
+    Set<EventDiscount> eventDiscounts = new HashSet<>();
+    baseEvent.getEventDiscounts().forEach(eventDiscount -> {
+      eventDiscounts.add(
+        new EventDiscount(
+          eventDiscount.getDiscount(),
+          newEvent,
+          eventDiscount.getDiscountAmount(),
+          eventDiscount.getCapacity()
+        )
+      );
+    });
+    newEvent.setEventDiscounts(eventDiscounts);
 
     // Clone Food
-     Set<EventFoodSlot> eventFoodSlots = new HashSet<>();
-     baseEvent.getEventFoodSlots().forEach(eventFoodSlot -> {
-       eventFoodSlots.add(new EventFoodSlot(
-         eventFoodSlot.getFood(),
-         eventFoodSlot.getSlot(),
-         newEvent,
-         eventFoodSlot.getPrice(),
-         eventFoodSlot.getSeqNr()
-       )
-       );
-     });
-     newEvent.setEventFoodSlots(eventFoodSlots);
-     save(newEvent);
+    Set<EventFoodSlot> eventFoodSlots = new HashSet<>();
+    baseEvent.getEventFoodSlots().forEach(eventFoodSlot -> {
+      eventFoodSlots.add(new EventFoodSlot(
+          eventFoodSlot.getFood(),
+          eventFoodSlot.getSlot(),
+          newEvent,
+          eventFoodSlot.getPrice(),
+          eventFoodSlot.getSeqNr()
+        )
+      );
+    });
+    newEvent.setEventFoodSlots(eventFoodSlots);
+    save(newEvent);
 
-     // Clone Tracks
-     Map<Bundle, Set<EventTrack>> baseBundleNewEventTrackList = new HashMap<>();
-     Set<Bundle> baseBundles = baseEvent.getEventBundles().stream().map(EventBundle::getBundle)
-       .collect(Collectors.toSet());
-    baseBundles.forEach(bundle -> {
-      baseBundleNewEventTrackList.put(bundle, new HashSet<>());
+    // Clone Event Dance Roles
+    Set<EventDanceRole> newEventDanceroles = new HashSet<>();
+    baseEvent.getEventDanceRoles().forEach(baseEventDanceRole -> {
+      newEventDanceroles.add(new EventDanceRole(
+        newEvent
+        ,baseEventDanceRole.getDanceRole()
+        ,baseEventDanceRole.getHint()
+      ));
+    });
+    newEvent.setEventDanceRoles(newEventDanceroles);
+    save(newEvent);
+
+
+    // Clone Tracks
+    Map<BundleEventTrack, EventTrack> baseBundleEventTrackNewEventTrackList = new HashMap<>();
+//    Set<Bundle> baseBundles = baseEvent.getEventBundles().stream().map(EventBundle::getBundle)
+//      .collect(Collectors.toSet());
+    baseEvent.getEventBundles().forEach(baseEventBundle -> {
+      if (bundleService.hasTrack(baseEventBundle.getBundle()))
+        baseEventBundle.getBundle().getBundleEventTracks().forEach(
+          baseBundleEventTrack -> {
+            baseBundleEventTrackNewEventTrackList.put(baseBundleEventTrack, null);
+      });
     });
 
     newEvent.setEventTracks(new HashSet<>());
     baseEvent.getEventTracks().forEach(baseEventTrack -> {
       Track baseTrack = baseEventTrack.getTrack();
-      Track newTrack = trackService.clone(newEvent, baseTrack);
+      EventTrack newEventTrack = trackService.clone(newEvent, baseTrack);
       save(newEvent);
-      Set<Bundle> baseBundlesWithTrack = baseEvent.getEventBundles().stream()
-        .filter(eventBundle -> eventBundle.getBundle().getEventTracks().contains(baseEventTrack))
-        .map(EventBundle::getBundle).collect(Collectors.toSet());
-      baseBundlesWithTrack.forEach(baseBundleWithTrack -> {
-        baseBundleNewEventTrackList.put(
-          baseBundleWithTrack,
-          newEvent.getEventTracks().stream().filter(
-            eventTrack -> eventTrack.getTrack().equals(newTrack)
-          ).collect(Collectors.toSet()));
+
+      baseEvent.getEventBundles().forEach(baseEventBundle -> {
+        baseEventBundle.getBundle().getBundleEventTracks().forEach(
+          baseBundleEventTrack -> {
+          if (baseBundleEventTrack.getEventTrack().equals(baseEventTrack)) {
+            baseBundleEventTrackNewEventTrackList.put(baseBundleEventTrack, newEventTrack);
+          }
+        });
+
       });
     });
-
     save(newEvent);
 
     // Clone Bundles
     Set<EventBundle> eventBundles = new HashSet<>();
     baseEvent.getEventBundles().forEach(
-      eventBundle -> {
-        Bundle baseBundle = eventBundle.getBundle();
-
-        Bundle newBundle =  bundleService.clone(newEvent, baseBundle, baseBundleNewEventTrackList.get(baseBundle));
-        eventBundles.add(new EventBundle(newBundle, newEvent));
+      baseEventBundle -> {
+        Bundle baseBundle = baseEventBundle.getBundle();
+        Bundle newBundle = bundleService.clone(newEvent, baseBundle, baseBundleEventTrackNewEventTrackList);
+        eventBundles.add(new EventBundle(newBundle, newEvent, baseEventBundle.getCapacity()));
       });
     newEvent.setEventBundles(eventBundles);
     save(newEvent);
 
     // clone eventPartInfo
     eventPartService.clone(baseEvent, newEvent);
-
   }
 
   public List<EventPrivateClass> findPrivateClassesByEvent(Event event) {
@@ -1183,6 +1228,18 @@ public class EventService {
     return eventDiscountSchema;
   }
 
+  public List<Map<String, String>> eventDanceRoleSchema() {
+    List<Map<String, String>> eventDanceRoleSchema = EventDanceRole.schema();
+    eventDanceRoleSchema.forEach(item -> {
+      switch (item.get("key")) {
+        case "danceRole":
+          item.put("list", danceRoleService.getDanceRolesMap().toString());
+          break;
+      }
+    });
+    return eventDanceRoleSchema;
+  }
+
   public List<Long> eventPrivatesIds(Event event) {
     return event.getEventPrivates().stream()
       .map(EventPrivateClass::getEventPrivateClassId)
@@ -1201,8 +1258,6 @@ public class EventService {
         eventPrivateData.put("price", String.valueOf(eventPrivate.getPrice()));
         eventPrivateDataList.add(eventPrivateData);
       });
-    log.info(eventPrivateDataList.toString());
-
     return eventPrivateDataList;
   }
 
@@ -1221,9 +1276,9 @@ public class EventService {
       });
     return eventSpecialDataList;
   }
+
   public List<Map<String, String>> eventTrackData(Event event) {
     List<Map<String, String>> eventTrackDataList = new ArrayList<>();
-    log.info("eventTrackData: {}", event.getEventTracks().size());
     event.getEventTracks().forEach(
       eventTrack -> {
         Map<String, String> eventTrackData = eventTrack.dataMap();
@@ -1252,6 +1307,21 @@ public class EventService {
     return eventDiscountDataList;
   }
 
+  public List<Map<String, String>> eventDanceRoleData(Event event) {
+    List<Map<String, String>> eventDanceRoleDataList = new ArrayList<>();
+    event.getEventDanceRoles().forEach(
+      eventDanceRole -> {
+        Map<String, String> evetDanceRoleData = eventDanceRole.dataMap();
+        evetDanceRoleData.put("eventId", Long.toString(event.getEventId()));
+        evetDanceRoleData.put("id", Long.toString(eventDanceRole.getEventDanceRoleId()));
+        evetDanceRoleData.put("name", eventDanceRole.getDanceRole().getName());
+        evetDanceRoleData.put("hint", eventDanceRole.getHint());
+        eventDanceRoleDataList.add(evetDanceRoleData);
+      });
+    return eventDanceRoleDataList;
+  }
+
+
   public boolean hasEventSpecial(Event event, Special special) {
     return eventSpecialRepo.existsByEventAndSpecial(event, special);
   }
@@ -1259,11 +1329,33 @@ public class EventService {
   public List<Map<String, String>> getTermsSchema() {
     return new ArrayList<>() {
       {
-        add(new HashMap<>() {{put("key", "id");               put("type", "id");           put("label", "id");}});
-        add(new HashMap<>() {{put("key", "requireTerms");     put("type", "bool");         put("labelTrue", "Enable Terms"); put("labelFalse", "Disable Terms");}});
-        add(new HashMap<>() {{put("key", "eventPartInfo");    put("type", "partInfo");     put("eventPartKey", "terms");    put("label", OutTextConfig.LABEL_TERMS_INFO_EN.getOutTextKey());}});
-        add(new HashMap<>() {{put("key", "plural");           put("type", "title");        put("label", OutTextConfig.LABEL_TERMS_EN.getOutTextKey()); }});
-        add(new HashMap<>() {{put("key", "singular");         put("type", "title");        put("label", OutTextConfig.LABEL_TERMS_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{
+          put("key", "id");
+          put("type", "id");
+          put("label", "id");
+        }});
+        add(new HashMap<>() {{
+          put("key", "requireTerms");
+          put("type", "bool");
+          put("labelTrue", "Enable Terms");
+          put("labelFalse", "Disable Terms");
+        }});
+        add(new HashMap<>() {{
+          put("key", "eventPartInfo");
+          put("type", "partInfo");
+          put("eventPartKey", "terms");
+          put("label", OutTextConfig.LABEL_TERMS_INFO_EN.getOutTextKey());
+        }});
+        add(new HashMap<>() {{
+          put("key", "plural");
+          put("type", "title");
+          put("label", OutTextConfig.LABEL_TERMS_EN.getOutTextKey());
+        }});
+        add(new HashMap<>() {{
+          put("key", "singular");
+          put("type", "title");
+          put("label", OutTextConfig.LABEL_TERMS_EN.getOutTextKey());
+        }});
 
       }
 
@@ -1282,8 +1374,6 @@ public class EventService {
   public List<Map<String, String>> getTermsData(Event event) {
     List<Map<String, String>> termsData = new ArrayList<>();
     termsData.add(termsDataMap(event));
-//    log.info("termsdata:");
-//    log.info(termsData.toString());
     return termsData;
   }
 
@@ -1295,7 +1385,7 @@ public class EventService {
         Field field;
 
         try {
-          switch(type) {
+          switch (type) {
             case "bool":
               field = getField(key);
               field.set(event, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
@@ -1318,6 +1408,138 @@ public class EventService {
     eventRepo.save(event);
   }
 
+  @Transactional(readOnly = true)
+  public Integer getEventCapacity(Event event) {
+    return eventRepo.findCapacityByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
+  public boolean getEventSoldOut(Event event) {
+    return eventRepo.findSoldOutByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
+  public Set<EventBundle> findAllEventBundles(Event event) {
+    return eventRepo.findAllEventBundlesByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
+  public Set<EventTrack> findAllEventTracks(Event event) {
+    return eventRepo.findAllEventTracksByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
+  public Set<EventSpecial> findAllEventSpecials(Event event) {
+    return eventRepo.findAllEventSpecialsByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
+  public Set<EventPrivateClass> findAllEventPrivates(Event event) {
+    return eventRepo.findAllEventPrivatesByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
+  public String findEventName(Event event) {
+    return eventRepo.findEventNameByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
+  public boolean findIsActive(Event event) {
+    return eventRepo.findIsActiveByEventId(event.getEventId());
+  }
+//  public Integer eventCapacity(Event event) {
+//    return eventRepo.findCapacityByEventId(event.getEventId());
+//  }
+
+
+  public Field getEventDanceRoleField(String key) {
+    Field field;
+    try {
+      field = EventDanceRole.class.getDeclaredField(key);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+    field.setAccessible(true);
+    return field;
+  }
+
+  public void updateEventDanceRole(JsonObject request) throws IOException, TemplateException {
+    Long eventDanceRoleId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+    EventDanceRole eventDanceRole;
+    if (eventDanceRoleId == null || eventDanceRoleId == 0) {
+      eventDanceRole = new EventDanceRole();
+      eventDanceRole.setEvent(findByEventId(request.get("eventId").isJsonNull() ? null : request.get("eventId").getAsLong()));
+    } else {
+      eventDanceRole = eventDanceRoleRepo.findByEventDanceRoleId(eventDanceRoleId);
+    }
+
+    EventDanceRole.schema().forEach(
+      stringStringMap -> {
+        String key = stringStringMap.get("key");
+        String type = stringStringMap.get("type");
+        Field field;
+
+        try {
+          switch (type) {
+            case "label":
+              if (request.get("label") != null && request.get("label").isJsonArray()) {
+                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
+
+                if (outTextKey != null) {
+                  field = getEventDanceRoleField(key);
+                  field.set(eventDanceRole, outTextKey);
+                }
+              }
+              break;
+            case "text":
+              field = getEventDanceRoleField(key);
+              field.set(eventDanceRole, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
+              break;
+
+            case "number":
+              field = getEventDanceRoleField(key);
+              field.set(eventDanceRole, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
+              break;
+
+            case "double":
+              field = getEventDanceRoleField(key);
+              field.set(eventDanceRole, request.get(key).isJsonNull() ? null : Double.parseDouble(request.get(key).getAsString()));
+              break;
+
+
+            case "color":
+              field = getEventDanceRoleField(key);
+              field.set(eventDanceRole, request.get(key).isJsonNull() ? null :
+                request.get(key).getAsJsonObject().isJsonNull() ? request.get(key).getAsString() :
+                  request.get(key).getAsJsonObject().get("hex").getAsString());
+              break;
+
+            case "bool":
+              field = getEventDanceRoleField(key);
+              field.set(eventDanceRole, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
+              break;
+
+            case "listText":
+              field = getEventDanceRoleField(key);
+              switch (key) {
+                case "danceRole":
+                  field.set(eventDanceRole, danceRoleService.findByDanceRoleId(
+                    request.get(key).isJsonNull() ? null : Long.parseLong(request.get(key).getAsString())
+                  ));
+                  break;
+              }
+              break;
+
+            default:
+              // Nothing will happen here
+          }
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    );
+    save(eventDanceRole);
+  }
 
 
 }

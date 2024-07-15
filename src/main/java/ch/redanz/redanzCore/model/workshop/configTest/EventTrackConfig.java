@@ -19,7 +19,7 @@ import java.util.List;
 public enum EventTrackConfig {
   REDANZ_ADVANCED(EventConfig.REDANZ_EVENT, TrackConfig.ADVANCED),
   REDANZ_INTEREMDIATEE(EventConfig.REDANZ_EVENT, TrackConfig.INTERMEDIATE),
-  REDANZ_NO_LEVEL(EventConfig.REDANZ_EVENT, TrackConfig.NO_LEVEL);
+  REDANZ_NO_LEVEL(EventConfig.REDANZ_EVENT, TrackConfig.NO_LEVEL)
   ;
 
   private final EventConfig eventConfig;

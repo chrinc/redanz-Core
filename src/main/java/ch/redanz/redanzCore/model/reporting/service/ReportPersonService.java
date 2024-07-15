@@ -61,7 +61,7 @@ public class ReportPersonService {
           , registration.getParticipant().getPostalCode()
           , registration.getParticipant().getCity()
           , registration.getParticipant().getCountry().getName()
-          , registration.getParticipant().getPersonLang().getName()
+          , registration.getParticipant().getPersonLang().getLanguageKey()
           , registration.getDanceRole() == null ? null : registration.getDanceRole().getName()
         )
       );

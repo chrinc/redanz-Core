@@ -11,7 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public enum BundleEventSpecialConfig {
   FULL_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, BundleConfig.FULL_PASS),
-  HALF_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, BundleConfig.HALF_PASS);
+  HALF_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, BundleConfig.HALF_PASS),
+  ;
 
   private final EventConfig eventConfig;
   private final SpecialConfig specialConfig;

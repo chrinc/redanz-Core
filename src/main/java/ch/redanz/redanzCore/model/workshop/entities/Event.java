@@ -34,6 +34,8 @@ public class Event implements Serializable {
   private List<VolunteerType> volunteerTypes;
 
   private String name;
+
+  @Column(name = "capacity")
   private Integer capacity;
 
   @Column(name = "sold_out")
@@ -86,6 +88,9 @@ public class Event implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventPartInfo> eventPartInfoSet;
 
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  private Set<EventDanceRole> eventDanceRoles;
+
   public Event() {
   }
 
@@ -137,6 +142,7 @@ public class Event implements Serializable {
         add(new HashMap<>() {{put("key", "bundle");               put("type", "attribute");                              put("label", "Bundles");}});
         add(new HashMap<>() {{put("key", "track");                put("type", "attribute");                              put("label", "Tracks");}});
         add(new HashMap<>() {{put("key", "foodSlot");             put("type", "attribute");                              put("label", "Food");}});
+        add(new HashMap<>() {{put("key", "eventDanceRole");         put("type", "attribute");                              put("label", "Dance Roles");}});
         add(new HashMap<>() {{put("key", "eventPrivate");         put("type", "attribute");                              put("label", "Private Classes");}});
         add(new HashMap<>() {{put("key", "eventSpecial");         put("type", "attribute");                              put("label", "Specials");}});
         add(new HashMap<>() {{put("key", "eventDiscount");        put("type", "attribute");                              put("label", "Discounts");}});

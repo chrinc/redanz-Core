@@ -43,8 +43,9 @@ public class EventTrack {
     return new ArrayList<>() {
       {
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                 put("label", "id");}});
-        add(new HashMap<>() {{put("key", "track");                put("type", "list");    put("required", "true");   put("label", "Track"); put("list", null);}});
-//        add(new HashMap<>() {{put("eventPartKey", "price");                put("type", "double");  put("required", "false");   put("label", "Price");}});
+        add(new HashMap<>() {{ put("key", "track");  put("type", "multiselectText");        put("required", "false");      put("label", "Track");  put("list", null);}});
+
+        //        add(new HashMap<>() {{put("eventPartKey", "price");                put("type", "double");  put("required", "false");   put("label", "Price");}});
 //        add(new HashMap<>() {{put("eventPartKey", "capacity");             put("type", "number");  put("required", "true");   put("label", "Capacity");}});
 //        add(new HashMap<>() {{put("eventPartKey", "url");                  put("type", "label");   put("required", "false");  put("label", "Web Url");}});
       }
@@ -57,7 +58,6 @@ public class EventTrack {
         put("id", String.valueOf(eventTrackId));
         put("track", null);
 //        put("price", String.valueOf(price));
-//        put("capacity", String.valueOf(capacity));
 //        put("url", url);
       }
     };
