@@ -82,6 +82,7 @@ public class RegistrationService {
       }
     }
 
+
     // Bundle
     AtomicBoolean allBundlesSoldOut = new AtomicBoolean(true);
     eventService.findAllEventBundles(event).forEach(eventBundle -> {
@@ -129,14 +130,6 @@ public class RegistrationService {
               && bundleEventTrackDanceRole.getEventDanceRole().getDanceRole() != danceRoleService.getSwitchDanceRole()
               && roleOpen >= (open / danceRolesCount) + waitListLength;
 
-//            log.info("danceRole: " + bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().getName() + " sold out?: " + danceRoleSoldOut);
-//            log.info("because roleOpen: " + roleOpen);
-//            log.info(", open: " + open);
-//            log.info(", danceRolesCount: " + danceRolesCount);
-//            log.info(", waitListLength: " + waitListLength);
-//            log.info(", (open / danceRolesCount) + waitListLength: " + ((open / danceRolesCount) + waitListLength));
-
-
             if (danceRoleSoldOut != bundleEventTrackDanceRole.isSoldOut()) {
               bundleEventTrackDanceRole.setSoldOut(danceRoleSoldOut);
               bundleEventTrackService.save(bundleEventTrackDanceRole);
@@ -178,7 +171,7 @@ public class RegistrationService {
       }
     });
 
-    if (allBundlesSoldOut.get() != event.isSoldOut()) {
+    if (allBundlesSoldOut.get() != eventService.getEventSoldOut(event)) {
       event.setSoldOut(allBundlesSoldOut.get());
       eventService.save(event);
     }
@@ -466,14 +459,19 @@ public class RegistrationService {
   }
 
   public void onDelete(Registration registration) throws TemplateException, IOException {
-    registration.setActive(false);
+    try {
+      registration.setActive(false);
 
-    update(registration);
-    workflowTransitionService.setWorkflowStatus(
-      registration,
-      workflowStatusService.getDeleted()
-    );
-    updateSoldOut(registration.getEvent());
+      update(registration);
+      workflowTransitionService.setWorkflowStatus(
+        registration,
+        workflowStatusService.getDeleted()
+      );
+      updateSoldOut(registration.getEvent());
+    } catch (Exception exception) {
+      errorLogService.addLog(ErrorLogType.SUBMIT_DELETE.toString(), exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
+    }
   }
 
   public void onDeleteHost(Registration registration) throws TemplateException, IOException {

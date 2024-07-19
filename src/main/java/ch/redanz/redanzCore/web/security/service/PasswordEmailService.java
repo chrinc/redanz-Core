@@ -46,8 +46,7 @@ public class PasswordEmailService {
     Map<String, Object> model = new HashMap<>();
     Person person = personService.findByUser(user);
     model.put("headerLink", environment.getProperty("link.login"));
-    model.put("loginLink", environment.getProperty("link.login") + "/" + person.getPersonLang().getLanguageKey().toLowerCase());
-
+    model.put("resetLink", link);
     model.put("firstName", person.getFirstName());
     Template template = mailConfig.getTemplate("resetPassword.ftl");
 

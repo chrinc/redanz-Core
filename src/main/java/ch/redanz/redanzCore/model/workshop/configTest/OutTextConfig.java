@@ -365,7 +365,7 @@ public enum OutTextConfig {
   LABEL_VOLUNTEER_INTRO_TITLE_EXIST_EN("FRONT_LOGIN"     , "LABEL-VOLUNTEER-INTRO-TITLE-EXIST" , "Introduction"                              , "EN"),
   LABEL_VOLUNTEER_INTRO_TITLE_EXIST_GE("FRONT_LOGIN"     , "LABEL-VOLUNTEER-INTRO-TITLE-EXIST" , "Über dich"                       , "GE"),
   LABEL_VOLUNTEER_INTRO_HINT_EN("FRONT_LOGIN"            , "LABEL-VOLUNTEER-INTRO-HINT"        , "Abilities, preferences, etc."                       , "EN"),
-  LABEL_VOLUNTEER_INTRO_HINT_GE("FRONT_LOGIN"            , "LABEL-VOLUNTEER-INTRO-HINT"        , "Anzahl Personen"                         , "GE"),
+  LABEL_VOLUNTEER_INTRO_HINT_GE("FRONT_LOGIN"            , "LABEL-VOLUNTEER-INTRO-HINT"        , "Fähigkeiten, Präferenzen, etc."                         , "GE"),
 
   LABEL_VOLUNTEER_MOBILE_TITLE_EN(      "FRONT_LOGIN"    , "LABEL-VOLUNTEER-COMMENT-TITLE"       , "Your mobile number?"       , "EN"),
   LABEL_VOLUNTEER_MOBILE_TITLE_GE(      "FRONT_LOGIN"    , "LABEL-VOLUNTEER-COMMENT-TITLE"       , "Wie lautet deine Handynummer?"  , "GE"),
@@ -391,15 +391,15 @@ public enum OutTextConfig {
   LABEL_SCHOLARSHIP_YES_TITLE_GE(      "FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE"           , "Möchtest du dich für ein Stipendium bewerben?"           , "GE"),
   LABEL_SCHOLARSHIP_YES_TITLE_EXIST_EN("FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE-EXIST"     , "Apply for scholarship"            , "EN"),
   LABEL_SCHOLARSHIP_YES_TITLE_EXIST_GE("FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE-EXIST"     , "Für Stipendium bewerben"                       , "GE"),
-  LABEL_SCHOLARSHIP_YES_HINT_EN("FRONT_LOGIN"              , "LABEL-SCHOLARSHIP-YES-HINT"        , "This information will be treated confidentially"                       , "EN"),
-  LABEL_SCHOLARSHIP_YES_HINT_GE("FRONT_LOGIN"              , "LABEL-SCHOLARSHIP-YES-HINT"        , "Diese Information wird vertraulich behandelt"                         , "GE"),
+  LABEL_SCHOLARSHIP_YES_HINT_EN("FRONT_LOGIN"              , "LABEL-SCHOLARSHIP-YES-HINT"        , "This information will be treated confidentially."                       , "EN"),
+  LABEL_SCHOLARSHIP_YES_HINT_GE("FRONT_LOGIN"              , "LABEL-SCHOLARSHIP-YES-HINT"        , "Diese Information wird vertraulich behandelt."                         , "GE"),
 
   LABEL_SCHOLARSHIP_INTRO_TITLE_EN(      "FRONT_LOGIN"     , "LABEL-SCHOLARSHIP-INTRO-TITLE"       , "Please describe why you need a scholarship"        , "EN"),
   LABEL_SCHOLARSHIP_INTRO_TITLE_GE(      "FRONT_LOGIN"     , "LABEL-SCHOLARSHIP-INTRO-TITLE"       , "Bitte Beschreibe kurz, weshalb du ein Stipendium benötigst"      , "GE"),
   LABEL_SCHOLARSHIP_INTRO_TITLE_EXIST_EN("FRONT_LOGIN"     , "LABEL-SCHOLARSHIP-INTRO-TITLE-EXIST" , "Scholarship justification"                                 , "EN"),
   LABEL_SCHOLARSHIP_INTRO_TITLE_EXIST_GE("FRONT_LOGIN"     , "LABEL-SCHOLARSHIP-INTRO-TITLE-EXIST" , "Begründung Stipendium"                     , "GE"),
-  LABEL_SCHOLARSHIP_INTRO_HINT_EN("FRONT_LOGIN"            , "LABEL-SCHOLARSHIP-INTRO-HINT"        , "Please don't exceed 30 words"                       , "EN"),
-  LABEL_SCHOLARSHIP_INTRO_HINT_GE("FRONT_LOGIN"            , "LABEL-SCHOLARSHIP-INTRO-HINT"        , "Bitte nicht mehr als 30 Wörter"                         , "GE"),
+  LABEL_SCHOLARSHIP_INTRO_HINT_EN("FRONT_LOGIN"            , "LABEL-SCHOLARSHIP-INTRO-HINT"        , "Please don't exceed 30 words."                       , "EN"),
+  LABEL_SCHOLARSHIP_INTRO_HINT_GE("FRONT_LOGIN"            , "LABEL-SCHOLARSHIP-INTRO-HINT"        , "Bitte nicht mehr als 30 Wörter."                         , "GE"),
   LABEL_SCHOLARSHIP_INTRO_HINT2_EN("FRONT_LOGIN"           , "LABEL-SCHOLARSHIP-INTRO-HINT2"        , "Your justification"                       , "EN"),
   LABEL_SCHOLARSHIP_INTRO_HINT2_GE("FRONT_LOGIN"           , "LABEL-SCHOLARSHIP-INTRO-HINT2"        , "Deine Begründung"                         , "GE"),
 

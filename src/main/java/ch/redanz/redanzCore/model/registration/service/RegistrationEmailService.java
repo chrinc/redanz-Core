@@ -359,7 +359,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_HEADER01_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", registration.getEvent().getName())
+      ).getOutText().replace("{1}", eventService.findEventName(registration.getEvent()))
     );
     model.put("header02",
       outTextService.getOutTextByKeyAndLangKey(
@@ -409,7 +409,7 @@ public class RegistrationEmailService {
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       ,baseParService.testMailOnly()
       ,baseParService.testEmail()
-      ,!registration.getEvent().isActive()
+      ,!eventService.findIsActive(registration.getEvent())
       ,null
     );
 
