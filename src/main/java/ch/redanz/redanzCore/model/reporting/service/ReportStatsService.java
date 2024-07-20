@@ -6,6 +6,7 @@ import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseStats;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,8 @@ public class ReportStatsService {
   private final EventService eventService;
   private final BundleEventTrackService bundleEventTrackService;
   public List<ResponseStats> getStatsReport(Language language, Event event) {
+    String yes = outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_YES_EN.getOutTextKey(), language.getLanguageKey()).getOutText();
+    String no = outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_NO_EN.getOutTextKey(), language.getLanguageKey()).getOutText();
     List<ResponseStats> stats = new ArrayList<>();
     stats.add(
       new ResponseStats(
@@ -41,7 +44,7 @@ public class ReportStatsService {
         ,registrationService.countConfirmingAndSplitRoles(event)
         ,registrationService.countDoneAndSplitRoles(event)
         ,event.getCapacity()
-        ,event.isSoldOut()
+        ,event.isSoldOut() ? yes : no
       )
     );
 
@@ -60,7 +63,7 @@ public class ReportStatsService {
               , registrationService.countTracksByBundleConfirmingAndSplitRoles(track, bundle, event)
               , registrationService.countTracksByBundleDoneAndSplitRoles(track, bundle, event)
               , bundleEventTrack.getCapacity()
-              , eventBundle.isSoldOut() || bundleEventTrack.isSoldOut()
+              , eventBundle.isSoldOut() || bundleEventTrack.isSoldOut() ? yes : no
             )
           );
         });
@@ -76,7 +79,7 @@ public class ReportStatsService {
           ,registrationService.countBundlesConfirmingAndSplitRoles(bundle, event)
           ,registrationService.countBundlesDoneAndSplitRoles(bundle, event)
           ,eventService.findByEventAndBundle(event, bundle).getCapacity()
-          ,eventService.findByEventAndBundle(event, bundle).isSoldOut()
+          ,eventService.findByEventAndBundle(event, bundle).isSoldOut() ? yes : no
         )
       );
     });
@@ -93,7 +96,7 @@ public class ReportStatsService {
          ,specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
          ,specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
          ,eventSpecial.getCapacity()
-         ,eventSpecial.getSoldOut()
+         ,eventSpecial.getSoldOut() ? yes : no
         )
       );
     });
@@ -140,7 +143,7 @@ public class ReportStatsService {
           ,specialRegistrationService.countPrivatesConfirmingAndSplitRoles(privateClass, event)
           ,specialRegistrationService.countPrivatesDoneAndSplitRoles(privateClass, event)
           ,eventPrivateClass.getCapacity()
-          ,eventPrivateClass.getSoldOut()
+          ,eventPrivateClass.getSoldOut() ? yes : no
         )
       );
     });
@@ -157,7 +160,7 @@ public class ReportStatsService {
           , foodRegistrationService.countFoodSlotConfirmingAsList(food, slot, event)
           , foodRegistrationService.countFoodSlotDoneAsList(food, slot, event)
           , null
-          , false
+          , no
 
         )
       );
@@ -182,7 +185,8 @@ public class ReportStatsService {
           , discountRegistrationService.countDiscountConfirmingAsList(discount, event)
           , discountRegistrationService.countDiscountDoneAsList(discount, event)
           , eventDiscount.getCapacity()
-          , eventDiscount.getCapacity() == null ? false : discountRegistrationService.countDiscountSubmittedConfirmingAndDone(discount, event) >= eventDiscount.getCapacity()
+          , eventDiscount.getCapacity() == null ? no
+            : discountRegistrationService.countDiscountSubmittedConfirmingAndDone(discount, event) >= eventDiscount.getCapacity() ? yes : no
         )
       );
     });

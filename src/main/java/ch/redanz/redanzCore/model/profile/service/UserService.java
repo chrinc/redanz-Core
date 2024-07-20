@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.profile.service;
 
 import ch.redanz.redanzCore.model.profile.entities.User;
+import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.repository.TestUserRepo;
 import ch.redanz.redanzCore.model.profile.repository.UserRepo;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
@@ -106,6 +107,15 @@ public class UserService implements UserDetailsService {
     );
     confirmationTokenService.saveConfirmationToken(confirmationToken);
     return token;
+  }
+
+  public UserRole findUserRoleByName(String userRoleName) {
+    return UserRole.valueOf(userRoleName);
+  }
+
+  public void changeUserRole(User user, UserRole userRole) {
+    user.setUserRole(userRole);
+    save(user);
   }
 
   public void enableUser(String username) {

@@ -38,18 +38,13 @@ public class UserRegistrationService {
     if (!isValidEmail) {
       throw new IllegalStateException("email not valid");
     }
-//
-//    log.info("request {}", request);
-//    log.info(request.toString());
-//    log.info(request.getUsername());
-//    log.info(request.getPassword());
 
     String token = userService.signUpNewUser(
       new User(
         request.getUsername(),
         request.getPassword(),
-        userService.usernameIsTester(request.getUsername()) ? UserRole.ORGANIZER :
-        UserRole.PARTICIPANT) // @Todo variable?
+        UserRole.PARTICIPANT
+      )
     );
     return token;
   }

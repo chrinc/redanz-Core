@@ -1,5 +1,10 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
+import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.entities.UserRole;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
+import ch.redanz.redanzCore.model.profile.service.UserRegistrationService;
+import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.jobs.EODCancelJob;
 import ch.redanz.redanzCore.model.registration.jobs.EODMatchingJob;
 import ch.redanz.redanzCore.model.registration.jobs.EODReleaseJob;
@@ -35,6 +40,8 @@ public class JobController {
   private final RegistrationService registrationService;
   private final RegistrationMatchingService registrationMatchingService;
   private final ErrorLogService errorLogService;
+  private final PersonService personService;
+  private final UserService userService;
   @GetMapping(path = "/run-cancel")
   public void runCancel(
     @RequestParam("eventId") Long eventId
@@ -104,6 +111,23 @@ public class JobController {
     try {
       Event event = eventService.findByEventId(eventId);
       checkInService.resetByEvent(event);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @GetMapping (path = "/change-role")
+  @Transactional
+  public void createCheckIn(
+    @RequestParam("personId") Long personId,
+    @RequestParam("role") String userRoleName
+  ) {
+    try {
+      Person person = personService.findByPersonId(personId);
+      UserRole userRole = userService.findUserRoleByName(userRoleName);
+      userService.changeUserRole(person.getUser(), userRole);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
