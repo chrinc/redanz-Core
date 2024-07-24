@@ -7,6 +7,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.service.EventPartService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
@@ -36,7 +37,7 @@ public class RegistrationEmailService {
   private final UserService userService;
   private final EmailService emailService;
   private final EventService eventService;
-//  private final RegistrationService registrationService;
+  private final EventPartService eventPartService;
   @Autowired
   Environment environment;
 
@@ -136,8 +137,8 @@ public class RegistrationEmailService {
     Registration registration
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    String lang = person.getPersonLang().getLanguageKey().toLowerCase();
     model.put("headerLink", environment.getProperty("link.login"));
+    model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", person.getFirstName());
     Template template = mailConfig.getTemplate("registrationDone.ftl");
 
@@ -157,6 +158,98 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText()
     );
+    model.put("details",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_DETAILS01_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("account",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText().replace("{1}", baseParService.organizerName())
+    );
+
+    model.put("questions",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_QUESTIONS_ABOUT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("cancellation",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CANCELLATION_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("refund",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REFUND_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("ticketTransfer",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TICKET_TRANSFER_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("waitingLists",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_WAITING_LISTS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("photoVideo",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_PHOTO_VIDEO_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("andMore",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_AND_MORE_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("checkOutTerms",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CHECK_TERMS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("checkOutTermsAt",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CHECK_TERMS_AT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("termsUrl",
+      outTextService.getOutTextByKeyAndLangKey(
+        eventPartService.terms(registration.getEvent()),
+        languageKey
+      ).getOutText()
+    );
+    model.put("termsWebsite",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TERMS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("doneHappy",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_HAPPY_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
@@ -176,7 +269,6 @@ public class RegistrationEmailService {
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
     emailService.sendEmail(
-//      EmailService.getSession(),
       person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),

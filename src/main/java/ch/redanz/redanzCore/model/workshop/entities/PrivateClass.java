@@ -23,8 +23,6 @@ public class PrivateClass implements Serializable {
 
   private String name;
   private String description;
-//  private Integer capacity;
-//  private double price;
 
   @Column(name = "partner_required")
   private Boolean partnerRequired;
@@ -39,15 +37,11 @@ public class PrivateClass implements Serializable {
   public PrivateClass(
     String name,
     String description,
-//    Integer capacity,
-//    double price,
     Boolean partnerRequired,
     DanceLevel danceLevel
   ) {
     this.name = name;
     this.description = description;
-//    this.capacity = capacity;
-//    this.price = price;
     this.partnerRequired = partnerRequired;
     this.requiredDanceLevel = danceLevel;
   }

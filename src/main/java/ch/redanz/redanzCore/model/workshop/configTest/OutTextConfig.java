@@ -675,10 +675,15 @@ public enum OutTextConfig {
   LABEL_EMAIL_RELEASED_SUBJECT_GE("EMAIL", "LABEL_EMAIL_RELEASED_SUBJECT", "Anmeldebestätigung", "GE"),
 
   // DONE
-  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "We have received your payment and confirm your participation at {1}. We are looking forward to welcoming you in November!", "EN"),
-  LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Wir haben deine Zahlung erhalten und bestätigen deine Teilnahme am {1}. Wir freuen uns sehr, dich im November begrüssen zu dürfen!", "GE"),
+  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Thank you for your payment – we are pleased to confirm your participation in {1}.", "EN"),
+  LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Lieben Dank für deine Zahlung – Wir bestätigen damit deine Teilnahme am {1}.", "GE"),
   LABEL_EMAIL_DONE_BASE_EN("EMAIL", "LABEL_EMAIL_DONE_BASE", "We will provide you with more information regarding bands, party, work shop schedules, etc. shortly before the festival.", "EN"),
   LABEL_EMAIL_DONE_BASE_GE("EMAIL", "LABEL_EMAIL_DONE_BASE", "Weitere Informationen zu Bands, Party, Zeiten für die Workshops, etc. werden wir dir kurz vor dem Festival zusenden.", "GE"),
+  LABEL_EMAIL_DONE_DETAILS01_EN("EMAIL", "LABEL_EMAIL_DONE_DETAILS01", "No ticket is needed for entry to the festival. A valid identification document will suffice for us to verify your registration. You can review all the details of your registration at any time in your", "EN"),
+  LABEL_EMAIL_DONE_DETAILS01_GE("EMAIL", "LABEL_EMAIL_DONE_DETAILS01", "Für den Einlass am Festival wird kein Ticket benötigt. Ein gültiges Ausweisdokument reicht für uns zur Kontrolle aus. Alle Angaben zu deiner Anmeldung findest du jederzeit im", "GE"),
+  LABEL_EMAIL_DONE_HAPPY_EN("EMAIL", "LABEL_EMAIL_DONE_HAPPY", "We are eagerly looking forward to an unforgettable weekend with you!", "EN"),
+  LABEL_EMAIL_DONE_HAPPY_GE("EMAIL", "LABEL_EMAIL_DONE_HAPPY", "Wir freuen uns riesig auf ein unvergessliches Wochenende mit dir!", "GE"),
+
   LABEL_EMAIL_DONE_SUBJECT_EN("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Booking Confirmation", "EN"),
   LABEL_EMAIL_DONE_SUBJECT_GE("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Buchungsbestätigung", "GE"),
 
@@ -704,6 +709,26 @@ public enum OutTextConfig {
 
 
   // GENERIC
+  LABEL_EMAIL_QUESTIONS_ABOUT_EN("EMAIL", "LABEL_EMAIL_QUESTIONS_ABOUT", "If you have questions about ...", "EN"),
+  LABEL_EMAIL_QUESTIONS_ABOUT_GE("EMAIL", "LABEL_EMAIL_QUESTIONS_ABOUT", "Falls du Fragen hast zu ...", "GE"),
+  LABEL_EMAIL_CANCELLATION_EN("EMAIL", "LABEL_EMAIL_CANCELLATION", "Last-Minute Cancellations", "EN"),
+  LABEL_EMAIL_CANCELLATION_GE("EMAIL", "LABEL_EMAIL_CANCELLATION", "Kurzfristige Absagen", "GE"),
+  LABEL_EMAIL_REFUND_EN("EMAIL", "LABEL_EMAIL_REFUND", "Refunds", "EN"),
+  LABEL_EMAIL_REFUND_GE("EMAIL", "LABEL_EMAIL_REFUND", "Rückerstattungen", "GE"),
+  LABEL_EMAIL_TICKET_TRANSFER_EN("EMAIL", "LABEL_EMAIL_TICKET_TRANSFER", "Ticket Transfer", "EN"),
+  LABEL_EMAIL_TICKET_TRANSFER_GE("EMAIL", "LABEL_EMAIL_TICKET_TRANSFER", "Ticket-Übertrag", "GE"),
+  LABEL_EMAIL_PHOTO_VIDEO_EN("EMAIL", "LABEL_EMAIL_PHOTO_VIDEO", "Photo/Video Material", "EN"),
+  LABEL_EMAIL_PHOTO_VIDEO_GE("EMAIL", "LABEL_EMAIL_PHOTO_VIDEO", "Foto-/Videomaterial", "GE"),
+  LABEL_EMAIL_AND_MORE_EN("EMAIL", "LABEL_EMAIL_AND_MORE", "and more", "EN"),
+  LABEL_EMAIL_AND_MORE_GE("EMAIL", "LABEL_EMAIL_AND_MORE", "und mehr", "GE"),
+  LABEL_EMAIL_CHECK_TERMS_EN("EMAIL", "LABEL_EMAIL_CHECK_TERMS", "... please refer to our ", "EN"),
+  LABEL_EMAIL_CHECK_TERMS_GE("EMAIL", "LABEL_EMAIL_CHECK_TERMS", "... dann schaue dir unsere ", "GE"),
+  LABEL_EMAIL_CHECK_TERMS_AT_EN("EMAIL", "LABEL_EMAIL_CHECK_TERMS_AT", "", "EN"),
+  LABEL_EMAIL_CHECK_TERMS_AT_GE("EMAIL", "LABEL_EMAIL_CHECK_TERMS_AT", " an", "GE"),
+  LABEL_EMAIL_TERMS_EN("EMAIL", "LABEL_EMAIL_TERMS", "Terms & Conditions", "EN"),
+  LABEL_EMAIL_TERMS_GE("EMAIL", "LABEL_EMAIL_TERMS", "Geschäftsbedingungen", "GE"),
+  LABEL_EMAIL_WAITING_LISTS_EN("EMAIL", "LABEL_EMAIL_WAITING_LISTS", "Waiting Lists", "EN"),
+  LABEL_EMAIL_WAITING_LISTS_GE("EMAIL", "LABEL_EMAIL_WAITING_LISTS", "Wartelisten", "GE"),
   LABEL_EMAIL_ACCOUNT_EN("EMAIL", "LABEL_EMAIL_ACCOUNT", "{1} account", "EN"),
   LABEL_EMAIL_ACCOUNT_GE("EMAIL", "LABEL_EMAIL_ACCOUNT", "{1} Profil", "GE"),
   LABEL_EMAIL_SEE_YOU_EN("EMAIL", "LABEL_EMAIL_SEE_YOU", "See you soon", "EN"),

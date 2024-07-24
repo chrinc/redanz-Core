@@ -91,7 +91,6 @@ public class PaymentService {
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
       Special special = specialRegistration.getSpecial();
       double price = 0.0;
-//      log.info(String.valueOf(eventService.hasEventSpecial(specialRegistration.getRegistration().getEvent(), special)));
       if (eventService.hasEventSpecial(specialRegistration.getRegistration().getEvent(), special)) {
         EventSpecial eventSpecial = eventService.findByEventAndSpecial(registration.getEvent(), special);
         price = eventSpecial.getPrice();
@@ -105,7 +104,6 @@ public class PaymentService {
           String.valueOf((int) price)
         )
       );
-//      log.info(String.valueOf(specials));
     });
 
     // private class
@@ -118,7 +116,7 @@ public class PaymentService {
         List.of(
           privateClass.getName(),
           privateClass.getDescription(),
-          String.valueOf(eventPrivateClass.getPrice())
+          String.valueOf((int) eventPrivateClass.getPrice())
         )
       );
     });
@@ -228,12 +226,8 @@ public class PaymentService {
   }
 
   public long amountDue(Registration registration) {
-    // log.info("amountDue");
     long amountPaid = amountPaid(registration);
     long totalAmount = totalAmount(registration);
-    // log.info("amountPaid: " + amountPaid);
-    // log.info("totalAmount: " + totalAmount);
-    // log.info("amountDue: " + (totalAmount - amountPaid > 0 ? totalAmount - amountPaid : 0));
     return totalAmount - amountPaid;
   }
 

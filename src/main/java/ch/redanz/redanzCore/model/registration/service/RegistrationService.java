@@ -734,14 +734,21 @@ public class RegistrationService {
         throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
       }
     }
-//    log.info("inc@updateRegistration, bfr Host");
-    hostingService.updateHostRegistrationRequest(registration, request);
-//    log.info("inc@updateRegistration, bfr Hostee");
-    hostingService.updateHosteeRegistrationRequest(registration, request);
-//    log.info("inc@updateRegistration, bfr Volunteer");
-    volunteerService.updateVolunteerRequest(registration, request);
 
-//    log.info("inc@updateRegistration, isNewRegistration: {}", isNewRegistration);
+    if (request.get("hosteeRegistration") != null
+      && !request.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
+      hostingService.updateHosteeRegistrationRequest(registration, request);
+    }
+
+    if (request.get("hostRegistration") != null
+      && !request.get("hostRegistration").getAsJsonArray().isEmpty()) {
+      hostingService.updateHostRegistrationRequest(registration, request);
+    }
+
+    if (request.get("volunteerRegistration") != null && !request.get("volunteerRegistration").isJsonNull()) {
+      volunteerService.updateVolunteerRequest(registration, request);
+    }
+
     if (isNewRegistration) {
       try {
         workflowTransitionService.setWorkflowStatus(

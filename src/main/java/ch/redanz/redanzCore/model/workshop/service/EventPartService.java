@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.config.EventPartConfig;
 import ch.redanz.redanzCore.model.workshop.configTest.EventPartInfoConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.EventPart;
@@ -53,6 +54,9 @@ public class EventPartService {
     return eventPartRepo.existsByEventPartKey(eventPartKey);
   }
 
+  public String terms(Event event) {
+    return eventPartInfoRepo.findByEventAndEventPart(event, eventPartRepo.findByEventPartKey(EventPartConfig.TERMS.getEventPartKey())).getHintLink();
+  }
   public List<Map<String, String>> getEventPartInfoSchema(EventPartInfo eventPartInfo) {
     List<Map<String, String>> eventPartInfoSchema = EventPartInfo.schema();
     eventPartInfoSchema.stream()
