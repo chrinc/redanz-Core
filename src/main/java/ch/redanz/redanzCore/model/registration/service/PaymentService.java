@@ -49,7 +49,8 @@ public class PaymentService {
 
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
-    long timeout = 1000L * 60 * 5; // 5 minutes
+    // Timout 4 Minutes, gateway timeout should be 5 minutes
+    long timeout = 1000L * 60 * 4;
     long waitTime = 2000;
     long t0 = System.currentTimeMillis() + timeout;
     while (!checkPaymentConfirmed(registration)) {

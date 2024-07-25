@@ -32,8 +32,7 @@
             <div class="indented">• ${cancellation}</div>
             <div class="indented">• ${refund}</div>
             <div class="indented">• ${ticketTransfer}</div>
-            <div class="indented">• ${waitingLists}</div>
-            <div class="indented">• ${andMore}</div><br/>
+            <div class="indented">• ${waitingLists}</div><br/>
             ${checkOutTerms} <a href=${termsUrl}>${termsWebsite}</a>${checkOutTermsAt}.
         </p>
         <p>

@@ -424,7 +424,7 @@ public enum OutTextConfig {
   LABEL_PARTNER_REGISTRATION_EN(      "FRONT_LOGIN"     , "LABEL-PARTNER-REGISTRATION"       , "Partner registration"        , "EN"),
   LABEL_PARTNER_REGISTRATION_GE(      "FRONT_LOGIN"     , "LABEL-PARTNER-REGISTRATION"       , "Partner-Anmeldung"      , "GE"),
   LABEL_PARTNER_REGISTRATION_TITLE_EN(      "FRONT_LOGIN"     , "LABEL-PARTNER-REGISTRATION-TITLE"       , "Would you like to register with a partner?"        , "EN"),
-  LABEL_PARTNER_REGISTRATION_TITLE_GE(      "FRONT_LOGIN"     , "LABEL-PARTNER-REGISTRATION-TITLE"       , "Möchtest du dich mit einer Partner*in anmelden?"      , "GE"),
+  LABEL_PARTNER_REGISTRATION_TITLE_GE(      "FRONT_LOGIN"     , "LABEL-PARTNER-REGISTRATION-TITLE"       , "Möchtest du dich mit Partner*in anmelden?"      , "GE"),
   LABEL_PARTNER_REGISTRATION_TITLE_EXIST_EN("FRONT_LOGIN"     , "LABEL-PARTNER-REGISTRATION-TITLE-EXIST" , "Partner registration"                                 , "EN"),
   LABEL_PARTNER_REGISTRATION_TITLE_EXIST_GE("FRONT_LOGIN"     , "LABEL-PARTNER-REGISTRATION-TITLE-EXIST" , "Partner-Anmeldung"                     , "GE"),
   LABEL_PARTNER_EMAIL_EN(      "FRONT_LOGIN"           , "LABEL-PARTNER-EMAIL"             , "Partner email"        , "EN"),
@@ -655,10 +655,10 @@ public enum OutTextConfig {
 
 
   // SUBMITTED
-  LABEL_EMAIL_SUBMITTED_HEADER_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_HEADER", "Thank you for your registration!", "EN"),
-  LABEL_EMAIL_SUBMITTED_HEADER_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_HEADER", "Vielen Dank für deine Anmeldung!", "GE"),
-  LABEL_EMAIL_SUBMITTED_BASE_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "We will check your entries and inform you as soon as possible if we can offer you a spot at {1}.", "EN"),
-  LABEL_EMAIL_SUBMITTED_BASE_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "Wir prüfen nun deine Eingaben und melden uns baldmöglichst bei dir mit der Info, ob wir dir einen Platz am {1} anbieten können.", "GE"),
+  LABEL_EMAIL_SUBMITTED_HEADER_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_HEADER", "Thank you for your registration.", "EN"),
+  LABEL_EMAIL_SUBMITTED_HEADER_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_HEADER", "Vielen Dank für deine Anmeldung.", "GE"),
+  LABEL_EMAIL_SUBMITTED_BASE_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "We will get back to you as soon as possible with the information on whether we can offer you a spot at {1}.", "EN"),
+  LABEL_EMAIL_SUBMITTED_BASE_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_BASE", "Wir melden uns baldmöglichst bei dir mit der Info, ob wir dir einen Platz am {1} anbieten können.", "GE"),
   LABEL_EMAIL_SUBMITTED_DETAILS01_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_DETAILS01", "You can find the details of your submission in your", "EN"),
   LABEL_EMAIL_SUBMITTED_DETAILS01_GE("EMAIL", "LABEL_EMAIL_SUBMITTED_DETAILS01", "Du findest die Angaben deiner Anmeldung in deinem", "GE"),
   LABEL_EMAIL_SUBMITTED_SUBJECT_EN("EMAIL", "LABEL_EMAIL_SUBMITTED_SUBJECT", "Registration submitted", "EN"),
@@ -666,7 +666,7 @@ public enum OutTextConfig {
 
   // RELEASED
   LABEL_EMAIL_RELEASED_HEADER01_EN("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurray - we've got a spot for you at {1}", "EN"),
-  LABEL_EMAIL_RELEASED_HEADER01_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurra - wir haben einen Platz für dich beim {1}", "GE"),
+  LABEL_EMAIL_RELEASED_HEADER01_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurra - wir haben einen Platz für dich am {1}", "GE"),
   LABEL_EMAIL_RELEASED_HEADER02_EN("EMAIL", "LABEL_EMAIL_RELEASED_HEADER02", "As soon as we receive your payment, we will confirm your participation", "EN"),
   LABEL_EMAIL_RELEASED_HEADER02_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER02", "Sobald deine Zahlung bei uns eingegangen ist, können wir deine Teilnahme am Festival fix bestätigen", "GE"),
   LABEL_EMAIL_RELEASED_DETAILS_EN("EMAIL", "LABEL_EMAIL_RELEASED_DETAILS", "Please find the payment details in your ", "EN"),
@@ -675,7 +675,7 @@ public enum OutTextConfig {
   LABEL_EMAIL_RELEASED_SUBJECT_GE("EMAIL", "LABEL_EMAIL_RELEASED_SUBJECT", "Anmeldebestätigung", "GE"),
 
   // DONE
-  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Thank you for your payment – we are pleased to confirm your participation in {1}.", "EN"),
+  LABEL_EMAIL_DONE_HEADER_EN("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Thank you for your payment – we are pleased to confirm your participation at {1}.", "EN"),
   LABEL_EMAIL_DONE_HEADER_GE("EMAIL", "LABEL_EMAIL_DONE_HEADER", "Lieben Dank für deine Zahlung – Wir bestätigen damit deine Teilnahme am {1}.", "GE"),
   LABEL_EMAIL_DONE_BASE_EN("EMAIL", "LABEL_EMAIL_DONE_BASE", "We will provide you with more information regarding bands, party, work shop schedules, etc. shortly before the festival.", "EN"),
   LABEL_EMAIL_DONE_BASE_GE("EMAIL", "LABEL_EMAIL_DONE_BASE", "Weitere Informationen zu Bands, Party, Zeiten für die Workshops, etc. werden wir dir kurz vor dem Festival zusenden.", "GE"),
