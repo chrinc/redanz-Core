@@ -111,13 +111,7 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
-      Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      if (id != null && id != 0 && eventRegistrationService.volunteerTypeIsUsedAndHasRegistration(volunteerService.findVolunteerTypeById(id))) {
-        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
-      } else {
-        volunteerService.updateVolunteerType(request);
-      }
-
+      volunteerService.updateVolunteerType(request);
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
@@ -134,12 +128,7 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
-      Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      if (id != null && id != 0 && eventRegistrationService.specialIsUsedAndHasRegistration(specialService.findBySpecialId(id))) {
-        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
-      } else {
-        specialService.update(request);
-      }
+      specialService.update(request);
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
@@ -156,12 +145,7 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
-      Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      if (id != null && id != 0 && eventRegistrationService.privateIsUsedAndHasRegistration(privateClassService.findByPrivateClassId(id))) {
-        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
-      } else {
-        privateClassService.update(request);
-      }
+      privateClassService.update(request);
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
@@ -178,12 +162,7 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
-      Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      if (id != null && id != 0 && eventRegistrationService.slotIsUsedAndHasRegistration(slotService.findBySlotId(id))) {
-        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
-      } else {
-        slotService.update(request);
-      }
+      slotService.update(request);
 
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
@@ -201,12 +180,7 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
-      Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      if (id != null && id != 0 && eventRegistrationService.foodIsUsedAndHasRegistration(foodService.findByFoodId(id))) {
-        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
-      } else {
-        foodService.update(request);
-      }
+      foodService.update(request);
 
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
