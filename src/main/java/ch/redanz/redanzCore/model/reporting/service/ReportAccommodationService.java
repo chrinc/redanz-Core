@@ -37,6 +37,8 @@ public class ReportAccommodationService {
           , hostingService.getSlots(hostRegistration, language)
           , ""
           , hostingService.getUtils(hostRegistration, language)
+          , registration.getParticipant().getStreet()
+          , registration.getParticipant().getCity()
           , hostRegistration.getHostComment()
           , registration.getRegistrationType().name()
         )
@@ -57,6 +59,8 @@ public class ReportAccommodationService {
           , hosteeRegistration.getNameRoomMate() == null ? "" : hosteeRegistration.getNameRoomMate()
               + (hosteeRegistration.isSharedBed() ? " (shared bed)" : "")
           , hostingService.getUtils(hosteeRegistration, language)
+          , registration.getParticipant().getStreet()
+          , registration.getParticipant().getCity()
           , hosteeRegistration.getComment()
           , registration.getRegistrationType().name()
         )

@@ -20,6 +20,8 @@ public class ResponseAccommodation {
   private String slots;
   private String namePartner;
   private String utilities;
+  private String address;
+  private String city;
   private String comments;
   private String registrationType;
 }
