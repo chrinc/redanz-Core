@@ -61,17 +61,13 @@ public class JobController {
     @RequestParam("eventId") Long eventId
   ) {
     try {
-//      log.info("inc@run-matching");
       Event event = eventService.findByEventId(eventId);
       registrationService.updateSoldOut(event);
-//      log.info("inc@doMatching");
       registrationMatchingService.doMatching(event);
     } catch (ApiRequestException apiRequestException) {
-//      log.info("throw: apiRequestException.getMessage(), {}", apiRequestException.getMessage());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
 
-//      log.info("throw: exception, {}", exception.toString());
       errorLogService.addLog("RUN-MATCHING", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }

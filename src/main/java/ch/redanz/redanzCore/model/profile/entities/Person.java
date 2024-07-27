@@ -56,13 +56,6 @@ public class Person implements Serializable {
   public Person() {
   }
 
-//  @JsonCreator
-//  public UserResponse(
-//    @JsonProperty("username") String username,
-//    @JsonProperty("password") String password) {
-//    this.username = username;
-//    this.password = password;
-//  }
 
   public Person(
     User user,

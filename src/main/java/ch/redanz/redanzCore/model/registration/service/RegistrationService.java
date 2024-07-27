@@ -124,11 +124,14 @@ public class RegistrationService {
           int open = trackCapacity - countTracksDone;
 
           bundleEventTrack.getBundleEventTrackDanceRoles().forEach(bundleEventTrackDanceRole -> {
-            int roleOpen = countTracksSubmittedAndConfirmingByDanceRole(track, event, bundleEventTrackDanceRole.getEventDanceRole().getDanceRole());
-
+            int roleOpen = countTracksSubmittedAndConfirmingByDanceRole(track, bundle, event, bundleEventTrackDanceRole.getEventDanceRole().getDanceRole());
             boolean danceRoleSoldOut = !bundleEventTrack.isSoldOut()
               && bundleEventTrackDanceRole.getEventDanceRole().getDanceRole() != danceRoleService.getSwitchDanceRole()
               && roleOpen >= (open / danceRolesCount) + waitListLength;
+//            log.info("bundle: " + bundleEventTrackDanceRole.getBundleEventTrack().getBundle().getName());
+//            log.info("role: " + bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().getName());
+//            log.info("roleOpenCount: " + roleOpen);
+//            log.info("(open / danceRolesCount) + waitListLength: " + ((open / danceRolesCount) + waitListLength));
 
             if (danceRoleSoldOut != bundleEventTrackDanceRole.isSoldOut()) {
               bundleEventTrackDanceRole.setSoldOut(danceRoleSoldOut);
@@ -390,14 +393,24 @@ public class RegistrationService {
       );
   }
 
-  public int countTracksSubmittedAndConfirmingByDanceRole(Track track, Event event, DanceRole danceRole) {
+//  public int countTracksSubmittedAndConfirmingByDanceRole(Track track, Event event, DanceRole danceRole) {
+//    if (track == null) return 0;
+//    return
+//         registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationType(
+//           track, workflowStatusService.getSubmitted(), danceRole,true, event, RegistrationType.PARTICIPANT
+//         )
+//      +  registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationType(
+//        track, workflowStatusService.getConfirming(), danceRole,true, event, RegistrationType.PARTICIPANT
+//      );
+//  }
+  public int countTracksSubmittedAndConfirmingByDanceRole(Track track, Bundle bundle, Event event, DanceRole danceRole) {
     if (track == null) return 0;
     return
-         registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationType(
-           track, workflowStatusService.getSubmitted(), danceRole,true, event, RegistrationType.PARTICIPANT
+         registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationTypeAndBundle(
+           track, workflowStatusService.getSubmitted(), danceRole,true, event, RegistrationType.PARTICIPANT, bundle
          )
-      +  registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationType(
-        track, workflowStatusService.getConfirming(), danceRole,true, event, RegistrationType.PARTICIPANT
+      +  registrationRepo.countAllByTrackAndWorkflowStatusAndDanceRoleAndActiveAndEventAndRegistrationTypeAndBundle(
+        track, workflowStatusService.getConfirming(), danceRole,true, event, RegistrationType.PARTICIPANT, bundle
       );
   }
   public int countTracksDone(Track track, Event event, DanceRole danceRole) {

@@ -9,6 +9,7 @@ import ch.redanz.redanzCore.model.profile.response.UserResponse;
 import ch.redanz.redanzCore.model.profile.service.*;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
+import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
 import ch.redanz.redanzCore.web.security.service.PasswordEmailService;
@@ -43,6 +44,7 @@ public class ProfileController {
   private final PasswordResetService passwordResetService;
   private final PersonService personService;
   private final LanguageService languageService;
+  private final ErrorLogService errorLogService;
 
   @Autowired
   private Environment environment;
@@ -59,34 +61,31 @@ public class ProfileController {
 
   @PostMapping(path = "/user/registration")
   public long register(@RequestBody UserResponse request) {
-    userRegistrationService.register(request);
-    return userService.getUser(request.getUsername()).getUserId();
-  }
-
-  @GetMapping(path = "/user/registration/confirm")
-  public String confirm(@RequestParam("token") String token) {
     try {
-      String link = userRegistrationService.confirmToken(token);
-      //log.info("link");
-      // log.info(link);
-      return link;
+      userRegistrationService.register(request);
+      return userService.getUser(request.getUsername()).getUserId();
     } catch (ApiRequestException apiRequestException) {
-      // log.info("inc@apiRequestException");
-      // log.info(apiRequestException.getMessage());
+      errorLogService.addLog("USER-REGISTRATION", apiRequestException.toString());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
-      // log.info("inc@exception");
-      // log.info(exception.getMessage());
+      errorLogService.addLog("USER-REGISTRATION", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
-//  @GetMapping(path = "/user/registration/confirm")
-//  public ResponseEntity<Void> confirm(@RequestParam("token") String token) {
-//    String link = userRegistrationService.confirmToken(token);
-//    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(
-//      Objects.requireNonNull(link)
-//    )).build();
-//  }
+
+  @GetMapping(path = "/user/registration/confirm")
+  public String confirm(
+    @RequestParam("token") String token
+  ) {
+    try {
+      String link = userRegistrationService.confirmToken(token);
+      return link;
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
 
   @GetMapping(path = "/country/all")
   public List<Country> getAllCountries() {
@@ -101,10 +100,7 @@ public class ProfileController {
     try {
       User user = userService.getUser(email);
       if (user == null) {
-
-        // do not inform user about missing user in database.
         return;
-        // throw new ApiRequestException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
       }
 
       String token = UUID.randomUUID().toString();
@@ -162,13 +158,36 @@ public class ProfileController {
   public void register(
     @RequestParam("userId") Long userId,
     @RequestBody PersonResponse personResponse
-  ) throws IOException, TemplateException {
-    String link = environment.getProperty("link.confirm.token.prefix")
-      + confirmationTokenService.getTokenByUser(userService.findByUserId(userId)
-    );
+  ) {
+    try {
+      String link = environment.getProperty("link.confirm.token.prefix")
+        + confirmationTokenService.getTokenByUser(userService.findByUserId(userId)
+      );
+      String headerLink = environment.getProperty("email.header.link");
+      profileService.registerProfile(userId, personResponse, link, headerLink);
+    } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("PERSON-REGISTRATION", apiRequestException.toString());
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      errorLogService.addLog("PERSON-REGISTRATION", exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
 
-    String headerLink = environment.getProperty("email.header.link");
-    profileService.registerProfile(userId, personResponse, link, headerLink);
+  @PostMapping(path = "/profile")
+  public void register(
+    @RequestBody String jsonObject
+  ) {
+    try {
+//      log.info("inc@profile registration");
+//      log.info("inc@profile jsonObject:" + jsonObject);
+    } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("PROFILE-REGISTRATION", apiRequestException.toString());
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      errorLogService.addLog("PROFILE-REGISTRATION", exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
   }
 
   @GetMapping(path = "/persons")

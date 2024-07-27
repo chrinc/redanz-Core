@@ -29,9 +29,6 @@ public class UserRegistrationService {
   private final PasswordResetService passwordResetService;
   private final PersonService personService;
 
-  @Autowired
-  private Environment environment;
-
   public String register(UserResponse request) {
     boolean isValidEmail = emailValidator.test(request.getUsername());
 
