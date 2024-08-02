@@ -121,4 +121,22 @@ public class UserService implements UserDetailsService {
   public void enableUser(String username) {
     userRepo.enableUser(username);
   }
+
+  public void setLoginTimestamp(User user) {
+    user.setLoginTimestamp(LocalDateTime.now());
+    user.setLogoutTimestamp(null);
+    save(user);
+  }
+
+  public Long tokenExpiresInMillis() {
+    return Long.parseLong(
+      Objects.requireNonNull(
+        environment.getProperty("jwt.auth-token.expires-min"))
+    ) * 60 * 1000L;
+  }
+
+  public void logout(User user) {
+    user.setLogoutTimestamp(LocalDateTime.now());
+    save(user);
+  }
 }

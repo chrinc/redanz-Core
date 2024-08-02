@@ -69,11 +69,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           Long requestPersonId = request.getParameter("personId") == null ? null : Long.valueOf(request.getParameter("personId"));
           Long requestRegistrationId = request.getParameter("registrationId") == null ? null : Long.valueOf(request.getParameter("registrationId"));
 
-//          log.info("inc@auth,  request.getServletPath() {}",  request.getServletPath());
-//          log.info("inc@auth, requestUserId {}", requestUserId);
-//          log.info("inc@auth, requestPersonId {}", requestPersonId);
-//          log.info("inc@auth, requestRegistrationId {}", requestRegistrationId);
-//          log.info("inc@auth, username {}", username);
           if (
                (requestUserId != null && !Objects.equals(userService.getUser(username).getUserId(), requestUserId))
             || (requestPersonId != null && !Objects.equals(personService.findByUser(userService.getUser(username)).getPersonId(), requestPersonId))
@@ -95,6 +90,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
               );
           }
+
           // only organizers are authorized to retrieve report data
           if (request.getServletPath().startsWith("/core-api/app/report")) {
 

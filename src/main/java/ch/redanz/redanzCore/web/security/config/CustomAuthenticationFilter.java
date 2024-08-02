@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.security.config;
 
+import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -34,14 +35,15 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
-
+  private UserService userService;
   private final AuthenticationManager authenticationManager;
   private AuthenticationFailureHandler failureHandler = new CustomAuthenticationFailureHandler();
   private RememberMeServices rememberMeServices = new NullRememberMeServices();
 
-  public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+  public CustomAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService
+  ) {
     this.authenticationManager = authenticationManager;
+    this.userService = userService;
   }
 
   @Override
@@ -66,20 +68,18 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
   @Override
   protected void successfulAuthentication(
-
     HttpServletRequest request,
     HttpServletResponse response,
     FilterChain chain,
     Authentication authentication
   ) throws IOException {
-    long MINUTES_300 = 300 * 60 * 1000L;
+    long EXPIRES_IN_MILLIS = userService.tokenExpiresInMillis();
     User user = (User) authentication.getPrincipal();
     Algorithm algorithm = Algorithm.HMAC256(JWTConfig.getJwtSecret().getBytes());
-//    log.info(user.getAuthorities().toString());
     String access_token = JWT.create()
       .withSubject(user.getUsername())
       .withExpiresAt(
-        new Date(System.currentTimeMillis() + MINUTES_300)
+        new Date(System.currentTimeMillis() + EXPIRES_IN_MILLIS)
       )
       .withIssuer(request.getRequestURL().toString())
       .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
@@ -88,7 +88,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     String refresh_token = JWT.create()
       .withSubject(user.getUsername())
       .withExpiresAt(
-        new Date(System.currentTimeMillis() + MINUTES_300)
+        new Date(System.currentTimeMillis() + EXPIRES_IN_MILLIS)
       )
       .withIssuer(request.getRequestURL().toString())
       .sign(algorithm);
@@ -97,5 +97,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     tokens.put("refresh_token", refresh_token);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+    userService.setLoginTimestamp(userService.getUser(user.getUsername()));
   }
 }

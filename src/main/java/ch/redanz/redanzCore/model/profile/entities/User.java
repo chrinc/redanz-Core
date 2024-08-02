@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -38,6 +39,11 @@ public class User implements Serializable, UserDetails {
   @JsonIgnore
   private String password;
 
+  @Column(name="login_timestamp")
+  LocalDateTime loginTimestamp;
+
+  @Column(name="logout_timestamp")
+  LocalDateTime logoutTimestamp;
 
   public User(
     String username,
@@ -145,7 +151,9 @@ public class User implements Serializable, UserDetails {
         + "userId=" + userId + '\''
         + ", ch.redanz.redanzCore.username=" + username + '\''
         + ", password= '" + password + '\''
-        + ", role= '" + userRole
+        + ", role= '" + userRole + '\''
+        + ", lastLogin= '" + loginTimestamp + '\''
+        + ", lastLogout= '" + logoutTimestamp + '\''
         + "}";
   }
 

@@ -18,8 +18,6 @@ import java.util.Date;
 @Setter
 public class PasswordResetToken implements Serializable {
 
-  private static final int EXPIRATION = 60 * 24;
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;

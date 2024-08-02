@@ -23,8 +23,6 @@
                 <a href=${resetLink}>${reset_now}</a>
             </p>
         </blockquote>
-        </br>
-        ${expires}.
         <p>${regards} <br>
         ${team}
         </p>

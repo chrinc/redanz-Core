@@ -44,7 +44,7 @@ public class PasswordResetService {
     save(myToken);
   }
 
-  public void updatePassword(User user, String password){
+  public void updatePassword(User user, String password) {
     String encodedPassword = bCryptPasswordEncoder.encode(password);
     user.setPassword(encodedPassword);
 

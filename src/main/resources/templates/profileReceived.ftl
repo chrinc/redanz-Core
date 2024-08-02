@@ -24,9 +24,6 @@
                 <a href=${registrationLink}>${activate_now}</a>
             </p>
         </blockquote>
-        </br>
-        ${expires}.
-        <p>
         <p>${regards} <br>
             ${team}
         </p>

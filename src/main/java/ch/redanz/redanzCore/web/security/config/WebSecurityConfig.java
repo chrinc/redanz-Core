@@ -36,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+    CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), userService);
     customAuthenticationFilter.setFilterProcessesUrl("/core-api/login");
     http.authorizeRequests().antMatchers("/core-api/profile/user/registration/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/zahls/checkout/**").permitAll();

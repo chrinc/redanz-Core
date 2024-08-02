@@ -622,6 +622,8 @@ public enum OutTextConfig {
   LABEL_ERROR_TOKEN_EXPIRED_GE("FRONT_BASE", "LABEL_ERROR_TOKEN_EXPIRED", "Das Token ist abgelaufen. Bitte melde dich erneut an.", "GE"),
   LABEL_ERROR_EMAIL_CONFIRMED_EN("FRONT_BASE", "LABEL_ERROR_EMAIL_CONFIRMED", "Email already confirmed.", "EN"),
   LABEL_ERROR_EMAIL_CONFIRMED_GE("FRONT_BASE", "LABEL_ERROR_EMAIL_CONFIRMED", "Email wurde bereits bestätigt.", "GE"),
+  LABEL_ERROR_LINK_EXPIRED_EN("FRONT_BASE", "LABEL_ERROR_LINK_EXPIRED", "Link expired. Please reset your Password", "EN"),
+  LABEL_ERROR_LINK_EXPIRED_GE("FRONT_BASE", "LABEL_ERROR_LINK_EXPIRED", "Link abgelaufen. Bitte Passwort zurücksetzen.", "GE"),
 
   LABEL_ERROR_HAS_REGISTRATION_EN("FRONT_LOGIN", "LABEL_ERROR_HAS_REGISTRATION", "Event cannot be deleted because registrations exist.", "EN"),
   LABEL_ERROR_HAS_REGISTRATION_GE("FRONT_LOGIN", "LABEL_ERROR_HAS_REGISTRATION", "Evenet kann nicht gelöscht werden, weil Anmeldungen existieren.", "GE"),

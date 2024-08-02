@@ -12,8 +12,6 @@ import ch.redanz.redanzCore.web.security.service.ConfirmationTokenService;
 import ch.redanz.redanzCore.web.security.service.PasswordResetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -55,7 +53,7 @@ public class UserRegistrationService {
         new IllegalStateException("token not found")
       );
     String lang = personService.findByUser(confirmationToken.getUser()).getPersonLang().getLanguageKey().toLowerCase();
-    if (confirmationToken.getConfirmedAt() != null) {
+    if (confirmationToken.getConfirmedAt() != null || confirmationToken.getUser().getEnabled()) {
       return
         baseUrl
           + "/" + OutTextConfig.LABEL_ERROR_EMAIL_CONFIRMED_EN.getOutTextKey().toLowerCase()
@@ -64,12 +62,12 @@ public class UserRegistrationService {
 
     LocalDateTime expiredAt = confirmationToken.getExpiresAt();
     if (expiredAt.isBefore(LocalDateTime.now())) {
-      userService.delete(confirmationToken.getUser());
-      personService.delete(personService.findByUser(confirmationToken.getUser()));
       return
         baseUrl
-          + "/" + OutTextConfig.LABEL_ERROR_EMAIL_CONFIRMED_EN.getOutTextKey().toLowerCase()
-          + "/" + lang;
+          + "/" + OutTextConfig.LABEL_ERROR_LINK_EXPIRED_EN.getOutTextKey().toLowerCase()
+          + "/" + lang
+          + "/" + true
+        ;
     }
     confirmationTokenService.setConfirmedAt(token);
     userService.enableUser(
