@@ -27,8 +27,8 @@ public class ResponseCheckIn {
   private String discounts;
   private String privates;
   private String workflowStatus;
-  private Long amountDue;
-  private Long totalAmount;
+//  private Long amountDue;
+//  private Long totalAmount;
   private String color;
   private ZonedDateTime checkInTime;
 
@@ -43,15 +43,21 @@ public class ResponseCheckIn {
 //        }});
 
         add(new HashMap<>() {{
+          put("key", "isUpdate");
+          put("type", "isUpdate");
+          put("label", "Check In");
+        }});
+
+        add(new HashMap<>() {{
           put("key", "name");
           put("type", "text");
           put("label", "Name");
         }});
-        add(new HashMap<>() {{
-          put("key", "color");
-          put("type", "color");
-          put("label", "Wrist Band Color");
-        }});
+//        add(new HashMap<>() {{
+//          put("key", "color");
+//          put("type", "color");
+//          put("label", "Wrist Band Color");
+//        }});
         add(new HashMap<>() {{
           put("key", "bundle");
           put("type", "text");
@@ -99,22 +105,17 @@ public class ResponseCheckIn {
           put("label", "Status");
         }});
 
-        add(new HashMap<>() {{
-          put("key", "amountDue");
-          put("type", "number");
-          put("label", "Due");
-        }});
-        add(new HashMap<>() {{
-          put("key", "totalAmount");
-          put("type", "number");
-          put("label", "Total Amount");
-        }});
+//        add(new HashMap<>() {{
+//          put("key", "amountDue");
+//          put("type", "number");
+//          put("label", "Due");
+//        }});
+//        add(new HashMap<>() {{
+//          put("key", "totalAmount");
+//          put("type", "number");
+//          put("label", "Total Amount");
+//        }});
 
-        add(new HashMap<>() {{
-          put("key", "isUpdate");
-          put("type", "isUpdate");
-          put("label", "Check In");
-        }});
       }
     };
   }

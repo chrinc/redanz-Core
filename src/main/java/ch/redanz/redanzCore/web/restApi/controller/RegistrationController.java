@@ -348,9 +348,27 @@ public class RegistrationController {
     @RequestBody String guestsJsonObject
   ) {
     try {
-      // log.info("update guest List");
       Event event = eventService.findByEventId(eventId);
       guestService.updateGuestListRequest(JsonParser.parseString(guestsJsonObject).getAsJsonArray(), event);
+    } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("GuestsUpdateApi", apiRequestException.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+    } catch (Exception exception) {
+      errorLogService.addLog("GuestsUpdate", exception.toString());
+      throw new ApiRequestException(exception.getMessage());
+    }
+  }
+
+  @PostMapping(path = "/guest/update")
+  @Transactional
+  public void guestUpdate(
+    @RequestParam("personId") Long personId,
+    @RequestParam("eventId") Long eventId,
+    @RequestBody String guestsJsonObject
+  ) {
+    try {
+      Event event = eventService.findByEventId(eventId);
+      guestService.updateGuestRequest(JsonParser.parseString(guestsJsonObject).getAsJsonObject(), event);
     } catch (ApiRequestException apiRequestException) {
       errorLogService.addLog("GuestsUpdateApi", apiRequestException.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());

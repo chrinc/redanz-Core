@@ -33,7 +33,7 @@ public class Guest implements Serializable {
   @JoinColumn(name = "person_id")
   private Person person;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id")
   @JsonIgnore
   private Event event;
@@ -41,7 +41,7 @@ public class Guest implements Serializable {
   @JsonIgnore
   private boolean active;
 
-  @ManyToMany(cascade=CascadeType.ALL)
+  @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinTable(
     name="guest_slots",
     joinColumns = @JoinColumn(name="guest_id"),
@@ -121,7 +121,7 @@ public class Guest implements Serializable {
         add(new HashMap<>() {{
           put("key", "isEdit");
           put("type", "isEdit");
-          put("label", "");
+          put("label", "Edit");
         }});
 
         add(new HashMap<>() {{

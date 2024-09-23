@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum BundlePartySlotConfig {
-  FULL_FRI(BundleConfig.FULL_PASS, SlotConfig.SLOT_FRIDAY),
-  FULL_SAT(BundleConfig.FULL_PASS, SlotConfig.SLOT_SATURDAY),
-  FULL_SUN(BundleConfig.FULL_PASS, SlotConfig.SLOT_SUNDAY),
+  FULL_FRI(BundleConfig.FULL_PASS, SlotConfig.SLOT_FRI_SAT),
+  FULL_SAT(BundleConfig.FULL_PASS, SlotConfig.SLOT_SAT_SUN),
+  FULL_SUN(BundleConfig.FULL_PASS, SlotConfig.SLOT_SUN_MON),
 
-  HALF_FRI(BundleConfig.HALF_PASS, SlotConfig.SLOT_FRIDAY),
-  HALF_SAT(BundleConfig.HALF_PASS, SlotConfig.SLOT_SATURDAY),
-  HALF_SUN(BundleConfig.HALF_PASS, SlotConfig.SLOT_SUNDAY),
+  HALF_FRI(BundleConfig.HALF_PASS, SlotConfig.SLOT_FRI_SAT),
+  HALF_SAT(BundleConfig.HALF_PASS, SlotConfig.SLOT_SAT_SUN),
+  HALF_SUN(BundleConfig.HALF_PASS, SlotConfig.SLOT_SUN_MON),
 
   PARTY_FRI(BundleConfig.PARTY_PASS, SlotConfig.SLOT_FRIDAY),
   PARTY_SAT(BundleConfig.PARTY_PASS, SlotConfig.SLOT_SATURDAY),

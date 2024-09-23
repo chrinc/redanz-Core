@@ -24,7 +24,7 @@ public enum EventTypeSlotConfig {
   PARTY_THU(EventConfig.REDANZ_EVENT, TypeSlotConfig.PARTY_FRI, null, 1),
   PARTY_FRI(EventConfig.REDANZ_EVENT, TypeSlotConfig.PARTY_SAT, null, 2),
   PARTY_SAT(EventConfig.REDANZ_EVENT, TypeSlotConfig.PARTY_SUN, null,3),
-//
+
 //  FOOD_SAT(EventConfig.REDANZ_EVENT, TypeSlotConfig.FOOD_SLOT_SATURDAY, FoodConfig.FOOD_ORIENTAL, 1),
 //  FOOD_SUN(EventConfig.REDANZ_EVENT, TypeSlotConfig.FOOD_SLOT_SUNDAY, FoodConfig.FOOD_VARIETY, 2),
 

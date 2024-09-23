@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
 import ch.redanz.redanzCore.model.workshop.entities.*;
+import ch.redanz.redanzCore.model.workshop.repository.EventFoodSlotRepo;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.FoodRepo;
 import com.google.gson.JsonObject;
@@ -23,6 +24,7 @@ public class FoodService {
   private final OutTextService outTextService;
   private final SlotService slotService;
   private final EventTypeSlotService eventTypeSlotService;
+  private final EventFoodSlotRepo eventFoodSlotRepo;
   private final EventRepo eventRepo;
 
 
@@ -141,19 +143,8 @@ public class FoodService {
     foodRepo.delete(food);
   }
 
-  public List<List<Object>> getFoodSlotsPairsByEvent(Event event) {
-    List<List<Object>> foodSlots = new ArrayList<>();
-    List<EventTypeSlot> eventTypeSlots;
-    eventTypeSlots = slotService.findAllByEvent(event);
-    eventTypeSlots.forEach(eventTypeSlot -> {
-      if (eventTypeSlot.getTypeSlot().getType().equals("food")) {
-        List<Object> foodSlot = new ArrayList<>();
-        foodSlot.add(findByFoodId(eventTypeSlot.getTypeSlot().getTypeObjectId()));
-        foodSlot.add(eventTypeSlot.getTypeSlot().getSlot());
-        foodSlots.add(foodSlot);
-      }
-    });
-    return foodSlots;
+  public List<EventFoodSlot> getEventFoodSlots(Event event) {
+    return eventFoodSlotRepo.findByEvent(event);
   }
 
   public class EventTypeSlotComparator implements Comparator<EventTypeSlot> {

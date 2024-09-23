@@ -66,6 +66,37 @@ public class RegistrationService {
     registrationRepo.save(registration);
   }
 
+  public String firstName(Registration registration) {
+    return  registration.getParticipant().getFirstName();
+  }
+  public String fullName (
+    Registration registration
+  ) {
+    return registrationRepo.getFullName(registration.getRegistrationId());
+  }
+
+  public String bundleName(
+    Registration registration
+  ) {
+    return registrationRepo.getBundleName(registration.getRegistrationId());
+  };
+
+  public String trackName(
+    Registration registration
+  ) {
+    return registrationRepo.getTrackName(registration.getRegistrationId());
+  };
+
+  public String workflowStatusName(
+    Registration registration
+  ) {
+    return registrationRepo.getWorkflowStatusName(registration.getRegistrationId());
+  };
+
+  public int getBunldePrice(Registration registration) {
+    return  registrationRepo.getBundlePrice(registration.getRegistrationId());
+  }
+
   public void updateSoldOut(Event event) {
     Integer waitListLength = baseParService.waitListLength();
 

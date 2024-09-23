@@ -11,6 +11,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.workshop.entities.Track;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -60,4 +61,19 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     int countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(Track track, Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, DanceRole danceRole);
     int countAllByEventAndActiveAndDanceRole(Event event, Boolean active, DanceRole danceRole);
     int countAllByEvent(Event event);
+
+    @Query("SELECT CONCAT(p.firstName, ' ', p.lastName) FROM Registration r INNER JOIN r.participant p WHERE r.registrationId = :registrationId")
+    String getFullName(@Param("registrationId") Long registrationId);
+
+    @Query("SELECT b.name FROM Registration r INNER JOIN r.bundle b WHERE r.registrationId = :registrationId")
+    String getBundleName(@Param("registrationId") Long registrationId);
+
+    @Query("SELECT t.name FROM Registration r LEFT JOIN r.track t WHERE r.registrationId = :registrationId")
+    String getTrackName(@Param("registrationId") Long registrationId);
+
+    @Query("SELECT wfs.name FROM Registration r LEFT JOIN r.workflowStatus wfs WHERE r.registrationId = :registrationId")
+    String getWorkflowStatusName(@Param("registrationId") Long registrationId);
+
+    @Query("SELECT b.price FROM Registration r LEFT JOIN r.bundle b WHERE r.registrationId = :registrationId")
+    int getBundlePrice(@Param("registrationId") Long registrationId);
 }

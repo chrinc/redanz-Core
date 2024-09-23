@@ -152,10 +152,7 @@ public class GuestService {
 
   @Transactional
   public void updateGuestListRequest(JsonArray request, Event event) throws IOException, TemplateException {
-
     request.forEach(guest -> {
-      AtomicBoolean doUpdate = new AtomicBoolean(false);
-
       try {
         updateGuestRequest(guest.getAsJsonObject(), event);
       } catch (IOException e) {

@@ -27,20 +27,20 @@ public class CheckIn implements Serializable {
   @Column(name = "check_in_id", nullable = false, updatable = false)
   private Long checkInId;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="registration_id")
   private Registration registration;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="guest_id")
   private Guest guest;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JsonIgnore
   @JoinColumn(name="event_id")
   private Event event;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="slot_id")
   private Slot slot;
 

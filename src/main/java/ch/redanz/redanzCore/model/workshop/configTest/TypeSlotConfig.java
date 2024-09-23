@@ -28,10 +28,10 @@ public enum TypeSlotConfig {
   PARTY_SAT(   "party"    , SlotConfig.SLOT_SATURDAY , null),
   PARTY_SUN( "party"    , SlotConfig.SLOT_SUNDAY     , null),
 
-  ACCOMMODATION_SLOT_THURSDAY( "accommodation"    , SlotConfig.SLOT_THURSDAY    , null),
-  ACCOMMODATION_SLOT_FRIDAY(   "accommodation"    , SlotConfig.SLOT_FRIDAY      , null),
-  ACCOMMODATION_SLOT_SATURDAY( "accommodation"    , SlotConfig.SLOT_SATURDAY    , null),
-  ACCOMMODATION_SLOT_SUNDAY(   "accommodation"    , SlotConfig.SLOT_SUNDAY      , null);
+  ACCOMMODATION_SLOT_THURSDAY( "accommodation"    , SlotConfig.SLOT_THU_FRI    , null),
+  ACCOMMODATION_SLOT_FRIDAY(   "accommodation"    , SlotConfig.SLOT_FRI_SAT      , null),
+  ACCOMMODATION_SLOT_SATURDAY( "accommodation"    , SlotConfig.SLOT_SAT_SUN    , null),
+  ACCOMMODATION_SLOT_SUNDAY(   "accommodation"    , SlotConfig.SLOT_SUN_MON      , null);
 
   private final String type;
   private final SlotConfig slotConfig;

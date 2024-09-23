@@ -130,38 +130,17 @@ public class ReportStatsService {
 //      );
 //    });
 
-    // Private Classes
-    event.getEventPrivates().forEach(
-      eventPrivateClass -> {
-      PrivateClass privateClass = eventPrivateClass.getPrivateClass();
-      stats.add(
-        new ResponseStats(
-          "Private Class"
-          ,privateClass.getName()
-          ,specialRegistrationService.countPrivateRegistrationsAndSplitRoles(privateClass, event)
-          ,specialRegistrationService.countPrivatesSubmittedAndSplitRoles(privateClass, event)
-          ,specialRegistrationService.countPrivatesConfirmingAndSplitRoles(privateClass, event)
-          ,specialRegistrationService.countPrivatesDoneAndSplitRoles(privateClass, event)
-          ,eventPrivateClass.getCapacity()
-          ,eventPrivateClass.getSoldOut() ? yes : no
-        )
-      );
-    });
-
-    foodService.getFoodSlotsPairsByEvent(event).forEach(foodSlot -> {
-      Food food = (Food) foodSlot.get(0);
-      Slot slot = (Slot) foodSlot.get(1);
+    foodService.getEventFoodSlots(event).forEach(eventFoodSlot -> {
       stats.add(
         new ResponseStats(
           "Food"
-          , outTextService.getOutTextByKeyAndLangKey(slot.getName(), language.getLanguageKey()).getOutText()
-          , foodRegistrationService.countFoodSlotSubmittedConfirmingAndDoneAsList(food, slot, event)
-          , foodRegistrationService.countFoodSlotSubmittedAsList(food, slot, event)
-          , foodRegistrationService.countFoodSlotConfirmingAsList(food, slot, event)
-          , foodRegistrationService.countFoodSlotDoneAsList(food, slot, event)
+          , outTextService.getOutTextByKeyAndLangKey(eventFoodSlot.getSlot().getName(), language.getLanguageKey()).getOutText()
+          , foodRegistrationService.countFoodSlotSubmittedConfirmingAndDoneAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
+          , foodRegistrationService.countFoodSlotSubmittedAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
+          , foodRegistrationService.countFoodSlotConfirmingAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
+          , foodRegistrationService.countFoodSlotDoneAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
           , null
           , no
-
         )
       );
     });
@@ -190,6 +169,23 @@ public class ReportStatsService {
         )
       );
     });
+    // Private Classes
+    event.getEventPrivates().forEach(
+      eventPrivateClass -> {
+        PrivateClass privateClass = eventPrivateClass.getPrivateClass();
+        stats.add(
+          new ResponseStats(
+            "Private Class"
+            ,privateClass.getName()
+            ,specialRegistrationService.countPrivateRegistrationsAndSplitRoles(privateClass, event)
+            ,specialRegistrationService.countPrivatesSubmittedAndSplitRoles(privateClass, event)
+            ,specialRegistrationService.countPrivatesConfirmingAndSplitRoles(privateClass, event)
+            ,specialRegistrationService.countPrivatesDoneAndSplitRoles(privateClass, event)
+            ,eventPrivateClass.getCapacity()
+            ,eventPrivateClass.getSoldOut() ? yes : no
+          )
+        );
+      });
     return stats;
   }
 }
