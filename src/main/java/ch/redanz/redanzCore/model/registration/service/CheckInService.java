@@ -77,7 +77,8 @@ public class CheckInService {
         registrationService.workflowStatusName(registration),
         paymentService.amountDue(registration),
         paymentService.totalAmount(registration),
-        registration.getBundle().getColor()
+        registration.getBundle().getColor(),
+        registration.getDanceRole() != null ? registration.getDanceRole().getName() : ""
        )
       );
     });

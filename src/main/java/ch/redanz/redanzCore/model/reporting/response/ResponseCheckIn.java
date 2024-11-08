@@ -30,6 +30,7 @@ public class ResponseCheckIn {
   private Long amountDue;
   private Long totalAmount;
   private String color;
+  private String danceRole;
   private ZonedDateTime checkInTime;
 
   public static List<Map<String, String>> schema() {
@@ -52,6 +53,11 @@ public class ResponseCheckIn {
           put("key", "workflowStatus");
           put("type", "text");
           put("label", "Status");
+        }});
+        add(new HashMap<>() {{
+          put("key", "danceRole");
+          put("type", "text");
+          put("label", "Dance Role");
         }});
         add(new HashMap<>() {{
           put("key", "bundle");

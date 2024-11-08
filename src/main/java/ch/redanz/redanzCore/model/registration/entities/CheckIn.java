@@ -81,6 +81,9 @@ public class CheckIn implements Serializable {
   @Column(name="color")
   private String color;
 
+  @Column(name="dance_role")
+  private String danceRole;
+
   @Column(name = "check_in_time")
   private ZonedDateTime checkInTime;
 
@@ -114,7 +117,8 @@ public class CheckIn implements Serializable {
     String status,
     Long amountDue,
     Long totalAmount,
-    String color
+    String color,
+    String danceRole
   ) {
     this.event = event;
     this.registration = registration;
@@ -130,6 +134,7 @@ public class CheckIn implements Serializable {
     this.color = color;
     this.amountDue = amountDue;
     this.totalAmount = totalAmount;
+    this.danceRole = danceRole;
   }
 
   public static List<Map<String, String>> schema() {

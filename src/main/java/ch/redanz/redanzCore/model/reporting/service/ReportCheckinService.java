@@ -57,6 +57,7 @@ public class ReportCheckinService {
           checkIn.getAmountDue(),
           checkIn.getTotalAmount(),
           checkIn.getColor(),
+          checkIn.getDanceRole(),
           checkIn.getCheckInTime()
         );
         // Add the response to the thread-safe list
