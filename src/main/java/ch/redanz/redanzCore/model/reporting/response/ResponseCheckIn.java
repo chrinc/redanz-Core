@@ -21,14 +21,14 @@ public class ResponseCheckIn {
   private String name;
   private String bundle;
   private String track;
-  private Slot slot;
+  private String slots;
   private String food;
   private String addons;
   private String discounts;
   private String privates;
   private String workflowStatus;
-//  private Long amountDue;
-//  private Long totalAmount;
+  private Long amountDue;
+  private Long totalAmount;
   private String color;
   private ZonedDateTime checkInTime;
 
@@ -36,12 +36,6 @@ public class ResponseCheckIn {
 
     return new ArrayList<>() {
       {
-//        add(new HashMap<>() {{
-//          put("eventPartKey", "checkInId");
-//          put("type", "id");
-//          put("label", "Check In Id");
-//        }});
-
         add(new HashMap<>() {{
           put("key", "isUpdate");
           put("type", "isUpdate");
@@ -53,11 +47,12 @@ public class ResponseCheckIn {
           put("type", "text");
           put("label", "Name");
         }});
-//        add(new HashMap<>() {{
-//          put("key", "color");
-//          put("type", "color");
-//          put("label", "Wrist Band Color");
-//        }});
+
+        add(new HashMap<>() {{
+          put("key", "workflowStatus");
+          put("type", "text");
+          put("label", "Status");
+        }});
         add(new HashMap<>() {{
           put("key", "bundle");
           put("type", "text");
@@ -87,11 +82,11 @@ public class ResponseCheckIn {
           put("label", "Privates");
         }});
 
-//        add(new HashMap<>() {{
-//          put("eventPartKey", "slot");
-//          put("type", "text");
-//          put("label", "Slot");
-//        }});
+        add(new HashMap<>() {{
+          put("key", "slots");
+          put("type", "text");
+          put("label", "Slots");
+        }});
 
         add(new HashMap<>() {{
           put("key", "discounts");
@@ -100,22 +95,15 @@ public class ResponseCheckIn {
         }});
 
         add(new HashMap<>() {{
-          put("key", "workflowStatus");
-          put("type", "text");
-          put("label", "Status");
+          put("key", "amountDue");
+          put("type", "number");
+          put("label", "Due");
         }});
-
-//        add(new HashMap<>() {{
-//          put("key", "amountDue");
-//          put("type", "number");
-//          put("label", "Due");
-//        }});
-//        add(new HashMap<>() {{
-//          put("key", "totalAmount");
-//          put("type", "number");
-//          put("label", "Total Amount");
-//        }});
-
+        add(new HashMap<>() {{
+          put("key", "totalAmount");
+          put("type", "number");
+          put("label", "Total Amount");
+        }});
       }
     };
   }

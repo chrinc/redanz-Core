@@ -3,8 +3,10 @@ package ch.redanz.redanzCore.model.registration.entities;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jdk.jfr.Name;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -20,6 +22,7 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CheckIn implements Serializable {
 
   @Id
@@ -28,58 +31,105 @@ public class CheckIn implements Serializable {
   private Long checkInId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name="registration_id")
-  private Registration registration;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name="guest_id")
-  private Guest guest;
-
-  @ManyToOne(fetch = FetchType.LAZY)
   @JsonIgnore
   @JoinColumn(name="event_id")
   private Event event;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name="slot_id")
-  private Slot slot;
+  @JsonIgnore
+  @JoinColumn(name="registration_id")
+  private Registration registration;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JsonIgnore
+  @JoinColumn(name="guest_id")
+  private Guest guest;
+
+  @Column(name="check_in_name")
+  private String checkinName;
+
+  @Column(name="type")
+  private String type;
+
+  @Column(name="description")
+  private String description;
+
+  @Column(name="slots")
+  private String slots;
+
+  @Column(name="food")
+  private String food;
+
+  @Column(name="addons")
+  private String addons;
+
+  @Column(name="privates")
+  private String privates;
+
+  @Column(name="discounts")
+  private String discounts;
+
+  @Column(name="status")
+  private String status;
+
+  @Column(name="amount_due")
+  private Long amountDue;
+
+  @Column(name="total_amount")
+  private Long totalAmount;
+
+  @Column(name="color")
+  private String color;
 
   @Column(name = "check_in_time")
   private ZonedDateTime checkInTime;
 
-  public CheckIn() {
-  }
   public CheckIn(
-    Registration registration,
     Event event,
-    Slot slot
-  ) {
-    this.registration = registration;
-    this.event = event;
-    this.slot = slot;
-  }
-  public CheckIn(
     Guest guest,
+    String checkInName,
+    String type,
+    String description,
+    String slots
+  ) {
+    this.event = event;
+    this.guest = guest;
+    this.checkinName = checkInName;
+    this.type = type;
+    this.description = description;
+    this.slots = slots;
+  }
+
+  public CheckIn(
     Event event,
-    Slot slot
-  ) {
-    this.guest = guest;
-    this.event = event;
-    this.slot = slot;
-  }
-  public CheckIn(
     Registration registration,
-    Event event
+    String checkInName,
+    String type,
+    String description,
+    String slots,
+    String food,
+    String addons,
+    String discounts,
+    String privates,
+    String status,
+    Long amountDue,
+    Long totalAmount,
+    String color
   ) {
+    this.event = event;
     this.registration = registration;
-    this.event = event;
-  }
-  public CheckIn(
-    Guest guest,
-    Event event
-  ) {
-    this.guest = guest;
-    this.event = event;
+    this.checkinName = checkInName;
+    this.type = type;
+    this.description = description;
+    this.slots = slots;
+    this.food = food;
+    this.addons = addons;
+    this.discounts = discounts;
+    this.privates = privates;
+    this.status = status;
+    this.color = color;
+    this.amountDue = amountDue;
+    this.totalAmount = totalAmount;
   }
 
   public static List<Map<String, String>> schema() {
@@ -96,11 +146,6 @@ public class CheckIn implements Serializable {
           put("type", "id");
           put("label", "Registration");
         }});
-//        add(new HashMap<>() {{
-//          put("eventPartKey", "slot");
-//          put("type", "id");
-//          put("label", "Slot");
-//        }});
         add(new HashMap<>() {{
           put("key", "update");
           put("type", "update");

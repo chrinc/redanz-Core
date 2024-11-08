@@ -40,46 +40,25 @@ public class ReportCheckinService {
     // Fetch all check-ins for the event
     List<CheckIn> checkIns = checkInService.findAllByEvent(event);
 
-    // Pre-fetch and initialize lazy-loaded entities before parallel processing
     checkIns.forEach(checkIn -> {
-      Hibernate.initialize(checkIn.getRegistration());
-      Registration registration = checkIn.getRegistration();
-      if (registration != null) {
-        Hibernate.initialize(registration.getParticipant());
-        Hibernate.initialize(registration.getBundle());
-        Hibernate.initialize(registration.getTrack());
-        if (registration.getBundle() != null) {
-          Hibernate.initialize(registration.getBundle().getColor());
-        }
-      }
-    });
-
-    // Parallel processing of check-ins
-    checkIns.parallelStream().forEach(checkIn -> {
-      boolean isGuest = checkIn.getGuest() != null;
-      String bundleColor = (checkIn.getRegistration() != null && checkIn.getRegistration().getBundle() != null && checkIn.getRegistration().getBundle().getColor() != null) ? checkIn.getRegistration().getBundle().getColor() : null;
-      String slotColor = (checkIn.getSlot() != null && checkIn.getSlot().getColor() != null) ? checkIn.getSlot().getColor() : null;
-
-
       try {
         // Create ResponseCheckIn object
         ResponseCheckIn responseCheckIn = new ResponseCheckIn(
           checkIn.getCheckInId(),
-          isGuest ? checkIn.getGuest().getName() : registrationService.fullName(checkIn.getRegistration()),
-          isGuest ? "Guest" : registrationService.bundleName(checkIn.getRegistration()),
-          isGuest ? checkIn.getGuest().getDescription() : registrationService.trackName(checkIn.getRegistration()),
-          null, // Check-in slot, if needed, add handling
-          isGuest ? "" : foodRegistrationService.getReportFoodSlots(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
-          isGuest ? "" : specialRegistrationService.getReportSpecials(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
-          isGuest ? "" : discountRegistrationService.getReportDiscounts(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
-          isGuest ? "" : privateClassService.getReportPrivates(checkIn.getRegistration(), languageService.findLanguageByLanguageKey(LanguageConfig.ENGLISH.getKey())),
-          isGuest ? "" : registrationService.workflowStatusName(checkIn.getRegistration()),
-//          isGuest ? null : null, // paymentService.amountDue(checkIn.getRegistration()),
-//          isGuest ? null : null, // paymentService.totalAmount(checkIn.getRegistration()),
-          isGuest ? slotColor : bundleColor, // Color info, slot or bundle color
+          checkIn.getCheckinName(),
+          checkIn.getType(),
+          checkIn.getDescription(),
+          checkIn.getSlots(),
+          checkIn.getFood(),
+          checkIn.getAddons(),
+          checkIn.getDiscounts(),
+          checkIn.getPrivates(),
+          checkIn.getStatus(),
+          checkIn.getAmountDue(),
+          checkIn.getTotalAmount(),
+          checkIn.getColor(),
           checkIn.getCheckInTime()
         );
-
         // Add the response to the thread-safe list
         responseCheckIns.add(responseCheckIn);
       } catch (ApiRequestException apiRequestException) {

@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.EventTypeSlotRepo;
@@ -14,10 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -309,6 +307,26 @@ public class SlotService {
     save(slot);
   }
 
+  public String slotNames(List<Slot> slots, Language language) {
+    if (slots == null || slots.isEmpty()) {
+      return "";
+    }
+    // Sort the list by seqNr before processing
+    slots.sort(Comparator.comparing(Slot::getSeqNr));
+
+    return slots.stream()
+      .map(slot -> outTextService.getOutTextByKeyAndLangKey(slot.getName(), language.getLanguageKey()).getOutText())
+      .collect(Collectors.joining(", "));
+  }
+
+  public String slotNames(Set<Slot> slots, Language language) {
+    if (slots == null || slots.isEmpty()) {
+      return "";
+    }
+
+    // Convert the Set to a List
+    return slotNames(slots.stream().collect(Collectors.toList()), language);
+  }
 
   public void save (EventTypeSlot eventTypeSlot) {
     this.eventTypeSlotRepo.save(eventTypeSlot);

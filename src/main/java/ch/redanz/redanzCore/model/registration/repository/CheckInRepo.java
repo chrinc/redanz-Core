@@ -17,15 +17,6 @@ import java.util.Optional;
 @Repository
 public interface CheckInRepo extends JpaRepository<CheckIn, Long> {
   List<CheckIn> findAllByEvent(Event event);
-  List<CheckIn> findAllByEventAndSlot(Event event, Slot slot);
-  List<CheckIn> findAllByEventAndSlotAndCheckInTimeIsNull(Event event, Slot slot);
-  List<CheckIn> findAllByEventAndCheckInTimeIsNull(Event event);
-  List<CheckIn> findAllByEventAndSlotAndCheckInTimeIsNotNull(Event event, Slot slot);
-  void deleteAllByEventAndSlot(Event event, Slot slot);
   void deleteAllByEvent(Event event);
-
   CheckIn findByCheckInId(Long checkInId);
-
-  Optional<CheckIn> findByEventAndSlotAndGuest(Event event, Slot slot, Guest guest);
-  Optional<CheckIn> findByEventAndSlotAndRegistration(Event event, Slot slot, Registration registration);
 }
