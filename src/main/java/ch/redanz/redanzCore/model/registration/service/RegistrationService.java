@@ -242,6 +242,10 @@ public class RegistrationService {
     return registrationRepo.findAllByEventAndActiveAndRegistrationType(event, true, RegistrationType.PARTICIPANT);
   }
 
+  public List<Registration> findStaffByEvent(Event event) {
+    return registrationRepo.findAllByEventAndActiveAndRegistrationType(event, true, RegistrationType.STAFF);
+  }
+
   public List<WorkflowStatus> getWorkflowStatusList() {
     return workflowStatusService.findAll();
   }

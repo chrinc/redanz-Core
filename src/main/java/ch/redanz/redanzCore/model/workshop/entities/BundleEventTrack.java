@@ -39,6 +39,8 @@ public class BundleEventTrack {
 
   private int capacity;
 
+  private String color;
+
   public BundleEventTrack() {
   }
 
@@ -66,6 +68,7 @@ public class BundleEventTrack {
         add(new HashMap<>() {{put("key", "id");                  put("type", "id");                                        put("label", "id");           }});
         add(new HashMap<>() {{put("key", "bundleId");            put("type", "id");                                        put("label", "Track Id");          }});
         add(new HashMap<>() {{put("key", "eventTrack");          put("type", "listText");    put("required", "false");   put("label", "Track"); put("list", null);}});
+        add(new HashMap<>() {{put("key", "color");               put("type", "color");       put("required", "false"); put("label", "Wrist Band Color"); }});
         add(new HashMap<>() {{put("key", "bundleEventTrackDanceRoles");          put("type", "multiselectText");    put("required", "false");   put("label", "Dance Roles"); put("list", null);}});
         add(new HashMap<>() {{put("key", "capacity");            put("type", "number");       put("required", "true");    put("label", "Capacity");             }});
         add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_TRACKS_EN.getOutTextKey()); }});
@@ -80,6 +83,7 @@ public class BundleEventTrack {
         put("id", bundleEventTrackId.toString());
         put("bundleId", bundle.getBundleId().toString());
         put("eventTrack", eventTrack.getEventTrackId().toString());
+        put("color", color);
         put("capacity", String.valueOf(capacity));
       }
     };

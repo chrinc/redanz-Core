@@ -37,6 +37,10 @@ public class BundleEventTrackService {
     return bundleEventTrackRepo.findAllByBundleAndEventTrackEvent(bundle, event);
   }
 
+  public BundleEventTrack findByEventBundleAndTrack(Event event, Bundle bundle, Track track) {
+    return bundleEventTrackRepo.findByEventTrackEventAndBundleAndEventTrackTrack(event, bundle, track);
+  }
+
 
   public BundleEventTrack findByBundleAndEventTrack(Bundle bundle, EventTrack eventTrack) {
     return bundleEventTrackRepo.findByBundleAndEventTrack(bundle, eventTrack);

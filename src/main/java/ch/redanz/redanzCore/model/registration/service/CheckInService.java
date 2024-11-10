@@ -2,10 +2,10 @@ package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.entities.CheckIn;
+import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.repository.CheckInRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
-import ch.redanz.redanzCore.model.workshop.service.SlotService;
+import ch.redanz.redanzCore.model.workshop.service.*;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +29,10 @@ public class CheckInService {
   private final PrivateClassService privateClassService;
   private final LanguageService languageService;
   private final PaymentService paymentService;
+  private final VolunteerService volunteerService;
+  private final BundleService bundleService;
+  private final EventService eventService;
+  private final BundleEventTrackService bundleEventTrackService;
   public void save(CheckIn checkIn) {
     checkInRepo.save(checkIn);
   }
@@ -48,6 +52,8 @@ public class CheckInService {
     deleteAllByEvent(event);
 
     List<CheckIn> checkIns = new ArrayList<>();
+
+    // Guests
     guestService.findAllByEvent(event).forEach(guest -> {
       checkIns.add(
       new CheckIn(
@@ -56,11 +62,28 @@ public class CheckInService {
         guest.getName(),
         "Guest",
         guest.getDescription(),
-        slotService.slotNames(guest.getSlots(), languageService.english())
+        slotService.slotNames(guest.getSlots(), languageService.english()),
+        "d3d3d3" // grey
       )
       );
     });
 
+    // Staff
+    registrationService.findStaffByEvent(event).forEach(staff -> {
+      checkIns.add(
+      new CheckIn(
+        staff.getEvent(),
+        staff,
+        staff.getParticipant().getFirstName() + " " +  staff.getParticipant().getLastName(),
+        RegistrationType.STAFF.name(),
+        volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "",
+        "",
+        "e4e4e4"
+       )
+      );
+    });
+
+    // Participants
     registrationService.findAllByEvent(event).forEach(registration -> {
       checkIns.add(
       new CheckIn(
@@ -77,7 +100,7 @@ public class CheckInService {
         registrationService.workflowStatusName(registration),
         paymentService.amountDue(registration),
         paymentService.totalAmount(registration),
-        registration.getBundle().getColor(),
+        bundleService.hasTrack(registration.getBundle()) ? bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(),registration.getTrack()).getColor() : registration.getBundle().getColor(),
         registration.getDanceRole() != null ? registration.getDanceRole().getName() : ""
        )
       );

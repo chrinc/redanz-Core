@@ -93,7 +93,8 @@ public class CheckIn implements Serializable {
     String checkInName,
     String type,
     String description,
-    String slots
+    String slots,
+    String color
   ) {
     this.event = event;
     this.guest = guest;
@@ -101,6 +102,25 @@ public class CheckIn implements Serializable {
     this.type = type;
     this.description = description;
     this.slots = slots;
+    this.color = color;
+  }
+
+  public CheckIn(
+    Event event,
+    Registration registration,
+    String checkInName,
+    String type,
+    String description,
+    String slots,
+    String color
+  ) {
+    this.event = event;
+    this.registration = registration;
+    this.checkinName = checkInName;
+    this.type = type;
+    this.description = description;
+    this.slots = slots;
+    this.color = color;
   }
 
   public CheckIn(

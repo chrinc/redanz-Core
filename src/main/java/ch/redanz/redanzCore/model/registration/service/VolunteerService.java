@@ -35,9 +35,7 @@ public class VolunteerService {
   private final VolunteerSlotRegistrationRepo volunteerSlotRegistrationRepo;
   private final SlotService slotService;
   private final PersonService personService;
-  private final LanguageService languageService;
   private final OutTextService outTextService;
-  private final EventService eventService;
   private final VolunteerTypeRepo volunteerTypeRepo;
   private final EventRepo eventRepo;
 
@@ -47,7 +45,13 @@ public class VolunteerService {
   public List<VolunteerRegistration> getAll() {
     return volunteerRegistrationRepo.findAll();
   }
+  public VolunteerRegistration findByRegistration(Registration registration) {
+    return volunteerRegistrationRepo.existsByRegistration(registration) ? volunteerRegistrationRepo.findByRegistration(registration) : null;
+  }
 
+  public String volunteerTypeName(VolunteerRegistration volunteerRegistration, Language language) {
+    return outTextService.getOutTextByKeyAndLangKey(volunteerRegistration.getType().getName(), language.getLanguageKey()).getOutText();
+  }
   public List<VolunteerRegistration> getAllByEvent(Event event) {
     return volunteerRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
   }
