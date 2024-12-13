@@ -260,19 +260,15 @@ public class RegistrationController {
     @RequestBody String jsonObject
   ) {
     try {
-//      log.info("inc@start");
       Event event = eventService.findByEventId(eventId);
       registrationService.updateSoldOut(event);
 
       // update
-//      log.info("inc@update Registration 1");
       Registration registration = registrationService.updateRegistrationRequest(
         personId,
         event,
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
-//      log.info("inc@update Registration 2");
-//      log.info("bfr automatch");
 
       // match
       if (baseParService.doAutoMatch()) {

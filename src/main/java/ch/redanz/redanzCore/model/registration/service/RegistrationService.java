@@ -93,6 +93,10 @@ public class RegistrationService {
     return registrationRepo.getWorkflowStatusName(registration.getRegistrationId());
   };
 
+  public boolean hasRegistration(Event event, Person person) {
+    return registrationRepo.existsByActiveAndEventAndParticipant(true, event, person);
+  }
+
   public int getBunldePrice(Registration registration) {
     return  registrationRepo.getBundlePrice(registration.getRegistrationId());
   }
@@ -594,6 +598,7 @@ public class RegistrationService {
   @Transactional
   public Registration updateRegistrationRequest(Long personId, Event event, JsonObject request) throws IOException, TemplateException {
     boolean isNewRegistration = false;
+    Long registrationId = request.get("registrationId").isJsonNull() ? null : request.get("registrationId").getAsLong();
     // ignore if user already has a registration
     Registration registration;
     RegistrationRequest registrationRequest = new RegistrationRequest(
@@ -606,20 +611,19 @@ public class RegistrationService {
     );
 
 //     log.info("inc@updateRegistration, after registrationRequest");
-    if (findByParticipantAndEvent(
-      personService.findByPersonId(personId),
-      event,
-      RegistrationType.PARTICIPANT
-    ).isPresent()) {
-//         log.info("inc@updateRegistration, update Registration");
-        // update Registration
-        registration = findByParticipantAndEvent(
-          personService.findByPersonId(personId),
-          event,
-          RegistrationType.PARTICIPANT
-        ).get();
-        updateRegistration(registration, registrationRequest, personId, RegistrationType.PARTICIPANT);
-      }
+    if (registrationId != null) {
+      registration = findByParticipantAndEvent(
+        personService.findByPersonId(personId),
+        event,
+        RegistrationType.PARTICIPANT
+      ).get();
+      updateRegistration(
+        findByRegistrationId(registrationId),
+        registrationRequest,
+        request.get("personId").isJsonNull() ? personId : request.get("personId").getAsLong(),
+        RegistrationType.PARTICIPANT
+      );
+    }
 
     // new Registration
     else {

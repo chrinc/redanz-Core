@@ -47,6 +47,8 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
       Boolean active, Event event, Bundle bundle
     );
 
+    boolean existsByActiveAndEventAndParticipant(Boolean active, Event event, Person participant);
+
     int countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
     int countAllByBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(Bundle bundle, WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
     int countAllByTrackAndWorkflowStatusAndActiveAndEventAndRegistrationType(Track track, WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);

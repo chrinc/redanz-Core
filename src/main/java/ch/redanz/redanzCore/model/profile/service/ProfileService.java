@@ -4,7 +4,9 @@ package ch.redanz.redanzCore.model.profile.service;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import freemarker.template.Configuration;
@@ -19,6 +21,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,7 @@ public class ProfileService {
   private final OutTextService outTextService;
   private final LanguageService languageService;
   private final BaseParService baseParService;
+  private final RegistrationService registrationService;
   private final EmailService emailService;
   Configuration mailConfig;
 
@@ -92,6 +96,16 @@ public class ProfileService {
 
   public List<Person> getPersons() {
     return personService.findAll(true);
+  }
+
+  public List<Person> getPersonsWoutRegistration(Event event, Person person) {
+    List<Person> personsWoutRegistration = new ArrayList<>();
+    personService.findAll(true).forEach(foundPerson -> {
+      if (!registrationService.hasRegistration(event, foundPerson) || foundPerson == person) {
+        personsWoutRegistration.add(foundPerson);
+      }
+    });
+    return personsWoutRegistration;
   }
 
   public void sendRegisteredProfileEmail(Person person, String registrationLink, String headerLink) throws IOException, TemplateException {

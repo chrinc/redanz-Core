@@ -8,6 +8,7 @@ import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.profile.response.UserResponse;
 import ch.redanz.redanzCore.model.profile.service.*;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -45,6 +46,7 @@ public class ProfileController {
   private final PersonService personService;
   private final LanguageService languageService;
   private final ErrorLogService errorLogService;
+  private final EventService eventService;
 
   @Autowired
   private Environment environment;
@@ -195,6 +197,15 @@ public class ProfileController {
     @RequestParam("userId") Long userId
   ) {
     return profileService.getPersons();
+  }
+
+  @GetMapping(path = "/persons/wout-registration")
+  public List<Person> persons(
+    @RequestParam("userId") Long userId,
+    @RequestParam("eventId") Long eventId,
+    @RequestParam("personId") Long personId
+  ) {
+    return profileService.getPersonsWoutRegistration(eventService.findByEventId(eventId), personService.findByPersonId(personId));
   }
 
   @PostMapping(path = "/person/update")
