@@ -412,4 +412,23 @@ public class RegistrationController {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
   }
+  @PostMapping(path = "/resetCheckIn")
+  @Transactional
+  public void resetCheckIn(
+    @RequestParam("personId") Long personId,
+    @RequestParam("eventId") Long eventId,
+    @RequestBody String guestJsonObject
+  ) {
+    try {
+      // log.info("remove guest");
+      Event event = eventService.findByEventId(eventId);
+      checkInService.resetCheckInRequest(JsonParser.parseString(guestJsonObject).getAsJsonObject());
+    } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("ResetCheckInApi", apiRequestException.toString());
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      errorLogService.addLog("ResetCheckIn", exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
+    }
+  }
 }

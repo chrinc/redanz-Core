@@ -6,6 +6,7 @@ import ch.redanz.redanzCore.model.registration.entities.Guest;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import org.hibernate.annotations.Check;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +20,9 @@ public interface CheckInRepo extends JpaRepository<CheckIn, Long> {
   List<CheckIn> findAllByEvent(Event event);
   void deleteAllByEvent(Event event);
   CheckIn findByCheckInId(Long checkInId);
+  boolean existsByGuest(Guest guest);
+  CheckIn findByGuest(Guest guest);
+  boolean existsByRegistration(Registration registration);
+  CheckIn findByRegistration(Registration registration);
+  void deleteByCheckInId(Long checkInId);
 }

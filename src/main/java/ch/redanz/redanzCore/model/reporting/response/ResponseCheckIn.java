@@ -41,6 +41,8 @@ public class ResponseCheckIn {
           put("key", "isUpdate");
           put("type", "isUpdate");
           put("label", "Check In");
+          put("labelTrue", "Check In");
+          put("labelFalse", "Check Out");
         }});
 
         add(new HashMap<>() {{

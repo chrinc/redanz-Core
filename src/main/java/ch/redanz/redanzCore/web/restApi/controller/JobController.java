@@ -114,6 +114,21 @@ public class JobController {
     }
   }
 
+  @GetMapping (path = "/checkIn/update")
+  @Transactional
+  public void updateCheckIn(
+    @RequestParam("eventId") Long eventId
+  ) {
+    try {
+      Event event = eventService.findByEventId(eventId);
+      checkInService.updateByEvent(event);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
   @GetMapping (path = "/change-role")
   @Transactional
   public void createCheckIn(
