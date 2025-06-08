@@ -40,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     customAuthenticationFilter.setFilterProcessesUrl("/core-api/login");
     http.authorizeRequests().antMatchers("/core-api/profile/user/registration/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/zahls/checkout/**").permitAll();
+    http.authorizeRequests().antMatchers("/core-api/payrexx/checkout/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/profile/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/login/check-server").permitAll();
     http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
