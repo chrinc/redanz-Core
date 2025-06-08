@@ -7,6 +7,7 @@ import ch.redanz.redanzCore.model.registration.service.PaymentService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,8 @@ import java.util.concurrent.TimeoutException;
 public class PayrexxPaymentController {
   private final RegistrationService registrationService;
   private final PaymentService paymentService;
-  private final EventService eventService;
+  private final ErrorLogService errorLogService;
+
 
   @GetMapping("/payment-intent")
   public PaymentDetailsResponse getPaymentIntent(
@@ -81,6 +83,7 @@ public class PayrexxPaymentController {
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
     } catch (Exception exception) {
+      errorLogService.addLog("/confirmPayment", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }

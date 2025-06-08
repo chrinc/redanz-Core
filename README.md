@@ -91,9 +91,8 @@ Necessary tools for testing and development
    - detach `Ctrl + A Ctrl + D`
  - Start Spring on Server:
 -- clean inst all: `mvn clean install`
---spring.profiles.active=prod --redanz.master.password=
-``java -jar [-Dserver.port=8083] $snapshot --spring.profiles.active=prod --redanz.master.password=$pass``
-`snapshot=[snapshot], pass=[password] => escape with \ before special characters`
+--Set password and Snapshot: `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
+--RUN: ``java -jar $SNAPSHOT --spring.profiles.active=prod --redanz.master.password=$PASSWORD --server.port=8083``
  - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)
  - Create a Cronjob for
    - sql-db backup

@@ -45,6 +45,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
          request.getServletPath().equals("/core-api/login")
       || request.getServletPath().equals("/core-api/login/token/refresh")
       || request.getServletPath().equals("/core-api/zahls/checkout/confirm")
+      || request.getServletPath().equals("/core-api/payrexx/checkout/confirm")
     ) {
       filterChain.doFilter(request, response);
     } else {
