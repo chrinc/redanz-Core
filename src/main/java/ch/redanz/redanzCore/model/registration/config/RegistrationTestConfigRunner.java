@@ -40,9 +40,6 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final FoodRegistrationService foodRegistrationService;
   private final DonationRegistrationService donationRegistrationService;
 
-  private final EODMatchingJob eodMatchingJob;
-  private final EODReleaseJob eodReleaseJob;
-
   @Autowired
   Configuration mailConfig;
 

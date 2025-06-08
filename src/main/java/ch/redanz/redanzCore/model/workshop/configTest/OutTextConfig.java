@@ -634,7 +634,7 @@ public enum OutTextConfig {
   LABEL_ERROR_LINK_EXPIRED_GE("FRONT_BASE", "LABEL_ERROR_LINK_EXPIRED", "Link abgelaufen. Bitte Passwort zurücksetzen.", "GE"),
 
   LABEL_ERROR_HAS_REGISTRATION_EN("FRONT_LOGIN", "LABEL_ERROR_HAS_REGISTRATION", "Event cannot be deleted because registrations exist.", "EN"),
-  LABEL_ERROR_HAS_REGISTRATION_GE("FRONT_LOGIN", "LABEL_ERROR_HAS_REGISTRATION", "Evenet kann nicht gelöscht werden, weil Anmeldungen existieren.", "GE"),
+  LABEL_ERROR_HAS_REGISTRATION_GE("FRONT_LOGIN", "LABEL_ERROR_HAS_REGISTRATION", "Event kann nicht gelöscht werden, weil Anmeldungen existieren.", "GE"),
 
   LABEL_ERROR_HAS_EVENT_EN("FRONT_LOGIN", "LABEL_ERROR_HAS_EVENT", "Is used in a Event and cannot be deleted", "EN"),
   LABEL_ERROR_HAS_EVENT_GE("FRONT_LOGIN", "LABEL_ERROR_HAS_EVENT", "Wird in einem Event verwendet und kann nicht gelöscht werden.", "GE"),
