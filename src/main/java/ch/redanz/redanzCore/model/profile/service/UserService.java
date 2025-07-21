@@ -61,8 +61,12 @@ public class UserService implements UserDetailsService {
     }
   }
 
+  public boolean userIsAdmin(User user) {
+    return user.getUserRole().equals(UserRole.ADMIN)
+      || user.getUserRole().equals(UserRole.ORGANIZER);
+  }
+
   public boolean userIsTester(User user) {
-//    log.info(user.getUsername().replace(".", ""));
     return testUserRepo.existsByUsernameIgnoreCase(user.getUsername().replace(".", ""));
   }
   public boolean usernameIsTester(String username) {

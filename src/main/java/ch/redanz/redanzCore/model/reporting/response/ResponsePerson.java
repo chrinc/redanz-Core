@@ -12,11 +12,13 @@ import lombok.ToString;
 public class ResponsePerson {
   private String firstName;
   private String LastName;
-  private String address;
+  private String street;
   private String postalCode;
   private String city;
   private String email;
   private String role;
-  private String lang;
+  private String language;
   private Long personId;
+  private Long countryId;
+  private String mobile;
 }

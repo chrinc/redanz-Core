@@ -7,9 +7,11 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventPartService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
+import ch.redanz.redanzCore.model.workshop.service.SpecialService;
 import ch.redanz.redanzCore.service.email.EmailService;
 import com.google.gson.JsonObject;
 import freemarker.template.Configuration;
@@ -43,6 +45,8 @@ public class RegistrationEmailService {
 
   @Autowired
   Configuration mailConfig;
+  @Autowired
+  private SpecialService specialService;
 
   public void update(RegistrationEmail registrationEmail) {
     registrationEmailRepo.save(registrationEmail);
@@ -108,6 +112,11 @@ public class RegistrationEmailService {
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
+    );
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
     );
 
 //    log.info("incbfr send Email");
@@ -268,6 +277,47 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
+    StringBuilder specialsHtml = new StringBuilder();
+
+    // "specials"
+    specialService.findByEventInfoOnly(registration.getEvent(), true).forEach(eventSpecial -> {
+      String name = eventSpecial.getSpecial().getName();
+      String description = eventSpecial.getSpecial().getDescription();
+      String url = eventSpecial.getUrl();
+    log.info(eventSpecial.getSpecial().getName());
+      if (name != null && !name.isEmpty()) {
+        specialsHtml.append("<div class=\"indented\">\uD83D\uDC49 <b>"
+          + outTextService.getOutTextByKeyAndLangKey(name, languageKey).getOutText()
+          + "</b>");
+        if (description != null && !description.isEmpty()) {
+          specialsHtml.append("<b>: </b>"
+            + outTextService.getOutTextByKeyAndLangKey(description, languageKey).getOutText()
+          );
+        }
+        if (url != null && !url.isEmpty()) {
+          specialsHtml.append(" (<a href=\""
+            + outTextService.getOutTextByKeyAndLangKey(url, languageKey).getOutText()
+            + "\">"
+            + outTextService.getOutTextByKeyAndLangKey("LABEL_LINK", languageKey).getOutText()
+            + "</a>)");
+        }
+        specialsHtml.append("</div>");
+      }
+    });
+    log.info(specialsHtml.toString());
+    if (specialsHtml.length() > 0) {
+      specialsHtml.insert(0,
+        outTextService.getOutTextByKeyAndLangKey("LABEL_SPECIALS_INTRO", languageKey).getOutText()
+          + "<br/><br/>");
+
+    }
+    model.put("specials", specialsHtml.toString());
+
     emailService.sendEmail(
       person.getUser().getUsername(),
       outTextService.getOutTextByKeyAndLangKey(
@@ -352,6 +402,12 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
+
     emailService.sendEmail(
 //      EmailService.getSession(),
       registration.getParticipant().getUser().getUsername(),
@@ -416,6 +472,11 @@ public class RegistrationEmailService {
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
       ).getOutText().replace("{1}", registration.getEvent().getName())
+    );
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
     );
     emailService.sendEmail(
 //      EmailService.getSession(),
@@ -491,6 +552,18 @@ public class RegistrationEmailService {
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
 
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
+
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
+
     emailService.sendEmail(
 //      EmailService.getSession(),
       registration.getParticipant().getUser().getUsername(),
@@ -527,9 +600,24 @@ public class RegistrationEmailService {
         : "";
 
     registrationList.forEach(registration -> {
+      try {
+        sendGenericEmail(senderUser, registration.getParticipant(), subject, content);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      } catch (TemplateException e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  public void sendGenericEmail(Long senderUser, Person receiver, String subject, String content) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login"));
-    model.put("firstName", registration.getParticipant().getFirstName());
+
+//    model.put("logo_round", environment.getProperty("link.logo_round"));
+
+    // Name withough special chars, underscore instead of space
+    model.put("firstName", receiver.getFirstName());
     model.put("content", content);
       Template template = null;
       try {
@@ -539,9 +627,9 @@ public class RegistrationEmailService {
       }
 
       String languageKey =
-        registration.getParticipant().getPersonLang() == null ?
+        receiver.getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
-          registration.getParticipant().getPersonLang().getLanguageKey();
+          receiver.getPersonLang().getLanguageKey();
 
     model.put("regards",
       outTextService.getOutTextByKeyAndLangKey(
@@ -555,11 +643,16 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText().replace("{1}", baseParService.organizerName())
     );
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
 
       try {
         emailService.sendEmail(
 //          EmailService.getSession(),
-          registration.getParticipant().getEmail(),
+          receiver.getEmail(),
           subject,
           FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
           ,baseParService.testMailOnly()
@@ -573,7 +666,6 @@ public class RegistrationEmailService {
         throw new RuntimeException(e);
       }
 
-    });
   }
 
   public void postPoneLastReminderDate(Registration registration) {

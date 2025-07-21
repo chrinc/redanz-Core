@@ -34,19 +34,22 @@ public class EventSpecial {
 
   private String url;
 
+  private Boolean infoOnly;
+
   @Column(name = "sold_out")
   private Boolean soldOut;
 
   public EventSpecial() {
   }
 
-  public EventSpecial(Special special, Event event, double price, boolean soldOut, int capacity, String url) {
+  public EventSpecial(Special special, Event event, double price, boolean soldOut, int capacity, String url, Boolean infoOnly) {
     this.event = event;
     this.special = special;
     this.price = price;
     this.soldOut = soldOut;
     this.capacity = capacity;
     this.url = url;
+    this.infoOnly = infoOnly;
   }
 
   public static List<Map<String, String>> schema() {
@@ -60,6 +63,7 @@ public class EventSpecial {
         add(new HashMap<>() {{put("key", "eventPartInfo"); put("type", "partInfo");        put("eventPartKey", "special");                          put("label", OutTextConfig.LABEL_SPECIAL_INFO_EN.getOutTextKey());}});
         add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_SPECIALS_EN.getOutTextKey()); }});
         add(new HashMap<>() {{put("key", "singular");            put("type", "title");         put("label", OutTextConfig.LABEL_SPECIAL_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{put("key", "infoOnly");            put("type", "bool");;  put("required", "false");    put("labelTrue", "Info Only");            put("labelFalse", "Allow Registration");;}});
 
       }
     };
@@ -73,6 +77,7 @@ public class EventSpecial {
         put("price", String.valueOf(price));
         put("capacity", String.valueOf(capacity));
         put("url", url);
+        put("infoOnly", String.valueOf(infoOnly));
       }
     };
   }

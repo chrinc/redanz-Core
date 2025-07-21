@@ -19,7 +19,7 @@ public class ResponsePersonRegistrations {
   private String lastName;
   private String email;
   private String mobile;
-  private String address;
+  private String street;
   private String postalCode;
   private String city;
   private String country;

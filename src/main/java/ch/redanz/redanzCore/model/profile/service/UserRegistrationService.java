@@ -27,8 +27,8 @@ public class UserRegistrationService {
   private final PasswordResetService passwordResetService;
   private final PersonService personService;
 
-  public String register(UserResponse request) {
-    boolean isValidEmail = emailValidator.test(request.getUsername());
+  public String register(String username, String password) {
+    boolean isValidEmail = emailValidator.test(username);
 
     if (!isValidEmail) {
       throw new IllegalStateException("email not valid");
@@ -36,8 +36,8 @@ public class UserRegistrationService {
 
     String token = userService.signUpNewUser(
       new User(
-        request.getUsername(),
-        request.getPassword(),
+        username,
+        password,
         UserRole.PARTICIPANT
       )
     );

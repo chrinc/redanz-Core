@@ -1,10 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
-import ch.redanz.redanzCore.model.workshop.entities.Bundle;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
-import ch.redanz.redanzCore.model.workshop.entities.Special;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
+import ch.redanz.redanzCore.model.workshop.repository.EventSpecialRepo;
 import ch.redanz.redanzCore.model.workshop.repository.SpecialRepo;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
@@ -33,15 +31,20 @@ public class SpecialService {
   private final SpecialRepo specialRepo;
   private final OutTextService outTextService;
   private final EventRepo eventRepo;
+  private final EventSpecialRepo eventSpecialRepo;
 
 
   public void save(Special special) {
     specialRepo.save(special);
   }
 
-//  public Set<Special> findByEvent(Event event) {
-//    return event.;
-//  }
+  public List<EventSpecial> findByEvent(Event event) {
+    return eventSpecialRepo.findAllByEvent(event);
+  }
+
+  public List<EventSpecial> findByEventInfoOnly(Event event, Boolean infoOnly) {
+    return eventSpecialRepo.findAllByEventAndInfoOnly(event, infoOnly);
+  }
   public List<Special> findAll() {
     return specialRepo.findAll();
   }
@@ -104,7 +107,6 @@ public class SpecialService {
         Field field;
 
         try {
-          log.info(type);
           switch(type) {
             case "label":
               if (request.get("label") != null && request.get("label").isJsonArray()) {

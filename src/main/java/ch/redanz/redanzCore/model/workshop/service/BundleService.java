@@ -414,15 +414,13 @@ public class BundleService {
         return bundle.getEventSpecials();
     }
 
-//    public List<Map<String, String>> getEventTrackSchema(Event event){
-//        List<Map<String, String>> eventTracksSchema = EventTrack.schema();
-//        eventTracksSchema.forEach(item -> {
-//            if (item.get("key").equals("track")) {
-//                item.put("list", trackService.getTracksData(event).toString());
-//            }
-//        });
-//        return eventTracksSchema;
-//    }
+    public Set<EventSpecial> findSpecialsByBundleAllowRegistration(Bundle bundle) {
+        return bundle.getEventSpecials()
+          .stream()
+          .filter(eventSpecial -> eventSpecial.getInfoOnly() == null || !eventSpecial.getInfoOnly())
+          .collect(Collectors.toSet());
+    }
+
 
     public List<Map<String, String>> getBundleEventTrackSchema(Event event){
         List<Map<String, String>> bundleEventTrackSchema = BundleEventTrack.schema();

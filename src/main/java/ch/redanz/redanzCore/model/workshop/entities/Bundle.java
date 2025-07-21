@@ -4,8 +4,6 @@ import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -30,16 +28,8 @@ public class Bundle implements Serializable {
     inverseJoinColumns = @JoinColumn(name = "event_special_id"))
   private Set<EventSpecial> eventSpecials;
 
-//  @ManyToMany(fetch = FetchType.EAGER)
-//  @JoinTable(
-//    name = "bundle_event_track",
-//    joinColumns = @JoinColumn(name = "bundle_id"),
-//    inverseJoinColumns = @JoinColumn(name = "event_track_id"))
-//  private Set<EventTrack> eventTracks;
-
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle", fetch = FetchType.EAGER)
   private Set<BundleEventTrack> bundleEventTracks;
-
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -61,11 +51,7 @@ public class Bundle implements Serializable {
 
   private double price;
   private String description;
-//  private Integer capacity;
   private Boolean simpleTicket;
-
-//  @Column(name = "sold_out")
-//  private boolean soldOut;
 
   private String color;
 
@@ -82,7 +68,6 @@ public class Bundle implements Serializable {
     String name,
     double price,
     String description,
-//    Integer capacity,
     Boolean simpleTicket,
     Integer seqNr,
     Set<Slot> partySlots,
@@ -92,7 +77,6 @@ public class Bundle implements Serializable {
     this.name = name;
     this.price = price;
     this.description = description;
-//    this.capacity = capacity;
     this.simpleTicket = simpleTicket;
     this.seqNr = seqNr;
     this.partySlots = partySlots;
@@ -115,7 +99,6 @@ public class Bundle implements Serializable {
         add(new HashMap<>() {{put("key", "bundleSpecial"); put("type", "multiselectInfo");                           put("label", "Specials");                 put("infoKey", "price");}});
         add(new HashMap<>() {{put("key", "bundleEventTrack");        put("type", "attribute"); put("required", "false"); put("label", "Choose Tracks"); put("list", null);}});
         add(new HashMap<>() {{put("key", "partySlots");    put("type", "multiselect");     put("required", "false"); put("label", "Party Slots");              put("list", null);}});
-//        add(new HashMap<>() {{ put("key", "bundleDanceRole");  put("type", "multiselectText");        put("required", "false");      put("label", "Dance Roles");  put("list", null);}});
         add(new HashMap<>() {{put("key", "seqNr");         put("type", "number");          put("required", "true");  put("label", "Sequence Number");  }});
         add(new HashMap<>() {{put("key", "eventPartInfo"); put("type", "partInfo");        put("eventPartKey", "bundle");                          put("label", OutTextConfig.LABEL_BUNDLE_INFO_EN.getOutTextKey());}});
         add(new HashMap<>() {{put("key", "clone");         put("type", "action");          put("show", "true");}});

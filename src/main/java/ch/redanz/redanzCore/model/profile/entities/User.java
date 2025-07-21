@@ -67,8 +67,6 @@ public class User implements Serializable, UserDetails {
   @JsonIgnore
   private Boolean enabled = false;
 
-//  public User () {}
-
   public User(
     String username,
     String password,
@@ -87,12 +85,6 @@ public class User implements Serializable, UserDetails {
   public String getPassword() {
     return password;
   }
-
-  // implements UserDetails
-//  @Override
-//  public String getUsername() {
-//    return username;
-//  }
 
   @Override
   public boolean isAccountNonExpired() {

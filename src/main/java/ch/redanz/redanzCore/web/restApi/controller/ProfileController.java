@@ -1,11 +1,7 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
-import ch.redanz.redanzCore.model.profile.entities.Country;
-import ch.redanz.redanzCore.model.profile.entities.Language;
-import ch.redanz.redanzCore.model.profile.entities.Person;
-import ch.redanz.redanzCore.model.profile.entities.User;
+import ch.redanz.redanzCore.model.profile.entities.*;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
-import ch.redanz.redanzCore.model.profile.response.UserResponse;
 import ch.redanz.redanzCore.model.profile.service.*;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
@@ -25,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -59,20 +52,6 @@ public class ProfileController {
   @GetMapping("/languages")
   public List<Language> getLanguages() {
     return languageService.findAll();
-  }
-
-  @PostMapping(path = "/user/registration")
-  public long register(@RequestBody UserResponse request) {
-    try {
-      userRegistrationService.register(request);
-      return userService.getUser(request.getUsername()).getUserId();
-    } catch (ApiRequestException apiRequestException) {
-      errorLogService.addLog("USER-REGISTRATION", apiRequestException.toString());
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
-      errorLogService.addLog("USER-REGISTRATION", exception.toString());
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
-    }
   }
 
   @GetMapping(path = "/user/registration/confirm")
@@ -156,17 +135,34 @@ public class ProfileController {
     return outTextService.getOutTextByType(types);
   }
 
-  @PostMapping(path = "/person")
-  public void register(
+  @PostMapping(path = "/profile/update")
+  public void updateProfile(
     @RequestParam("userId") Long userId,
     @RequestBody PersonResponse personResponse
   ) {
     try {
+      profileService.updateProfile(userId, personResponse);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/profile/submit")
+  public void submitProfile(
+    @RequestBody Map<String, Object> payload
+  ) {
+    try {
+
+      Map<String, Object> userMap = (Map<String, Object>) payload.get("user");
+      Map<String, Object> personMap = (Map<String, Object>) payload.get("person");
+      String username = userMap.get("username").toString();
+      String password = userMap.get("password").toString();
+      userRegistrationService.register(username, password);
+      User user = userService.getUser(username);
       String link = environment.getProperty("link.confirm.token.prefix")
-        + confirmationTokenService.getTokenByUser(userService.findByUserId(userId)
-      );
+        + confirmationTokenService.getTokenByUser(user);
       String headerLink = environment.getProperty("email.header.link");
-      profileService.registerProfile(userId, personResponse, link, headerLink);
+      profileService.registerProfile(user.getUserId(), username, personMap, link, headerLink);
     } catch (ApiRequestException apiRequestException) {
       errorLogService.addLog("PERSON-REGISTRATION", apiRequestException.toString());
       throw new ApiRequestException(apiRequestException.getMessage());
@@ -176,18 +172,38 @@ public class ProfileController {
     }
   }
 
-  @PostMapping(path = "/profile")
-  public void register(
-    @RequestBody String jsonObject
+  @PostMapping(path = "/person/update")
+  public void updatePerson(
+    @RequestParam("userId") Long userId,
+    @RequestBody PersonResponse personResponse
   ) {
     try {
-//      log.info("inc@profile registration");
-//      log.info("inc@profile jsonObject:" + jsonObject);
+      if (userService.userIsAdmin(userService.findByUserId(userId))) {
+        personService.updatePerson(personResponse);
+      }
     } catch (ApiRequestException apiRequestException) {
-      errorLogService.addLog("PROFILE-REGISTRATION", apiRequestException.toString());
+      errorLogService.addLog("PERSON-REGISTRATION", apiRequestException.toString());
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
-      errorLogService.addLog("PROFILE-REGISTRATION", exception.toString());
+      errorLogService.addLog("PERSON-REGISTRATION", exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/person/submit")
+  public void submitPerson(
+    @RequestParam("userId") Long userId,
+    @RequestBody PersonResponse personResponse
+  ) {
+    try {
+      if (userService.userIsAdmin(userService.findByUserId(userId))) {
+        personService.submitPerson(personResponse);
+      }
+    } catch (ApiRequestException apiRequestException) {
+      errorLogService.addLog("PERSON-REGISTRATION", apiRequestException.toString());
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      errorLogService.addLog("PERSON-REGISTRATION", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
@@ -206,18 +222,6 @@ public class ProfileController {
     @RequestParam("personId") Long personId
   ) {
     return profileService.getPersonsWoutRegistration(eventService.findByEventId(eventId), personService.findByPersonId(personId));
-  }
-
-  @PostMapping(path = "/person/update")
-  public void updatePerson(
-    @RequestParam("userId") Long userId,
-    @RequestBody PersonResponse personResponse
-  ) {
-    try {
-      profileService.updateProfile(userId, personResponse);
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
-    }
   }
 
   @GetMapping(path = "/person/remove")

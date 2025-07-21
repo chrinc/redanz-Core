@@ -46,7 +46,6 @@ public class EventController {
 
   @GetMapping(path = "/schema/event")
   public List<Map<String, String>> getEventSchema() {
-//    log.info("inc@getEventSchema");
     return eventService.getEventSchema();
   }
 
@@ -588,6 +587,13 @@ public class EventController {
     @RequestParam("bundleId") Long bundleId
   ) {
     return bundleService.findSpecialsByBundle(bundleService.findByBundleId(bundleId));
+  }
+
+  @GetMapping(path = "/bundleSpecialsAllowRegistration")
+  public Set<EventSpecial> getBundleSpecialsAllowRegistration(
+    @RequestParam("bundleId") Long bundleId
+  ) {
+    return bundleService.findSpecialsByBundleAllowRegistration(bundleService.findByBundleId(bundleId));
   }
 
   @GetMapping(path = "/privateClasses/all")

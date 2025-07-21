@@ -1,7 +1,10 @@
 package ch.redanz.redanzCore.model.profile.service;
 
 
+import ch.redanz.redanzCore.model.profile.entities.Country;
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
@@ -43,19 +46,18 @@ public class ProfileService {
   @Autowired
   Environment environment;
 
-  public void registerProfile(Long userId, PersonResponse personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
+  public void registerProfile(Long userId, String username, Map<String, Object> personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
     Person newPerson = new Person(
       userService.findByUserId(userId)
-      ,personResponse.getFirstName()
-      ,personResponse.getLastName()
-      ,personResponse.getStreet()
-      ,personResponse.getPostalCode()
-      ,personResponse.getCity()
-      ,countryService.findCountry(personResponse.getCountryId())
-      ,languageService.findLanguageByLanguageKey(personResponse.getLanguage())
-      ,userService.findByUserId(userId).getUsername()
+      ,personResponse.get("firstName").toString()
+      ,personResponse.get("lastName").toString()
+      ,personResponse.get("street").toString()
+      ,personResponse.get("postalCode").toString()
+      ,personResponse.get("city").toString()
+      ,countryService.findCountry(Long.valueOf(personResponse.get("countryId").toString()))
+      ,languageService.findLanguageByLanguageKey(personResponse.get("language").toString())
+      ,username
       ,true
-
     );
 
     newPerson.setUpdateTimestamp(LocalDateTime.now());
@@ -71,6 +73,7 @@ public class ProfileService {
     updatePerson.setPostalCode(personResponse.getPostalCode());
     updatePerson.setCity(personResponse.getCity());
     updatePerson.setCountry(countryService.findCountry(personResponse.getCountryId()));
+    updatePerson.setPersonLang(languageService.findLanguageByLanguageKey(personResponse.getLanguage()));
     updatePerson.setUpdateTimestamp(LocalDateTime.now());
     personService.savePerson(updatePerson);
   }
@@ -123,6 +126,12 @@ public class ProfileService {
       "team", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(), languageKey).getOutText().replace("{1}", baseParService.organizerName())
     );
     Template template = mailConfig.getTemplate("profileReceived.ftl");
+
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
 
     emailService.sendEmail(
 //      EmailService.getSession(),

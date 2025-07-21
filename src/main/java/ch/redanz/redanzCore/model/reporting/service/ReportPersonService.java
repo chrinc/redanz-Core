@@ -35,7 +35,9 @@ public class ReportPersonService {
           person.getEmail(),
           person.getUser() == null ? "NO USER" : person.getUser().getUserRole().toString(),
           person.getPersonLang().getLanguageKey(),
-          person.getPersonId()
+          person.getPersonId(),
+          person.getCountry().getId(),
+          person.getMobile()
         )
       );
     });

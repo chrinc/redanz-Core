@@ -1,21 +1,25 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
+import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
+import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -24,6 +28,7 @@ import java.util.List;
 public class EmailController {
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationService registrationService;
+  private final PersonService personService;
 
   @GetMapping(path = "/send-generic-email")
   public void sendGenericMail(
@@ -98,6 +103,33 @@ public class EmailController {
         registrationList,
         jsonEmail
       );
+
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/send-generic-mass-email")
+  public void sendGenericMassMail(@RequestBody Map<String, Object> payload) {
+    try {
+
+      Long senderUserId = Long.valueOf(payload.get("senderUserId").toString());
+      Map<String, Object> emailContent = (Map<String, Object>) payload.get("emailContent");
+      List<Map<String, Object>> receiverList = (List<Map<String, Object>>) payload.get("receiverList");
+      receiverList.forEach(receiver -> {
+        try {
+          registrationEmailService.sendGenericEmail(
+            senderUserId,
+            personService.findByPersonId(Long.valueOf(receiver.get("personId").toString())),
+            emailContent.get("subject").toString(),
+            emailContent.get("content").toString()
+          );
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        } catch (TemplateException e) {
+          throw new RuntimeException(e);
+        }
+      });
 
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());

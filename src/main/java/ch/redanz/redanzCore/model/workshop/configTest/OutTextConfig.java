@@ -643,6 +643,9 @@ public enum OutTextConfig {
 
   // EMAIL
 
+  LABEL_CHANGE_LANGUAGE_GE("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Like to get emails in English? Switch your language in your <a href=\"{1}\">Stir it! profile.</a>.", "GE"),
+  LABEL_CHANGE_LANGUAGE_EN("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F E-Mails lieber auf Deutsch? Kein Problem – ändere die Sprache in deinem <a href=\"{1}\">Stir it! Profil</a>!", "EN"),
+
   // CONFIRM EMAIL
   LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Thank you for registering. Please click on the link below to activate your account.", "EN"),
   LABEL_EMAIL_CONFIRM_EMAIL_BASE_GE("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Vielen Dank für deine Anmeldung. Bitte klicke auf den Link unten, um dein Profil zu aktivieren.", "GE"),
@@ -693,9 +696,14 @@ public enum OutTextConfig {
   LABEL_EMAIL_DONE_DETAILS01_GE("EMAIL", "LABEL_EMAIL_DONE_DETAILS01", "Für den Einlass am Festival wird kein Ticket benötigt. Ein gültiges Ausweisdokument reicht für uns zur Kontrolle aus. Alle Angaben zu deiner Anmeldung findest du jederzeit im", "GE"),
   LABEL_EMAIL_DONE_HAPPY_EN("EMAIL", "LABEL_EMAIL_DONE_HAPPY", "We are eagerly looking forward to an unforgettable weekend with you!", "EN"),
   LABEL_EMAIL_DONE_HAPPY_GE("EMAIL", "LABEL_EMAIL_DONE_HAPPY", "Wir freuen uns riesig auf ein unvergessliches Wochenende mit dir!", "GE"),
-
+  LABEL_LINK_EN("EMAIL", "LABEL_LINK", "Link", "EN"),
+  LABEL_LINK_GE("EMAIL", "LABEL_LINK", "Link", "GE"),
+  LABEL_INFO_ONLY_EN("EMAIL", "INFO_ONLY", "Info only", "EN"),
+  LABEL_INFO_ONLY_GE("EMAIL", "INFO_ONLY", "Nur Info", "GE"),
   LABEL_EMAIL_DONE_SUBJECT_EN("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Booking Confirmation", "EN"),
   LABEL_EMAIL_DONE_SUBJECT_GE("EMAIL", "LABEL_EMAIL_DONE_SUBJECT", "Buchungsbestätigung", "GE"),
+  LABEL_SPECIALS_INTRO_EN("EMAIL", "LABEL_SPECIALS_INTRO", "Have you seen our specials?", "EN"),
+  LABEL_SPECIALS_INTRO__GE("EMAIL", "LABEL_SPECIALS_INTRO", "Hast du unsere Specials gesehen?", "GE"),
 
   // REMINDER
   LABEL_EMAIL_REMINDER_HEADER_EN("EMAIL", "LABEL_EMAIL_REMINDER_HEADER", "You have registered for {1}.", "EN"),

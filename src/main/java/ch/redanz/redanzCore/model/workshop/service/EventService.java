@@ -1072,7 +1072,8 @@ public class EventService {
           eventSpecial.getPrice(),
           false, // initialize not sold out
           eventSpecial.getCapacity(),
-          eventSpecial.getUrl()
+          eventSpecial.getUrl(),
+          eventSpecial.getInfoOnly()
         )
       );
     });
