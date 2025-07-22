@@ -29,7 +29,7 @@
             <tr>
                 <!-- LEFT CELL -->
                 <td style="width:50%; vertical-align:bottom; padding:0 0 10px 0;">
-                    ${regards}<br><br/>
+                    ${regards}<br>
                     ${team}<br/><br/>
                     *******************<br/>
                     <a href="mailto:info@stirit.ch" style="color:#0000ee;">info@stirit.ch</a><br/>

@@ -52,24 +52,14 @@ public class SpecialService {
   public void delete (Special special) {
     outTextService.delete(special.getName());
     outTextService.delete(special.getDescription());
-//    outTextService.delete(special.getUrl());
     specialRepo.delete(special);
   }
-//  public Set<Special> findByBundle(Bundle bundle) {
-//    return specialRepo.findAllByBundle(bundle).orElse(null);
-//  }
+
 
   public boolean existsByName(String name) {
     return specialRepo.existsByName(name);
   }
-//  public Set<Special> findByEventOrBundle(Event event) {
-//    Set<Special> allSpecials;
-//    allSpecials = findByEvent(event);
-//    event.getEventBundles().forEach(eventBundle -> {
-//      allSpecials.addAll(findByBundle(eventBundle.getBundle()));
-//    });
-//    return allSpecials;
-//  }
+
   public Special findByName(String name) {
     return specialRepo.findByName(name);
   }

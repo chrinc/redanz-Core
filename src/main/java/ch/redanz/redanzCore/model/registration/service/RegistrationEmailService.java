@@ -614,8 +614,6 @@ public class RegistrationEmailService {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login"));
 
-//    model.put("logo_round", environment.getProperty("link.logo_round"));
-
     // Name withough special chars, underscore instead of space
     model.put("firstName", receiver.getFirstName());
     model.put("content", content);
@@ -651,7 +649,6 @@ public class RegistrationEmailService {
 
       try {
         emailService.sendEmail(
-//          EmailService.getSession(),
           receiver.getEmail(),
           subject,
           FreeMarkerTemplateUtils.processTemplateIntoString(template, model)

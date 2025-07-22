@@ -643,8 +643,8 @@ public enum OutTextConfig {
 
   // EMAIL
 
-  LABEL_CHANGE_LANGUAGE_GE("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Like to get emails in English? Switch your language in your <a href=\"{1}\">Stir it! profile.</a>.", "GE"),
-  LABEL_CHANGE_LANGUAGE_EN("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F E-Mails lieber auf Deutsch? Kein Problem – ändere die Sprache in deinem <a href=\"{1}\">Stir it! Profil</a>!", "EN"),
+  LABEL_CHANGE_LANGUAGE_GE("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Prefer English? Switch your language in your <a href=\"{1}\">Stir it! profile</a>.", "GE"),
+  LABEL_CHANGE_LANGUAGE_EN("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Lieber Deutsch? Kein Problem – ändere die Sprache in deinem <a href=\"{1}\">Stir it! Profil</a>.", "EN"),
 
   // CONFIRM EMAIL
   LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Thank you for registering. Please click on the link below to activate your account.", "EN"),
@@ -752,7 +752,7 @@ public enum OutTextConfig {
   LABEL_EMAIL_SEE_YOU_EN("EMAIL", "LABEL_EMAIL_SEE_YOU", "See you soon", "EN"),
   LABEL_EMAIL_SEE_YOU_GE("EMAIL", "LABEL_EMAIL_SEE_YOU", "Bis bald", "GE"),
   LABEL_EMAIL_REGARDS_EN("EMAIL", "LABEL_EMAIL_REGARDS", "Best regards", "EN"),
-  LABEL_EMAIL_REGARDS_GE("EMAIL", "LABEL_EMAIL_REGARDS", "Beste Grüsse", "GE"),
+  LABEL_EMAIL_REGARDS_GE("EMAIL", "LABEL_EMAIL_REGARDS", "Herzliche Grüsse", "GE"),
   LABEL_EMAIL_TEAM_EN("EMAIL", "LABEL_EMAIL_TEAM", "Your {1} Team", "EN"),
   LABEL_EMAIL_TEAM_GE("EMAIL", "LABEL_EMAIL_TEAM", "Dein {1} Team", "GE"),
   LABEL_YES_EN("FRONT_LOGIN", "LABEL_YES", "Yes", "EN"),
