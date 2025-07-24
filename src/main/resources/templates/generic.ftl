@@ -10,7 +10,7 @@
          alt="Header"
          style="height:221px; width:auto; min-width:100%; object-fit:cover;">
 </div>
-<div style="width:100%;background:#ececec;text-align:left;font-family: Arial,serif;">
+<div style="width:100%;background:#ececec;text-align:left;font-family: Arial,serif; font-size:16px; -webkit-text-size-adjust:none;">
     <div style="padding:15px;">
         <div style="text-align:center;padding-bottom: 15px"><em>${changeLanguage}</em></div>
         <h3>Hi ${firstName}</h3>
