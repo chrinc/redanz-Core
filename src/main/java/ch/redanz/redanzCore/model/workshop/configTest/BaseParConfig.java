@@ -17,7 +17,7 @@ public enum BaseParConfig {
   DOEODMATCHING("doEODMatching"  , true, null),
   DOEODRELEASE("doEODRelease"  , true, null),
   DOEODREMINDER("doEODReminder"  , true, null),
-  REMINDERAFTERDAYS("reminderAfterDays"  , false, "14"),
+  REMINDERAFTERDAYS("reminderAfterDays"  , false, "5"),
   CANCELAFTERDAYS("cancelAfterDays"  , false, "3"),
   WAITLISTLENGTH("waitListLength"  , false, "2"),
   ORGANIZERNAME("organizerName"  , false, "Red Anz");

@@ -682,8 +682,10 @@ public enum OutTextConfig {
   LABEL_EMAIL_RELEASED_HEADER01_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER01", "Hurra - wir haben einen Platz für dich am {1}", "GE"),
   LABEL_EMAIL_RELEASED_HEADER02_EN("EMAIL", "LABEL_EMAIL_RELEASED_HEADER02", "As soon as we receive your payment, we will confirm your participation", "EN"),
   LABEL_EMAIL_RELEASED_HEADER02_GE("EMAIL", "LABEL_EMAIL_RELEASED_HEADER02", "Sobald deine Zahlung bei uns eingegangen ist, können wir deine Teilnahme am Festival fix bestätigen", "GE"),
-  LABEL_EMAIL_RELEASED_DETAILS_EN("EMAIL", "LABEL_EMAIL_RELEASED_DETAILS", "Please find the payment details in your ", "EN"),
-  LABEL_EMAIL_RELEASED_DETAILS_GE("EMAIL", "LABEL_EMAIL_RELEASED_DETAILS", "Du findest die Zahlungsinformationen in deinem ", "GE"),
+  LABEL_EMAIL_RELEASED_DETAILS_EN("EMAIL", "LABEL_EMAIL_RELEASED_DETAILS", "You can find the invoice in your ", "EN"),
+  LABEL_EMAIL_RELEASED_DETAILS_GE("EMAIL", "LABEL_EMAIL_RELEASED_DETAILS", "Du findest die Rechnung in deinem ", "GE"),
+  LABEL_EMAIL_RELEASED_MAKE_PAY_EN("EMAIL", "LABEL_EMAIL_RELEASED_MAKE_PAY", "Please make the payment within the next {1} days.", "EN"),
+  LABEL_EMAIL_RELEASED_MAKE_PAY_GE("EMAIL", "LABEL_EMAIL_RELEASED_MAKE_PAY", "Bitte nimm die Zahlung in den nächsten {1} Tagen vor.", "GE"),
   LABEL_EMAIL_RELEASED_SUBJECT_EN("EMAIL", "LABEL_EMAIL_RELEASED_SUBJECT", "Registration confirmation", "EN"),
   LABEL_EMAIL_RELEASED_SUBJECT_GE("EMAIL", "LABEL_EMAIL_RELEASED_SUBJECT", "Anmeldebestätigung", "GE"),
 

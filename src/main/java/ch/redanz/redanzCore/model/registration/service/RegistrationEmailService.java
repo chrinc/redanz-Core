@@ -526,6 +526,12 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText()
     );
+    model.put("makePayment",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_RELEASED_MAKE_PAY_EN.getOutTextKey(),
+        languageKey
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
+    );
     model.put("account",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
