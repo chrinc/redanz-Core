@@ -48,7 +48,7 @@
                             <img src="${headerLink}/assets/graphics/email_logo_insta_01.png" alt="Instagram"
                                  style="width:40px;height:40px;">
                         </a>
-                        <a href="https://www.facebook.com/groups/stiritfestival" target="_blank" style="display:inline-block;">
+                        <a href="https://www.facebook.com/stirit" target="_blank" style="display:inline-block;">
                             <img src="${headerLink}/assets/graphics/email_logo_fb_01.png" alt="Facebook"
                                  style="width:40px;height:40px;">
                         </a>
