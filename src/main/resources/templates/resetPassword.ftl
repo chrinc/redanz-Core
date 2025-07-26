@@ -57,7 +57,7 @@
 
                 <!-- RIGHT CELL -->
                 <td style="width:50%; text-align:right; vertical-align:bottom; padding-right:20px;">
-                    <a href="http://www.stirit.ch">
+                    <a href="https://www.stirit.ch">
                         <img src="${headerLink}/assets/graphics/email_logo_round_01.png" alt="Stir it! Logo"
                              style="width:150px;height:auto;">
                     </a>

@@ -59,31 +59,6 @@ public class ReportController {
       eventService.findByEventId(eventId)
     );
   }
-//
-//  @GetMapping(path = "/registration/all")
-//  public List<ResponseRegistration> getAllRegistrationsReport() {
-//    return reportRegistrationService.getAllRegistrationsReport();
-//  }
-//
-//  @GetMapping(path = "/registration/open")
-//  public List<ResponseRegistration> getOpenRegistrationsReport() {
-//    return reportRegistrationService.getOpenRegistrationsReport();
-//  }
-//
-//  @GetMapping(path = "/registration/confirming")
-//  public List<ResponseRegistration> getConfirmingRegistrationsReport() {
-//    return reportRegistrationService.getConfirmingRegistrationsReport();
-//  }
-//
-//  @GetMapping(path = "/registration/submitted")
-//  public List<ResponseRegistration> getSubmittedRegistrationsReport() {
-//    return reportRegistrationService.getSubmittedRegistrationsReport();
-//  }
-//
-//  @GetMapping(path = "/registration/done")
-//  public List<ResponseRegistration> getDoneRegistrationsReport() {
-//    return reportRegistrationService.getDoneRegistrationsReport();
-//  }
 
   @GetMapping(path = "/registration/details")
   public List<ResponseRegistrationDetails> getRegistrationDetailsReport(

@@ -86,49 +86,22 @@ public class ReportStatsService {
 
     // Event Specials
     event.getEventSpecials().forEach(eventSpecial -> {
-      Special special = eventSpecial.getSpecial();
-      stats.add(
-        new ResponseStats(
-          "Special"
-          ,outTextService.getOutTextByKeyAndLangKey(special.getName(), language.getLanguageKey()).getOutText()
-         ,specialRegistrationService.countSpecialRegistrationsAndSplitRoles(special, event)
-         ,specialRegistrationService.countSpecialsSubmittedAndSplitRoles(special, event)
-         ,specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
-         ,specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
-         ,eventSpecial.getCapacity()
-         ,eventSpecial.getSoldOut() ? yes : no
-        )
-      );
+      if (!eventSpecial.getInfoOnly()) {
+        Special special = eventSpecial.getSpecial();
+        stats.add(
+          new ResponseStats(
+            "Special"
+            , outTextService.getOutTextByKeyAndLangKey(special.getName(), language.getLanguageKey()).getOutText()
+            , specialRegistrationService.countSpecialRegistrationsAndSplitRoles(special, event)
+            , specialRegistrationService.countSpecialsSubmittedAndSplitRoles(special, event)
+            , specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
+            , specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
+            , eventSpecial.getCapacity()
+            , eventSpecial.getSoldOut() ? yes : no
+          )
+        );
+      }
     });
-
-    // BundleSpecials
-//    Set<Special> specials = new HashSet<>();
-//    event.getEventBundles().forEach(eventBundle -> {
-//      eventBundle.getBundle().getBundleSpecials().forEach(
-//        bundleSpecial -> {
-//          specials.add(bundleSpecial.getSpecial());
-//        });
-//      });
-//
-//    AtomicInteger specialCapacity = new AtomicInteger();
-//    specials.forEach(
-//      special -> {
-//        eventService.findBundleSpecialsByEventAndSpecial(event, special).forEach(bundleSpecial -> {
-//          specialCapacity.addAndGet(bundleSpecial.getCapacity());
-//        });
-//
-//      stats.add(
-//        new ResponseStats(
-//          "Special"
-//          ,outTextService.getOutTextByKeyAndLangKey(special.getName(), language.getLanguageKey()).getOutText()
-//          ,specialRegistrationService.countSpecialRegistrationsAndSplitRoles(special, event)
-//          ,specialRegistrationService.countSpecialsSubmittedAndSplitRoles(special, event)
-//          ,specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
-//          ,specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
-//          ,specialCapacity.get()
-//        )
-//      );
-//    });
 
     foodService.getEventFoodSlots(event).forEach(eventFoodSlot -> {
       stats.add(
