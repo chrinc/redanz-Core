@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(800)
-@Profile("dev || rdev ")
+@Profile("redanz-rdev || stirit-rdev ")
 public class RegistrationTestConfigRunner implements CommandLineRunner {
   private final UserService userService;
   private final BundleService bundleService;
@@ -60,9 +60,5 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
       eventService, registrationService, personService, userService, workflowStatusService, WorkflowStatusConfig.SUBMITTED,
       workflowTransitionService
     );
-
-//    eodMatchingJob.runMatching();
-//    eodReleaseJob.runRelease();
-
   }
 }

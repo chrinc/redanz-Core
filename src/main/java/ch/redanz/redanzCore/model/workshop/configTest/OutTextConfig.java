@@ -218,8 +218,8 @@ public enum OutTextConfig {
   LABEL_BUNDLE_INVALID_GE("FRONT_LOGIN", "LABEL-BUNDLE-INVALID", "Bitte wähle deinen Pass", "GE"),
   LABEL_BUNDLE_SUBTITLE_EN("FRONT_LOGIN", "LABEL-BUNDLE-SUBTITLE", "More pass information", "EN"),
   LABEL_BUNDLE_SUBTITLE_GE("FRONT_LOGIN", "LABEL-BUNDLE-SUBTITLE", "Mehr Informationen zu den Pässen", "GE"),
-  LABEL_BUNDLE_SUBTITLE_LINK_EN("FRONT_LOGIN", "LABEL-BUNDLE-SUBTITLE-LINK", "https://stirit.ch/?page_id=6959&lang=en", "EN"),
-  LABEL_BUNDLE_SUBTITLE_LINK_GE("FRONT_LOGIN", "LABEL-BUNDLE-SUBTITLE-LINK", "https://stirit.ch/?page_id=7260&lang=de", "GE"),
+  LABEL_BUNDLE_SUBTITLE_LINK_EN("FRONT_LOGIN", "LABEL-BUNDLE-SUBTITLE-LINK", "{organizerWebDomain}/bundle-subtitle-en", "EN"),
+  LABEL_BUNDLE_SUBTITLE_LINK_GE("FRONT_LOGIN", "LABEL-BUNDLE-SUBTITLE-LINK", "{organizerWebDomain}/bundle-subtitle-de", "GE"),
 
   LABEL_TRACK_TITLE_EN("FRONT_LOGIN"  , "LABEL-TRACK-TITLE", "Pass Details", "EN"),
   LABEL_TRACK_TITLE_GE("FRONT_LOGIN"  , "LABEL-TRACK-TITLE", "Pass Details", "GE"),
@@ -229,8 +229,8 @@ public enum OutTextConfig {
   LABEL_TRACK_INVALID_GE("FRONT_LOGIN"    , "LABEL-TRACK-INVALID", "Bitte prüfe deine Pass Details", "GE"),
   LABEL_TRACK_SUBTITLE_EN("FRONT_LOGIN"   , "LABEL-TRACK-SUBTITLE", "More level information", "EN"),
   LABEL_TRACK_SUBTITLE_GE("FRONT_LOGIN"   , "LABEL-TRACK-SUBTITLE", "Mehr Informationen zu den Levels", "GE"),
-  LABEL_TRACK_SUBTITLE_LINK_EN("FRONT_LOGIN"       , "LABEL-TRACK-SUBTITLE-LINK", "https://stirit.ch/?page_id=6959&lang=en", "EN"),
-  LABEL_TRACK_SUBTITLE_LINK_GE("FRONT_LOGIN"       , "LABEL-TRACK-SUBTITLE-LINK", "https://stirit.ch/?page_id=7260&lang=de", "GE"),
+  LABEL_TRACK_SUBTITLE_LINK_EN("FRONT_LOGIN"       , "LABEL-TRACK-SUBTITLE-LINK", "{organizerWebDomain}/track-subtitle-en", "EN"),
+  LABEL_TRACK_SUBTITLE_LINK_GE("FRONT_LOGIN"       , "LABEL-TRACK-SUBTITLE-LINK", "{organizerWebDomain}/track-subtitle-de", "GE"),
 
   LABEL_DISCOUNT_TITLE_EN(        "FRONT_LOGIN"       , "LABEL-DISCOUNT-TITLE"           , "Discounts"                                , "EN"),
   LABEL_DISCOUNT_TITLE_GE(        "FRONT_LOGIN"       , "LABEL-DISCOUNT-TITLE"           , "Discounts"                                , "GE"),
@@ -264,8 +264,8 @@ public enum OutTextConfig {
   LABEL_ACCOMMODATION_INVALID_GE(      "FRONT_LOGIN"  , "LABEL-ACCOMMODATION-INVALID"        , "Bitte prüfe deine Unterkunft Details"     , "GE"),
   LABEL_ACCOMMODATION_SUBTITLE_EN(     "FRONT_LOGIN"  , "LABEL-ACCOMMODATION-SUBTITLE"       , "More accommodation information"           , "EN"),
   LABEL_ACCOMMODATION_SUBTITLE_GE(     "FRONT_LOGIN"  , "LABEL-ACCOMMODATION-SUBTITLE"       , "Mehr Informationen zur Unterkunft"        , "GE"),
-  LABEL_ACCOMMODATION_SUBTITLE_LINK_EN("FRONT_LOGIN"  , "LABEL-ACCOMMODATION-SUBTITLE-LINK"  , "https://stirit.ch/?page_id=7001&lang=en"  , "EN"),
-  LABEL_ACCOMMODATION_SUBTITLE_LINK_GE("FRONT_LOGIN"  , "LABEL-ACCOMMODATION-SUBTITLE-LINK"  , "https://stirit.ch/?page_id=7003&lang=de"  , "GE"),
+  LABEL_ACCOMMODATION_SUBTITLE_LINK_EN("FRONT_LOGIN"  , "LABEL-ACCOMMODATION-SUBTITLE-LINK"  , "{organizerWebDomain}/accommodation-subtitle-en"  , "EN"),
+  LABEL_ACCOMMODATION_SUBTITLE_LINK_GE("FRONT_LOGIN"  , "LABEL-ACCOMMODATION-SUBTITLE-LINK"  , "{organizerWebDomain}/accommodation-subtitle-de"  , "GE"),
 
 
   LABEL_HOST_YES_TITLE_EN(      "FRONT_LOGIN"  , "LABEL-HOST-YES-TITLE"           , "Would you like to offer an accommodation for a fellow participant?"  , "EN"),
@@ -344,8 +344,8 @@ public enum OutTextConfig {
   LABEL_VOLUNTEER_INVALID_GE(      "FRONT_LOGIN"       , "LABEL-VOLUNTEER-INVALID"         , "Bitte prüfe die Details zu den Helfereinsätzen"           , "GE"),
   LABEL_VOLUNTEER_SUBTITLE_EN(     "FRONT_LOGIN"       , "LABEL-VOLUNTEER-SUBTITLE"        , "Volunteer description"                   , "EN"),
   LABEL_VOLUNTEER_SUBTITLE_GE(     "FRONT_LOGIN"       , "LABEL-VOLUNTEER-SUBTITLE"        , "Beschreibung Volunteering"         , "GE"),
-  LABEL_VOLUNTEER_SUBTITLE_LINK_EN("FRONT_LOGIN"       , "LABEL-VOLUNTEER-SUBTITLE-LINK"   , "https://stirit.ch/?page_id=6963&lang=en"  , "EN"),
-  LABEL_VOLUNTEER_SUBTITLE_LINK_GE("FRONT_LOGIN"       , "LABEL-VOLUNTEER-SUBTITLE-LINK"   , "https://stirit.ch/?page_id=6999&lang=de"  , "GE"),
+  LABEL_VOLUNTEER_SUBTITLE_LINK_EN("FRONT_LOGIN"       , "LABEL-VOLUNTEER-SUBTITLE-LINK"   , "{organizerWebDomain}/volunteer-link-en"  , "EN"),
+  LABEL_VOLUNTEER_SUBTITLE_LINK_GE("FRONT_LOGIN"       , "LABEL-VOLUNTEER-SUBTITLE-LINK"   , "{organizerWebDomain}/volunteer-link-de"  , "GE"),
 
   LABEL_VOLUNTEER_YES_TITLE_EN(      "FRONT_LOGIN"       , "LABEL-VOLUNTEER-YES-TITLE"           , "Would you like to support us as a volunteer?"  , "EN"),
   LABEL_VOLUNTEER_YES_TITLE_GE(      "FRONT_LOGIN"       , "LABEL-VOLUNTEER-YES-TITLE"           , "Möchtest du uns als Helfer*in unterstützen?"           , "GE"),
@@ -392,8 +392,8 @@ public enum OutTextConfig {
   LABEL_SOLIDARITY_FUND_INVALID_GE(      "FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-INVALID"         , "Bitte prüfe die Details zum Solidaritätsfonds"           , "GE"),
   LABEL_SOLIDARITY_FUND_SUBTITLE_EN(     "FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE"        , "Solidarity Fund description"                   , "EN"),
   LABEL_SOLIDARITY_FUND_SUBTITLE_GE(     "FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE"        , "Beschreibung Solidaritätsfonds"         , "GE"),
-  LABEL_SOLIDARITY_FUND_SUBTITLE_LINK_EN("FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE-LINK"   , "https://stirit.ch/?page_id=6963&lang=en"  , "EN"),
-  LABEL_SOLIDARITY_FUND_SUBTITLE_LINK_GE("FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE-LINK"   , "https://stirit.ch/?page_id=6999&lang=de"  , "GE"),
+  LABEL_SOLIDARITY_FUND_SUBTITLE_LINK_EN("FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE-LINK"   , "{organizerWebDomain}/solidarity-fund-en"  , "EN"),
+  LABEL_SOLIDARITY_FUND_SUBTITLE_LINK_GE("FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE-LINK"   , "{organizerWebDomain}/solidarity-fund-de"  , "GE"),
 
   LABEL_SCHOLARSHIP_YES_TITLE_EN(      "FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE"           , "Would you like to apply for a scholarship?"  , "EN"),
   LABEL_SCHOLARSHIP_YES_TITLE_GE(      "FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE"           , "Möchtest du dich für ein Stipendium bewerben?"           , "GE"),
@@ -415,8 +415,8 @@ public enum OutTextConfig {
   LABEL_DONATION_YES_TITLE_GE(      "FRONT_LOGIN"       , "LABEL-DONATION-YES-TITLE"           , "Möchtest du für ein Stipendium spenden?"           , "GE"),
   LABEL_DONATION_YES_TITLE_EXIST_EN("FRONT_LOGIN"       , "LABEL-DONATION-YES-TITLE-EXIST"     , "Donate for a scholarship"            , "EN"),
   LABEL_DONATION_YES_TITLE_EXIST_GE("FRONT_LOGIN"       , "LABEL-DONATION-YES-TITLE-EXIST"     , "Für ein Stipendium spenden"                       , "GE"),
-  LABEL_DONATION_YES_HINT_EN("FRONT_LOGIN"              , "LABEL-DONATION-YES-HINT"        , "We keep a solidarity fund for dancers, who would like to participate at Stir it!, but don't have the possibility without financial support."                       , "EN"),
-  LABEL_DONATION_YES_HINT_GE("FRONT_LOGIN"              , "LABEL-DONATION-YES-HINT"        , "Wir führen einen Solidaritätsfonds für Tänzer*innen, die gerne am Stir it! teilnehmen würden, jedoch ohne finanzielle Unterstützung die Möglichkeit dazu nicht haben."                         , "GE"),
+  LABEL_DONATION_YES_HINT_EN("FRONT_LOGIN"              , "LABEL-DONATION-YES-HINT"        , "We keep a solidarity fund for dancers, who would like to participate at {organizerName}, but don't have the possibility without financial support."                       , "EN"),
+  LABEL_DONATION_YES_HINT_GE("FRONT_LOGIN"              , "LABEL-DONATION-YES-HINT"        , "Wir führen einen Solidaritätsfonds für Tänzer*innen, die gerne am {organizerName} teilnehmen würden, jedoch ohne finanzielle Unterstützung die Möglichkeit dazu nicht haben."                         , "GE"),
 
   LABEL_DONATION_AMOUNT_TITLE_EN(      "FRONT_LOGIN"     , "LABEL-DONATION-AMOUNT-TITLE"       , "How much would you like to donate?"        , "EN"),
   LABEL_DONATION_AMOUNT_TITLE_GE(      "FRONT_LOGIN"     , "LABEL-DONATION-AMOUNT-TITLE"       , "Wieviel möchtest du spenden?"      , "GE"),
@@ -453,12 +453,12 @@ public enum OutTextConfig {
   LABEL_TERMS_INVALID_GE(      "FRONT_LOGIN"       , "LABEL-TERMS-INVALID"         , "Bitte prüfe die Geschäftsbedingungen"     , "GE"),
   LABEL_TERMS_HINT_EN(         "FRONT_LOGIN"       , "LABEL-TERMS-HINT"            ,  "Terms & Conditions"                      , "EN"),
   LABEL_TERMS_HINT_GE(         "FRONT_LOGIN"       , "LABEL-TERMS-HINT"            , "AGB"                                      , "GE"),
-  LABEL_TERMS_HINT_LINK_EN(    "FRONT_LOGIN"       , "LABEL-TERMS-HINT-LINK"       , "https://stirit.ch/?page_id=6959&lang=en"  , "EN"),
-  LABEL_TERMS_HINT_LINK_GE(    "FRONT_LOGIN"       , "LABEL-TERMS-HINT-LINK"       , "https://stirit.ch/?page_id=7260&lang=de"  , "GE"),
+  LABEL_TERMS_HINT_LINK_EN(    "FRONT_LOGIN"       , "LABEL-TERMS-HINT-LINK"       , "{organizerWebDomain}/terms-en"  , "EN"),
+  LABEL_TERMS_HINT_LINK_GE(    "FRONT_LOGIN"       , "LABEL-TERMS-HINT-LINK"       , "{organizerWebDomain}/terms-de"  , "GE"),
   LABEL_TERMS_HINT2_EN(        "FRONT_LOGIN"       , "LABEL-TERMS-HINT2"           , "Code of Conduct"                          , "EN"),
   LABEL_TERMS_HINT2_GE(        "FRONT_LOGIN"       , "LABEL-TERMS-HINT2"           , "Verhaltenscodex"                          , "GE"),
-  LABEL_TERMS_HINT2_LINK_EN(   "FRONT_LOGIN"       , "LABEL-TERMS-HINT2-LINK"      , "https://stirit.ch/?page_id=6959&lang=en"  , "EN"),
-  LABEL_TERMS_HINT2_LINK_GE(   "FRONT_LOGIN"       , "LABEL-TERMS-HINT2-LINK"      , "https://stirit.ch/?page_id=7260&lang=de"  , "GE"),
+  LABEL_TERMS_HINT2_LINK_EN(   "FRONT_LOGIN"       , "LABEL-TERMS-HINT2-LINK"      , "{organizerWebDomain}/terms2-en"  , "EN"),
+  LABEL_TERMS_HINT2_LINK_GE(   "FRONT_LOGIN"       , "LABEL-TERMS-HINT2-LINK"      , "{organizerWebDomain}/terms2-de"  , "GE"),
 
   LABEL_SWITCH_LEVEL_HINT_EN("FRONT_LOGIN"   , "LABEL-SWITCH-LEVEL-HINT", "Please keep in mind that you must meet the dance level in both roles (Lead & Follow)", "EN"),
   LABEL_SWITCH_LEVEL_HINT_GE("FRONT_LOGIN"   , "LABEL-SWITCH-LEVEL-HINT", "Bitte bedenke, dass du das Tanz-Level in beiden Rollen (Lead & Follow) erfüllen musst", "GE"),
@@ -486,8 +486,8 @@ public enum OutTextConfig {
   LABEL_FRIDAY_SPECIAL_DESC_EN("FRONT_LOGIN", "LABEL-FRIDAY-SPECIAL-DESC", "Solo Jazz Trio Class with Jazz Messengers Sonia Ortega, Héctor Artal and Clàudia Fonte", "EN"),
   LABEL_FRIDAY_SPECIAL_DESC_GE("FRONT_LOGIN", "LABEL-FRIDAY-SPECIAL-DESC", "Solo Jazz Trio Klasse mit den Jazz Messengers Sonia Ortega, Héctor Artal und Clàudia Fonte", "GE"),
 
-  LABEL_PASS_URL_EN("FRONT_LOGIN", "LABEL-PASS-URL", "https://stirit.ch/?page_id=6959&lang=en", "EN"),
-  LABEL_PASS_URL_GE("FRONT_LOGIN", "LABEL-PASS-URL", "https://stirit.ch/?page_id=7260&lang=de", "GE"),
+  LABEL_PASS_URL_EN("FRONT_LOGIN", "LABEL-PASS-URL", "{organizerWebDomain}/bundle-en", "EN"),
+  LABEL_PASS_URL_GE("FRONT_LOGIN", "LABEL-PASS-URL", "{organizerWebDomain}/bundle-de", "GE"),
 
   // CLASSES
   LABEL_PRIVATE_NORMA_DESC_EN("FRONT_LOGIN", "LABEL-PRIVATE-NORMA-DESC", "Solo Jazz Private with Norma Miller", "EN"),
@@ -642,9 +642,8 @@ public enum OutTextConfig {
   LABEL_ERROR_HAS_EVENT_SAVE_GE("FRONT_LOGIN", "LABEL_ERROR_SAVE_HAS_EVENT", "Wird in einem Event verwendet und kann nicht gespeichert oder aktualisiert werden.", "GE"),
 
   // EMAIL
-
-  LABEL_CHANGE_LANGUAGE_GE("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Prefer English? Switch your language in your <a href=\"{1}\">Stir it! profile</a>.", "GE"),
-  LABEL_CHANGE_LANGUAGE_EN("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Lieber Deutsch? Kein Problem – ändere die Sprache in deinem <a href=\"{1}\">Stir it! Profil</a>.", "EN"),
+  LABEL_CHANGE_LANGUAGE_GE("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Prefer English? Switch your language in your <a href=\"{1}\">{organizerName} profile</a>.", "GE"),
+  LABEL_CHANGE_LANGUAGE_EN("EMAIL", "LABEL_CHANGE_LANGUAGE", "\uD83C\uDF1F Lieber Deutsch? Kein Problem – ändere die Sprache in deinem <a href=\"{1}\">{organizerName} Profil</a>.", "EN"),
 
   // CONFIRM EMAIL
   LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN("EMAIL", "LABEL_EMAIL_CONFIRM_EMAIL_BASE", "Thank you for registering. Please click on the link below to activate your account.", "EN"),
@@ -1161,7 +1160,7 @@ public enum OutTextConfig {
     for (OutTextConfig outTextConfig : OutTextConfig.values()) {
       if (outTextService.outTextExists(outTextConfig.outTextKey, outTextConfig.languageKey)) {
         OutText outText = outTextService.getOutTextByKeyAndLangKey(outTextConfig.outTextKey, outTextConfig.languageKey);
-        outText.setOutText(outTextConfig.outText);
+        outText.setOutText(outTextService.replaceBasePar(outTextConfig.outText));
         outText.setType(outTextConfig.type);
         outTextService.save(outText);
       } else {
@@ -1171,7 +1170,7 @@ public enum OutTextConfig {
             outTextConfig.outTextKey
             , outTextConfig.languageKey
           ),
-          outTextConfig.outText,
+          outTextService.replaceBasePar(outTextConfig.outText),
           outTextConfig.type
         )
       );

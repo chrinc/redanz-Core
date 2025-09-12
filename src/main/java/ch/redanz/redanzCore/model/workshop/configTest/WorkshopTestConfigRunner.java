@@ -21,8 +21,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(200)
-@Profile("rdev || dev")
+@Profile("redanz-rdev || stirit-rdev")
 public class WorkshopTestConfigRunner implements CommandLineRunner {
+  private final BaseParService baseParService;
   private final BundleService bundleService;
   private final TrackService trackService;
   private final EventService eventService;
@@ -36,7 +37,6 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final DiscountService discountService;
   private final SpecialService specialService;
   private final VolunteerService volunteerService;
-  private final BaseParService baseParService;
   private final CountryService countryService;
   private final PrivateClassService privateClassService;
   private final EventPartService eventPartService;
@@ -87,7 +87,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       EventPartConfig.setup(eventPartService);
       EventPartInfoConfig.setup(eventService, eventPartService);
 
-      BaseParConfig.setup(baseParService);
+//      BaseParConfig.setup(baseParService);
     }
   }
 }

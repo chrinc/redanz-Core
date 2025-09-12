@@ -20,7 +20,8 @@ public enum BaseParConfig {
   REMINDERAFTERDAYS("reminderAfterDays"  , false, "5"),
   CANCELAFTERDAYS("cancelAfterDays"  , false, "3"),
   WAITLISTLENGTH("waitListLength"  , false, "2"),
-  ORGANIZERNAME("organizerName"  , false, "Red Anz");
+  ORGANIZERNAME("organizerName"  , false, "Red Anz"),
+  ORGANIZERWEBSITE("organizerWebDomain", false, "https://redanz.ch/");
 
   private final String baseParKey;
   private final boolean boolVal;
@@ -37,12 +38,15 @@ public enum BaseParConfig {
             baseParConfig.stringVal
           )
         );
-      } else {
+      }
+        // No Update
+       /* else {
         BasePar basePar = baseParService.findByKey(baseParConfig.baseParKey);
         basePar.setBoolValue(baseParConfig.boolVal);
         basePar.setStringValue(baseParConfig.stringVal);
         baseParService.save(basePar);
       }
+       */
     }
   }
 }

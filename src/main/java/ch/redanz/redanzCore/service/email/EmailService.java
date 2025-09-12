@@ -96,7 +96,7 @@ public class EmailService {
         (!emailIsConfig && sendEmail) ? (
           (sendToTestEmail || baseParTestMailOnly || eventInactive) ?
             (baseParTestEmail != null ? baseParTestEmail : testEmail) : toEmail
-        ) : "nobody";
+        ) : sendToTestEmail ?  testEmail : "nobody";
       log.info("send email, send to: " + emailTo);
       log.info("bcc: " + bccEmail);
       if (!emailIsConfig && sendEmail) {

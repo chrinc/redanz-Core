@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -77,6 +78,32 @@ public class Person implements Serializable {
     this.city = city;
     this.country = country;
     this.personLang = personLang;
+    this.email = email;
+    this.active = active;
+  }
+
+  public Person(
+    User user,
+    String firstName,
+    String lastName,
+    String street,
+    String postalCode,
+    String city,
+    Country country,
+    Language personLang,
+    LocalDateTime timestamp,
+    String email,
+    boolean active
+  ) {
+    this.user = user;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.street = street;
+    this.postalCode = postalCode;
+    this.city = city;
+    this.country = country;
+    this.personLang = personLang;
+    this.updateTimestamp = timestamp;
     this.email = email;
     this.active = active;
   }

@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.entities.OutText;
 import ch.redanz.redanzCore.model.workshop.entities.OutTextId;
 import ch.redanz.redanzCore.model.workshop.repository.OutTextRepo;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OutTextService {
   private final OutTextRepo outTextRepo;
+  private final BaseParService baseParService;
 
   public void save(OutText outText) {
     outTextRepo.save(outText);
@@ -36,6 +38,11 @@ public class OutTextService {
     return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey).isPresent();
   }
 
+  public String replaceBasePar(String outText) {
+    return
+      outText.replace("{organizerName}", baseParService.organizerName())
+        .replace("{organizerWebDomain}", baseParService.organizerWebDomain());
+  }
 
   public OutText getOutTextByKeyAndLangKey(String key, String langKey) {
     return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey).get();

@@ -37,6 +37,7 @@ public class BaseParService {
     true; // default: true
   }
 
+
   public boolean doEODCancel(){
     return baseParRepo.findAllByBaseParKey("doEODCancel").isPresent() ?
     baseParRepo.findAllByBaseParKey("doEODCancel").get().getBoolValue() :
@@ -76,6 +77,12 @@ public class BaseParService {
   public String organizerName(){
     return baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() != null ?
       baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() : "";
+    // default: ""
+  }
+
+  public String organizerWebDomain(){
+    return baseParRepo.findAllByBaseParKey("organizerWebDomain").get().getStringValue() != null ?
+      baseParRepo.findAllByBaseParKey("organizerWebDomain").get().getStringValue() : "";
     // default: ""
   }
 

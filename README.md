@@ -102,4 +102,3 @@ Necessary tools for testing and development
  - Renew Certificates
    - show all Certificats: `certbot certificates`
    - certbot certonly --force-renew -d model.redanz.ch
-

@@ -32,99 +32,16 @@ public class ReportRegistrationService {
       event
     );
   }
-//  public List<ResponseRegistration> getAllRegistrationsReport() {
-//    return getRegistrations(workflowStatusService.findAll());
-//  }
-//
-//  public List<ResponseRegistration> getOpenRegistrationsReport() {
-//    return getRegistrations(workflowStatusService.findAllOpen());
-//  }
-//
-//  public List<ResponseRegistration> getConfirmingRegistrationsReport() {
-//    return getRegistrations(workflowStatusService.findAllConfirming());
-//  }
-//
-//  public List<ResponseRegistration> getSubmittedRegistrationsReport() {
-//    return getRegistrations(workflowStatusService.findAllSubmitted());
-//  }
-//
-//  public List<ResponseRegistration> getDoneRegistrationsReport() {
-//    return getRegistrations(workflowStatusService.findAllDone());
-//  }
-
-//  private List<ResponseRegistration> getRegistrations(List<WorkflowStatus> workflowStatusList) {
-//    List<ResponseRegistration> registrations = new ArrayList<>();
-//    List<Registration> partnerRegistrations = new ArrayList<>();
-//
-//    registrationService.findAllCurrentEvent().forEach(registration -> {
-//      RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
-//      boolean hasPartner = registrationMatching != null && registrationMatching.getRegistration2() != null;
-//      List<WorkflowStatus> registrationWorkflowStatusList = new ArrayList<>() {{
-//        add(workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(registration).getWorkflowStatus());
-//      }};
-//      if (hasPartner) {
-//        registrationWorkflowStatusList.add(
-//          workflowTransitionService.findFirstByRegistrationOrderByTransitionTimestampDesc(
-//            registrationMatching.getRegistration2()
-//          ).getWorkflowStatus());
-//      }
-//
-//      if (workflowStatusList.contains(getLowestWorkflowStatus(registrationWorkflowStatusList))) {
-//
-//        boolean ignoreRegistration = false;
-//
-//        if (hasPartner) {
-//          boolean rolesMatch = registration.getDanceRole().getName().equals(registrationMatching.getRegistration2().getDanceRole().getName());
-//          boolean registration1IsFollower = registration.getDanceRole().getName().equals(DanceRoleConfig.FOLLOWER.getName());
-//          boolean registration2IsFollower = registrationMatching.getRegistration2().getDanceRole().getName().equals(DanceRoleConfig.FOLLOWER.getName());
-//          boolean registration1IsLeader = registration.getDanceRole().getName().equals(DanceRoleConfig.LEADER.getName());
-//          boolean registration2IsLeader = registrationMatching.getRegistration2().getDanceRole().getName().equals(DanceRoleConfig.LEADER.getName());
-//
-//          // make sure leader is left, follower right
-//          ignoreRegistration =
-//            registration1IsFollower && !registration2IsFollower
-//              || (!registration1IsLeader && registration2IsLeader)
-//          ;
-//
-//          if (rolesMatch) {
-//            partnerRegistrations.add(registrationMatching.getRegistration2());
-//          }
-//        }
-//
-//        // make sure AxB BxA Registrations are eliminated
-//        if (!ignoreRegistration && !partnerRegistrations.contains(registration)) {
-//          registrations.add(
-//            new ResponseRegistration(
-//              registration.getParticipant().getPersonId(),
-//              registration.getBundle().getName(),
-//              registration.getTrack() == null ? null : registration.getTrack().getName(),
-//              registration.getParticipant().getFirstName(),
-//              registration.getParticipant().getLastName(),
-//              registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
-//              hasPartner ? registrationMatching.getRegistration2().getParticipant().getPersonId() : null,
-//              hasPartner ? registrationMatching.getRegistration2().getParticipant().getFirstName() : null,
-//              hasPartner ? registrationMatching.getRegistration2().getParticipant().getLastName() : null,
-//              hasPartner ? registrationMatching.getRegistration2().getDanceRole().getName() : null,
-//              registration.getEvent().getEventId(),
-//              registration.getParticipant().getPersonLang().getLanguageKey()
-//            )
-//          );
-//        }
-//        ;
-//      }
-//      ;
-//    });
-//    return registrations;
-//  }
 
   private List<ResponseRegistrationDetails> getRegistrationsDetails(List<WorkflowStatus> workflowStatusList, Event event) {
     List<ResponseRegistrationDetails> registrationDetails = new ArrayList<>();
 
     registrationService.findAllByEvent(event).forEach(registration -> {
-      RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
+     RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
       WorkflowStatus workflowStatus = workflowStatusService.findById(registration.getWorkflowStatus().getWorkflowStatusId());
       boolean hasPartner = registrationMatching != null && registrationMatching.getRegistration2() != null;
       if (workflowStatusList.contains(workflowStatus)) {
+//        log.info("registration.participant: " + registration.getParticipant().getFirstName());
         registrationDetails.add(
           new ResponseRegistrationDetails(
             registration.getParticipant().getPersonId(),
@@ -144,6 +61,8 @@ public class ReportRegistrationService {
             paymentService.totalAmount(registration)
           )
         );
+
+//        log.info("add registration.participant: " + registration.getParticipant().getFirstName());
       }
     });
     return registrationDetails;
