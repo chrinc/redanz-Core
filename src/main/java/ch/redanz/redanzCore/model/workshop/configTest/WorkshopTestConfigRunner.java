@@ -45,6 +45,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   @Override
   public void run(String... args) {
     if (eventService.findAll().isEmpty()) {
+      BaseParConfig.setup(baseParService);
       OutTextConfig.setup(outTextService);
       WorkflowStatusConfig.setup(workflowStatusService);
       LanguageConfig.setup(languageService);
@@ -87,7 +88,6 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       EventPartConfig.setup(eventPartService);
       EventPartInfoConfig.setup(eventService, eventPartService);
 
-//      BaseParConfig.setup(baseParService);
     }
   }
 }
