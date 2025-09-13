@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(200)
-@Profile("redanz-rdev || stirit-rdev")
+@Profile("redanz-prod || redanz-rdev || stirit-rdev")
 public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final BaseParService baseParService;
   private final BundleService bundleService;

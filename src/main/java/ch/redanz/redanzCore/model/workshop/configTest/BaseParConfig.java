@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum BaseParConfig {
-  DOAUTOMATCH("doAutoMatch"  , false, null),
-  DOAUTORELEASE("doAutoRelease"  , false, null),
+  DOAUTOMATCH("doAutoMatch"  , true, null),
+  DOAUTORELEASE("doAutoRelease"  , true, null),
   TESTMAILONLY("testMailOnly"  , false, null),
   DOEODCANCEL("doEODCancel"  , false, null),
   DOEODMATCHING("doEODMatching"  , false, null),
