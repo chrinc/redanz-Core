@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OutTextService {
   private final OutTextRepo outTextRepo;
-  private final BaseParService baseParService;
+  private final Environment environment;
 
   public void save(OutText outText) {
     outTextRepo.save(outText);
@@ -40,8 +41,8 @@ public class OutTextService {
 
   public String replaceBasePar(String outText) {
     return
-      outText.replace("{organizerName}", baseParService.organizerName())
-        .replace("{organizerWebDomain}", baseParService.organizerWebDomain());
+      outText.replace("{omsHostName}", environment.getProperty("oms.host.name"))
+        .replace("{omsHostDomain}", environment.getProperty("oms.host.domain"));
   }
 
   public OutText getOutTextByKeyAndLangKey(String key, String langKey) {

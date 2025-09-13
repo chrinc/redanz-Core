@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
+import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
@@ -38,6 +39,8 @@ public class PasswordEmailService {
 
   @Autowired
   Configuration mailConfig;
+  @Autowired
+  private UserService userService;
 
   public void sendResetPasswordEmail(
     User user,
@@ -48,12 +51,25 @@ public class PasswordEmailService {
     model.put("headerLink", environment.getProperty("link.login"));
     model.put("resetLink", link);
     model.put("firstName", person.getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
     Template template = mailConfig.getTemplate("resetPassword.ftl");
 
     String languageKey =
       person.getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
         person.getPersonLang().getLanguageKey();
+
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
 
     model.put("base",
       outTextService.getOutTextByKeyAndLangKey(
@@ -85,24 +101,21 @@ public class PasswordEmailService {
         languageKey
       ).getOutText()
     );
-    // log.info("set team");
-    // log.info("baseParService.organizerName(): " + baseParService.organizerName());
     model.put("team",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
     emailService.sendEmail(
 //      EmailService.getSession(),
-      user.getUsername(),
+      person.getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RESET_PASSWORD_SUBJECT_EN.getOutTextKey(),
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,baseParService.testMailOnly()
-      ,baseParService.testEmail()
+      ,userService.emailIsTester(person.getEmail())
       ,false
       ,null
     );

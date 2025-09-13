@@ -31,13 +31,6 @@ public class BaseParService {
     false; // default: false
   }
 
-  public boolean testMailOnly(){
-    return baseParRepo.findAllByBaseParKey("testMailOnly").isPresent() ?
-    baseParRepo.findAllByBaseParKey("testMailOnly").get().getBoolValue() :
-    true; // default: true
-  }
-
-
   public boolean doEODCancel(){
     return baseParRepo.findAllByBaseParKey("doEODCancel").isPresent() ?
     baseParRepo.findAllByBaseParKey("doEODCancel").get().getBoolValue() :
@@ -66,24 +59,6 @@ public class BaseParService {
     return baseParRepo.findAllByBaseParKey("doEODReminder").isPresent() ?
     baseParRepo.findAllByBaseParKey("doEODReminder").get().getBoolValue() :
     true; // default: true
-  }
-
-  public String testEmail(){
-    return testMailOnly() ?
-      baseParRepo.findAllByBaseParKey("testMailOnly").get().getStringValue() :
-    null; // default: true
-  }
-
-  public String organizerName(){
-    return baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() != null ?
-      baseParRepo.findAllByBaseParKey("organizerName").get().getStringValue() : "";
-    // default: ""
-  }
-
-  public String organizerWebDomain(){
-    return baseParRepo.findAllByBaseParKey("organizerWebDomain").get().getStringValue() != null ?
-      baseParRepo.findAllByBaseParKey("organizerWebDomain").get().getStringValue() : "";
-    // default: ""
   }
 
   public Integer cancelAfterDays(){

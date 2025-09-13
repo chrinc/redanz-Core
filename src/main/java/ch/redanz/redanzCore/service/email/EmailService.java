@@ -31,7 +31,7 @@ public class EmailService {
 
   @Autowired
   public EmailService(
-    @Value("${email.host.username}") String hostEmail,
+    @Value("${email.host.email}") String hostEmail,
     @Value("${email.host.name}") String emailHostName,
     @Value("${email.send}") boolean sendEmail,
     @Value("${email.sendToTestMail}") boolean sendToTestMailEmail,
@@ -53,12 +53,15 @@ public class EmailService {
     String toEmail,
     String subject,
     String body,
-    Boolean baseParTestMailOnly,
-    String baseParTestEmail,
+    Boolean emailIsTester,
     Boolean eventInactive,
     String bccEmail
   ) {
     try {
+      if (eventInactive) {
+        throw new IllegalStateException("Event is inactive! / No Email should be sent");
+      };
+
       MimeMessage msg = new MimeMessage(emailSession);
       msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
       msg.addHeader("format", "flowed");
@@ -69,37 +72,24 @@ public class EmailService {
       msg.setContent(body, "text/html; charset=UTF-8");
       msg.setSentDate(new Date());
 
-      boolean emailIsConfig = Arrays.stream(UserConfig.values())
-        .anyMatch(userConfig -> Objects.equals(userConfig.getUsername(), toEmail));
-
-      boolean bccIsConfig = Arrays.stream(UserConfig.values())
-        .anyMatch(userConfig -> Objects.equals(userConfig.getUsername(), bccEmail));
-
       msg.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(
-          (sendToTestEmail || baseParTestMailOnly || eventInactive) ?
-            (baseParTestEmail != null ? baseParTestEmail : testEmail) : toEmail,
+          sendToTestEmail ?
+            (emailIsTester ? toEmail : testEmail)
+            : toEmail,
           false
         )
       );
 
       // bcc to sender for archive reasons
       if (bccEmail != null) {
-        if (bccIsConfig) {
+        if (sendToTestEmail) {
           msg.addRecipients(Message.RecipientType.BCC, hostEmail);
         } else {
           msg.addRecipients(Message.RecipientType.BCC, bccEmail);
         }
       }
-
-      String emailTo =
-        (!emailIsConfig && sendEmail) ? (
-          (sendToTestEmail || baseParTestMailOnly || eventInactive) ?
-            (baseParTestEmail != null ? baseParTestEmail : testEmail) : toEmail
-        ) : sendToTestEmail ?  testEmail : "nobody";
-      log.info("send email, send to: " + emailTo);
-      log.info("bcc: " + bccEmail);
-      if (!emailIsConfig && sendEmail) {
+      if (sendEmail && Arrays.stream(msg.getRecipients(Message.RecipientType.TO)).count() > 0) {
         asyncEmailService.sendEmail(msg);
       }
 

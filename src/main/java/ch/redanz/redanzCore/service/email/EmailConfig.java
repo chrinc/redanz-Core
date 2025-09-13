@@ -13,7 +13,7 @@ import java.util.Properties;
 @Configuration
 public class EmailConfig {
 
-  @Value("${email.host.username}")
+  @Value("${email.host.email}")
   private String hostEmail;
 
   @Value("${email.host.password}")

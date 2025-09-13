@@ -139,8 +139,6 @@ public enum RegistrationConfig {
 
     for (RegistrationConfig registrationConfig : RegistrationConfig.values()) {
       Registration newRegistration;
-//      log.info("new registration registrationConfig");
-//      log.info(registrationConfig.trackConfig == null ? "null" : registrationConfig.trackConfig.toString());
       if (registrationConfig.trackConfig != null && registrationConfig.danceRoleConfig != null) {
         newRegistration = new Registration(
           personService.findByUser(userService.getUser(registrationConfig.getUserConfig().getUsername())),
@@ -152,7 +150,6 @@ public enum RegistrationConfig {
 
         );
       } else {
-//        log.info("new registration ?");
         newRegistration =
           new Registration(
             eventService.findByName(registrationConfig.eventConfig.getName()),

@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?!= include("css.html") ?>
 </head>
 <body style="-webkit-text-size-adjust:none; -ms-text-size-adjust:none; font-size:16px; font-family: Arial, sans-serif;">
 
@@ -31,15 +30,15 @@
                     ${regards}<br>
                     ${team}<br/><br/>
                     *******************<br/>
-                    <a href="mailto:info@stirit.ch" style="color:#0000ee; font-size:16px;">info@stirit.ch</a><br/>
-                    <a href="http://www.stirit.ch" target="_blank" style="color:#0000ee; font-size:16px;">www.stirit.ch</a>
+                    <a href="mailto:${hostEmail}" style="color:#0000ee; font-size:16px;">${hostEmail}</a><br/>
+                    <a href="https://www.${omsHostDomain}" target="_blank" style="color:#0000ee; font-size:16px;">www.${omsHostDomain}</a>
 
                     <div style="margin-top:8px;">
-                        <a href="https://www.instagram.com/stiritfestival" target="_blank" style="margin-right:5px; display:inline-block;">
+                        <a href="${omsInstaLink}" target="_blank" style="margin-right:5px; display:inline-block;">
                             <img src="${headerLink}/assets/graphics/email_logo_insta_01.png" alt="Instagram"
                                  style="width:40px; height:40px;">
                         </a>
-                        <a href="https://www.facebook.com/stirit" target="_blank" style="display:inline-block;">
+                        <a href="${omsFbLink}" target="_blank" style="display:inline-block;">
                             <img src="${headerLink}/assets/graphics/email_logo_fb_01.png" alt="Facebook"
                                  style="width:40px; height:40px;">
                         </a>
@@ -48,8 +47,8 @@
 
                 <!-- RIGHT CELL -->
                 <td style="width:50%; text-align:right; vertical-align:bottom; padding-right:20px;">
-                    <a href="https://www.stirit.ch">
-                        <img src="${headerLink}/assets/graphics/email_logo_round_01.png" alt="Stir it! Logo"
+                    <a href="https://www.${omsHostDomain}">
+                        <img src="${headerLink}/assets/graphics/email_logo_round_01.png" alt="${omsHostName} Logo"
                              style="width:150px;height:auto;">
                     </a>
                 </td>

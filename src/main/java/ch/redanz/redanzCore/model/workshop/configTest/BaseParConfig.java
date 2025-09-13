@@ -10,18 +10,17 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum BaseParConfig {
-  DOAUTOMATCH("doAutoMatch"  , true, null),
-  DOAUTORELEASE("doAutoRelease"  , true, null),
+  DOAUTOMATCH("doAutoMatch"  , false, null),
+  DOAUTORELEASE("doAutoRelease"  , false, null),
   TESTMAILONLY("testMailOnly"  , false, null),
-  DOEODCANCEL("doEODCancel"  , true, null),
-  DOEODMATCHING("doEODMatching"  , true, null),
-  DOEODRELEASE("doEODRelease"  , true, null),
-  DOEODREMINDER("doEODReminder"  , true, null),
+  DOEODCANCEL("doEODCancel"  , false, null),
+  DOEODMATCHING("doEODMatching"  , false, null),
+  DOEODRELEASE("doEODRelease"  , false, null),
+  DOEODREMINDER("doEODReminder"  , false, null),
   REMINDERAFTERDAYS("reminderAfterDays"  , false, "5"),
   CANCELAFTERDAYS("cancelAfterDays"  , false, "3"),
   WAITLISTLENGTH("waitListLength"  , false, "2"),
-  ORGANIZERNAME("organizerName"  , false, "Red Anz"),
-  ORGANIZERWEBSITE("organizerWebDomain", false, "https://redanz.ch/");
+;
 
   private final String baseParKey;
   private final boolean boolVal;

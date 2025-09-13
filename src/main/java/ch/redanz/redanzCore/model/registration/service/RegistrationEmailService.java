@@ -2,6 +2,7 @@ package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
@@ -47,6 +48,8 @@ public class RegistrationEmailService {
   Configuration mailConfig;
   @Autowired
   private SpecialService specialService;
+  @Autowired
+  private PersonService personService;
 
   public void update(RegistrationEmail registrationEmail) {
     registrationEmailRepo.save(registrationEmail);
@@ -63,6 +66,14 @@ public class RegistrationEmailService {
     model.put("headerLink", environment.getProperty("link.login"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", registration.getParticipant().getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
+
     Template template = mailConfig.getTemplate("registrationSubmitted.ftl");
 
     String languageKey =
@@ -92,7 +103,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
 
     model.put("see_you",
@@ -111,7 +122,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
     model.put("changeLanguage",
       outTextService.getOutTextByKeyAndLangKey(
@@ -119,25 +130,20 @@ public class RegistrationEmailService {
         languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
     );
 
-//    log.info("incbfr send Email");
     emailService.sendEmail(
-//      EmailService.getSession(),
-      registration.getParticipant().getUser().getUsername(),
+      registration.getParticipant().getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,baseParService.testMailOnly()
-      ,baseParService.testEmail()
+      ,userService.emailIsTester(registration.getParticipant().getEmail())
       ,!registration.getEvent().isActive()
       ,null
     );
-//    log.info("incbfr bfr update");
     update(
       new RegistrationEmail(registration, LocalDateTime.now())
     );
-//    log.info("incbfr after update");
   }
 
   public void sendEmailBookingConfirmation(
@@ -149,6 +155,13 @@ public class RegistrationEmailService {
     model.put("headerLink", environment.getProperty("link.login"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", person.getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
     Template template = mailConfig.getTemplate("registrationDone.ftl");
 
     String languageKey =
@@ -177,7 +190,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
 
     model.put("questions",
@@ -275,7 +288,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
     model.put("changeLanguage",
       outTextService.getOutTextByKeyAndLangKey(
@@ -319,14 +332,13 @@ public class RegistrationEmailService {
     model.put("specials", specialsHtml.toString());
 
     emailService.sendEmail(
-      person.getUser().getUsername(),
+      person.getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,baseParService.testMailOnly()
-      ,baseParService.testEmail()
+      ,userService.emailIsTester(person.getEmail())
       ,!eventService.findIsActive(registration.getEvent())
       ,null
     );
@@ -338,8 +350,14 @@ public class RegistrationEmailService {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
-
     model.put("firstName", registration.getParticipant().getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
     Template template = mailConfig.getTemplate("registrationReminder.ftl");
 
     String languageKey =
@@ -382,7 +400,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
@@ -400,7 +418,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
     model.put("changeLanguage",
       outTextService.getOutTextByKeyAndLangKey(
@@ -409,15 +427,13 @@ public class RegistrationEmailService {
     );
 
     emailService.sendEmail(
-//      EmailService.getSession(),
-      registration.getParticipant().getUser().getUsername(),
+      registration.getParticipant().getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_SUBJECT_EN.getOutTextKey(),
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,baseParService.testMailOnly()
-      ,baseParService.testEmail()
+      ,userService.emailIsTester(registration.getParticipant().getEmail())
       ,!registration.getEvent().isActive()
       ,null
     );
@@ -430,6 +446,13 @@ public class RegistrationEmailService {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login"));
     model.put("firstName", registration.getParticipant().getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
     Template template = mailConfig.getTemplate("registrationCancelled.ftl");
 
     String languageKey =
@@ -480,14 +503,13 @@ public class RegistrationEmailService {
     );
     emailService.sendEmail(
 //      EmailService.getSession(),
-      registration.getParticipant().getUser().getUsername(),
+      registration.getParticipant().getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_SUBJECT_EN.getOutTextKey(),
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,baseParService.testMailOnly()
-      ,baseParService.testEmail()
+      ,userService.emailIsTester(registration.getParticipant().getEmail())
       ,!registration.getEvent().isActive()
       ,null
     );
@@ -499,8 +521,14 @@ public class RegistrationEmailService {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
-
     model.put("firstName", registration.getParticipant().getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
     Template template = mailConfig.getTemplate("registrationReleased.ftl");
 
     String languageKey =
@@ -536,7 +564,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
 
     model.put("see_you",
@@ -555,7 +583,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
 
     model.put("changeLanguage",
@@ -571,15 +599,13 @@ public class RegistrationEmailService {
     );
 
     emailService.sendEmail(
-//      EmailService.getSession(),
-      registration.getParticipant().getUser().getUsername(),
+      registration.getParticipant().getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_SUBJECT_EN.getOutTextKey(),
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,baseParService.testMailOnly()
-      ,baseParService.testEmail()
+      ,userService.emailIsTester(registration.getParticipant().getEmail())
       ,!eventService.findIsActive(registration.getEvent())
       ,null
     );
@@ -619,9 +645,15 @@ public class RegistrationEmailService {
   public void sendGenericEmail(Long senderUser, Person receiver, String subject, String content) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login"));
-
     // Name withough special chars, underscore instead of space
     model.put("firstName", receiver.getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
     model.put("content", content);
       Template template = null;
       try {
@@ -645,7 +677,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.organizerName())
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
     model.put("changeLanguage",
       outTextService.getOutTextByKeyAndLangKey(
@@ -658,10 +690,9 @@ public class RegistrationEmailService {
           receiver.getEmail(),
           subject,
           FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-          ,baseParService.testMailOnly()
-          ,baseParService.testEmail()
+          ,userService.emailIsTester(receiver.getEmail())
           ,false
-          ,userService.findByUserId(senderUser).getUsername()
+          ,personService.findByUser(userService.findByUserId(senderUser)).getEmail()
         );
       } catch (IOException e) {
         throw new RuntimeException(e);

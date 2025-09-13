@@ -17,6 +17,6 @@ import javax.persistence.*;
 public class TestUser {
   @Id
   private Long id;
-
   private String username;
+  private String email;
 }

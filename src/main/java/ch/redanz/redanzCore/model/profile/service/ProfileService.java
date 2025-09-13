@@ -117,13 +117,20 @@ public class ProfileService {
     model.put("headerLink", environment.getProperty("link.login"));
     model.put("registrationLink", registrationLink);
     model.put("firstName", person.getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
     model.put("base", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN.getOutTextKey(), languageKey).getOutText());
     model.put("activate_now", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_EN.getOutTextKey(), languageKey).getOutText());
 //    model.put("expires", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_LINK_EXPIRES_EN.getOutTextKey(), languageKey).getOutText());
     model.put("regards", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(), languageKey).getOutText());
     model.put("see_you", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(), languageKey).getOutText());
     model.put(
-      "team", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(), languageKey).getOutText().replace("{1}", baseParService.organizerName())
+      "team", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(), languageKey).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
     Template template = mailConfig.getTemplate("profileReceived.ftl");
 
@@ -134,15 +141,13 @@ public class ProfileService {
     );
 
     emailService.sendEmail(
-//      EmailService.getSession(),
-      person.getUser().getUsername(),
+      person.getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CONFIRM_SUBJECT_EN.getOutTextKey(),
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,baseParService.testMailOnly()
-      ,baseParService.testEmail()
+      ,userService.emailIsTester(person.getEmail())
       ,false
       ,null
     );
