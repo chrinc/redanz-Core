@@ -114,7 +114,7 @@ public class ProfileService {
   public void sendRegisteredProfileEmail(Person person, String registrationLink, String headerLink) throws IOException, TemplateException {
     String languageKey = person.getPersonLang() == null ? languageService.findLanguageByLanguageKey("GE").getLanguageKey() : person.getPersonLang().getLanguageKey();
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("registrationLink", registrationLink);
     model.put("firstName", person.getFirstName());
 

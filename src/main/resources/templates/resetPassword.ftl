@@ -7,7 +7,7 @@
 
 <!-- HEADER IMAGE -->
 <div style="width:100%; height:221px; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-    <img src="${headerLink}/assets/graphics/email_header_01.png"
+    <img src="${headerLink}/email_header_01.png"
          alt="Header"
          style="height:221px; width:auto; min-width:100%; object-fit:cover;">
 </div>
@@ -48,11 +48,11 @@
                     <a href="https://www.${omsHostDomain}" target="_blank" style="color:#0000ee; font-size:16px; text-decoration:none;">www.${omsHostDomain}</a>
                     <div style="margin-top:8px;">
                         <a href="${omsInstaLink}" target="_blank" style="margin-right:5px; display:inline-block;">
-                            <img src="${headerLink}/assets/graphics/email_logo_insta_01.png" alt="Instagram"
+                            <img src="${headerLink}/email_logo_insta_01.png" alt="Instagram"
                                  style="width:40px;height:40px;">
                         </a>
                         <a href="${omsFbLink}" target="_blank" style="display:inline-block;">
-                            <img src="${headerLink}/assets/graphics/email_logo_fb_01.png" alt="Facebook"
+                            <img src="${headerLink}/email_logo_fb_01.png" alt="Facebook"
                                  style="width:40px;height:40px;">
                         </a>
                     </div>
@@ -61,7 +61,7 @@
                 <!-- RIGHT CELL -->
                 <td style="width:50%; text-align:right; vertical-align:bottom; padding-right:20px;">
                     <a href="https://www.${omsHostDomain}">
-                        <img src="${headerLink}/assets/graphics/email_logo_round_01.png" alt="${omsHostName} Logo"
+                        <img src="${headerLink}/email_logo_round_01.png" alt="${omsHostName} Logo"
                              style="width:150px;height:auto;">
                     </a>
                 </td>

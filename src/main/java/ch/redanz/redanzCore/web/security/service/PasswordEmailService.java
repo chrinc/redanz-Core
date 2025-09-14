@@ -48,7 +48,7 @@ public class PasswordEmailService {
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     Person person = personService.findByUser(user);
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("resetLink", link);
     model.put("firstName", person.getFirstName());
 

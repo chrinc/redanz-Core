@@ -63,7 +63,7 @@ public class RegistrationEmailService {
     Registration registration
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", registration.getParticipant().getFirstName());
 
@@ -152,7 +152,7 @@ public class RegistrationEmailService {
     Registration registration
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", person.getFirstName());
 
@@ -348,7 +348,7 @@ public class RegistrationEmailService {
 
   public void sendReminderEmail(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", registration.getParticipant().getFirstName());
 
@@ -444,7 +444,7 @@ public class RegistrationEmailService {
 
   public void sendCancellationEmail(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("firstName", registration.getParticipant().getFirstName());
 
     model.put("omsFbLink", environment.getProperty("oms.fb.link"));
@@ -519,7 +519,7 @@ public class RegistrationEmailService {
 
   public void sendEmailConfirmation(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
     model.put("firstName", registration.getParticipant().getFirstName());
 
@@ -644,7 +644,7 @@ public class RegistrationEmailService {
 
   public void sendGenericEmail(Long senderUser, Person receiver, String subject, String content) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
-    model.put("headerLink", environment.getProperty("link.login"));
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     // Name withough special chars, underscore instead of space
     model.put("firstName", receiver.getFirstName());
 
