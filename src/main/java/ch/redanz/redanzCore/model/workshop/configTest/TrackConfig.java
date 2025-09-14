@@ -11,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum TrackConfig {
-  ADVANCED("Advanced Track", "", true, false,null),
-  INTERMEDIATE("Intermediate Track", "", true, false, null),
-  NO_LEVEL("No Level Track", "", true, false, null),
+  ADVANCED("Advanced Track", OutTextConfig.LABEL_ADVANCED_DESC_EN.getOutTextKey(), true, false,null),
+  INTERMEDIATE("Intermediate Track", OutTextConfig.LABEL_INTERMEDIATE_DESC_EN.getOutTextKey(), true, false, null),
+  NO_LEVEL("Solo Jazz Track", OutTextConfig.LABEL_SOLO_JAZZ_DESC_EN.getOutTextKey(), true, false, null),
   ;
 
   private final String name;

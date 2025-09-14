@@ -39,7 +39,7 @@ public class OutTextService {
     return outTextRepo.findAllByOutTextIdOutTextKeyAndOutTextIdOutTextLanguageKey(key, langKey).isPresent();
   }
 
-  public String replaceBasePar(String outText) {
+  public String replaceOmsPar(String outText) {
     return
       outText.replace("{omsHostName}", environment.getProperty("oms.host.name"))
         .replace("{omsHostDomain}", environment.getProperty("oms.host.domain"));
@@ -56,7 +56,7 @@ public class OutTextService {
       outTextRepo.findAllByType(type).forEach(
         outText -> outTextMap.put(
           outText.getOutTextId().getOutTextKey() + "." + outText.getOutTextId().getOutTextLanguageKey(),
-          outText.getOutText()
+          replaceOmsPar(outText.getOutText())
         ));
     });
 

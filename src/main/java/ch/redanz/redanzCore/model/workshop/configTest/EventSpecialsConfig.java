@@ -18,7 +18,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum EventSpecialsConfig {
-  EVENT_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, 45.0, false, 30, null, true)
+  EVENT_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, 45.0, false, 30, "https://redanz.ch", false)
   ;
 
   private final EventConfig eventConfig;

@@ -15,6 +15,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ public class LoginController {
   private final UserService userService;
   private final ProfileService profileService;
   private final PersonService personService;
+  private final Environment environment;
 
   @GetMapping(path = "/user-id")
   public Long userId(
@@ -101,6 +103,13 @@ public class LoginController {
   public Integer checkServer(
   ) {
     return 1;
+  }
+
+  @GetMapping(path = "/host-key")
+  public String hostKey(
+  ) {
+    log.info("return: " + environment.getProperty("oms.host.key"));
+    return environment.getProperty("oms.host.key");
   }
 
   @GetMapping("/token/refresh")

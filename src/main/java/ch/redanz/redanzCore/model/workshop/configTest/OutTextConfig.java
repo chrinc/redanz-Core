@@ -465,12 +465,18 @@ public enum OutTextConfig {
 
 
   // Bundles
-  LABEL_FULLPASS_DESC_EN("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN classes, 3 additional free choice classes, 3 parties (FRI/SAT/SUN)", "EN"),
-  LABEL_FULLPASS_DESC_GE("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 FUN-Klassen, 3 zusätzliche Klassen (freie Wahl), 3 Parties (FR/SA/SO)", "GE"),
+  LABEL_ADVANCED_DESC_EN("FRONT_LOGIN", "LABEL-ADVANCED-DESC", "Advanced Level", "EN"),
+  LABEL_ADVANCED_DESC_GE("FRONT_LOGIN", "LABEL-ADVANCED-DESC", "Fortgeschrittenes Level", "GE"),
+  LABEL_INTERMEDIATE_DESC_EN("FRONT_LOGIN", "LABEL-INTERMEDIATE-DESC", "Intermediate Level", "EN"),
+  LABEL_INTERMEDIATE_DESC_GE("FRONT_LOGIN", "LABEL-INTERMEDIATE-DESC", "Mittleres Level", "GE"),
+  LABEL_SOLO_JAZZ_DESC_EN("FRONT_LOGIN", "LABEL-SOLOJAZZ-DESC", "Solo Jazz", "EN"),
+  LABEL_SOLO_JAZZ_DESC_GE("FRONT_LOGIN", "LABEL-SOLOJAZZ-DESC", "Solo Jazz", "GE"),
+  LABEL_FULLPASS_DESC_EN("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 level classes, 3 additional free choice classes, 3 parties (FRI/SAT/SUN)", "EN"),
+  LABEL_FULLPASS_DESC_GE("FRONT_LOGIN", "LABEL-FULLPASS-DESC", "4 Level-Klassen, 3 zusätzliche Klassen (freie Wahl), 3 Parties (FR/SA/SO)", "GE"),
   LABEL_PARTYPASS_DESC_EN("FRONT_LOGIN", "LABEL-PARTY-PASS-DESC", "3 parties (FRI/SAT/SUN)", "EN"),
   LABEL_PARTYPASS_DESC_GE("FRONT_LOGIN", "LABEL-PARTY-PASS-DESC", "3 Parties (FR/SA/SO)", "GE"),
-  LABEL_HALFPASS_DESC_EN("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN classes, 3 parties (FRI/SAT/SUN)", "EN"),
-  LABEL_HALFPASS_DESC_GE("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 FUN-Klassen, 3 Parties (FR/SA/SO)", "GE"),
+  LABEL_HALFPASS_DESC_EN("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 level classes, 3 parties (FRI/SAT/SUN)", "EN"),
+  LABEL_HALFPASS_DESC_GE("FRONT_LOGIN", "LABEL-HALFPASS-DESC", "4 Level-Klassen, 3 Parties (FR/SA/SO)", "GE"),
   LABEL_LEVELPASS_DESC_EN("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN classes, 3 level classes, 3 parties (FRI/SAT/SUN)", "EN"),
   LABEL_LEVELPASS_DESC_GE("FRONT_LOGIN", "LABEL-LEVELPASS-DESC", "4 FUN-Klassen, 3 Level-Klassen, 3 Parties (FR/SA/SO)", "GE"),
   LABEL_EXTRAFUN_DESC_EN("FRONT_LOGIN", "LABEL-EXTRA-FUN-DESC", "6 Free-Choice Classes (SAT/SUN), 3 Parties (FRI/SAT/SUN)", "EN"),
@@ -584,6 +590,10 @@ public enum OutTextConfig {
   // profile
   LABEL_EMAIL_CONFIRMED_EN("FRONT_BASE", "LABEL_EMAIL_CONFIRMED", "Thank you. Your email address has been confirmed.", "EN"),
   LABEL_EMAIL_CONFIRMED_GE("FRONT_BASE", "LABEL_EMAIL_CONFIRMED", "Vielen Dank, deine Email-Adresse wurde bestätigt.", "GE"),
+  LABEL_LOGIN_TITLE_EN("FRONT_BASE", "LABEL_LOGIN_TITLE", "{omsHostName} Account", "EN"),
+  LABEL_LOGIN_TITLE_GE("FRONT_BASE", "LABEL_LOGIN_TITLE", "{omsHostName} Profil", "GE"),
+  LABEL_LOGIN_SUBTITLE_EN("FRONT_BASE", "LABEL_LOGIN_SUBTITLE", "Noch kein {omsHostName} Profil? – Hier registrieren.", "GE"),
+  LABEL_LOGIN_SUBTITLE_GE("FRONT_BASE", "LABEL_LOGIN_SUBTITLE", "No {omsHostName} account yet? – register here.", "EN"),
 
   // languages
   LABEL_LANGUAGE_ENGLISH_EN("FRONT_BASE", "LABEL-LANGUAGE-ENGLSH", "English", "EN"),
@@ -1160,7 +1170,7 @@ public enum OutTextConfig {
     for (OutTextConfig outTextConfig : OutTextConfig.values()) {
       if (outTextService.outTextExists(outTextConfig.outTextKey, outTextConfig.languageKey)) {
         OutText outText = outTextService.getOutTextByKeyAndLangKey(outTextConfig.outTextKey, outTextConfig.languageKey);
-        outText.setOutText(outTextService.replaceBasePar(outTextConfig.outText));
+        outText.setOutText(outTextService.replaceOmsPar(outTextConfig.outText));
         outText.setType(outTextConfig.type);
         outTextService.save(outText);
       } else {
@@ -1170,7 +1180,7 @@ public enum OutTextConfig {
             outTextConfig.outTextKey
             , outTextConfig.languageKey
           ),
-          outTextService.replaceBasePar(outTextConfig.outText),
+          outTextService.replaceOmsPar(outTextConfig.outText),
           outTextConfig.type
         )
       );

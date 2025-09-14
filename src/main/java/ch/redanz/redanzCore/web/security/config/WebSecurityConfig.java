@@ -43,6 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests().antMatchers("/core-api/payrexx/checkout/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/profile/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/login/check-server").permitAll();
+    http.authorizeRequests().antMatchers("/core-api/login/host-key").permitAll();
     http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
     http.cors();
     http.csrf().disable();
