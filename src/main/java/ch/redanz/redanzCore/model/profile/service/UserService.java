@@ -63,7 +63,8 @@ public class UserService implements UserDetailsService {
 
   public boolean userIsAdmin(User user) {
     return user.getUserRole().equals(UserRole.ADMIN)
-      || user.getUserRole().equals(UserRole.ORGANIZER);
+      || user.getUserRole().equals(UserRole.ORGANIZER)
+      || user.getUserRole().equals(UserRole.VOLUNTEER);
   }
 
   public boolean userIsTester(User user) {

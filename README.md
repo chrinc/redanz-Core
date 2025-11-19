@@ -87,7 +87,8 @@ Necessary tools for testing and development
  - screen: 
    - create new screen: `screen -dmS redanz.spring`
    - list all screens: `screen -list`
-   - attach to a screen: `screen -r redanz.spring`
+   - detach to existing screen and attach to it: `screen -d -r redanz.spring`
+   - remove a screen: `screen -X -S redanz.spring quite`
    - detach `Ctrl + A Ctrl + D`
  - Start Spring on Server:
 -- clean inst all: `mvn clean install`

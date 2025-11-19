@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -95,10 +96,17 @@ public class PaymentService {
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
       Special special = specialRegistration.getSpecial();
       double price = 0.0;
-      if (eventService.hasEventSpecial(specialRegistration.getRegistration().getEvent(), special)) {
-        EventSpecial eventSpecial = eventService.findByEventAndSpecial(registration.getEvent(), special);
-        price = eventSpecial.getPrice();
+      Optional<EventSpecial> matchingEventSpecial =
+        registration.getBundle()
+          .getEventSpecials()
+          .stream()
+          .filter(es -> es.getSpecial().equals(specialRegistration.getSpecial()))
+          .findFirst();
+      if (matchingEventSpecial.isPresent()) {
+        price = matchingEventSpecial.get().getPrice();
       }
+
+      // log.info("Found special " + special + " with price " + price);
 
       totalAmount.addAndGet((int) price);
       specials.add(
@@ -192,8 +200,14 @@ public class PaymentService {
 
     // specials
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
-      if (eventService.hasEventSpecial(registration.getEvent(), specialRegistration.getSpecial())) {
-        totalAmount.addAndGet((int) eventService.findByEventAndSpecial(registration.getEvent(), specialRegistration.getSpecial()).getPrice());
+      Optional<EventSpecial> matchingEventSpecial =
+        registration.getBundle()
+          .getEventSpecials()
+          .stream()
+          .filter(es -> es.getSpecial().equals(specialRegistration.getSpecial()))
+          .findFirst();
+      if (matchingEventSpecial.isPresent()) {
+          totalAmount.addAndGet((int) matchingEventSpecial.get().getPrice());
       }
     });
 

@@ -25,26 +25,26 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     List<Registration> findAllByParticipantAndActiveAndEventArchivedAndEventActive(Person participant, Boolean active, Boolean archived, Boolean eventActive);
     List<Registration> findAllByParticipantAndActive(Person person, Boolean active);
     List<Registration> findAllByWorkflowStatusAndActiveAndEventAndRegistrationType(WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);
-    List<Registration> findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndBundle(
-      Boolean active, Event event, WorkflowStatus workflowStatus, Language personLang, Bundle bundle
+    List<Registration> findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndBundleAndRegistrationType(
+      Boolean active, Event event, WorkflowStatus workflowStatus, Language personLang, Bundle bundle, RegistrationType type
     );
-    List<Registration> findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLang(
-      Boolean active, Event event, WorkflowStatus workflowStatus, Language personLang
+    List<Registration> findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndRegistrationType(
+      Boolean active, Event event, WorkflowStatus workflowStatus, Language personLang, RegistrationType type
     );
-    List<Registration> findAllByActiveAndEventAndWorkflowStatusAndBundle(
-      Boolean active, Event event, WorkflowStatus workflowStatus, Bundle bundle
+    List<Registration> findAllByActiveAndEventAndWorkflowStatusAndBundleAndRegistrationType(
+      Boolean active, Event event, WorkflowStatus workflowStatus, Bundle bundle, RegistrationType type
     );
     List<Registration> findAllByActiveAndEventAndWorkflowStatusAndRegistrationType(
       Boolean active, Event event, WorkflowStatus workflowStatus, RegistrationType type
     );
-    List<Registration> findAllByActiveAndEventAndParticipantPersonLangAndBundle(
-      Boolean active, Event event, Language personLang, Bundle bundle
+    List<Registration> findAllByActiveAndEventAndParticipantPersonLangAndBundleAndRegistrationType(
+      Boolean active, Event event, Language personLang, Bundle bundle, RegistrationType type
     );
-    List<Registration> findAllByActiveAndEventAndParticipantPersonLang(
-      Boolean active, Event event, Language personLang
+    List<Registration> findAllByActiveAndEventAndParticipantPersonLangAndRegistrationType(
+      Boolean active, Event event, Language personLang, RegistrationType type
     );
-    List<Registration> findAllByActiveAndEventAndBundle(
-      Boolean active, Event event, Bundle bundle
+    List<Registration> findAllByActiveAndEventAndBundleAndRegistrationType(
+      Boolean active, Event event, Bundle bundle, RegistrationType type
     );
 
     boolean existsByActiveAndEventAndParticipant(Boolean active, Event event, Person participant);

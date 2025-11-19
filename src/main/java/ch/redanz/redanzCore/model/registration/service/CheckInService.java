@@ -34,6 +34,8 @@ public class CheckInService {
   private final BundleService bundleService;
   private final EventService eventService;
   private final BundleEventTrackService bundleEventTrackService;
+  private final HostingService hostingService;
+
   public void save(CheckIn checkIn) {
     checkInRepo.save(checkIn);
   }
@@ -75,17 +77,19 @@ public class CheckInService {
 
     // Staff
     registrationService.findStaffByEvent(event).forEach(staff -> {
-      checkIns.add(
-      new CheckIn(
-        staff.getEvent(),
-        staff,
-        staff.getParticipant().getFirstName() + " " +  staff.getParticipant().getLastName(),
-        RegistrationType.STAFF.name(),
-        volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "",
-        "",
-        "e4e4e4"
-       )
-      );
+      if (!hostingService.hasHostRegistration(staff)) {
+        checkIns.add(
+          new CheckIn(
+            staff.getEvent(),
+            staff,
+            staff.getParticipant().getFirstName() + " " + staff.getParticipant().getLastName(),
+            RegistrationType.STAFF.name(),
+            volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "",
+            "",
+            "e4e4e4"
+          )
+        );
+      }
     });
 
     // Participants
@@ -153,17 +157,19 @@ public class CheckInService {
         existingCheckIn.setDescription(volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "");
         checkIns.add(existingCheckIn);
       } else {
-        checkIns.add(
-          new CheckIn(
-            staff.getEvent(),
-            staff,
-            staff.getParticipant().getFirstName() + " " + staff.getParticipant().getLastName(),
-            RegistrationType.STAFF.name(),
-            volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "",
-            "",
-            "e4e4e4"
-          )
-        );
+        if (!hostingService.hasHostRegistration(staff)) {
+          checkIns.add(
+            new CheckIn(
+              staff.getEvent(),
+              staff,
+              staff.getParticipant().getFirstName() + " " + staff.getParticipant().getLastName(),
+              RegistrationType.STAFF.name(),
+              volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "",
+              "",
+              "e4e4e4"
+            )
+          );
+        }
       }
     });
 
@@ -172,7 +178,11 @@ public class CheckInService {
       if (checkInRepo.existsByRegistration(registration)) {
         CheckIn existingCheckIn = checkInRepo.findByRegistration(registration);
         existingCheckIn.setEvent(registration.getEvent());
-        existingCheckIn.setCheckinName(registration.getParticipant().getFirstName() + " " + registration.getParticipant().getLastName());
+        existingCheckIn.setCheckinName(
+                  registration.getParticipant().getFirstName()
+          + " " + registration.getParticipant().getLastName()
+          + (hostingService.hasHostRegistration(registration) ? " (Host)" : "")
+        );
         existingCheckIn.setType(registration.getBundle().getName());
         existingCheckIn.setDescription(registration.getTrack() != null ? registration.getTrack().getName() : "");
         existingCheckIn.setSlots(slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()));

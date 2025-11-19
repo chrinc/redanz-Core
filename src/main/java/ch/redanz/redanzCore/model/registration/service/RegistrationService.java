@@ -1028,22 +1028,22 @@ public class RegistrationService {
   public List<Registration> findAllByEventStatusLangAndBundle(
     Event event, WorkflowStatus workflowStatus, Language language, Bundle bundle
   ) {
-    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndBundle(
-      true,event, workflowStatus, language, bundle
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndBundleAndRegistrationType(
+      true,event, workflowStatus, language, bundle, RegistrationType.PARTICIPANT
     );
   }
   public List<Registration> findAllByEventStatusAndLang(
     Event event, WorkflowStatus workflowStatus, Language language
   ) {
-    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLang(
-      true,event, workflowStatus, language
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndParticipantPersonLangAndRegistrationType(
+      true,event, workflowStatus, language, RegistrationType.PARTICIPANT
     );
   }
   public List<Registration> findAllByEventStatusAndBundle(
     Event event, WorkflowStatus workflowStatus, Bundle bundle
   ) {
-    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndBundle(
-      true,event, workflowStatus, bundle
+    return registrationRepo.findAllByActiveAndEventAndWorkflowStatusAndBundleAndRegistrationType(
+      true,event, workflowStatus, bundle, RegistrationType.PARTICIPANT
     );
   }
   public List<Registration> findAllByEventAndStatus(
@@ -1056,22 +1056,22 @@ public class RegistrationService {
   public List<Registration> findAllByEventLangAndBundle(
     Event event, Language language, Bundle bundle
   ) {
-    return registrationRepo.findAllByActiveAndEventAndParticipantPersonLangAndBundle(
-      true,event, language, bundle
+    return registrationRepo.findAllByActiveAndEventAndParticipantPersonLangAndBundleAndRegistrationType(
+      true,event, language, bundle, RegistrationType.PARTICIPANT
     );
   }
   public List<Registration> findAllByEventAndLang(
     Event event, Language language
   ) {
-    return registrationRepo.findAllByActiveAndEventAndParticipantPersonLang(
-      true,event, language
+    return registrationRepo.findAllByActiveAndEventAndParticipantPersonLangAndRegistrationType(
+      true,event, language, RegistrationType.PARTICIPANT
     );
   }
   public List<Registration> findAllByEventAndBundle(
     Event event, Bundle bundle
   ) {
-    return registrationRepo.findAllByActiveAndEventAndBundle(
-      true,event, bundle
+    return registrationRepo.findAllByActiveAndEventAndBundleAndRegistrationType(
+      true,event, bundle, RegistrationType.PARTICIPANT
     );
   }
 

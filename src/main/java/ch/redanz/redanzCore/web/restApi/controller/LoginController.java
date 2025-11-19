@@ -108,7 +108,7 @@ public class LoginController {
   @GetMapping(path = "/host-key")
   public String hostKey(
   ) {
-    log.info("return: " + environment.getProperty("oms.host.key"));
+//    log.info("return: " + environment.getProperty("oms.host.key"));
     return environment.getProperty("oms.host.key");
   }
 

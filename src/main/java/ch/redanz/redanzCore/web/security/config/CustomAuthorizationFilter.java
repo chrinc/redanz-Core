@@ -85,6 +85,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
               auth ->
                    auth.getAuthority().equals(UserRole.ORGANIZER.name())
                 || auth.getAuthority().equals(UserRole.ADMIN.name())
+                || auth.getAuthority().equals(UserRole.VOLUNTEER.name())
               )
               .findAny()
               .orElseThrow(
@@ -99,6 +100,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                auth ->
                     auth.getAuthority().equals(UserRole.ORGANIZER.name())
                  || auth.getAuthority().equals(UserRole.ADMIN.name())
+                 || auth.getAuthority().equals(UserRole.VOLUNTEER.name())
                )
                .findAny()
                .orElseThrow(
@@ -113,6 +115,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                auth ->
                     auth.getAuthority().equals(UserRole.ORGANIZER.name())
                  || auth.getAuthority().equals(UserRole.ADMIN.name())
+                 || auth.getAuthority().equals(UserRole.VOLUNTEER.name())
                )
                .findAny()
                .orElseThrow(

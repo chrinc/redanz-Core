@@ -25,13 +25,6 @@ import java.util.List;
 @Slf4j
 public class ReportCheckinService {
   private final CheckInService checkInService;
-  private final PaymentService paymentService;
-  private final FoodRegistrationService foodRegistrationService;
-  private final LanguageService languageService;
-  private final SpecialRegistrationService specialRegistrationService;
-  private final PrivateClassService privateClassService;
-  private final DiscountRegistrationService discountRegistrationService;
-  private final RegistrationService registrationService;
 
   @Transactional
   public List<ResponseCheckIn> getCheckinReport(Event event) {
