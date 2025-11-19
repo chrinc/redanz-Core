@@ -98,7 +98,9 @@ public class CheckInService {
       new CheckIn(
         registration.getEvent(),
         registration,
-        registration.getParticipant().getFirstName() + " " +  registration.getParticipant().getLastName(),
+        registration.getParticipant().getFirstName()
+          + " " +  registration.getParticipant().getLastName()
+          + (hostingService.hasHostRegistration(registration) ? " (Host)" : ""),
         registration.getBundle().getName(),
         registration.getTrack() != null ? registration.getTrack().getName() : "",
         slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()),
@@ -201,7 +203,9 @@ public class CheckInService {
           new CheckIn(
             registration.getEvent(),
             registration,
-            registration.getParticipant().getFirstName() + " " + registration.getParticipant().getLastName(),
+            registration.getParticipant().getFirstName()
+              + " " + registration.getParticipant().getLastName()
+              + (hostingService.hasHostRegistration(registration) ? " (Host)" : ""),
             registration.getBundle().getName(),
             registration.getTrack() != null ? registration.getTrack().getName() : "",
             slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()),
