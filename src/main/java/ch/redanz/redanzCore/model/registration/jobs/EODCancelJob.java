@@ -43,7 +43,7 @@ public class EODCancelJob {
       eventService.getActiveEventsFuture().forEach(event -> {
         registrationService.getAllConfirmingRegistrations(event).forEach(registration -> {
           RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-          LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate();
+          LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate().toLocalDateTime();
           LocalDateTime deadline = LocalDateTime.now().minusDays(
             baseParService.cancelAfterDays()
           );

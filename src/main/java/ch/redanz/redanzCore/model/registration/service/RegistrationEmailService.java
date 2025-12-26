@@ -27,6 +27,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
@@ -142,7 +143,7 @@ public class RegistrationEmailService {
       ,null
     );
     update(
-      new RegistrationEmail(registration, LocalDateTime.now())
+      new RegistrationEmail(registration, OffsetDateTime.now().toZonedDateTime())
     );
   }
 
@@ -342,7 +343,7 @@ public class RegistrationEmailService {
       ,!eventService.findIsActive(registration.getEvent())
       ,null
     );
-    registrationEmail.setDoneSentDate(LocalDateTime.now());
+    registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
   }
 
@@ -438,7 +439,7 @@ public class RegistrationEmailService {
       ,null
     );
 
-    registrationEmail.setReminderSentDate(LocalDateTime.now());
+    registrationEmail.setReminderSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
   }
 
@@ -513,7 +514,7 @@ public class RegistrationEmailService {
       ,!registration.getEvent().isActive()
       ,null
     );
-    registrationEmail.setCancelledSentDate(LocalDateTime.now());
+    registrationEmail.setCancelledSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
   }
 
@@ -610,7 +611,7 @@ public class RegistrationEmailService {
       ,null
     );
 
-    registrationEmail.setReleasedSentDate(LocalDateTime.now());
+    registrationEmail.setReleasedSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
 
   }
@@ -706,7 +707,7 @@ public class RegistrationEmailService {
     RegistrationEmail registrationEmail = registrationEmailRepo.findByRegistration(registration);
 
     if (registrationEmail.getReminderSentDate() != null) {
-      registrationEmail.setReminderSentDate(LocalDateTime.now());
+      registrationEmail.setReminderSentDate(OffsetDateTime.now().toZonedDateTime());
     }
   }
 

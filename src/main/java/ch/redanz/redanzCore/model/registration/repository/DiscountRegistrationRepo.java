@@ -20,4 +20,5 @@ public interface DiscountRegistrationRepo extends JpaRepository<DiscountRegistra
   int countAllByDiscountAndRegistrationEvent(Discount discount, Event event);
   int countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(Discount discount, WorkflowStatus workflowStatus, Event event);
   boolean existsByRegistrationAndDiscount(Registration registration, Discount discount);
+  List<DiscountRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, Boolean active);
 }

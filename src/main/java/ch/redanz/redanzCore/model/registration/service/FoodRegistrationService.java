@@ -3,11 +3,10 @@ package ch.redanz.redanzCore.model.registration.service;
 import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
 import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.Food;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.registration.repository.SpecialRegistrationRepo;
+import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
@@ -32,8 +31,9 @@ public class FoodRegistrationService {
   private final FoodService foodService;
   private final SlotService slotService;
   private final WorkflowStatusService workflowStatusService;
-  private final EventService eventService;
   private final OutTextService outTextService;
+  private final SpecialRegistrationRepo specialRegistrationRepo;
+  private final DiscountRegistrationRepo discountRegistrationRepo;
 
   public void save(Registration registration, Food food, Slot slot) {
     foodRegistrationRepo.save(
@@ -55,6 +55,19 @@ public class FoodRegistrationService {
       .collect(Collectors.toSet());
 
     return registrations;
+  }
+
+  public Boolean hasRegistrations(Food food, Boolean active) {
+    return foodRegistrationRepo
+      .findAllByRegistrationActive(active)
+      .stream()
+      .anyMatch(fr -> fr.getFood().equals(food));
+  }
+  public Boolean hasRegistrations(Event event, Food food, Boolean active) {
+    return foodRegistrationRepo
+      .findAllByRegistrationEventAndRegistrationActive(event, active)
+      .stream()
+      .anyMatch(fr -> fr.getFood().equals(food));
   }
 
   public String getReportFoodSlots(Registration registration, Language language) {

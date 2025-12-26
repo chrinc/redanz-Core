@@ -19,8 +19,8 @@ public enum EventConfig {
   REDANZ_EVENT(
   "Redanz Workshop"
   , 350
-  , LocalDate.parse("2025-11-01")
-  , LocalDate.parse("2025-11-04")
+  , LocalDate.parse("2026-11-01")
+  , LocalDate.parse("2026-11-04")
     ,ZonedDateTime.parse("2023-07-29T11:00:00.000+01:00[Europe/Paris]")
   ,true
     ,false

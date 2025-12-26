@@ -11,7 +11,9 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -47,8 +49,11 @@ public class Event implements Serializable {
   @Column(name = "event_to")
   private LocalDate eventTo;
 
-  @Column(name = "registration_start")
-  private ZonedDateTime registrationStart;
+  @Column(name = "registration_start", nullable = false)
+  private Instant registrationStart;
+
+  @Column(name = "registration_start_tz", nullable = false, length = 64)
+  private String registrationStartTz; // e.g. "+02:00"
 
   private boolean active;
 
@@ -64,22 +69,22 @@ public class Event implements Serializable {
 
   private String description;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventPrivateClass> eventPrivates;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventSpecial> eventSpecials;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventDiscount> eventDiscounts;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventBundle> eventBundles;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventTypeSlot> eventTypeSlots;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventFoodSlot> eventFoodSlots;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
@@ -88,8 +93,23 @@ public class Event implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventPartInfo> eventPartInfoSet;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventDanceRole> eventDanceRoles;
+
+
+
+  @Transient
+  public ZonedDateTime getRegistrationStart() {
+    if (registrationStart == null || registrationStartTz == null) {
+      return null;
+    }
+    return registrationStart.atZone(ZoneId.of(registrationStartTz));
+  }
+
+  public void setRegistrationStart(ZonedDateTime zdt) {
+    this.registrationStartTz = zdt.getOffset().getId();
+    this.registrationStart = zdt.toInstant();
+  }
 
   public Event() {
   }
@@ -113,14 +133,13 @@ public class Event implements Serializable {
     this.capacity = capacity;
     this.eventFrom = eventFrom;
     this.eventTo = eventTo;
-    this.registrationStart = registrationStart;
+    setRegistrationStart(registrationStart);
     this.active = active;
     this.archived = archived;
     this.description = description;
     this.hosting = hosting;
     this.volunteering = volunteering;
     this.scholarship = scholarship;
-//    this.discounts = discounts;
     this.volunteerTypes = volunteerTypes;
     this.requireTerms = requireTerms;
   }
@@ -165,7 +184,7 @@ public class Event implements Serializable {
         put("capacity", String.valueOf(capacity));
         put("eventFrom", eventFrom.toString() + "T00:00+0100");
         put("eventTo", eventTo.toString() + "T00:00+0100");
-        put("registrationStart", registrationStart.toString());
+        put("registrationStart", getRegistrationStart().toString());
         put("active", String.valueOf(active));
         put("archived", String.valueOf(archived));
         put("description", description);

@@ -57,21 +57,22 @@ public class PrivateClassService {
     return privates.get() == null ? "" : privates.toString();
   }
 
-//  public List<PrivateClass> findByEvent(Event event) {
-//    List<PrivateClass> privateClasses = new ArrayList<>();
-//    event
-//    return privateClassRepo.findAllByEvent(event).isPresent() ?
-//      privateClassRepo.findAllByEvent(event).get() :
-//      null;
-//  }
+  public Boolean hasRegistration(PrivateClass privateClass,  Boolean active) {
+    return privateClassRegistrationRepo
+      .findAllByRegistrationActive(active)
+      .stream()
+      .anyMatch(pr -> pr.getPrivateClass().equals(privateClass));
+  }
+  public Boolean hasRegistration(Event event, PrivateClass privateClass,  Boolean active) {
+    return privateClassRegistrationRepo
+      .findAllByRegistrationEventAndRegistrationActive(event, active)
+      .stream()
+      .anyMatch(pr -> pr.getPrivateClass().equals(privateClass));
+  }
+
   public List<PrivateClass> findAll() {
     return privateClassRepo.findAll();
   }
-
-//  public List<PrivateClass> findByEventAndBundle(Event event, Bundle bundle) {
-//    if (bundle.getSimpleTicket()) {return new ArrayList<>();}
-//    else { return findByEvent(event);}
-//  }
 
   public List<PrivateClassRegistration> findAllByRegistrations(Registration registration) {
     return privateClassRegistrationRepo.findAllByRegistration(registration);
@@ -170,19 +171,6 @@ public class PrivateClassService {
               field.set(privateClass, request.get(key).isJsonNull() ? null : localDate);
               break;
 
-            case "datetime":
-              field = getField(key);
-              // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
-              String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
-              String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
-              ZoneId zoneId = ZoneId.of("Europe/Zurich");
-              LocalDateTime dateTime = LocalDateTime.parse(dateTimeDateString + " " + dateTimeTimeString, dateTimeFormatter);
-
-              // hack hack hack, need fix plus Days
-              ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zoneId).plusDays(1);
-              field.set(privateClass, request.get(key).isJsonNull() ? null : zonedDateTime);
-              break;
 
             case "bool":
               field = getField(key);

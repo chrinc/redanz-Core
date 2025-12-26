@@ -143,19 +143,6 @@ public class DiscountService {
               field.set(discount, request.get(key).isJsonNull() ? null : localDate);
               break;
 
-            case "datetime":
-              field = getField(key);
-              // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
-              String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
-              String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
-              ZoneId zoneId = ZoneId.of("Europe/Zurich");
-              LocalDateTime dateTime = LocalDateTime.parse(dateTimeDateString + " " + dateTimeTimeString, dateTimeFormatter);
-
-              // hack hack hack, need fix plus Days
-              ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zoneId).plusDays(1);
-              field.set(discount, request.get(key).isJsonNull() ? null : zonedDateTime);
-              break;
 
             case "bool":
               field = getField(key);
@@ -228,17 +215,7 @@ public class DiscountService {
 
     return discountsData;
   }
-
   public boolean isUsed(Discount discount) {
-    AtomicBoolean isUsed = new AtomicBoolean(false);
-    eventRepo.findAll().forEach(event -> {
-      event.getEventTypeSlots().forEach(eventTypeSlot -> {
-        if (eventTypeSlot.getTypeSlot().getSlot().equals(discount)) {
-          isUsed.set(true);
-        }
-      });
-    });
-    return isUsed.get();
+    return eventDiscountRepo.existsByDiscount(discount);
   }
-
 }

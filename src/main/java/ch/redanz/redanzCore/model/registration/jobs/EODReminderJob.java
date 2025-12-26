@@ -40,7 +40,7 @@ public class EODReminderJob {
       log.info("Job: runReminder");
       eventService.getActiveEventsFuture().forEach(event -> {
         registrationService.getAllConfirmingRegistrations(event).forEach(registration -> {
-          LocalDateTime releasedAt = registration.getWorkflowStatusDate();
+          LocalDateTime releasedAt = registration.getWorkflowStatusDate().toLocalDateTime();
           LocalDateTime deadline = LocalDateTime.now().minusDays(
             baseParService.reminderAfterDays()
           );

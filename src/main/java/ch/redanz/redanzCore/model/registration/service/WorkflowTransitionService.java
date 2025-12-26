@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Service
 @AllArgsConstructor
@@ -27,7 +28,7 @@ public class WorkflowTransitionService {
   }
 
   public void setWorkflowStatus(Registration registration, WorkflowStatus workflowStatus) {
-    LocalDateTime currentTimestamp = LocalDateTime.now();
+    ZonedDateTime currentTimestamp = ZonedDateTime.now();
     WorkflowTransition workflowTransition = new WorkflowTransition(
       workflowStatus,
       registration,

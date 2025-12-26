@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Entity
 @ToString
@@ -41,30 +44,31 @@ public class WorkflowTransition implements Serializable {
   private Registration registration;
 
   @Column(name="transition_timestamp")
-  private LocalDateTime transitionTimestamp;
+  private Instant transitionTimestamp;
 
+  @Column(name="transition_timestamp_tz")
+  private String transitionTimestampTz;
+  @Transient
+  public ZonedDateTime getTransitionTimestamp() {
+    if (transitionTimestamp == null || transitionTimestampTz == null) {
+      return null;
+    }
+    return transitionTimestamp.atZone(ZoneId.of(transitionTimestampTz));
+  }
 
+  @Transient
+  public void setTransitionTimestamp(ZonedDateTime zdt) {
+    this.transitionTimestamp = zdt.toInstant();
+    this.transitionTimestampTz = zdt.getOffset().getId();
+  }
 
   public WorkflowTransition(
     WorkflowStatus workflowStatus
     , Registration registration
-    , LocalDateTime transitionTimestamp
+    , ZonedDateTime transitionTimestamp
   ) {
     this.workflowStatus = workflowStatus;
     this.registration = registration;
-    this.transitionTimestamp = transitionTimestamp;
-//    updateRegistration();
+    setTransitionTimestamp(transitionTimestamp);
   }
-
-//  private void updateRegistration() {
-//    Registration updateRegistration = this.registration;
-//    log.info("this: {}",   this);
-//    updateRegistration.setWorkflowTransition(this);
-//    log.info("avter save inc001");
-//    log.info("avter save inc001 firstName {}", updateRegistration.getParticipant().getFirstName());
-//    log.info("avter save inc001 firstName 2? {}", updateRegistration.getWorkflowTransition().getRegistration().getParticipant().getFirstName());
-////    registrationRepo.save(updateRegistration);
-//
-//    log.info("avter save registration");
-//  }
 }

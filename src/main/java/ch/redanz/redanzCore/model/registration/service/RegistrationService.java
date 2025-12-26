@@ -96,6 +96,16 @@ public class RegistrationService {
   public boolean hasRegistration(Event event, Person person) {
     return registrationRepo.existsByActiveAndEventAndParticipant(true, event, person);
   }
+  public boolean hasRegistration(Event event, Bundle bundle, Boolean activ) {
+    return registrationRepo.existsByActiveAndEventAndBundle(activ, event, bundle);
+  }
+  public boolean hasRegistration(Event event, Track track, Boolean activ) {
+    return registrationRepo.existsByActiveAndEventAndTrack(activ, event, track);
+  }
+  public boolean hasRegistration(Event event, DanceRole danceRole, Boolean activ) {
+    return registrationRepo.existsByActiveAndEventAndDanceRole(activ, event, danceRole);
+  }
+
 
   public int getBunldePrice(Registration registration) {
     return  registrationRepo.getBundlePrice(registration.getRegistrationId());
@@ -564,6 +574,13 @@ public class RegistrationService {
   public void onManualRelease(Registration registration) throws TemplateException, IOException {
     releaseToConfirming(registration);
     registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration));
+  }
+
+  public void onManualDone(Registration registration) throws TemplateException, IOException {
+    workflowTransitionService.setWorkflowStatus(
+      registration,
+      workflowStatusService.getDone()
+    );
   }
 
   public void releaseToConfirming(Registration registration) {

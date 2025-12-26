@@ -148,7 +148,12 @@ public class SpecialRegistrationService {
     // log.info("inc@bfr return");
     return privateClassRegistrations;
   }
-
+  public Boolean hasRegistrations(Event event, Special special, Boolean active) {
+    return specialRegistrationRepo
+      .findAllByRegistrationEventAndRegistrationActive(event, active)
+      .stream()
+      .anyMatch(fr -> fr.getSpecial().equals(special));
+  }
   private boolean hasSpecialRegistration(List<SpecialRegistration> specialRegistrations, Special special) {
     AtomicBoolean hasSpecialRegistration = new AtomicBoolean(false);
     specialRegistrations.forEach(specialRegistration -> {

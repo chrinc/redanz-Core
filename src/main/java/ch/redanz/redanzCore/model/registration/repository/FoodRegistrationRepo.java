@@ -18,6 +18,8 @@ void deleteAllByRegistrationAndFoodAndSlot(Registration registration, Food food,
 
 List<FoodRegistration> findAllByRegistration(Registration registration);
 List<FoodRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, Boolean active);
+List<FoodRegistration> findAllByRegistrationActive(Boolean active);
+
 
 int countAllByFoodAndRegistrationWorkflowStatusAndRegistrationEvent(
   Food food, WorkflowStatus workflowStatus, Event event

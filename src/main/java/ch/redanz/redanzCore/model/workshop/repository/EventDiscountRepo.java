@@ -12,4 +12,6 @@ public interface EventDiscountRepo extends JpaRepository<EventDiscount, Long> {
   EventDiscount findByEventAndDiscount(Event event, Discount discount);
   boolean existsByEventDiscountIdAndCapacityIsNull(Long eventDiscountId);
   boolean existsByEventDiscountIdAndCapacityNotNull(Long eventDiscountId);
+
+  boolean existsByDiscount(Discount discount);
 }

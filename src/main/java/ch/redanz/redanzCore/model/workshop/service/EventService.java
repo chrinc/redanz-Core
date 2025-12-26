@@ -1,21 +1,25 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
+import ch.redanz.redanzCore.model.registration.service.DiscountRegistrationService;
+import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
+import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.*;
+import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
+import ch.redanz.redanzCore.web.security.exception.HasRegistrationException;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,8 +36,6 @@ public class EventService {
   private final FoodService foodService;
   private final SpecialService specialService;
   private final PrivateClassService privateClassService;
-  private final AccommodationService accommodationService;
-  private final VolunteeringService volunteeringService;
   private final EventTypeSlotService eventTypeSlotService;
   private final SlotService slotService;
   private final EventPrivateClassRepo eventPrivateClassRepo;
@@ -47,6 +49,10 @@ public class EventService {
   private final DanceRoleService danceRoleService;
   private final BundleEventTrackService bundleEventTrackService;
   private final EventDanceRoleRepo eventDanceRoleRepo;
+  private final FoodRegistrationService foodRegistrationService;
+  private final RegistrationRepo registrationRepo;
+  private final DiscountRegistrationService discountRegistrationService;
+  private final SpecialRegistrationService specialRegistrationService;
 
   public EventBundle findByEventAndBundle(Event event, Bundle bundle) {
     return eventBundleRepo.findByEventAndBundle(event, bundle);
@@ -302,6 +308,7 @@ public class EventService {
       eventData.put("specials", eventSpecialIdList(event).toString());
       eventData.put("privates", eventPrivateIdList(event).toString());
       eventsData.add(eventData);
+//      log.info(eventsData.toString());
     });
     return eventsData;
   }
@@ -505,6 +512,7 @@ public class EventService {
         String key = stringStringMap.get("key");
         String type = stringStringMap.get("type");
         Field field;
+        log.info(type);
         try {
           switch (type) {
             case "label":
@@ -547,17 +555,18 @@ public class EventService {
               break;
 
             case "datetime":
-              field = getField(key);
-              // registrationStart":{"date":"2023-07-29","time":"23:00"}
-              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
               String dateTimeDateString = request.get(key + "_date").getAsString().substring(0, 10);
               String dateTimeTimeString = request.get(key + "_time").isJsonNull() ? "12:00" : request.get(key + "_time").getAsString();
-              ZoneId zoneId = ZoneId.of("Europe/Zurich");
-              LocalDateTime dateTime = LocalDateTime.parse(dateTimeDateString + " " + dateTimeTimeString, dateTimeFormatter);
-
-              // hack hack hack, need fix plus Days
-              ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zoneId).plusDays(1);
-              field.set(event, zonedDateTime);
+              String dateTimeTzString = request.get(key + "_tz").isJsonNull() ? "+02:00" : request.get(key + "_tz").getAsString();
+              LocalDateTime ldt = LocalDateTime.parse(dateTimeDateString + "T" + dateTimeTimeString);
+              ZoneOffset offset = ZoneOffset.of(dateTimeTzString);
+              OffsetDateTime odt = OffsetDateTime.of(ldt, offset);
+              Field fInstant = getField(key);
+              Field fTz      = getField(key + "Tz");
+              fInstant.setAccessible(true);
+              fTz.setAccessible(true);
+              fInstant.set(event, odt.toInstant());
+              fTz.set(event, offset.getId());
               break;
 
             case "bool":
@@ -569,7 +578,7 @@ public class EventService {
             case "multiselectInfo":
               if (request.get(key) != null && request.get(key).isJsonArray()) {
                 request.get(key).getAsJsonArray().forEach(item -> {
-                  log.info(item.toString());
+//                  log.info(item.toString());
 
                   switch (key) {
                     case "specials":
@@ -673,6 +682,7 @@ public class EventService {
     Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
     if (eventSpecialId == null || eventSpecialId == 0) {
       eventSpecial = new EventSpecial();
+      eventSpecial.setSoldOut(false);
     } else {
       eventSpecial = eventSpecialRepo.findByEventSpecialId(eventSpecialId);
     }
@@ -968,29 +978,98 @@ public class EventService {
   }
 
   public void deleteEventFoodSlot(JsonObject request) {
-    Long eventFoodSlotId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    EventFoodSlot eventFoodSlot = eventFoodSlotRepo.findByEventFoodSlotId(eventFoodSlotId);
-    delete(eventFoodSlot);
+    try {
+      Long eventFoodSlotId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+      Long eventId = request.get("eventId").isJsonNull() ? null : request.get("eventId").getAsLong();
+      Long foodId = request.get("food").isJsonNull() ? null : request.get("food").getAsLong();
+      if (foodRegistrationService.hasRegistrations(findByEventId(eventId), foodService.findByFoodId(foodId), true)) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_GE.getOutTextKey());
+      } else {
+        delete(eventFoodSlotRepo.findByEventFoodSlotId(eventFoodSlotId));
+      }
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
 
   public void deleteEventPrivate(JsonObject request) {
-    Long eventPrivateId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    delete(eventPrivateClassRepo.findByEventPrivateClassId(eventPrivateId));
+    try {
+      Long eventPrivateId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+      Long privateClassId = request.get("privateClass").isJsonNull() ? null : request.get("privateClass").getAsLong();
+      Long eventId = request.get("eventId").isJsonNull() ? null : request.get("eventId").getAsLong();
+      if (privateClassService.hasRegistration(findByEventId(eventId), privateClassService.findByPrivateClassId(privateClassId), true)) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_GE.getOutTextKey());
+      } else {
+        delete(eventPrivateClassRepo.findByEventPrivateClassId(eventPrivateId));
+      }
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
+
 
   public void deleteEventDanceRole(JsonObject request) {
-    Long eventDanceRoleId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    eventDanceRoleRepo.deleteById(eventDanceRoleId);
+    try {
+      Long eventDanceRoleId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+      Long danceRoleId = request.get("danceRole").isJsonNull() ? null : request.get("danceRole").getAsLong();
+      Long eventId = request.get("eventId").isJsonNull() ? null : request.get("eventId").getAsLong();
+      if (registrationRepo.existsByActiveAndEventAndDanceRole(true, findByEventId(eventId), danceRoleService.findByDanceRoleId(danceRoleId))) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_GE.getOutTextKey());
+      } else {
+        eventDanceRoleRepo.deleteById(eventDanceRoleId);
+      }
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
-
   public void deleteEventSpecial(JsonObject request) {
-    Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    delete(eventSpecialRepo.findByEventSpecialId(eventSpecialId));
+    try {
+      Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+      Long eventId = request.get("eventId").isJsonNull() ? null : request.get("eventId").getAsLong();
+      Long specialId = request.get("special").isJsonNull() ? null : request.get("special").getAsLong();
+      if (specialRegistrationService.hasRegistrations(findByEventId(eventId), specialService.findBySpecialId(specialId), true)) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_GE.getOutTextKey());
+      } else {
+        delete(eventSpecialRepo.findByEventSpecialId(eventSpecialId));
+      }
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
 
   public void deleteEventDiscount(JsonObject request) {
-    Long eventDiscountId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-    delete(eventDiscountRepo.findByEventDiscountId(eventDiscountId));
+    try {
+      Long eventDiscountId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+      Long eventId = request.get("eventId").isJsonNull() ? null : request.get("eventId").getAsLong();
+      Long discountId = request.get("discount").isJsonNull() ? null : request.get("discount").getAsLong();
+      if (discountRegistrationService.hasRegistrations(findByEventId(eventId), discountService.findByDiscountId(discountId), true)) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_GE.getOutTextKey());
+      } else {
+        delete(eventDiscountRepo.findByEventDiscountId(eventDiscountId));
+      }
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
 
   public void delete(EventBundle eventBundle) {
@@ -1002,24 +1081,30 @@ public class EventService {
     eventTrackRepo.delete(eventTrack);
   }
 
+  @Transactional
   public void delete(EventTypeSlot eventTypeSlot) {
-    eventTypeSlotService.delete(eventTypeSlot);
+    eventTypeSlot.getEvent().getEventTypeSlots().remove(eventTypeSlot);
   }
 
+  @Transactional
   public void delete(EventPrivateClass eventPrivate) {
-    eventPrivateClassRepo.delete(eventPrivate);
+    eventPrivate.getEvent().getEventPrivates().remove(eventPrivate);
   }
 
+  @Transactional
   public void delete(EventDiscount eventDiscount) {
-    eventDiscountRepo.delete(eventDiscount);
+    eventDiscount.getEvent().getEventDiscounts().remove(eventDiscount);
   }
 
+
+  @Transactional
   public void delete(EventSpecial eventSpecial) {
-    eventSpecialRepo.delete(eventSpecial);
+    eventSpecial.getEvent().getEventSpecials().remove(eventSpecial);
   }
 
-  public void delete(EventFoodSlot eventFoodSlot) {
-    eventFoodSlotRepo.delete(eventFoodSlot);
+  @Transactional
+  public void delete(EventFoodSlot slot) {
+    slot.getEvent().getEventFoodSlots().remove(slot);
   }
 
   public void clone(Event baseEvent) {

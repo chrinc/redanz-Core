@@ -41,11 +41,11 @@ public class ReportEmailLogsService {
             registration.getWorkflowStatus().getName(),
             paymentService.amountDue(registration),
             paymentService.totalAmount(registration),
-            registrationEmail == null || registrationEmail.getReceivedSentDate() == null ?  "" : registrationEmail.getReceivedSentDate().plusHours(timeDifference).format(formatter),
-            registrationEmail == null || registrationEmail.getReleasedSentDate() == null ?  "" : registrationEmail.getReleasedSentDate().plusHours(timeDifference).format(formatter),
-            registrationEmail == null || registrationEmail.getDoneSentDate() == null ?  "" : registrationEmail.getDoneSentDate().plusHours(timeDifference).format(formatter),
-            registrationEmail == null || registrationEmail.getReminderSentDate() == null ?  "" : registrationEmail.getReminderSentDate().plusHours(timeDifference).format(formatter),
-            registrationEmail == null || registrationEmail.getCancelledSentDate() == null ?  "" : registrationEmail.getCancelledSentDate().plusHours(timeDifference).format(formatter)
+            registrationEmail == null || registrationEmail.getReceivedSentDate() == null ?  "" : registrationEmail.getReceivedSentDate().toString(),
+            registrationEmail == null || registrationEmail.getReleasedSentDate() == null ?  "" : registrationEmail.getReleasedSentDate().toString(),
+            registrationEmail == null || registrationEmail.getDoneSentDate() == null ?  "" : registrationEmail.getDoneSentDate().toString(),
+            registrationEmail == null || registrationEmail.getReminderSentDate() == null ?  "" : registrationEmail.getReminderSentDate().toString(),
+            registrationEmail == null || registrationEmail.getCancelledSentDate() == null ?  "" : registrationEmail.getCancelledSentDate().toString()
           )
         );
     });

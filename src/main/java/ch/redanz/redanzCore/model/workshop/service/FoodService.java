@@ -25,7 +25,6 @@ public class FoodService {
   private final SlotService slotService;
   private final EventTypeSlotService eventTypeSlotService;
   private final EventFoodSlotRepo eventFoodSlotRepo;
-  private final EventRepo eventRepo;
 
 
   public void save(Food food) {
@@ -205,21 +204,8 @@ public class FoodService {
     return Food.schema();
   }
 
-
-//  public List<EventTypeSlot> eventFoodList(Event event) {
-//    return eventTypeSlotService.findByEventAndType(event, "food");
-//  }
-  public boolean isUsed(Food food) {
+  public Boolean isUsed(Food food) {
     AtomicBoolean isUsed = new AtomicBoolean(false);
-    eventRepo.findAll().forEach(event -> {
-      event.getEventTypeSlots().forEach(eventTypeSlot -> {
-        if (eventTypeSlot.getTypeSlot().getType().equals("food")
-          && eventTypeSlot.getTypeSlot().getTypeObjectId().equals(food.getFoodId())
-        ) {
-          isUsed.set(true);
-        }
-      });
-    });
-    return isUsed.get();
+    return eventFoodSlotRepo.existsByFood(food);
   }
 }

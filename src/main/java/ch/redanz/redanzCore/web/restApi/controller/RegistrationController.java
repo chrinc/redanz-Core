@@ -142,6 +142,20 @@ public class RegistrationController {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }
+  @GetMapping(path = "/manual-done")
+  @Transactional
+  public void manualDone(
+    @RequestParam("registrationId") Long registrationId
+  ) {
+    try {
+      registrationService.onManualDone(
+        registrationService.findByRegistrationId(registrationId)
+      );
+    } catch (Exception exception) {
+      errorLogService.addLog("manual-done", exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
   @GetMapping(path = "/manual-cancel")
   @Transactional
   public void manualCancel(
@@ -432,3 +446,4 @@ public class RegistrationController {
     }
   }
 }
+

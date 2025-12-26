@@ -7,6 +7,7 @@ import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRe
 import ch.redanz.redanzCore.model.workshop.entities.Discount;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
+import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.repository.EventDiscountRepo;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
@@ -42,19 +43,12 @@ public class DiscountRegistrationService {
     );
   }
 
-//  public List<DiscountRegistration> discountRegistrationsCapacity(Registration registration) {
-//    List<DiscountRegistration> discountRegistrations = new ArrayList<>();
-//    discountRegistrationRepo.findAllByRegistration(registration).forEach(
-//      discountRegistration -> {
-//        EventDiscount eventDiscount = eventDiscountRepo.findByEventAndDiscount(
-//          registration.getEvent(), discountRegistration.getDiscount()
-//        );
-//        if (eventDiscountRepo.existsByEventDiscountIdAndCapacityNotNull(eventDiscount.getEventDiscountId()))  {
-//          discountRegistrations.add(discountRegistration);
-//        }
-//      });
-//    return discountRegistrations;
-//  }
+  public Boolean hasRegistrations(Event event, Discount discount, Boolean active) {
+    return discountRegistrationRepo
+      .findAllByRegistrationEventAndRegistrationActive(event, active)
+      .stream()
+      .anyMatch(fr -> fr.getDiscount().equals(discount));
+  }
 
 
   public void saveCapacityDiscount(Registration registration) {

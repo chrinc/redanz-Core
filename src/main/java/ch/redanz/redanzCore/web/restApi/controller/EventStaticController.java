@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
+import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
@@ -30,6 +31,7 @@ public class EventStaticController {
   private final DiscountService discountService;
   private final EventService eventService;
   private final EventRegistrationService eventRegistrationService;
+  private final FoodRegistrationService foodRegistrationService;
 
   // schema / data
   @GetMapping(path = "/data")
@@ -318,6 +320,7 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+      log.info(request.toString());
       Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
       Discount discount = discountService.findByDiscountId(id);
       if (discountService.isUsed(discount)) {

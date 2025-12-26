@@ -221,15 +221,7 @@ public class SlotService {
   }
 
   public boolean isUsed(Slot slot) {
-    AtomicBoolean isUsed = new AtomicBoolean(false);
-    eventRepo.findAll().forEach(event -> {
-      event.getEventTypeSlots().forEach(eventTypeSlot -> {
-        if (eventTypeSlot.getTypeSlot().getSlot().equals(slot)) {
-          isUsed.set(true);
-        }
-      });
-    });
-    return isUsed.get();
+    return eventTypeSlotRepo.existsByTypeSlotSlot(slot);
   }
 
   public Field getField(String key) {

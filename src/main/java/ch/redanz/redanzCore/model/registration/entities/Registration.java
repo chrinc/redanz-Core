@@ -12,7 +12,10 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
@@ -49,7 +52,10 @@ public class Registration implements Serializable {
   private WorkflowStatus workflowStatus;
 
   @Column(name = "current_transition_date")
-  private LocalDateTime workflowStatusDate;
+  private Instant workflowStatusDate;
+
+  @Column(name = "current_transition_date_tz")
+  private String workflowStatusDateTz;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="dance_role_id")
@@ -71,6 +77,20 @@ public class Registration implements Serializable {
     inverseJoinColumns = @JoinColumn(name="discount_id")
   )
   private List<Discount> discountList;
+
+  @Transient
+  public ZonedDateTime getWorkflowStatusDate() {
+    if (workflowStatusDate == null || workflowStatusDateTz == null) {
+      return null;
+    }
+    return this.workflowStatusDate.atZone(ZoneId.of(workflowStatusDateTz));
+  }
+
+  @Transient
+  public void setWorkflowStatusDate(ZonedDateTime zdt) {
+    this.workflowStatusDateTz = zdt.getOffset().getId();
+    this.workflowStatusDate = zdt.toInstant();
+  }
 
   public Registration(Event event, Bundle bundle, Person participant, RegistrationType registrationType) {
     this.event = event;

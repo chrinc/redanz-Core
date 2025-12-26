@@ -13,6 +13,7 @@ import java.util.List;
 
 public interface PrivateClassRegistrationRepo extends JpaRepository<PrivateClassRegistration, Long> {
   List<PrivateClassRegistration> findAllByRegistration(Registration registration);
+  List<PrivateClassRegistration> findAllByRegistrationActive(Boolean active);
   List<PrivateClassRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, Boolean active);
   void deleteAllByRegistrationAndPrivateClass(Registration registration, PrivateClass privateClass);
   int countAllByRegistration_EventAndPrivateClassAndRegistration_WorkflowStatus(Event event, PrivateClass privateClass, WorkflowStatus workflowStatus);

@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.web.restApi.controller;
 
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
@@ -43,6 +44,7 @@ public class EventController {
   private final EventTypeSlotService eventTypeSlotService;
   private final EventPartService eventPartService;
   private final BundleEventTrackService bundleEventTrackService;
+  private final RegistrationService registrationService;
 
   @GetMapping(path = "/schema/event")
   public List<Map<String, String>> getEventSchema() {
@@ -269,24 +271,6 @@ public class EventController {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
     }
   }
-
-//  @PostMapping(path = "/trackDanceRole/delete")
-//  @Transactional
-//  public void deleteTrackDanceRole(
-//    @RequestBody String jsonObject
-//  ) {
-//    try {
-//      JsonObject specialObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-//      trackService.deleteTrackDanceRole(
-//        specialObject
-//      );
-//
-//    } catch (ApiRequestException apiRequestException) {
-//      throw new ApiRequestException(apiRequestException.getMessage());
-//    } catch (Exception exception) {
-//      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
-//    }
-//  }
 
   @PostMapping(path = "/bundleEventTrack/delete")
   @Transactional
@@ -632,6 +616,7 @@ public class EventController {
     @RequestBody String jsonObject
   ) {
     try {
+      log.info(JsonParser.parseString(jsonObject).getAsJsonObject().toString());
       eventService.updateEvent(
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
@@ -699,12 +684,15 @@ public class EventController {
       Event event = eventService.findByEventId(bundleObject.get("eventId").getAsLong());
       EventBundle eventBundle = eventService.findByEventAndBundle(event, bundle);
 
-      eventService.delete(
-        eventBundle
-      );
-      bundleService.deleteBundle(
-        bundle
-      );
+      if (registrationService.hasRegistration(event, bundle, true)) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_REGISTRATION_GE.getOutTextKey());
+      } else {
+        eventService.delete(eventBundle);
+        bundleService.deleteBundle(bundle);
+      }
+
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -724,7 +712,8 @@ public class EventController {
         jsonTrackObject,
         eventService.findByEventId(jsonTrackObject.get("eventId").getAsLong())
       );
-
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -759,7 +748,15 @@ public class EventController {
       Track track = trackService.findByTrackId(request.get("id").getAsLong());
       Event event = eventService.findByEventId(request.get("eventId").getAsLong());
       eventService.delete(event, track);
-//      trackService.delete(track);
+
+      if (registrationService.hasRegistration(event, track, true)) {
+        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_REGISTRATION_GE.getOutTextKey());
+      } else {
+        eventService.delete(event, track);
+      }
+
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -790,18 +787,11 @@ public class EventController {
   public void deleteFoodSlot(
     @RequestBody String jsonObject
   ) {
-    try {
-      // update
-      JsonObject jsonFoodObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-      eventService.deleteEventFoodSlot(
-        jsonFoodObject
-      );
+    JsonObject jsonFoodObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+    eventService.deleteEventFoodSlot(
+      jsonFoodObject
+    );
 
-    } catch (ApiRequestException apiRequestException) {
-      throw new ApiRequestException(apiRequestException.getMessage());
-    } catch (Exception exception) {
-      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
-    }
   }
 
   @PostMapping(path = "/discount/upsert")
