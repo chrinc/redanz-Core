@@ -180,7 +180,7 @@ public class BundleEventTrackService {
 
   public void deleteBundleEventTrack(JsonObject request) {
 //    log.info("delete");
-    log.info(request.toString());
+//    log.info(request.toString());
     delete(bundleEventTrackRepo.findByBundleEventTrackId(request.get("id").getAsLong()));
 //    event.setScholarship(false);
 //    eventRepo.save(event);

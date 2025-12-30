@@ -10,10 +10,7 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -50,10 +47,7 @@ public class Event implements Serializable {
   private LocalDate eventTo;
 
   @Column(name = "registration_start", nullable = false)
-  private Instant registrationStart;
-
-  @Column(name = "registration_start_tz", nullable = false, length = 64)
-  private String registrationStartTz; // e.g. "+02:00"
+  private ZonedDateTime registrationStart;
 
   private boolean active;
 
@@ -96,21 +90,6 @@ public class Event implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventDanceRole> eventDanceRoles;
 
-
-
-  @Transient
-  public ZonedDateTime getRegistrationStart() {
-    if (registrationStart == null || registrationStartTz == null) {
-      return null;
-    }
-    return registrationStart.atZone(ZoneId.of(registrationStartTz));
-  }
-
-  public void setRegistrationStart(ZonedDateTime zdt) {
-    this.registrationStartTz = zdt.getOffset().getId();
-    this.registrationStart = zdt.toInstant();
-  }
-
   public Event() {
   }
 
@@ -133,7 +112,7 @@ public class Event implements Serializable {
     this.capacity = capacity;
     this.eventFrom = eventFrom;
     this.eventTo = eventTo;
-    setRegistrationStart(registrationStart);
+    this.registrationStart = registrationStart;
     this.active = active;
     this.archived = archived;
     this.description = description;
@@ -157,7 +136,6 @@ public class Event implements Serializable {
         add(new HashMap<>() {{put("key", "description");          put("type", "text");        put("required", "false");  put("label", "Description");}});
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                     put("label", "id");}});
         add(new HashMap<>() {{put("key", "isEdit");               put("type", "isEdit");                                 put("label", "");}});
-//        add(new HashMap<>() {{put("eventPartKey", "eventInfo");            put("type", "partInfo");                               put("label", "Event Info");}});
         add(new HashMap<>() {{put("key", "bundle");               put("type", "attribute");                              put("label", "Bundles");}});
         add(new HashMap<>() {{put("key", "track");                put("type", "attribute");                              put("label", "Tracks");}});
         add(new HashMap<>() {{put("key", "foodSlot");             put("type", "attribute");                              put("label", "Food");}});

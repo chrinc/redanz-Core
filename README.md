@@ -91,7 +91,7 @@ Necessary tools for testing and development
    - remove a screen: `screen -X -S redanz.spring quite`
    - detach `Ctrl + A Ctrl + D`
  - Start Spring on Server:
--- clean inst all: `mvn clean install`
+-- clean inst all: `mvn clean install -DskipTests`
 --Set password and Snapshot: `snapshot=[snapshot], pass=[password] => escape with \ before special characters`
 --RUN: ``java -jar $SNAPSHOT --spring.profiles.active=prod --redanz.master.password=$PASSWORD --server.port=8083``
  - encrypt Data at: [Devglan.com](https://www.devglan.com/online-tools/jasypt-online-encryption-decryption/)

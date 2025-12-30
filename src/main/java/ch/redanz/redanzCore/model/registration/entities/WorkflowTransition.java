@@ -6,9 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -20,47 +17,22 @@ import java.time.ZonedDateTime;
 @Table(name="workflow_transition")
 @AllArgsConstructor
 public class WorkflowTransition implements Serializable {
-//  @JsonIgnore
-//  @Transient
-//  private RegistrationRepo registrationRepo;
-
-//  @EmbeddedId
-//  private final WorkflowTransitionId workflowTransitionId = new WorkflowTransitionId();
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "workflow_transition_id")
   private Long workflowTransitionId;
 
   @ManyToOne
-//  @MapsId("workflowStatusId")
   @JoinColumn(name="workflow_status_id")
   private WorkflowStatus workflowStatus;
 
   @ManyToOne
-//  @MapsId("registrationId")
   @JsonIgnore
   @JoinColumn(name="registration_id")
   private Registration registration;
 
   @Column(name="transition_timestamp")
-  private Instant transitionTimestamp;
-
-  @Column(name="transition_timestamp_tz")
-  private String transitionTimestampTz;
-  @Transient
-  public ZonedDateTime getTransitionTimestamp() {
-    if (transitionTimestamp == null || transitionTimestampTz == null) {
-      return null;
-    }
-    return transitionTimestamp.atZone(ZoneId.of(transitionTimestampTz));
-  }
-
-  @Transient
-  public void setTransitionTimestamp(ZonedDateTime zdt) {
-    this.transitionTimestamp = zdt.toInstant();
-    this.transitionTimestampTz = zdt.getOffset().getId();
-  }
+  private ZonedDateTime transitionTimestamp;
 
   public WorkflowTransition(
     WorkflowStatus workflowStatus
@@ -69,6 +41,6 @@ public class WorkflowTransition implements Serializable {
   ) {
     this.workflowStatus = workflowStatus;
     this.registration = registration;
-    setTransitionTimestamp(transitionTimestamp);
+    this.transitionTimestamp = transitionTimestamp;
   }
 }

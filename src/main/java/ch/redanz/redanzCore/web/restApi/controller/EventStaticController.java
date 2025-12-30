@@ -320,7 +320,7 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
-      log.info(request.toString());
+//      log.info(request.toString());
       Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
       Discount discount = discountService.findByDiscountId(id);
       if (discountService.isUsed(discount)) {

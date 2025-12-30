@@ -46,7 +46,7 @@ public class BundleService {
     }
 
     public void save(EventDanceRole eventDanceRole) {
-        log.info(eventDanceRole.toString());
+//        log.info(eventDanceRole.toString());
         eventDanceRoleRepo.save(eventDanceRole);
     }
 //    public void save(BundleSpecial bundleSpecial) {
@@ -191,20 +191,6 @@ public class BundleService {
                           field.set(bundle, request.get(key).isJsonNull() ? null : localDate);
                           break;
 
-//                      case "datetime":
-//                          field = getField(key);
-//                          // registrationStart":{"date":"2023-07-29","time":"23:00"}
-//                          // Assuming request.get(eventPartKey).getAsString() retrieves the date string
-//                          String dateTimeDateString = request.get(key).getAsJsonObject().get("date").getAsString().substring(0, 10);
-//                          String dateTimeTimeString = request.get(key).getAsJsonObject().get("time").isJsonNull() ? "12:00" : request.get(key).getAsJsonObject().get("time").getAsString();
-//                          ZoneId zoneId = ZoneId.of("Europe/Zurich");
-//                          LocalDateTime dateTime = LocalDateTime.parse(dateTimeDateString + " " + dateTimeTimeString, dateTimeFormatter);
-//
-//                          // hack hack hack, need fix plus Days
-//                          ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zoneId).plusDays(1);
-//                          field.set(bundle, request.get(key).isJsonNull() ? null : zonedDateTime);
-//                          break;
-
                       case "bool":
                           field = getField(key);
                           field.set(bundle, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
@@ -220,7 +206,7 @@ public class BundleService {
 
                       case "multiselectText":
                           // tracks
-                             log.info(key);
+//                             log.info(key);
                           if (request.get(key) != null && request.get(key).isJsonArray()) {
                              switch(key) {
 //                                 case "bundleEventTrack":

@@ -512,7 +512,7 @@ public class EventService {
         String key = stringStringMap.get("key");
         String type = stringStringMap.get("type");
         Field field;
-        log.info(type);
+//        log.info(type);
         try {
           switch (type) {
             case "label":
@@ -555,18 +555,18 @@ public class EventService {
               break;
 
             case "datetime":
-              String dateTimeDateString = request.get(key + "_date").getAsString().substring(0, 10);
-              String dateTimeTimeString = request.get(key + "_time").isJsonNull() ? "12:00" : request.get(key + "_time").getAsString();
-              String dateTimeTzString = request.get(key + "_tz").isJsonNull() ? "+02:00" : request.get(key + "_tz").getAsString();
-              LocalDateTime ldt = LocalDateTime.parse(dateTimeDateString + "T" + dateTimeTimeString);
-              ZoneOffset offset = ZoneOffset.of(dateTimeTzString);
-              OffsetDateTime odt = OffsetDateTime.of(ldt, offset);
-              Field fInstant = getField(key);
-              Field fTz      = getField(key + "Tz");
-              fInstant.setAccessible(true);
-              fTz.setAccessible(true);
-              fInstant.set(event, odt.toInstant());
-              fTz.set(event, offset.getId());
+//              log.info(request.toString());
+              String dateTimeDateString = request.get(key + "_date").getAsString();   // yyyy-MM-dd
+              String dateTimeTimeString = request.get(key + "_time").isJsonNull()
+                ? "12:00"
+                : request.get(key + "_time").getAsString();
+              // HH:mm
+
+              ZoneId met = ZoneId.of("Europe/Berlin"); // (CET/CEST)
+              ZonedDateTime zonedDateTime = ZonedDateTime.of(LocalDate.parse(dateTimeDateString), LocalTime.parse(dateTimeTimeString), met);
+              Field zonedDateTimefield = getField(key);
+              zonedDateTimefield.setAccessible(true);
+              zonedDateTimefield.set(event, zonedDateTime);
               break;
 
             case "bool":

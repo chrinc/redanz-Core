@@ -11,7 +11,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -87,24 +86,7 @@ public class CheckIn implements Serializable {
   private String danceRole;
 
   @Column(name = "check_in_time")
-  private Instant checkInTime;
-
-  @Column(name = "check_in_time_tz")
-  private String checkInTimeTz;
-
-  @Transient
-  public ZonedDateTime getCheckInTime() {
-    if (checkInTime == null || checkInTimeTz == null) {
-      return null;
-    }
-    return this.checkInTime.atZone(ZoneId.of(checkInTimeTz));
-  }
-
-  @Transient
-  public void setCheckInTime(ZonedDateTime zdt) {
-    this.checkInTimeTz = zdt.getOffset().getId();
-    this.checkInTime = zdt.toInstant();
-  }
+  private ZonedDateTime checkInTime;
 
   public CheckIn(
     Event event,

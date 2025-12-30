@@ -616,7 +616,7 @@ public class EventController {
     @RequestBody String jsonObject
   ) {
     try {
-      log.info(JsonParser.parseString(jsonObject).getAsJsonObject().toString());
+//      log.info(JsonParser.parseString(jsonObject).getAsJsonObject().toString());
       eventService.updateEvent(
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
