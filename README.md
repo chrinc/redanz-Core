@@ -18,6 +18,7 @@ Necessary tools for testing and development
     - `init sql inserts with source (pwd shows path to folder) eg: ` source /Users/Chrine/Documents/GitHub/redAnz-Core/redanzCore/src/main/resources/init_sql_countries.sql
     - `stirit: ` source /usr/local/redanz/redanz-core/src/main/resources/init_sql_countries.sql
     - `model:` source /usr/local/redanz/redanzCore/redanz-Core/src/main/resources/init_sql_countries.sql
+  - Prompt shows root# `export PS1='root# '`
 - Save mysql db:
   - install mysql: `https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04`
   - export: ``mysqldump -u root -p stirit_redanz > /usr/local/redanz/data/prod/[YYMMDD]_redanz_backup.sql``

@@ -3,12 +3,10 @@ package ch.redanz.redanzCore.model.workshop.configTest;
 import ch.redanz.redanzCore.model.profile.service.CountryService;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.config.WorkflowStatusConfig;
-import ch.redanz.redanzCore.model.registration.service.BaseParService;
+import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.workshop.config.*;
-import ch.redanz.redanzCore.model.workshop.entities.BundleEventTrackDanceRole;
-import ch.redanz.redanzCore.model.workshop.entities.EventDanceRole;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(200)
-@Profile("redanz-prod || redanz-rdev || stirit-rdev")
+@Profile("redanz-prod || redanz-rdev || stirit-rdev || qsxz-dev")
 public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final BaseParService baseParService;
   private final BundleService bundleService;
@@ -45,7 +43,6 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   @Override
   public void run(String... args) {
     if (eventService.findAll().isEmpty()) {
-      BaseParConfig.setup(baseParService);
       OutTextConfig.setup(outTextService);
       WorkflowStatusConfig.setup(workflowStatusService);
       LanguageConfig.setup(languageService);
@@ -55,6 +52,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       SlotConfig.setup(slotService);
 
       EventConfig.setup(eventService, discountService);
+      BaseParConfig.setup(baseParService, eventService);
       EventDanceRoleConfig.setup(danceRoleService, eventService);
 
       TrackConfig.setup(trackService);
@@ -62,7 +60,6 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       DiscountConfig.setup(discountService);
       EventDiscountConfig.setup(discountService, eventService);
       TrackEventDiscountConfig.setup(eventService, trackService, discountService);
-//      TrackDanceRoleConfig.setup(trackService, danceRoleService);
 
       SpecialConfig.setup(specialService);
       EventSpecialsConfig.setup(specialService, eventService);

@@ -175,6 +175,10 @@ public enum OutTextConfig {
   LABEL_HOSTSPOTS_INFO_GE("FRONT_LOGIN", "LABEL-HOSTSPOTS-INFO", "Host Spots Info", "GE"),
   LABEL_HOSTCOMMENT_INFO_EN("FRONT_LOGIN", "LABEL-HOSTCOMMENT-INFO", "Host Comment Info", "EN"),
   LABEL_HOSTCOMMENT_INFO_GE("FRONT_LOGIN", "LABEL-HOSTCOMMENT-INFO", "Host Comment Info", "GE"),
+  LABEL_HOST_EN("FRONT_LOGIN", "LABEL-HOST", "Host", "EN"),
+  LABEL_HOST_GE("FRONT_LOGIN", "LABEL-HOST", "Gastgeber*in", "GE"),
+  LABEL_HOSTEE_EN("FRONT_LOGIN", "LABEL-HOSTEE", "Hostee", "EN"),
+  LABEL_HOSTEE_GE("FRONT_LOGIN", "LABEL-HOSTEE", "Gast / Gästin", "GE"),
   LABEL_HOSTEE_INFO_EN("FRONT_LOGIN", "LABEL-HOSTEE-INFO", "Hostee Info", "EN"),
   LABEL_HOSTEE_INFO_GE("FRONT_LOGIN", "LABEL-HOSTEE-INFO", "Hostee Info", "GE"),
   LABEL_HOSTEEYES_INFO_EN("FRONT_LOGIN", "LABEL-HOSTEEYES-INFO", "Is Hostee Info", "EN"),
@@ -183,6 +187,8 @@ public enum OutTextConfig {
   LABEL_HOSTEESHARE_INFO_GE("FRONT_LOGIN", "LABEL-HOSTEESHARE-INFO", "Hostee Share Info", "GE"),
   LABEL_HOSTEESHAREPERSON_INFO_EN("FRONT_LOGIN", "LABEL-HOSTEESHAREPERSON-INFO", "Hostee Share Person Info", "EN"),
   LABEL_HOSTEESHAREPERSON_INFO_GE("FRONT_LOGIN", "LABEL-HOSTEESHAREPERSON-INFO", "Hostee Share Person Info", "GE"),
+  LABEL_HOSTEESHAREDBED_EN("FRONT_LOGIN", "LABEL-HOSTEE-SHARED-BED", "Shared Bed", "EN"),
+  LABEL_HOSTEESHAREDBED_GE("FRONT_LOGIN", "LABEL-HOSTEE-SHARED-BED", "Gemeinsames Bett", "GE"),
   LABEL_HOSTEESHAREBEDS_INFO_EN("FRONT_LOGIN", "LABEL-HOSTEESHAREBEDS-INFO", "Hostee Share Beds Info", "EN"),
   LABEL_HOSTEESHAREBEDS_INFO_GE("FRONT_LOGIN", "LABEL-HOSTEESHAREBEDS-INFO", "Hostee Share Beds Info", "GE"),
   LABEL_HOSTEEDAYS_INFO_EN("FRONT_LOGIN", "LABEL-HOSTEEDAYS-INFO", "Hostee Days Info", "EN"),
@@ -395,6 +401,9 @@ public enum OutTextConfig {
   LABEL_SOLIDARITY_FUND_SUBTITLE_LINK_EN("FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE-LINK"   , "https://{omsHostDomain}/solidarity-fund-en"  , "EN"),
   LABEL_SOLIDARITY_FUND_SUBTITLE_LINK_GE("FRONT_LOGIN"       , "LABEL-SOLIDARITY-FUND-SUBTITLE-LINK"   , "https://{omsHostDomain}/solidarity-fund-de"  , "GE"),
 
+  LABEL_SCHOLARSHIP_EN(      "FRONT_LOGIN"       , "LABEL-SCHOLARSHIP"           , "Scholarship"  , "EN"),
+  LABEL_SCHOLARSHIP_GE(      "FRONT_LOGIN"       , "LABEL-SCHOLARSHIP"           , "Stipendium"   , "GE"),
+
   LABEL_SCHOLARSHIP_YES_TITLE_EN(      "FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE"           , "Would you like to apply for a scholarship?"  , "EN"),
   LABEL_SCHOLARSHIP_YES_TITLE_GE(      "FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE"           , "Möchtest du dich für ein Stipendium bewerben?"           , "GE"),
   LABEL_SCHOLARSHIP_YES_TITLE_EXIST_EN("FRONT_LOGIN"       , "LABEL-SCHOLARSHIP-YES-TITLE-EXIST"     , "Apply for scholarship"            , "EN"),
@@ -410,6 +419,7 @@ public enum OutTextConfig {
   LABEL_SCHOLARSHIP_INTRO_HINT_GE("FRONT_LOGIN"            , "LABEL-SCHOLARSHIP-INTRO-HINT"        , "Bitte nicht mehr als 30 Wörter."                         , "GE"),
   LABEL_SCHOLARSHIP_INTRO_HINT2_EN("FRONT_LOGIN"           , "LABEL-SCHOLARSHIP-INTRO-HINT2"        , "Your justification"                       , "EN"),
   LABEL_SCHOLARSHIP_INTRO_HINT2_GE("FRONT_LOGIN"           , "LABEL-SCHOLARSHIP-INTRO-HINT2"        , "Deine Begründung"                         , "GE"),
+
 
   LABEL_DONATION_YES_TITLE_EN(      "FRONT_LOGIN"       , "LABEL-DONATION-YES-TITLE"           , "Would you like to donate for a scholarship?"  , "EN"),
   LABEL_DONATION_YES_TITLE_GE(      "FRONT_LOGIN"       , "LABEL-DONATION-YES-TITLE"           , "Möchtest du für ein Stipendium spenden?"           , "GE"),
@@ -552,7 +562,6 @@ public enum OutTextConfig {
     , "1 Solo Jazz Trio Klasse", "GE"),
 
 
-
   // VOLUNTEERING / DONATION / SCHOLARSHIP
   LABEL_DONATION_EN("FRONT_LOGIN", "LABEL_DONATION", "Donation", "EN"),
   LABEL_DONATION_GE("FRONT_LOGIN", "LABEL_DONATION", "Spende", "GE"),
@@ -600,7 +609,6 @@ public enum OutTextConfig {
   LABEL_LANGUAGE_ENGLISH_GE("FRONT_BASE", "LABEL-LANGUAGE-ENGLSH", "Englisch", "GE"),
   LABEL_LANGUAGE_GERMAN_EN("FRONT_BASE",  "LABEL-LANGUAGE-GERMAN", "German", "EN"),
   LABEL_LANGUAGE_GERMAN_GE("FRONT_BASE",  "LABEL-LANGUAGE-GERMAN", "Deutsch", "GE"),
-
 
   // EXCEPTION HANDLING
   LABEL_ERROR_USER_TAKEN_EN("FRONT_BASE", "LABEL-ERROR-USER-TAKEN", "Email already taken", "EN"),
@@ -771,6 +779,27 @@ public enum OutTextConfig {
   LABEL_NO_EN("FRONT_LOGIN", "LABEL_NO", "No", "EN"),
   LABEL_NO_GE("FRONT_LOGIN", "LABEL_NO", "Nein", "GE"),
 
+  // BASE PAR
+  LABEL_BASE_PAR_AUTO_MATCH_EN("FRONT_LOGIN", "LABEL_BASE_PAR_AUTO_MATCH", "Partner Matching (immediately at registration)", "EN"),
+  LABEL_BASE_PAR_AUTO_MATCH_GE("FRONT_LOGIN", "LABEL_BASE_PAR_AUTO_MATCH", "Partnerzuordnung (direkt bei Anmeldung)", "GE"),
+  LABEL_BASE_PAR_AUTO_RELEASE_EN("FRONT_LOGIN", "LABEL_BASE_PAR_AUTO_RELEASE", "Auto Payment Request (immediately at registration)", "EN"),
+  LABEL_BASE_PAR_AUTO_RELEASE_GE("FRONT_LOGIN", "LABEL_BASE_PAR_AUTO_RELEASE", "Automatischer Versand Zahlungsaufforderung (direkt bei Anmeldung)", "GE"),
+  LABEL_BASE_PAR_TEST_MAIL_ONLY_EN("FRONT_LOGIN", "LABEL_BASE_PAR_TEST_MAIL_ONLY", "Test-Mail Only", "EN"),
+  LABEL_BASE_PAR_TEST_MAIL_ONLY_GE("FRONT_LOGIN", "LABEL_BASE_PAR_TEST_MAIL_ONLY", "Nur Test-Email", "GE"),
+  LABEL_BASE_PAR_EOD_CANCEL_EN("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_CANCEL", "Automatic sending of cancellation notice in case of non-payment (once daily)", "EN"),
+  LABEL_BASE_PAR_EOD_CANCEL_GE("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_CANCEL", "Automatischer Versand Stornomeldung bei ausbleibender Zahlung (einmal täglich)", "GE"),
+  LABEL_BASE_PAR_EOD_MATCHING_EN("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_MATCHING", "Partner Matching (once daily)", "EN"),
+  LABEL_BASE_PAR_EOD_MATCHING_GE("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_MATCHING", "Partnerzuordnung (einmal täglich)", "GE"),
+  LABEL_BASE_PAR_EOD_RELEASE_EN("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_RELEASE", "Payment Request (once daily)", "EN"),
+  LABEL_BASE_PAR_EOD_RELEASE_GE("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_RELEASE", "Versand Zahlungsaufforderung (einmal täglich)", "GE"),
+  LABEL_BASE_PAR_EOD_REMINDER_EN("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_REMINDER", "Send Payment Reminder (once daily)", "EN"),
+  LABEL_BASE_PAR_EOD_REMINDER_GE("FRONT_LOGIN", "LABEL_BASE_PAR_EOD_REMINDER", "Versand Zahlungserinnerung (einmal täglich)", "GE"),
+  LABEL_BASE_PAR_REMINDER_AFTER_DAYS_EN("FRONT_LOGIN", "LABEL_BASE_PAR_REMINDER_AFTER_DAYS", "Payment Reminder (After x Days)", "EN"),
+  LABEL_BASE_PAR_REMINDER_AFTER_DAYS_GE("FRONT_LOGIN", "LABEL_BASE_PAR_REMINDER_AFTER_DAYS", "Erinnerung Zahlungsanforderung (nach x Tagen)", "GE"),
+  LABEL_BASE_PAR_CANCEL_AFTER_DAYS_EN("FRONT_LOGIN", "LABEL_BASE_PAR_CANCEL_AFTER_DAYS", "Registration Cancellation (After x Days)", "EN"),
+  LABEL_BASE_PAR_CANCEL_AFTER_DAYS_GE("FRONT_LOGIN", "LABEL_BASE_PAR_CANCEL_AFTER_DAYS", "Storno der Anmeldung (nach x Tagen)", "GE"),
+  LABEL_BASE_PAR_WAIT_LIST_LENGTH_EN("FRONT_LOGIN", "LABEL_BASE_PAR_WAIT_LIST_LENGTH", "Wait list Length", "EN"),
+  LABEL_BASE_PAR_WAIT_LIST_LENGTH_GE("FRONT_LOGIN", "LABEL_BASE_PAR_WAIT_LIST_LENGTH", "Länge Warteliste", "GE"),
 
   // COUNTRY
   LABEL_COUNTRY_AF_EN("FRONT_BASE", "LABEL_COUNTRY_AF","Afghanistan", "EN"),

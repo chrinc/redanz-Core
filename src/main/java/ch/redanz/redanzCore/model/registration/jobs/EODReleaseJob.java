@@ -1,6 +1,6 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
-import ch.redanz.redanzCore.model.registration.service.BaseParService;
+import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationReleaseService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
@@ -32,14 +32,14 @@ public class EODReleaseJob {
 
   @Scheduled(cron = "${cron.matching.scheduler.value.release}")
   public void runRelease() {
-    if (baseParService.doEODRelease()) {
-      log.info("Job: runRelease");
-      eventService.getActiveEventsFuture().forEach(event -> {
+    eventService.findAll().forEach(event -> {
+      if (baseParService.doEODRelease(event)) {
+        log.info("Job: runRelease");
         registrationService.getAllSubmittedRegistrations(event).forEach(registration -> {
           registrationReleaseService.doRelease(registration);
         });
         registrationService.updateSoldOut(event);
-      });
-    }
+      }
+    });
   }
 }

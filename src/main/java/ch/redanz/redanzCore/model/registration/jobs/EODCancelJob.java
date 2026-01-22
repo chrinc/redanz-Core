@@ -1,7 +1,9 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
-import ch.redanz.redanzCore.model.registration.service.BaseParService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationCancelService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationReminderService;
+import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
@@ -33,31 +35,18 @@ public class EODCancelJob {
   private final RegistrationService registrationService;
   private final EventService eventService;
   private final BaseParService baseParService;
+  private final RegistrationCancelService registrationCancelService;
 
 
   @Scheduled(cron = "${cron.matching.scheduler.value.cancel}")
   @Transactional
   public void runCancelJob() {
-    if (baseParService.doEODCancel()) {
-      log.info("Job: runCancel");
-      eventService.getActiveEventsFuture().forEach(event -> {
-        registrationService.getAllConfirmingRegistrations(event).forEach(registration -> {
-          RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-          LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate().toLocalDateTime();
-          LocalDateTime deadline = LocalDateTime.now().minusDays(
-            baseParService.cancelAfterDays()
-          );
-          if (reminderSentDate != null && reminderSentDate.isBefore(deadline)) {
-            try {
-              registrationService.onCancel(registration);
-              registrationEmailService.sendCancellationEmail(registration, registrationEmailService.findByRegistration(registration));
-            } catch (IOException | TemplateException e) {
-              throw new RuntimeException(e);
-            }
-          }
-        });
-      });
-    }
+    eventService.getActiveEventsFuture().forEach(event -> {
+      if (baseParService.doEODCancel(event)) {
+        log.info("Job: runCancel");
+        registrationCancelService.doCancel(event);
+      }
+    });
   }
 
 }

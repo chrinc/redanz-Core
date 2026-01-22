@@ -219,6 +219,8 @@ public class DiscountRegistrationService {
   }
 
   public String getReportDiscounts(Registration registration, Language language) {
+
+
     AtomicReference<String> discounts = new AtomicReference<>();
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
       String specialOutText = outTextService.getOutTextByKeyAndLangKey(discountRegistration.getDiscount().getName(), language.getLanguageKey()).getOutText();

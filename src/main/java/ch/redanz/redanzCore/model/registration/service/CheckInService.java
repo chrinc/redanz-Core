@@ -104,10 +104,10 @@ public class CheckInService {
         registration.getBundle().getName(),
         registration.getTrack() != null ? registration.getTrack().getName() : "",
         slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()),
-        foodRegistrationService.getReportFoodSlots(registration, languageService.english()),
-        specialRegistrationService.getReportSpecials(registration, languageService.english()),
+        foodRegistrationService.getReportFoodSlots(registration),
+        specialRegistrationService.getReportSpecials(registration),
         discountRegistrationService.getReportDiscounts(registration, languageService.english()),
-        privateClassService.getReportPrivates(registration, languageService.english()),
+        privateClassService.getReportPrivates(registration),
         registrationService.workflowStatusName(registration),
         paymentService.amountDue(registration),
         paymentService.totalAmount(registration),
@@ -188,10 +188,10 @@ public class CheckInService {
         existingCheckIn.setType(registration.getBundle().getName());
         existingCheckIn.setDescription(registration.getTrack() != null ? registration.getTrack().getName() : "");
         existingCheckIn.setSlots(slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()));
-        existingCheckIn.setFood(foodRegistrationService.getReportFoodSlots(registration, languageService.english()));
-        existingCheckIn.setAddons(specialRegistrationService.getReportSpecials(registration, languageService.english()));
+        existingCheckIn.setFood(foodRegistrationService.getReportFoodSlots(registration));
+        existingCheckIn.setAddons(specialRegistrationService.getReportSpecials(registration));
         existingCheckIn.setDiscounts(discountRegistrationService.getReportDiscounts(registration, languageService.english()));
-        existingCheckIn.setPrivates(privateClassService.getReportPrivates(registration, languageService.english()));
+        existingCheckIn.setPrivates(privateClassService.getReportPrivates(registration));
         existingCheckIn.setStatus(registrationService.workflowStatusName(registration));
         existingCheckIn.setAmountDue(paymentService.amountDue(registration));
         existingCheckIn.setTotalAmount(paymentService.totalAmount(registration));
@@ -209,10 +209,10 @@ public class CheckInService {
             registration.getBundle().getName(),
             registration.getTrack() != null ? registration.getTrack().getName() : "",
             slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()),
-            foodRegistrationService.getReportFoodSlots(registration, languageService.english()),
-            specialRegistrationService.getReportSpecials(registration, languageService.english()),
+            foodRegistrationService.getReportFoodSlots(registration),
+            specialRegistrationService.getReportSpecials(registration),
             discountRegistrationService.getReportDiscounts(registration, languageService.english()),
-            privateClassService.getReportPrivates(registration, languageService.english()),
+            privateClassService.getReportPrivates(registration),
             registrationService.workflowStatusName(registration),
             paymentService.amountDue(registration),
             paymentService.totalAmount(registration),

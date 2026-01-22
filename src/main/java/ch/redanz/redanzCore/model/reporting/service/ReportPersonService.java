@@ -52,7 +52,7 @@ public class ReportPersonService {
         new ResponsePersonRegistrations(
           registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
-          , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
+          , outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
           , registration.getBundle().getName()
           , registration.getTrack() == null ? null : registration.getTrack().getName()
           , registration.getParticipant().getFirstName()
@@ -62,12 +62,11 @@ public class ReportPersonService {
           , registration.getParticipant().getStreet()
           , registration.getParticipant().getPostalCode()
           , registration.getParticipant().getCity()
-          , registration.getParticipant().getCountry().getName()
+          , outTextService.getOutTextMapByKey(registration.getParticipant().getCountry().getOutTextKey()).toString()
           , registration.getParticipant().getPersonLang().getLanguageKey()
           , registration.getDanceRole() == null ? null : registration.getDanceRole().getName()
         )
       );
-
     });
     return personRegistrations;
   }

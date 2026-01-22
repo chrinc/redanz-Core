@@ -8,13 +8,12 @@ import ch.redanz.redanzCore.model.reporting.response.ResponseRegistration;
 import ch.redanz.redanzCore.model.reporting.response.ResponseRegistrationDetails;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -22,7 +21,7 @@ import java.util.List;
 public class ReportRegistrationService {
   private final RegistrationService registrationService;
   private final RegistrationMatchingService registrationMatchingService;
-  private final WorkflowTransitionService workflowTransitionService;
+  private final OutTextService outTextService;
   private final WorkflowStatusService workflowStatusService;
   private final PaymentService paymentService;
 
@@ -41,7 +40,6 @@ public class ReportRegistrationService {
       WorkflowStatus workflowStatus = workflowStatusService.findById(registration.getWorkflowStatus().getWorkflowStatusId());
       boolean hasPartner = registrationMatching != null && registrationMatching.getRegistration2() != null;
       if (workflowStatusList.contains(workflowStatus)) {
-//        log.info("registration.participant: " + registration.getParticipant().getFirstName());
         registrationDetails.add(
           new ResponseRegistrationDetails(
             registration.getParticipant().getPersonId(),
@@ -52,7 +50,7 @@ public class ReportRegistrationService {
             registration.getBundle().getName(),
             registration.getTrack() == null ? null : registration.getTrack().getName(),
             registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
-            workflowStatus.getName(),
+            getWorkflowStatusMap(registration.getWorkflowStatus()),
             registrationMatching == null ? null: registrationMatching.getPartnerEmail(),
             registration.getParticipant().getPersonLang().getLanguageKey(),
             hasPartner ? registrationMatching.getRegistration2().getRegistrationId() : null,
@@ -61,15 +59,14 @@ public class ReportRegistrationService {
             paymentService.totalAmount(registration)
           )
         );
-
-//        log.info("add registration.participant: " + registration.getParticipant().getFirstName());
       }
     });
     return registrationDetails;
   }
 
-  private WorkflowStatus getLowestWorkflowStatus(List<WorkflowStatus> workflowStatusList) {
-    workflowStatusList.sort(Comparator.comparing(WorkflowStatus::getWorkflowStatusId));
-    return workflowStatusList.get(0);
+  private String getWorkflowStatusMap(WorkflowStatus workflowStatus) {
+    List<Map<String, String>> outTextMap = outTextService.getOutTextMapByKey(workflowStatus.getLabel());
+    outTextMap.get(0).put("code", workflowStatus.getName().toUpperCase());
+    return outTextMap.toString();
   }
 }

@@ -16,9 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -70,18 +68,22 @@ public class FoodRegistrationService {
       .anyMatch(fr -> fr.getFood().equals(food));
   }
 
-  public String getReportFoodSlots(Registration registration, Language language) {
-    AtomicReference<String> slots = new AtomicReference<>();
-    foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
-      String slotOutText = outTextService.getOutTextByKeyAndLangKey(foodRegistration.getSlot().getName(), language.getLanguageKey()).getOutText();
-      String foodOutText = outTextService.getOutTextByKeyAndLangKey(foodRegistration.getFood().getName(), language.getLanguageKey()).getOutText();
-      if (slots.get() == null)
-        slots.set(slotOutText);
-      else {
-        slots.set(slots.get() + ", " + slotOutText);
-      }
+  public String getReportFoodSlots(Registration registration) {
+    Map<String, StringBuilder> merged = new HashMap<>();
+    foodRegistrationRepo.findAllByRegistration(registration).forEach(fr -> {
+      List<Map<String, String>> slotOutText =
+        outTextService.getOutTextMapByKey(fr.getSlot().getName());
+      if (slotOutText == null || slotOutText.isEmpty()) return;
+      Map<String, String> map = slotOutText.get(0); // your structure
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return slots.get() == null ? "" : slots.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
 
   public List<FoodRegistration> foodRegistrations(Registration registration, JsonObject foodRegistrationRequest) {

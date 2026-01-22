@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -22,9 +23,7 @@ public class RegistrationReleaseService {
   public void doRelease(Registration registration){
     if (
          isRelease(registration)
-     //  && !releasedRegistrations.contains(registration)
     ) {
-//       log.info("registration firstName: {}", registration.getParticipant().getFirstName());
       try {
 
         // release partner first
@@ -46,8 +45,13 @@ public class RegistrationReleaseService {
         e.printStackTrace();
       }
     } else {
-      // send waiting list email?
     }
+  }
+
+  public void doRelease(Event event) {
+    registrationService.getAllSubmittedRegistrations(event).forEach(registration -> {
+      doRelease(registration);
+    });
   }
 
   private boolean isRelease(Registration registration) {
@@ -68,15 +72,6 @@ public class RegistrationReleaseService {
     return
       registrationService.countConfirmingAndDone(
         registration.getEvent()
-      ) < registration.getEvent().getCapacity()
-//        &&
-//        registrationService.countBundlesConfirmingAndDone(
-//          registration.getBundle(), registration.getEvent()
-//        ) < registration.getBundle().getCapacity()
-//        &&
-//        registrationService.countTracksConfirmingAndDone(
-//          registration.getTrack(), registration.getEvent()
-//        ) < (registration.getTrack() == null ? 99 : registration.getTrack().getCapacity())
-      ;
+      ) < registration.getEvent().getCapacity();
   }
 }

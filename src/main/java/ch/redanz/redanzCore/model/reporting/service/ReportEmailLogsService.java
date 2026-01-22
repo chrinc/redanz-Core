@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.reporting.response.ResponseEmailLogs;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class ReportEmailLogsService {
   private final RegistrationService registrationService;
   private final PaymentService paymentService;
   private final RegistrationEmailService registrationEmailService;
+  private final OutTextService outTextService;
 
 
   public List<ResponseEmailLogs> getEmailLogs(Event event) {
@@ -38,7 +40,7 @@ public class ReportEmailLogsService {
             registration.getParticipant().getLastName(),
             registration.getParticipant().getEmail(),
             registration.getBundle().getName(),
-            registration.getWorkflowStatus().getName(),
+            outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString(),
             paymentService.amountDue(registration),
             paymentService.totalAmount(registration),
             registrationEmail == null || registrationEmail.getReceivedSentDate() == null ?  "" : registrationEmail.getReceivedSentDate().toString(),

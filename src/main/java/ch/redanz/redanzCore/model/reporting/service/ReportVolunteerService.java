@@ -32,9 +32,9 @@ public class ReportVolunteerService {
           , registration.getParticipant().getEmail()
           , registration.getParticipant().getMobile()
           , volunteerRegistration.getType() == null ? null : volunteerRegistration.getType().getDescription()
-          , volunteerService.getSlots(volunteerRegistration, language)
+          , volunteerService.getSlots(volunteerRegistration)
           , volunteerRegistration.getIntro()
-          , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
+          , outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
         )
       );
 

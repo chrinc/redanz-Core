@@ -64,17 +64,22 @@ public class VolunteerService {
     return volunteerTypeRepo.findAllByEvent(event);
   }
 
-  public String getSlots(VolunteerRegistration volunteerRegistration, Language language) {
-    AtomicReference<String> slots = new AtomicReference<>();
-    volunteerSlotRegistrationRepo.findAllByVolunteerRegistration(volunteerRegistration).forEach(slot ->{
-      String slotOutText = outTextService.getOutTextByKeyAndLangKey(slot.getSlot().getName(), language.getLanguageKey()).getOutText();
-      if (slots.get() == null) {
-        slots.set(slotOutText);
-      } else {
-        slots.set(slots.get() + ", " + slotOutText);
-      }
+  public String getSlots(VolunteerRegistration volunteerRegistration) {
+    Map<String, StringBuilder> merged = new HashMap<>();
+    volunteerSlotRegistrationRepo.findAllByVolunteerRegistration(volunteerRegistration).forEach(slot -> {
+      List<Map<String, String>> slotOutText =
+        outTextService.getOutTextMapByKey(slot.getSlot().getName());
+      if (slotOutText == null || slotOutText.isEmpty()) return;
+      Map<String, String> map = slotOutText.get(0); // your structure
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return slots.get() == null ? "" : slots.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
 
   public VolunteerType findTypeByName(String name) {

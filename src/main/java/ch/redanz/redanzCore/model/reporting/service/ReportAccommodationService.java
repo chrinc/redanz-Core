@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.reporting.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.registration.entities.HosteeRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.service.HostingService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseAccommodation;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -21,6 +23,7 @@ public class ReportAccommodationService {
   private final AccommodationService accommodationService;
   private final OutTextService outTextService;
   private final HostingService hostingService;
+
   public List<ResponseAccommodation> getAccommodationReport(Language language, Event event) {
     List<ResponseAccommodation> accommodations = new ArrayList<>();
     hostingService.getAllHostRegistrationsByEvent(event).forEach(hostRegistration -> {
@@ -29,14 +32,14 @@ public class ReportAccommodationService {
         new ResponseAccommodation(
           registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
-          , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
+          , outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
           , registration.getParticipant().getFirstName()
           , registration.getParticipant().getLastName()
-          , "Host"
+          , outTextService.getOutTextMapByKey("LABEL-HOST").toString()
           , hostRegistration.getHostedPersonCount()
-          , hostingService.getSlots(hostRegistration, language)
+          , hostingService.getSlots(hostRegistration)
           , ""
-          , hostingService.getUtils(hostRegistration, language)
+          , hostingService.getUtils(hostRegistration)
           , registration.getParticipant().getStreet()
           , registration.getParticipant().getCity()
           , hostRegistration.getHostComment()
@@ -50,15 +53,14 @@ public class ReportAccommodationService {
         new ResponseAccommodation(
           registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
-          , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
+          , outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
           , registration.getParticipant().getFirstName()
           , registration.getParticipant().getLastName()
-          , "Hostee"
+          , outTextService.getOutTextMapByKey("LABEL-HOSTEE").toString()
           , null
-          , hostingService.getSlots(hosteeRegistration, language)
-          , hosteeRegistration.getNameRoomMate() == null ? "" : hosteeRegistration.getNameRoomMate()
-              + (hosteeRegistration.isSharedBed() ? " (shared bed)" : "")
-          , hostingService.getUtils(hosteeRegistration, language)
+          , hostingService.getSlots(hosteeRegistration)
+          , roomMate(hosteeRegistration)
+          , hostingService.getUtils(hosteeRegistration)
           , registration.getParticipant().getStreet()
           , registration.getParticipant().getCity()
           , hosteeRegistration.getComment()
@@ -68,4 +70,18 @@ public class ReportAccommodationService {
     });
     return accommodations;
   }
+
+  private String roomMate(HosteeRegistration hosteeRegistration) {
+    if (hosteeRegistration.getNameRoomMate() == null) return "";
+    List<Map<String, String>> roomMates = outTextService.getOutTextMapByKey("LABEL-HOSTEE-SHARED-BED");
+    roomMates.get(0).keySet().forEach(roomMateKey -> {
+      roomMates.get(0).put(roomMateKey, hosteeRegistration.getNameRoomMate()
+        + (hosteeRegistration.isSharedBed() ?
+        " (" + roomMates.get(0).get(roomMateKey) + ")"
+        : "")
+      );
+    });
+    return roomMates.isEmpty() ? "" : roomMates.toString();
+  }
 }
+

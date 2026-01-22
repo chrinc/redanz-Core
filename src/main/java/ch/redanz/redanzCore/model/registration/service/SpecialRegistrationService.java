@@ -17,9 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -45,17 +43,22 @@ public class SpecialRegistrationService {
     );
   }
 
-  public String getReportSpecials(Registration registration, Language language) {
-    AtomicReference<String> specials = new AtomicReference<>();
-    specialRegistrationRepo.findAllByRegistration(registration).forEach(specialsRegistration -> {
-      String specialOutText = outTextService.getOutTextByKeyAndLangKey(specialsRegistration.getSpecial().getName(), language.getLanguageKey()).getOutText();
-      if (specials.get() == null)
-        specials.set(specialOutText);
-      else {
-        specials.set(specials.get() + ", " + specialOutText);
-      }
+  public String getReportSpecials(Registration registration) {
+    Map<String, StringBuilder> merged = new HashMap<>();
+    specialRegistrationRepo.findAllByRegistration(registration).forEach(specialRegistration -> {
+      List<Map<String, String>> privateClassOutText =
+        outTextService.getOutTextMapByKey(specialRegistration.getSpecial().getName());
+      if (privateClassOutText == null || privateClassOutText.isEmpty()) return;
+      Map<String, String> map = privateClassOutText.get(0);
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return specials.get() == null ? "" : specials.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
 
   public Set<Registration> getRegistrationsByEvent(Event event) {
@@ -93,12 +96,10 @@ public class SpecialRegistrationService {
       JsonArray specialRequests = specialRegistrationRequest
         .get("specialRegistrations")
         .getAsJsonArray();
-//       log.info(specialRegistrationRequest.get("specialRegistrations").toString());
       specialRequests.forEach(specialRequest -> {
         if (specialRequest.getAsJsonObject().get("checked") != null
           && specialRequest.getAsJsonObject().get("checked").getAsBoolean()
         ) {
-//          log.info(specialRequest.toString());
           specialRegistrations.add(
             new SpecialRegistration(
               registration,
@@ -116,7 +117,6 @@ public class SpecialRegistrationService {
         }
       });
     }
-    // log.info("special Reg return: " + specialRegistrations);
     return specialRegistrations;
   }
 

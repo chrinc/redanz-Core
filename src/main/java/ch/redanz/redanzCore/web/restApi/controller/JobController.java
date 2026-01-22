@@ -9,9 +9,7 @@ import ch.redanz.redanzCore.model.registration.jobs.EODCancelJob;
 import ch.redanz.redanzCore.model.registration.jobs.EODMatchingJob;
 import ch.redanz.redanzCore.model.registration.jobs.EODReleaseJob;
 import ch.redanz.redanzCore.model.registration.jobs.EODReminderJob;
-import ch.redanz.redanzCore.model.registration.service.CheckInService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
-import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
@@ -30,15 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping("core-api/app/jobs")
 public class JobController {
-
-  private final EODCancelJob eodCancelJob;
-  private final EODMatchingJob eodMatchingJob;
-  private final EODReleaseJob eodReleaseJob;
-  private final EODReminderJob eodReminderJob;
   private final EventService eventService;
   private final CheckInService checkInService;
   private final RegistrationService registrationService;
   private final RegistrationMatchingService registrationMatchingService;
+  private final RegistrationReleaseService registrationReleaseService;
+  private final RegistrationReminderService registrationReminderService;
+  private final RegistrationCancelService registrationCancelService;
   private final ErrorLogService errorLogService;
   private final PersonService personService;
   private final UserService userService;
@@ -47,7 +43,7 @@ public class JobController {
     @RequestParam("eventId") Long eventId
   ) {
     try {
-      eodCancelJob.runCancelJob();
+      registrationCancelService.doCancel(eventService.findByEventId(eventId));
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -78,7 +74,10 @@ public class JobController {
     @RequestParam("eventId") Long eventId
   ) {
     try {
-      eodReleaseJob.runRelease();
+      Event event = eventService.findByEventId(eventId);
+      registrationService.updateSoldOut(event);
+      registrationReleaseService.doRelease(event);
+      registrationService.updateSoldOut(event);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {
@@ -91,7 +90,7 @@ public class JobController {
     @RequestParam("eventId") Long eventId
   ) {
     try {
-      eodReminderJob.runReminderJob();
+      registrationReminderService.doRemind(eventService.findByEventId(eventId));
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {

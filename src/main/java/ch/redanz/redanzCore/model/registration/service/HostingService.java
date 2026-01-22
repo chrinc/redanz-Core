@@ -37,29 +37,40 @@ public class HostingService {
 
   private final OutTextService outTextService;
 
-  public String getSlots(HostRegistration hostRegistration, Language language) {
-    AtomicReference<String> slots = new AtomicReference<>();
-    hostSlotRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(slot ->{
-      String slotOutText = outTextService.getOutTextByKeyAndLangKey(slot.getSlot().getName(), language.getLanguageKey()).getOutText();
-      if (slots.get() == null) {
-        slots.set(slotOutText);
-      } else {
-        slots.set(slots.get() + ", " + slotOutText);
-      }
+  public String getSlots(HostRegistration hostRegistration) {
+    Map<String, StringBuilder> merged = new HashMap<>();
+    hostSlotRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(slot -> {
+      List<Map<String, String>> outText =
+        outTextService.getOutTextMapByKey(slot.getSlot().getName());
+      if (outText == null || outText.isEmpty()) return;
+      Map<String, String> map = outText.get(0); // your structure
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return slots.get() == null ? "" : slots.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
-  public String getSlots(HosteeRegistration hosteeRegistration, Language language) {
-    AtomicReference<String> slots = new AtomicReference<>();
-    hosteeSlotRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(slot ->{
-      String slotOutText = outTextService.getOutTextByKeyAndLangKey(slot.getSlot().getName(), language.getLanguageKey()).getOutText();
-      if (slots.get() == null) {
-        slots.set(slotOutText);
-      } else {
-        slots.set(slots.get() + ", " + slotOutText);
-      }
+
+  public String getSlots(HosteeRegistration hosteeRegistration) {
+    Map<String, StringBuilder> merged = new HashMap<>();
+    hosteeSlotRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(slot -> {
+      List<Map<String, String>> outText =
+        outTextService.getOutTextMapByKey(slot.getSlot().getName());
+      if (outText == null || outText.isEmpty()) return;
+      Map<String, String> map = outText.get(0); // your structure
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return slots.get() == null ? "" : slots.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
 
   public JsonArray hostRegistrationArray(JsonObject hostRegistrationRequest) {
@@ -78,16 +89,9 @@ public class HostingService {
 
   public void updateHostRegistrationRequest(Registration registration, JsonObject request) {
     JsonArray hostRegistrationArray = hostRegistrationArray(request);
-//     log.info("hostRegistrationArray: " + hostRegistrationArray.getAsString());
-//    log.info("hostRegistrationArray: " + hostRegistrationArray);
     if (hostRegistrationArray != null) {
-//      log.info("update existing host");
-
-      // update existing
       updateHostRegistration(registration, hostRegistrationArray);
-//      log.info("update existing host, bfr sleep util");
       updateHostSleepUtilRegistration(registration, hostRegistrationArray);
-//      log.info("hldaupdatete existing host, bfr slot reg");
       updateHostSlotRegistration(registration, hostRegistrationArray);
 
     } else {
@@ -101,42 +105,45 @@ public class HostingService {
     }
   }
 
-  public String getUtils(HostRegistration hostRegistration, Language language) {
-    AtomicReference<String> sleepUtils = new AtomicReference<>();
-    hostSleepUtilRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(sleepUtilRegistration ->{
-      String sleepUtilOutText =
-        outTextService.getOutTextByKeyAndLangKey(sleepUtilRegistration.getSleepUtil().getName(), language.getLanguageKey()).getOutText()
-          + ": " + sleepUtilRegistration.getSleepUtilCount()
-        ;
-      if (sleepUtils.get() == null) {
-        sleepUtils.set(sleepUtilOutText) ;
-      } else {
-        sleepUtils.set(sleepUtils.get() + ", " + sleepUtilOutText);
-      }
+  public String getUtils(HostRegistration hostRegistration) {
+    Map<String, StringBuilder> merged = new HashMap<>();
+    hostSleepUtilRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(sleepUtilRegistration -> {
+      List<Map<String, String>> outText =
+        outTextService.getOutTextMapByKey(sleepUtilRegistration.getSleepUtil().getName());
+      if (outText == null || outText.isEmpty()) return;
+      Map<String, String> map = outText.get(0);
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return sleepUtils.get() == null ? "" : sleepUtils.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
 
-  public String getUtils(HosteeRegistration hosteeRegistration, Language language) {
-    AtomicReference<String> sleepUtils = new AtomicReference<>();
-    hosteeSleepUtilsRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(sleepUtilRegistration ->{
-      String sleepUtilOutText = outTextService.getOutTextByKeyAndLangKey(sleepUtilRegistration.getSleepUtil().getName(), language.getLanguageKey()).getOutText();
-      if (sleepUtils.get() == null) {
-        sleepUtils.set(sleepUtilOutText);
-      } else {
-        sleepUtils.set(sleepUtils.get() + ", " + sleepUtilOutText);
-      }
+  public String getUtils(HosteeRegistration hosteeRegistration) {
+    Map<String, StringBuilder> merged = new HashMap<>();
+    hosteeSleepUtilsRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(sleepUtilRegistration -> {
+      List<Map<String, String>> outText =
+        outTextService.getOutTextMapByKey(sleepUtilRegistration.getSleepUtil().getName());
+      if (outText == null || outText.isEmpty()) return;
+      Map<String, String> map = outText.get(0);
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return sleepUtils.get() == null ? "" : sleepUtils.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
 
   public void updateHostRegistration(Registration registration, JsonArray hostRegistration) {
     JsonObject personCountJson = hostRegistration.get(1).getAsJsonObject();
     JsonObject hostCommentJson = hostRegistration.get(3).getAsJsonObject();
-
-//    log.info("hostRegistration.getAsString(): ");
-//    log.info(hostRegistration.toString());
-
     HostRegistration existingHostregistration = hostRegistrationRepo.findAllByRegistration(registration);
 
     int requestPersonCount = personCountJson.get("personCount").isJsonNull() ? 0 : personCountJson.get("personCount").getAsInt();
@@ -420,11 +427,6 @@ public class HostingService {
     List<HosteeSleepUtilRegistration> requestHosteeSleepUtilRegistrations = hosteeSleepUtilRegistrations(registration, hosteeRegistration);
     HosteeRegistration existingHosteeRegistration = hosteeRegistrationRepo.findByRegistration(registration);
     List<HosteeSleepUtilRegistration> hosteeSleepUtilRegistrations = hosteeSleepUtilsRegistrationRepo.findAllByHosteeRegistration(existingHosteeRegistration);
-    // log.info("hosteeSleepUtilRegistrations: " + hosteeSleepUtilRegistrations);
-    // log.info("requestHosteeSleepUtilRegistrations: " + requestHosteeSleepUtilRegistrations);
-    // log.info("hosteeSleepUtilRegistrations size: " + hosteeSleepUtilRegistrations.size());
-    // log.info("requestHosteeSleepUtilRegistrations size: " + requestHosteeSleepUtilRegistrations.size());
-    // delete in current if not in request
     hosteeSleepUtilRegistrations.forEach(hosteeSleepUtilRegistration -> {
       if (
         !hasHosteeSleepUtilRegistration(requestHosteeSleepUtilRegistrations, hosteeSleepUtilRegistration.getSleepUtil())
@@ -449,19 +451,14 @@ public class HostingService {
 
     HosteeRegistration existingHosteeRegistration = hosteeRegistrationRepo.findByRegistration(registration);
 
-    // log.info("get attributes");
     boolean isShareRooms = !isShareRoomsJson.get("isShareRooms").isJsonNull() && isShareRoomsJson.get("isShareRooms").getAsBoolean();
-    // log.info("isShareRooms: " + isShareRooms);
     String nameRoomMate =
       nameRoomMateJson.get("nameRoomMate") == null  || nameRoomMateJson.get("nameRoomMate").isJsonNull() ?
         null : nameRoomMateJson.get("nameRoomMate").getAsString();
-    // log.info("nameRoomMate: " + nameRoomMate);
     boolean isSharedBed =  isSharedBedJson.get("isSharedBed") != null && !isSharedBedJson.get("isSharedBed").isJsonNull() && isSharedBedJson.get("isSharedBed").getAsBoolean();
-    // log.info("isSharedBed: " + isSharedBed);
     String hosteeComment = hosteeCommentJson.get("hosteeComment") == null
       || hosteeCommentJson.get("hosteeComment").isJsonNull() ?
       null : hosteeCommentJson.get("hosteeComment").getAsString();
-    // log.info("hosteeComment: " + hosteeComment);
     if (existingHosteeRegistration != null) {
 
       // update existing registration
@@ -498,7 +495,6 @@ public class HostingService {
   }
 
   public JsonArray hosteeRegistrationArray(JsonObject hosteeRegistrationRequest) {
-    // log.info("hosteeRegistrationRequest: " + hosteeRegistrationRequest);
     if (hosteeRegistrationRequest.get("hosteeRegistration") != null
       && !hosteeRegistrationRequest.get("hosteeRegistration").getAsJsonArray().isEmpty()) {
       return hosteeRegistrationRequest
@@ -510,17 +506,13 @@ public class HostingService {
 
   public void updateHosteeRegistrationRequest(Registration registration, JsonObject request) {
     JsonArray hosteeRegistrationArray = hosteeRegistrationArray(request);
-    // log.info("hosteeRegistrationArray: " + hosteeRegistrationArray);
 
     if (hosteeRegistrationArray != null) {
 
       // update existing
       updateHosteeRegistration(registration, hosteeRegistrationArray);
-      // log.info("updateHosteeRegistration done");
       updateHosteeSleepUtilRegistration(registration, hosteeRegistrationArray);
-      // log.info("updateHosteeSleepUtilRegistration done");
       updateHosteeSlotRegistration(registration, hosteeRegistrationArray);
-      // log.info("updateHosteeSlotRegistration done");
 
     } else {
 

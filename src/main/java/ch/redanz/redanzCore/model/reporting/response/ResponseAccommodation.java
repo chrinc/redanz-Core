@@ -15,7 +15,7 @@ public class ResponseAccommodation {
   private String workflowStatus;
   private String firstName;
   private String lastName;
-  private String host;
+  private String type;
   private Integer personCount;
   private String slots;
   private String namePartner;

@@ -8,11 +8,7 @@ import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.service.EventPartService;
-import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.OutTextService;
-import ch.redanz.redanzCore.model.workshop.service.SpecialService;
+import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.email.EmailService;
 import com.google.gson.JsonObject;
 import freemarker.template.Configuration;
@@ -26,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -376,7 +371,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_BASE01_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays(registration.getEvent()).toString())
     );
     model.put("base02",
       outTextService.getOutTextByKeyAndLangKey(
@@ -388,7 +383,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_REMINDER_BASE03_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.cancelAfterDays().toString())
+      ).getOutText().replace("{1}", baseParService.cancelAfterDays(registration.getEvent()).toString())
     );
 
     model.put("details",
@@ -477,7 +472,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_BASE02_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays(registration.getEvent()).toString())
     );
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
@@ -559,7 +554,7 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_RELEASED_MAKE_PAY_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", baseParService.reminderAfterDays().toString())
+      ).getOutText().replace("{1}", baseParService.reminderAfterDays(registration.getEvent()).toString())
     );
     model.put("account",
       outTextService.getOutTextByKeyAndLangKey(

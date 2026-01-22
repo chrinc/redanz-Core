@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
+import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
@@ -7,6 +8,7 @@ import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import ch.redanz.redanzCore.web.security.exception.HasRegistrationException;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
@@ -32,6 +34,7 @@ public class EventStaticController {
   private final EventService eventService;
   private final EventRegistrationService eventRegistrationService;
   private final FoodRegistrationService foodRegistrationService;
+  private final BaseParService baseParService;
 
   // schema / data
   @GetMapping(path = "/data")
@@ -70,7 +73,7 @@ public class EventStaticController {
   }
 
   @GetMapping(path = "/data/private")
-  public List<Map<String, String>> getPrivateData(){
+  public List<Map<String, String>> getPrivateData() {
     return privateClassService.getPrivateData();
   }
 
@@ -102,6 +105,13 @@ public class EventStaticController {
   @GetMapping(path = "/data/discount")
   public List<Map<String, String>> getDiscountData() {
     return discountService.getDiscountData();
+  }
+
+  @GetMapping(path = "/base-par/data")
+  public List<Map<String, Object>> baseParData(
+    Long eventId
+  ) {
+    return baseParService.getData(eventService.findByEventId(eventId));
   }
 
 
@@ -320,7 +330,6 @@ public class EventStaticController {
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
-//      log.info(request.toString());
       Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
       Discount discount = discountService.findByDiscountId(id);
       if (discountService.isUsed(discount)) {
@@ -336,4 +345,27 @@ public class EventStaticController {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
     }
   }
+
+  @PostMapping(path = "/base-par/upsert")
+  public void upsertBaseParData(
+    @RequestBody String jsonString
+  ) {
+    try {
+      log.info("inc@upsertBaseParData");
+      log.info("inc@upsert, jsonArray: {}", jsonString);
+//      log.info("inc@upsert, object: {} ", jsonArray.get(0));
+      JsonArray jsonArray = JsonParser.parseString(jsonString).getAsJsonArray();
+      log.info("inc@upsert, object: {} ", jsonArray.get(0));
+
+      baseParService.upsert(jsonArray);
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+
 }

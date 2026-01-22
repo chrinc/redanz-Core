@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
-import ch.redanz.redanzCore.model.registration.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.entities.OutText;
 import ch.redanz.redanzCore.model.workshop.entities.OutTextId;
 import ch.redanz.redanzCore.model.workshop.repository.OutTextRepo;
@@ -65,10 +64,7 @@ public class OutTextService {
 
   public List<Map<String, String>> getOutTextMapByKey(String key) {
     List<Map<String, String>> outTextList = new ArrayList<>();
-
-
     Map<String, String> labelMap = new HashMap<>();
-    labelMap.put("key", key);
     outTextRepo.findAllByOutTextIdOutTextKey(key).forEach(outText -> {
       labelMap.put(outText.getOutTextId().getOutTextLanguageKey(), outText.getOutText());
     });

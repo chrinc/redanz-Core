@@ -33,12 +33,6 @@ public class RegistrationMatchingService {
     return registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNull();
   }
 
-//  public List<RegistrationMatching> findRegistration2ISNullSubmittedCurrent(){
-//    return registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNullAndRegistration1WorkflowStatusAndRegistration1Event(
-//      workflowStatusService.getSubmitted(),
-//      eventService.getCurrentEvent()
-//    );
-//  }
   public List<RegistrationMatching> findRegistration2ISNullSubmitted(Event event){
     List<RegistrationMatching> myList = registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNullAndRegistration1WorkflowStatusAndRegistration1Event(
       workflowStatusService.getSubmitted(),

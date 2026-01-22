@@ -32,10 +32,10 @@ public class ReportDonationService {private final VolunteerService volunteerServ
             registration.getRegistrationId()
             , registration.getParticipant().getFirstName()
             , registration.getParticipant().getLastName()
-            , "Donation"
+            , outTextService.getOutTextMapByKey("LABEL_DONATION").toString()
             , donationRegistration.getAmount()
             , null
-            , registration.getWorkflowStatus().getName()
+            , outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
           )
         );
       }
@@ -48,10 +48,10 @@ public class ReportDonationService {private final VolunteerService volunteerServ
             registration.getRegistrationId(),
             registration.getParticipant().getFirstName(),
             registration.getParticipant().getLastName(),
-            "Scholarship",
+            outTextService.getOutTextMapByKey("LABEL-SCHOLARSHIP").toString(),
             null,
             scholarshipRegistration.getIntro(),
-            registration.getWorkflowStatus().getName()
+            outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
           )
         );
       }

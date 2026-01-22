@@ -37,10 +37,10 @@ public class ReportSpecialsService {
           , registration.getRegistrationId()
           , registration.getParticipant().getFirstName()
           , registration.getParticipant().getLastName()
-          , foodRegistrationService.getReportFoodSlots(registration, language)
-          , privateClassService.getReportPrivates(registration, language)
-          , specialRegistrationService.getReportSpecials(registration, language)
-          , outTextService.getOutTextByKeyAndLangKey(registration.getWorkflowStatus().getLabel(), language.getLanguageKey()).getOutText()
+          , foodRegistrationService.getReportFoodSlots(registration)
+          , privateClassService.getReportPrivates(registration)
+          , specialRegistrationService.getReportSpecials(registration)
+          , outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
         )
       );
 

@@ -1,10 +1,11 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
-import ch.redanz.redanzCore.model.registration.service.BaseParService;
+import ch.redanz.redanzCore.model.registration.service.CheckInService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationReminderService;
+import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
@@ -28,33 +29,18 @@ public class EODReminderJob {
 
   @Autowired
   private Environment environment;
-  private final RegistrationEmailService registrationEmailService;
-  private final RegistrationService registrationService;
   private final EventService eventService;
   private final BaseParService baseParService;
+  private final RegistrationReminderService registrationReminderService;
 
   @Scheduled(cron = "${cron.matching.scheduler.value.reminder}")
   public void runReminderJob() {
 
-    if (baseParService.doEODReminder()) {
-      log.info("Job: runReminder");
-      eventService.getActiveEventsFuture().forEach(event -> {
-        registrationService.getAllConfirmingRegistrations(event).forEach(registration -> {
-          LocalDateTime releasedAt = registration.getWorkflowStatusDate().toLocalDateTime();
-          LocalDateTime deadline = LocalDateTime.now().minusDays(
-            baseParService.reminderAfterDays()
-          );
-
-          RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-          if (releasedAt.isBefore(deadline) && registrationEmail.getReminderSentDate() == null) {
-            try {
-              registrationEmailService.sendReminderEmail(registration, registrationEmail);
-            } catch (IOException | TemplateException e) {
-              throw new RuntimeException(e);
-            }
-          }
-        });
-      });
-    }
+    eventService.getActiveEventsFuture().forEach(event -> {
+      if (baseParService.doEODReminder(event)) {
+        log.info("Job: runReminder");
+        registrationReminderService.doRemind(event);
+      }
+    });
   }
 }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 @Order(700)
-@Profile("redanz-prod || stirit-rdev || redanz-rdev ")
+@Profile("redanz-prod || stirit-rdev || redanz-rdev || qsxz-dev")
 public class ProfileTestConfigRunner implements CommandLineRunner {
   private final UserService userService;
   private final CountryService countryService;

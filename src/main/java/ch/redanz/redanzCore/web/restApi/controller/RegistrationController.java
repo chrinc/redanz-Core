@@ -7,6 +7,7 @@ import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -285,7 +286,7 @@ public class RegistrationController {
       );
 
       // match
-      if (baseParService.doAutoMatch()) {
+      if (baseParService.doAutoMatch(registration.getEvent())) {
 //        log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
 //        log.info("bfr doMatching");
@@ -295,7 +296,7 @@ public class RegistrationController {
 //      log.info("inc@update Registration 3");
 //      log.info("bfr release");
       // release
-      if (baseParService.doAutoRelease()) {
+      if (baseParService.doAutoRelease(registration.getEvent())) {
 //      log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
 //      log.info("bfr doRelease");

@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.service.DiscountRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
+import ch.redanz.redanzCore.model.workshop.configTest.BaseParConfig;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.*;
@@ -19,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,6 +57,7 @@ public class EventService {
   private final RegistrationRepo registrationRepo;
   private final DiscountRegistrationService discountRegistrationService;
   private final SpecialRegistrationService specialRegistrationService;
+  private final BaseParService baseParService;
 
   public EventBundle findByEventAndBundle(Event event, Bundle bundle) {
     return eventBundleRepo.findByEventAndBundle(event, bundle);
@@ -601,7 +606,12 @@ public class EventService {
     );
     save(event);
     if (newEvent) {
+
+      // New Event Part Info
       eventPartService.newBaseEventPartInfo(event);
+
+      // Set Default Base Par
+      BaseParConfig.setupDefault(baseParService, event);
     }
     ;
   }
@@ -1034,6 +1044,7 @@ public class EventService {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
     }
   }
+
   public void deleteEventSpecial(JsonObject request) {
     try {
       Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
@@ -1198,8 +1209,8 @@ public class EventService {
     baseEvent.getEventDanceRoles().forEach(baseEventDanceRole -> {
       newEventDanceroles.add(new EventDanceRole(
         newEvent
-        ,baseEventDanceRole.getDanceRole()
-        ,baseEventDanceRole.getHint()
+        , baseEventDanceRole.getDanceRole()
+        , baseEventDanceRole.getHint()
       ));
     });
     newEvent.setEventDanceRoles(newEventDanceroles);
@@ -1208,14 +1219,12 @@ public class EventService {
 
     // Clone Tracks
     Map<BundleEventTrack, EventTrack> baseBundleEventTrackNewEventTrackList = new HashMap<>();
-//    Set<Bundle> baseBundles = baseEvent.getEventBundles().stream().map(EventBundle::getBundle)
-//      .collect(Collectors.toSet());
     baseEvent.getEventBundles().forEach(baseEventBundle -> {
       if (bundleService.hasTrack(baseEventBundle.getBundle()))
         baseEventBundle.getBundle().getBundleEventTracks().forEach(
           baseBundleEventTrack -> {
             baseBundleEventTrackNewEventTrackList.put(baseBundleEventTrack, null);
-      });
+          });
     });
 
     newEvent.setEventTracks(new HashSet<>());
@@ -1227,10 +1236,10 @@ public class EventService {
       baseEvent.getEventBundles().forEach(baseEventBundle -> {
         baseEventBundle.getBundle().getBundleEventTracks().forEach(
           baseBundleEventTrack -> {
-          if (baseBundleEventTrack.getEventTrack().equals(baseEventTrack)) {
-            baseBundleEventTrackNewEventTrackList.put(baseBundleEventTrack, newEventTrack);
-          }
-        });
+            if (baseBundleEventTrack.getEventTrack().equals(baseEventTrack)) {
+              baseBundleEventTrackNewEventTrackList.put(baseBundleEventTrack, newEventTrack);
+            }
+          });
 
       });
     });
@@ -1249,6 +1258,9 @@ public class EventService {
 
     // clone eventPartInfo
     eventPartService.clone(baseEvent, newEvent);
+
+    // Base Par
+    BaseParConfig.setupDefault(baseParService, newEvent);
   }
 
   public List<EventPrivateClass> findPrivateClassesByEvent(Event event) {

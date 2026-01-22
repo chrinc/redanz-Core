@@ -44,17 +44,23 @@ public class PrivateClassService {
     privateClassRepo.save(privateClass);
   }
 
-  public String getReportPrivates(Registration registration, Language language) {
+  public String getReportPrivates(Registration registration) {
     AtomicReference<String> privates = new AtomicReference<>();
+    Map<String, StringBuilder> merged = new HashMap<>();
     privateClassRegistrationRepo.findAllByRegistration(registration).forEach(privateRegistration -> {
-      String privateOutText = outTextService.getOutTextByKeyAndLangKey(privateRegistration.getPrivateClass().getDescription(), language.getLanguageKey()).getOutText();
-      if (privates.get() == null)
-      privates.set(privateOutText);
-      else {
-        privates.set(privates.get() + ", " + privateOutText);
-      }
+      List<Map<String, String>> privateClassOutText =
+        outTextService.getOutTextMapByKey(privateRegistration.getPrivateClass().getDescription());
+      if (privateClassOutText == null || privateClassOutText.isEmpty()) return;
+      Map<String, String> map = privateClassOutText.get(0); // your structure
+
+      map.forEach((lang, text) -> {
+        merged
+          .computeIfAbsent(lang, k -> new StringBuilder())
+          .append(merged.get(lang).length() == 0 ? "" : ", ")
+          .append(text);
+      });
     });
-    return privates.get() == null ? "" : privates.toString();
+    return merged.isEmpty()? "" : merged.toString();
   }
 
   public Boolean hasRegistration(PrivateClass privateClass,  Boolean active) {

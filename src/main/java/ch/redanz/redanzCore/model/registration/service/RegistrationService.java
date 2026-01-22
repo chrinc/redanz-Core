@@ -112,7 +112,7 @@ public class RegistrationService {
   }
 
   public void updateSoldOut(Event event) {
-    Integer waitListLength = baseParService.waitListLength();
+    Integer waitListLength = baseParService.waitListLength(event);
 
     // Event
     if (countDone(event) >= eventService.getEventCapacity(event)) {

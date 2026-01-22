@@ -15,7 +15,6 @@ public enum EventBundleConfig {
   EVENT_HALF(EventConfig.REDANZ_EVENT, BundleConfig.HALF_PASS, 270),
   EVENT_PARTY(EventConfig.REDANZ_EVENT, BundleConfig.PARTY_PASS, 60)
   ;
-  ;
 
   private final EventConfig event;
   private final BundleConfig bundle;
