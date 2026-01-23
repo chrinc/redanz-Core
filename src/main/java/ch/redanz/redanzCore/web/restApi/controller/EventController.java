@@ -802,6 +802,7 @@ public class EventController {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
       Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+//      log.info(request.toString());
 //      log.info(id.toString());
       if (id != null && id != 0 && eventRegistrationService.discountIsUsedAndHasRegistration(discountService.findByDiscountId(id))) {
         throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());

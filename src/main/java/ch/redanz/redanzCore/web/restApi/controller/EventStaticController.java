@@ -203,6 +203,24 @@ public class EventStaticController {
     }
   }
 
+  @PostMapping(path = "/discount/upsert")
+  @Transactional
+  public void discountUpsert(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+      discountService.update(request);
+
+    } catch (HasRegistrationException hasRegistrationException) {
+      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
   // delete
   @PostMapping(path = "/volunteerType/delete")
   @Transactional

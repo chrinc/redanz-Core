@@ -83,14 +83,23 @@ public class EventPartService {
         new EventPartInfo(
           newEvent,
           eventPart,
+          eventPartInfoConfig.getTitle(),
           eventPartInfoConfig.getTitleRequired(),
+          eventPartInfoConfig.getTitleExist(),
           eventPartInfoConfig.getTitleExistRequired(),
+          eventPartInfoConfig.getInvalid(),
           eventPartInfoConfig.getInvalidRequired(),
+          eventPartInfoConfig.getSubtitle(),
           eventPartInfoConfig.getSubtitleRequired(),
+          eventPartInfoConfig.getSubtitleLink(),
           eventPartInfoConfig.getSubtitleLinkRequired(),
+          eventPartInfoConfig.getHint(),
           eventPartInfoConfig.getHintRequired(),
+          eventPartInfoConfig.getHintLink(),
           eventPartInfoConfig.getHintLinkRequired(),
+          eventPartInfoConfig.getHint2(),
           eventPartInfoConfig.getHint2Required(),
+          eventPartInfoConfig.getHint2Link(),
           eventPartInfoConfig.getHint2LinkRequired()
         )
       );

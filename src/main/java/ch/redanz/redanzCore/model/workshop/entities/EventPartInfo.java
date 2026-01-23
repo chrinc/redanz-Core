@@ -183,23 +183,14 @@ public class EventPartInfo {
         put("eventId", event.getEventId().toString());
         put("eventPart", eventPart.toString());
         put("title", title);
-//        put("titleActive", String.valueOf(titleActive));
         put("titleExist", titleExist);
-//        put("titleExistActive", String.valueOf(titleExistActive));
         put("invalid", invalid);
-//        put("invalidActive", String.valueOf(invalidActive));
         put("subtitle", subtitle);
-//        put("subtitleActive", String.valueOf(subtitleActive));
         put("subtitleLink", subtitleLink);
-//        put("subtitleLinkActive", String.valueOf(subtitleLinkActive));
         put("hint", hint);
-//        put("hintActive", String.valueOf(hintActive));
         put("hintLink", hintLink);
-//        put("hintLinkActive", String.valueOf(hintLinkActive));
         put("hint2", hint2);
-//        put("hint2Active", String.valueOf(hint2Active));
         put("hint2Link", hint2Link);
-//        put("hint2LinkActive", String.valueOf(hint2LinkActive));
       }
     };
   }

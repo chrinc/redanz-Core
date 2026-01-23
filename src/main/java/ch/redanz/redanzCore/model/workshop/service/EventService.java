@@ -517,7 +517,6 @@ public class EventService {
         String key = stringStringMap.get("key");
         String type = stringStringMap.get("type");
         Field field;
-//        log.info(type);
         try {
           switch (type) {
             case "label":
@@ -607,7 +606,7 @@ public class EventService {
     save(event);
     if (newEvent) {
 
-      // New Event Part Info
+      // New Default Event Part Info
       eventPartService.newBaseEventPartInfo(event);
 
       // Set Default Base Par
