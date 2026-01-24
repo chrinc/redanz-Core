@@ -45,14 +45,18 @@
                     <a href="mailto:${hostEmail}" style="color:#0000ee; font-size:16px; text-decoration:none;">${hostEmail}</a><br/>
                     <a href="https://www.${omsHostDomain}" target="_blank" style="color:#0000ee; font-size:16px; text-decoration:none;">www.${omsHostDomain}</a>
                     <div style="margin-top:8px;">
-                        <a href="${omsInstaLink}" target="_blank" style="margin-right:5px; display:inline-block;">
-                            <img src="${headerLink}/email_logo_insta_01.png" alt="Instagram"
-                                 style="width:40px;height:40px;">
-                        </a>
-                        <a href="${omsFbLink}" target="_blank" style="display:inline-block;">
-                            <img src="${headerLink}/email_logo_fb_01.png" alt="Facebook"
-                                 style="width:40px;height:40px;">
-                        </a>
+                        <#if omsInstaLink?? && omsInstaLink?has_content>
+                            <a href="${omsInstaLink}" target="_blank" style="margin-right:5px; display:inline-block;">
+                                <img src="${headerLink}/email_logo_insta_01.png" alt="Instagram"
+                                     style="width:40px;height:40px;">
+                            </a>
+                        </#if>
+                        <#if omsFbLink?? && omsFbLink?has_content>
+                            <a href="${omsFbLink}" target="_blank" style="display:inline-block;">
+                                <img src="${headerLink}/email_logo_fb_01.png" alt="Facebook"
+                                     style="width:40px;height:40px;">
+                            </a>
+                        </#if>
                     </div>
                 </td>
 
