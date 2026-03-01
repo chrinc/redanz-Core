@@ -151,11 +151,9 @@ public class VolunteerService {
     List<VolunteerSlotRegistration> requestVolunteerSlotRegistrations = volunteerSlotRegistrations(registration, volunteerRegistration);
     VolunteerRegistration existingVolunteerRegistration = volunteerRegistrationRepo.findByRegistration(registration);
     List<VolunteerSlotRegistration> volunteerSlotRegistrations = volunteerSlotRegistrationRepo.findAllByVolunteerRegistration(existingVolunteerRegistration);
-      // log.info("volunteerRegistration: " + volunteerRegistration);
 
     // delete in current if not in request
     volunteerSlotRegistrations.forEach(volunteerSlotRegistration -> {
-      // log.info("requestvolunteerSlotRegistration: " + volunteerSlotRegistration);
       if (!hasVolunteerSlotRegistration(requestVolunteerSlotRegistrations, volunteerSlotRegistration.getSlot())){
         volunteerSlotRegistrationRepo.deleteAllByVolunteerRegistrationAndSlot(existingVolunteerRegistration, volunteerSlotRegistration.getSlot());
       }
@@ -207,13 +205,10 @@ public class VolunteerService {
       );
 
       // add mobile
-//      log.info("inc@updateVolunteerReg bfr set mobile: {}", mobile);
       if (mobile != null) {
         registration.getParticipant().setMobile(mobile);
       }
-//      log.info("inc@updateVolunteerReg bfr set save person: {}");
       personService.savePerson(registration.getParticipant());
-//      log.info("inc@updateVolunteerReg after set save person: {}");
     }
   }
 
@@ -228,17 +223,13 @@ public class VolunteerService {
   public void updateVolunteerRequest(Registration registration, JsonObject request) {
     JsonObject volunteerRegistrationObject = volunteerRegistrationObject(request);
 
-//    log.info("inc@updateVolunteerRequest");
     if (volunteerRegistrationObject != null) {
 
       // update existing
-//      log.info("inc@bfrupdateRegistration");
       updateVolunteerRegistration(registration, volunteerRegistrationObject);
-//      log.info("inc@bfrupdateSlotRegistration");
       updateVolunteerSlotRegistration(registration, volunteerRegistrationObject);
 
     } else {
-//      log.info("inc@object is null");
 
       // delete existing volunteer registration
       if (volunteerRegistrationRepo.findByRegistration(registration) != null) {
@@ -246,8 +237,6 @@ public class VolunteerService {
         volunteerRegistrationRepo.deleteAllByRegistration(registration);
       }
     }
-
-//    log.info("inc@done");
   }
 
   public boolean hasVolunteerRegistration(Registration registration) {

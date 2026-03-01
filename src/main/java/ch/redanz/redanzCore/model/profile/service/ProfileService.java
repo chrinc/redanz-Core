@@ -46,33 +46,51 @@ public class ProfileService {
   public void registerProfile(Long userId, String username, Map<String, Object> personResponse, String registrationLink, String headerLink) throws IOException, TemplateException {
     Person newPerson = new Person(
       userService.findByUserId(userId)
-      ,personResponse.get("firstName").toString()
-      ,personResponse.get("lastName").toString()
-      ,personResponse.get("street").toString()
-      ,personResponse.get("postalCode").toString()
-      ,personResponse.get("city").toString()
-      ,countryService.findCountry(Long.valueOf(personResponse.get("countryId").toString()))
-      ,languageService.findLanguageByLanguageKey(personResponse.get("language").toString())
-      ,username
-      ,true
-    );
+      , personResponse.get("firstName").toString()
+      , personResponse.get("lastName").toString()
+      , personResponse.get("street") == null ? "" : personResponse.get("street").toString()
+      , personResponse.get("postalCode") == null ? null : personResponse.get("postalCode").toString()
+      , personResponse.get("city") == null ? null : personResponse.get("city").toString()
+      , personResponse.get("country") == null ? null : countryService.findCountry(personResponse.get("country").toString())
+      , personResponse.get("language") == null ? null : languageService.findLanguageByLanguageKey(personResponse.get("language").toString())
+       , username
+      , true
+      , personResponse.get("pronouns") == null ? null : personResponse.get("pronouns").toString()
 
+    );
     newPerson.setUpdateTimestamp(LocalDateTime.now());
     personService.addPerson(newPerson);
     sendRegisteredProfileEmail(newPerson, registrationLink, headerLink);
   }
 
   public void updateProfile(Long userId, PersonResponse personResponse) {
-    Person updatePerson = personService.findByUser(userService.findByUserId(userId));
-    updatePerson.setFirstName(personResponse.getFirstName());
-    updatePerson.setLastName(personResponse.getLastName());
-    updatePerson.setStreet(personResponse.getStreet());
-    updatePerson.setPostalCode(personResponse.getPostalCode());
-    updatePerson.setCity(personResponse.getCity());
-    updatePerson.setCountry(countryService.findCountry(personResponse.getCountryId()));
-    updatePerson.setPersonLang(languageService.findLanguageByLanguageKey(personResponse.getLanguage()));
-    updatePerson.setUpdateTimestamp(LocalDateTime.now());
-    personService.savePerson(updatePerson);
+    Long updateUserId = personResponse.getPersonId() != null ? personResponse.getPersonId() : userId;
+    if (updateUserId != null) {
+      Person updatePerson = personService.findByUser(userService.findByUserId(updateUserId));
+      updatePerson.setFirstName(personResponse.getFirstName());
+      updatePerson.setLastName(personResponse.getLastName());
+      updatePerson.setStreet(personResponse.getStreet());
+      updatePerson.setPostalCode(personResponse.getPostalCode());
+      updatePerson.setCity(personResponse.getCity());
+      updatePerson.setPronouns(personResponse.getPronouns());
+
+      if (personResponse.getCountryKey() != null) {
+        updatePerson.setCountry(countryService.findCountry(personResponse.getCountryKey()));
+      } else {
+        updatePerson.setCountry(null);
+      }
+
+      if (personResponse.getLanguage() != null) {
+        updatePerson.setPersonLang(languageService.findLanguageByLanguageKey(personResponse.getLanguage()));
+      } else {
+        updatePerson.setPersonLang(null);
+      }
+
+
+      updatePerson.setUpdateTimestamp(LocalDateTime.now());
+      personService.savePerson(updatePerson);
+
+    }
   }
 
   public void remove(Person person) {
@@ -144,9 +162,9 @@ public class ProfileService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,userService.emailIsTester(person.getEmail())
-      ,false
-      ,null
+      , userService.emailIsTester(person.getEmail())
+      , false
+      , null
     );
   }
 }

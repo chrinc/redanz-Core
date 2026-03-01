@@ -68,6 +68,10 @@ public class ReportController {
       eventService.findByEventId(eventId)
     );
   }
+  @GetMapping(path = "/registration/person/field-properties")
+  public List<String> personRegistrationFieldProperties() {
+    return reportRegistrationService.personRegistrationFieldProperties();
+  }
 
   @GetMapping(path = "/registration/emailLogs")
   public List<ResponseEmailLogs> getEmailLogs(
@@ -126,8 +130,6 @@ public class ReportController {
     @RequestParam("languageKey") String languageKey,
     @RequestParam("eventId") Long eventId
   ) {
-    // log.info("/stats, eventId: " + eventId);
-    // log.info("/stats, languageKey: " + languageKey);
     return reportStatsService.getStatsReport(
       languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
       eventService.findByEventId(eventId)

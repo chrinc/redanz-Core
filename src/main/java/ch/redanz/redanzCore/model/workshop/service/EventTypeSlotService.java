@@ -57,10 +57,6 @@ public class EventTypeSlotService {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     TypeSlot typeSlot;
     EventTypeSlot eventTypeSlot;
-
-    // log.info("inc@updateFood");
-    // log.info(request.toString());
-
     Long foodId = request.get("food").isJsonNull() ? null : request.get("food").getAsLong();
     Long slotId = request.get("slot").isJsonNull() ? null : request.get("slot").getAsLong();
     Integer seqNr = request.get("seqNr").isJsonNull() ? null : request.get("seqNr").getAsInt();

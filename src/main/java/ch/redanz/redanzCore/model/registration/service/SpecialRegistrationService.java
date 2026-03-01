@@ -83,10 +83,6 @@ public class SpecialRegistrationService {
 
   public List<SpecialRegistration> specialRegistrations(Registration registration, JsonObject specialRegistrationRequest) {
     List<SpecialRegistration> specialRegistrations = new ArrayList<>();
-
-//     log.info(specialRegistrationRequest.toString());
-
-    // log.info("inc@specialRegistrations");
     if (specialRegistrationRequest.get("specialRegistrations") != null
       && !specialRegistrationRequest.get("specialRegistrations").isJsonNull()
       && !specialRegistrationRequest.get("specialRegistrations").getAsJsonArray().isEmpty()
@@ -145,7 +141,6 @@ public class SpecialRegistrationService {
         );
       });
     }
-    // log.info("inc@bfr return");
     return privateClassRegistrations;
   }
   public Boolean hasRegistrations(Event event, Special special, Boolean active) {
@@ -259,8 +254,6 @@ public class SpecialRegistrationService {
     List<SpecialRegistration> requestSpecialRegistrations = specialRegistrations(registration, request);
     List<SpecialRegistration> specialRegistrations = specialRegistrationRepo.findAllByRegistration(registration);
 
-    // log.info("requestSpecialRegistrations: " + requestSpecialRegistrations.size());
-    // log.info("specialRegistrations: " + specialRegistrations.size());
     // delete in current if not in request
     specialRegistrations.forEach(specialRegistration -> {
       if (!hasSpecialRegistration(requestSpecialRegistrations, specialRegistration.getSpecial())){
@@ -279,7 +272,6 @@ public class SpecialRegistrationService {
   public void updatePrivateClassRequest(Registration registration, JsonObject request) {
     List<PrivateClassRegistration> requestPrivateClassRegistrations = privateClassRegistration(registration, request);
     List<PrivateClassRegistration> privateClassRegistrations = privateClassRegistrationRepo.findAllByRegistration(registration);
-    // log.info(String.valueOf(privateClassRegistrations.size()));
 
     // delete in current if not in request
     privateClassRegistrations.forEach(privateClassRegistration -> {

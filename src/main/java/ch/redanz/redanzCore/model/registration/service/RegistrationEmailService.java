@@ -298,7 +298,6 @@ public class RegistrationEmailService {
       String name = eventSpecial.getSpecial().getName();
       String description = eventSpecial.getSpecial().getDescription();
       String url = eventSpecial.getUrl();
-//    log.info(eventSpecial.getSpecial().getName());
       if (name != null && !name.isEmpty()) {
         specialsHtml.append("<div class=\"indented\">\uD83D\uDC49 <b>"
           + outTextService.getOutTextByKeyAndLangKey(name, languageKey).getOutText()
@@ -318,7 +317,6 @@ public class RegistrationEmailService {
         specialsHtml.append("</div>");
       }
     });
-//    log.info(specialsHtml.toString());
     if (specialsHtml.length() > 0) {
       specialsHtml.insert(0,
         outTextService.getOutTextByKeyAndLangKey("LABEL_SPECIALS_INTRO", languageKey).getOutText()

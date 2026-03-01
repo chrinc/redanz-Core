@@ -23,6 +23,7 @@ public class ResponsePersonRegistrations {
   private String postalCode;
   private String city;
   private String country;
-  private String lang;
+  private String language;
   private String role;
+  private String pronouns;
 }

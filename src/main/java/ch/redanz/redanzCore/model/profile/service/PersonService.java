@@ -17,6 +17,7 @@ public class PersonService {
   private final PersonRepo personRepo;
   private final CountryService countryService;
   private final LanguageService languageService;
+  private final FieldPropertyService fieldPropertyService;
 
   public void save(Person person) {
     personRepo.save(person);
@@ -45,11 +46,12 @@ public class PersonService {
       ,personResponse.getStreet()
       ,personResponse.getPostalCode()
       ,personResponse.getCity()
-      ,countryService.findCountry(personResponse.getCountryId())
+      ,countryService.findCountry(personResponse.getCountryKey())
       ,personResponse.getEmail()
       ,personResponse.getMobile()
       ,languageService.findLanguageByLanguageKey(personResponse.getLanguage())
       ,true
+      ,personResponse.getPronouns()
     ));
   }
 
@@ -60,7 +62,7 @@ public class PersonService {
     person.setStreet(personResponse.getStreet());
     person.setPostalCode(personResponse.getPostalCode());
     person.setCity(personResponse.getCity());
-    person.setCountry(countryService.findCountry(personResponse.getCountryId()));
+    person.setCountry(countryService.findCountry(personResponse.getCountryKey()));
     person.setEmail(personResponse.getEmail());
     person.setPersonLang(languageService.findLanguageByLanguageKey(personResponse.getLanguage()));
     person.setMobile(personResponse.getMobile());
@@ -79,4 +81,5 @@ public class PersonService {
     // @Todo, event currently not used;
     return personRepo.findAllByUserUserRole(UserRole.ORGANIZER);
   }
+
 }

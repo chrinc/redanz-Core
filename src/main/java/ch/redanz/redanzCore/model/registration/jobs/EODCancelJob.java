@@ -43,7 +43,6 @@ public class EODCancelJob {
   public void runCancelJob() {
     eventService.getActiveEventsFuture().forEach(event -> {
       if (baseParService.doEODCancel(event)) {
-        log.info("Job: runCancel");
         registrationCancelService.doCancel(event);
       }
     });

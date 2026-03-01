@@ -107,7 +107,6 @@ public class EventPartService {
   }
 
   public void clone(Event baseEvent, Event newEvent) {
-//    log.info("cloen event part info");
     eventPartInfoRepo.findAllByEvent(baseEvent).forEach(eventPartInfo -> {
       save(new EventPartInfo(
         newEvent,

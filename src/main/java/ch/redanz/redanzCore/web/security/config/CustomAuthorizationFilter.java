@@ -109,7 +109,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           }
           if (request.getServletPath().startsWith("/core-api/app/jobs")) {
             authorities.forEach(simpleGrantedAuthority -> {
-//              log.info(simpleGrantedAuthority.getAuthority());
             });
              authorities.stream().filter(
                auth ->

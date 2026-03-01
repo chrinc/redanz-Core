@@ -19,6 +19,7 @@ public class ResponsePerson {
   private String role;
   private String language;
   private Long personId;
-  private Long countryId;
+  private String country;
   private String mobile;
+  private String pronouns;
 }

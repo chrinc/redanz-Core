@@ -162,13 +162,10 @@ public class RegistrationMatchingService {
   }
 
   private boolean registrationIsMatch(Registration baseRegistration, Registration lookupRegistration) {
-//    log.info("baseRegistration.getTrack().getOwnPartnerRequired(): " + baseRegistration.getTrack().getOwnPartnerRequired());
-//    log.info("!baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId()): " + !baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId()));
     return
       (
         // check bundles
         baseRegistration.getBundle().getBundleId().equals(lookupRegistration.getBundle().getBundleId())
-//          && !baseRegistration.getBundle().isSoldOut()
 
           // check tracks
           // @todo: update new Flag getSameTrackRequired

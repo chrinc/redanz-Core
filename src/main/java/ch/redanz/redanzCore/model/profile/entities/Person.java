@@ -36,6 +36,8 @@ public class Person implements Serializable {
 
   private String street;
 
+  private String pronouns;
+
   @Column(name = "postal_code")
   private String postalCode;
   private String city;
@@ -68,7 +70,8 @@ public class Person implements Serializable {
     Country country,
     Language personLang,
     String email,
-    boolean active
+    boolean active,
+    String pronouns
   ) {
     this.user = user;
     this.firstName = firstName;
@@ -80,6 +83,7 @@ public class Person implements Serializable {
     this.personLang = personLang;
     this.email = email;
     this.active = active;
+    this.pronouns = pronouns;
   }
 
   public Person(
@@ -93,7 +97,8 @@ public class Person implements Serializable {
     Language personLang,
     LocalDateTime timestamp,
     String email,
-    boolean active
+    boolean active,
+    String pronouns
   ) {
     this.user = user;
     this.firstName = firstName;
@@ -106,9 +111,10 @@ public class Person implements Serializable {
     this.updateTimestamp = timestamp;
     this.email = email;
     this.active = active;
+    this.pronouns = pronouns;
   }
 
-  public Person(User user, String firstName, String lastName, String street, String postalCode, String city, String email, boolean active) {
+  public Person(User user, String firstName, String lastName, String street, String postalCode, String city, String email, boolean active, String pronouns) {
     this.user = user;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -117,9 +123,10 @@ public class Person implements Serializable {
     this.city = city;
     this.email = email;
     this.active = active;
+    this.pronouns = pronouns;
   }
 
-  public Person(String firstName, String lastName, String street, String postalCode, String city, Country country, String email, String mobile, Language language, boolean active) {
+  public Person(String firstName, String lastName, String street, String postalCode, String city, Country country, String email, String mobile, Language language, boolean active, String pronouns) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.street = street;
@@ -130,5 +137,6 @@ public class Person implements Serializable {
     this.personLang = language;
     this.country = country;
     this.active = active;
+    this.pronouns = pronouns;
   }
 }

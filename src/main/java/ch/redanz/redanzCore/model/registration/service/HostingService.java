@@ -74,10 +74,7 @@ public class HostingService {
   }
 
   public JsonArray hostRegistrationArray(JsonObject hostRegistrationRequest) {
-    // log.info("hostRegistrationArray ");
     JsonElement hostRegistration = hostRegistrationRequest.get("hostRegistration");
-    // log.info("hostRegistration: " + hostRegistration);
-    // log.info("jsonArrey: " + hostRegistration.getAsJsonArray());
 
     if (hostRegistration != null
       && !hostRegistration.getAsJsonArray().isEmpty()) {
@@ -393,7 +390,6 @@ public class HostingService {
   public List<HosteeSleepUtilRegistration> hosteeSleepUtilRegistrations (Registration registration, JsonArray hosteeRegistration) {
     List<HosteeSleepUtilRegistration> hosteeSleepUtilRegistrations = new ArrayList<>();
     JsonObject sleepUtilsJson = hosteeRegistration.get(4).getAsJsonObject();
-    // log.info("sleepUtilsJson: " + sleepUtilsJson);
     // host sleep util registration
     if (sleepUtilsJson.get("sleepUtils") != null) {
       sleepUtilsJson.get("sleepUtils").getAsJsonArray().forEach(sleepUtil -> {

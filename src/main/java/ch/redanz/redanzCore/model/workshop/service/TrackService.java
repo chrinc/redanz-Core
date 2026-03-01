@@ -149,8 +149,6 @@ public class TrackService {
 
             case "multiselect":
             case "multiselectText":
-//              log.info(eventPartKey);
-
               if (request.get(key) != null && request.get(key).isJsonArray()) {
                 switch (key) {
                   case "discounts":
@@ -158,11 +156,6 @@ public class TrackService {
                       newEventDiscounts.add(discountService.findByEventDiscountId(item.getAsLong()));
                     });
                     break;
-//                  case "danceRoles":
-//                    request.get(eventPartKey).getAsJsonArray().forEach(item -> {
-//                      newTrackDanceRoles.add(trackDanceRoleRepo.findByTrackDanceRoleId(item.getAsLong()));
-//                    });
-//                    break;
 
                 }
               }

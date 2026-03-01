@@ -34,7 +34,6 @@ public class EODReleaseJob {
   public void runRelease() {
     eventService.findAll().forEach(event -> {
       if (baseParService.doEODRelease(event)) {
-        log.info("Job: runRelease");
         registrationService.getAllSubmittedRegistrations(event).forEach(registration -> {
           registrationReleaseService.doRelease(registration);
         });

@@ -1,5 +1,7 @@
 package ch.redanz.redanzCore.model.reporting.service;
 
+import ch.redanz.redanzCore.model.profile.service.FieldPropertyService;
+import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
 import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
@@ -24,12 +26,31 @@ public class ReportRegistrationService {
   private final OutTextService outTextService;
   private final WorkflowStatusService workflowStatusService;
   private final PaymentService paymentService;
+  private final PersonService personService;
+  private final FieldPropertyService fieldPropertyService;
 
   public List<ResponseRegistrationDetails> getRegistrationDetailsReport(Event event) {
     return getRegistrationsDetails(
       workflowStatusService.findAll(),
       event
     );
+  }
+
+  public List<String> personRegistrationFieldProperties() {
+    List<String> fieldList = new ArrayList<>();
+    fieldList.add("registrationId");
+    
+    fieldPropertyService.displayedColumns().forEach(property -> {
+      fieldList.add(property);
+    });
+    fieldList.add("workflowStatus");
+    fieldList.add("bundle");
+    fieldList.add("track");
+    fieldList.add("email");
+    fieldList.add("mobile");
+    fieldList.add("role");
+
+    return fieldList;
   }
 
   private List<ResponseRegistrationDetails> getRegistrationsDetails(List<WorkflowStatus> workflowStatusList, Event event) {
@@ -69,4 +90,6 @@ public class ReportRegistrationService {
     outTextMap.get(0).put("code", workflowStatus.getName().toUpperCase());
     return outTextMap.toString();
   }
+
+
 }

@@ -38,7 +38,6 @@ public class EODReminderJob {
 
     eventService.getActiveEventsFuture().forEach(event -> {
       if (baseParService.doEODReminder(event)) {
-        log.info("Job: runReminder");
         registrationReminderService.doRemind(event);
       }
     });

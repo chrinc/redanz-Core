@@ -84,9 +84,6 @@ public class EventService {
   }
 
   public BundleEventTrack findByBundleEventAndTrack(Bundle bundle, Event event, Track track) {
-//    log.info("findByEventAndTrack: " + findByEventAndTrack(event, track));
-//    log.info("bundle: " + bundle);
-//    log.info("track: " + track);
     return bundleEventTrackService.findByBundleAndEventTrack(bundle, findByEventAndTrack(event, track));
   }
 
@@ -313,7 +310,6 @@ public class EventService {
       eventData.put("specials", eventSpecialIdList(event).toString());
       eventData.put("privates", eventPrivateIdList(event).toString());
       eventsData.add(eventData);
-//      log.info(eventsData.toString());
     });
     return eventsData;
   }
@@ -559,7 +555,6 @@ public class EventService {
               break;
 
             case "datetime":
-//              log.info(request.toString());
               String dateTimeDateString = request.get(key + "_date").getAsString();   // yyyy-MM-dd
               String dateTimeTimeString = request.get(key + "_time").isJsonNull()
                 ? "12:00"
@@ -582,8 +577,6 @@ public class EventService {
             case "multiselectInfo":
               if (request.get(key) != null && request.get(key).isJsonArray()) {
                 request.get(key).getAsJsonArray().forEach(item -> {
-//                  log.info(item.toString());
-
                   switch (key) {
                     case "specials":
                       newSpecials.add(specialService.findBySpecialId(item.getAsLong()));

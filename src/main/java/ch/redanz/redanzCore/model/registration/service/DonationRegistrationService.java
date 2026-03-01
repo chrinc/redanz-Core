@@ -101,7 +101,6 @@ public class DonationRegistrationService {
   public void updateDonationRequest(Registration registration, JsonObject request) {
     // .info("request" + request);
     JsonArray donationRegistrationArray = donationRegistrationArray(request);
-    // log.info("donationRegistrationArray" + donationRegistrationArray);
     if (donationRegistrationArray != null) {
 
       // update existing
@@ -147,9 +146,7 @@ public class DonationRegistrationService {
   }
 
   public void updateScholarshipRequest(Registration registration, JsonObject request) {
-    // log.info("request" + request);
     JsonArray scholarshipRegistrationArray = scholarshipRegistrationArray(request);
-    // log.info("scholarshipRegistrationArray" + scholarshipRegistrationArray);
     if (scholarshipRegistrationArray != null) {
 
       // update existing

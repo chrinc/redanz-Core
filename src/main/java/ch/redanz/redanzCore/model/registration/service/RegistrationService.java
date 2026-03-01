@@ -134,7 +134,6 @@ public class RegistrationService {
       Bundle bundle = eventBundle.getBundle();
 
       if (bundleService.hasTrack(bundle)) {
-//        log.info("set Bundle: " + eventBundle.getBundle().getName() + " sold Out to false");
         if (eventBundle.isSoldOut()) {
           eventBundle.setSoldOut(false);
           eventService.save(eventBundle);
@@ -149,12 +148,6 @@ public class RegistrationService {
           boolean trackSoldOut =
             countTracksDone >= trackCapacity
               || countTracksSubmittedConfirmingAndDone(track, bundle, event) >= (trackCapacity + waitListLength);
-
-//          log.info("track: " + track.getName() + " sold out?: " + trackSoldOut);
-//          log.info("because countTracksDone: " + countTracksDone);
-//          log.info(", trackCapacity: " + trackCapacity);
-//          log.info(", countTracksSubmittedConfirmingAndDone: " + countTracksSubmittedConfirmingAndDone(track, bundle, event));
-//          log.info(", trackCapacity: " +trackCapacity + " + waitListLength: " + waitListLength);
 
           if (trackSoldOut != bundleEventTrack.isSoldOut()) {
             bundleEventTrack.setSoldOut(trackSoldOut);
@@ -173,11 +166,6 @@ public class RegistrationService {
             boolean danceRoleSoldOut = !bundleEventTrack.isSoldOut()
               && bundleEventTrackDanceRole.getEventDanceRole().getDanceRole() != danceRoleService.getSwitchDanceRole()
               && roleOpen >= (open / danceRolesCount) + waitListLength;
-//            log.info("bundle: " + bundleEventTrackDanceRole.getBundleEventTrack().getBundle().getName());
-//            log.info("role: " + bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().getName());
-//            log.info("roleOpenCount: " + roleOpen);
-//            log.info("(open / danceRolesCount) + waitListLength: " + ((open / danceRolesCount) + waitListLength));
-
             if (danceRoleSoldOut != bundleEventTrackDanceRole.isSoldOut()) {
               bundleEventTrackDanceRole.setSoldOut(danceRoleSoldOut);
               bundleEventTrackService.save(bundleEventTrackDanceRole);
@@ -508,7 +496,6 @@ public class RegistrationService {
   }
 
   public Optional<Registration> findByParticipantAndEvent(Person participant, Event event, RegistrationType registrationType) {
-    // log.info("inc@findByParticipantAndEvent");
     return registrationRepo.findByParticipantAndEventAndRegistrationTypeAndActive(participant, event, registrationType, true);
   }
 
@@ -627,7 +614,6 @@ public class RegistrationService {
       (request.get("partnerEmail") == null || request.get("partnerEmail").isJsonNull()) ? null : request.get("partnerEmail").getAsString()
     );
 
-//     log.info("inc@updateRegistration, after registrationRequest");
     if (registrationId != null) {
       registration = findByParticipantAndEvent(
         personService.findByPersonId(personId),
@@ -646,13 +632,11 @@ public class RegistrationService {
     else {
       try {
         isNewRegistration = true;
-//         log.info("inc@updateRegistration, isNewRegistration");
         saveNewRegistration(registrationRequest, personId, RegistrationType.PARTICIPANT);
       } catch (Exception exception) {
         errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Base Registration for personId: " + personId + ", request: " + request);
         throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SAVE_REGISTRATION_EN.getOutTextKey());
       }
-//       log.info("inc@updateRegistration, bfr findByParticipantAndEvent");
       registration = findByParticipantAndEvent(
         personService.findByPersonId(personId),
         event,
@@ -662,44 +646,28 @@ public class RegistrationService {
     }
 
     discountRegistrationService.saveCapacityDiscount(registration);
-//     log.info("inc@updateRegistration, bfr food");
     foodRegistrationService.updateFoodRegistrationRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr discount");
     discountRegistrationService.updateDiscountRegistrationRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr special Reg");
     specialRegistrationService.updateSpecialRegistrationRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr privateClass Reg");
     specialRegistrationService.updatePrivateClassRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr Host");
     hostingService.updateHostRegistrationRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr Hostee");
     hostingService.updateHosteeRegistrationRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr Volunteer");
     volunteerService.updateVolunteerRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr Scholarship");
     donationRegistrationService.updateScholarshipRequest(registration, request);
-//     log.info("inc@updateRegistration, bfr Donation");
     donationRegistrationService.updateDonationRequest(registration, request);
-//    log.info("inc@updateRegistration, bfr matching");
     registrationMatchingService.updateMatchingRequest(registration, registrationRequest);
-//    log.info("inc@updateRegistration, after matching");
-
-//    log.info("inc@updateRegistration, isNewRegistration {}", isNewRegistration);
     if (isNewRegistration) {
       try {
         workflowTransitionService.setWorkflowStatus(
           registration
           ,workflowStatusService.getSubmitted()
         );
-//        log.info("inc@updateRegistration, after setWorkflowStatus");
         registrationEmailService.sendRegistrationSubmittedEmail(registration);
-//        log.info("inc@updateRegistration, after send Email");
       } catch (Exception exception) {
         errorLogService.addLog(ErrorLogType.SUBMIT_REGISTRATION.toString(), "Update Workflow Status for personId: " + personId + ", request: " + request);
       }
     }
 
-//    log.info("inc@updateRegistration, return");
     return registration;
   }
 
@@ -707,14 +675,8 @@ public class RegistrationService {
   public void updateStaffRegistrationRequest(Event event, JsonObject request) throws IOException, TemplateException {
     boolean isNewRegistration = false;
     Registration registration;
-    // ignore if user already has a registration
-
-//    log.info("inc@updateStaffRegistrationRequest");
-//    log.info(request.get("profile").getAsJsonObject().toString());
     JsonObject personRequest = request.get("profile").getAsJsonObject();
-
     Person person;
-
     if (
       personRequest.get("personId") != null
         && !personRequest.get("personId").isJsonNull()) {
@@ -742,11 +704,12 @@ public class RegistrationService {
         , personRequest.get("street").getAsString()
         , personRequest.get("postalCode").getAsString()
         , personRequest.get("city").getAsString()
-        , countryService.findCountry(personRequest.get("countryId").getAsLong())
-        , personRequest.get("email").getAsString()
-        , personRequest.get("mobile") == null ||personRequest.get("mobile").isJsonNull() ? null : personRequest.get("mobile").getAsString()
+        , countryService.findCountry(personRequest.get("country").getAsString())
+        , personRequest.get("email") == null ||  personRequest.get("email").isJsonNull() ? null :personRequest.get("email").getAsString()
+        , personRequest.get("mobile") == null || personRequest.get("mobile").isJsonNull() ? null : personRequest.get("mobile").getAsString()
         , languageService.findLanguageByLanguageKey(personRequest.get("language").getAsString())
         , true
+        , personRequest.get("pronouns").getAsString()
       );
     }
 
@@ -757,7 +720,6 @@ public class RegistrationService {
       event,
       RegistrationType.PARTICIPANT
     ).isPresent()) {
-        // log.info("inc@updateRegistration, update Registration");
         // update Registration
         registration = findByParticipantAndEvent(
           person,
@@ -770,7 +732,6 @@ public class RegistrationService {
       event,
       RegistrationType.STAFF
     ).isPresent()) {
-      // log.info("inc@updateRegistration, update Registration");
       // update Registration
       registration = findByParticipantAndEvent(
         person,
@@ -783,7 +744,6 @@ public class RegistrationService {
     else {
       try {
         isNewRegistration = true;
-        // log.info("inc@updateRegistration, isNewRegistration");
 
         update(
           new Registration(
@@ -792,7 +752,6 @@ public class RegistrationService {
             RegistrationType.STAFF
           )
         );
-        // log.info("inc@updateRegistration, bfr findByParticipantAndEvent");
         registration = findByParticipantAndEvent(
           person,
           event,
@@ -839,7 +798,6 @@ public class RegistrationService {
     ).get();
   }
   public RegistrationResponse getRegistrationResponse(Registration registration) {
-    // log.info("inc@getRegistrationResponse");
     RegistrationResponse registrationResponse = new RegistrationResponse(
       registration.getRegistrationId(),
       registration.getParticipant().getPersonId(),
@@ -869,8 +827,6 @@ public class RegistrationService {
     }
 
     // workflow Status
-//    log.info(registration.getWorkflowStatus().toString());
-//    log.info(registration.getWorkflowStatus().getName());
     registrationResponse.setWorkflowStatus(registration.getWorkflowStatus());
 
     // Food Registration
@@ -878,7 +834,6 @@ public class RegistrationService {
       foodRegistrationService.getAllByRegistration(registration)
     );
 
-    // log.info("inc@getRegistrationResponse, bfr host");
     // Host Registration
     registrationResponse.setHostRegistration(
       hostingService.getHostRegistration(registration)
@@ -899,7 +854,6 @@ public class RegistrationService {
       donationRegistrationService.getScholarshipRegistration(registration)
     );
 
-    // log.info("inc@getRegistrationResponse, bfr donation");
     // Donation Registration
     registrationResponse.setDonationRegistration(
       donationRegistrationService.getDonationRegistration(registration)
@@ -915,13 +869,11 @@ public class RegistrationService {
       specialRegistrationService.findAllByRegistration(registration)
     );
 
-    // log.info("inc@getRegistrationResponse, bfr private Class");
     // Private Classes
     registrationResponse.setPrivateClassRegistrations(
       specialRegistrationService.findAllPrivateClassesByRegistration(registration)
     );
 
-    // log.info("inc@getRegistrationResponse, bfr return, {}", registrationResponse);
     return registrationResponse;
   }
 
@@ -945,16 +897,13 @@ public class RegistrationService {
     if (registrationOptional.isPresent()) {
       Registration registration = registrationOptional.get();
       RegistrationResponse registrationResponse = getRegistrationResponse(registration);
-      // log.info("inc@bfr return response");
       return registrationResponse;
     } else {
-//      return new RegistrationResponse(personId, eventService.findByEventId(eventId));
       return new RegistrationResponse(personId, eventId);
     }
   }
 
   public RegistrationResponse getNewRegistrationResponse(Long eventId) {
-//      return new RegistrationResponse(eventService.findByEventId(eventId));
       return new RegistrationResponse(eventId);
   }
 
@@ -970,8 +919,6 @@ public class RegistrationService {
         registrationResponses.add(getRegistrationResponse(registration));
       });
     }
-    // log.info("bfr return responses");
-    // log.info("bfr return registrationResponses {}", registrationResponses);
     return registrationResponses;
   }
 
@@ -994,7 +941,6 @@ public class RegistrationService {
 
   public List<RegistrationResponse> getUserInactiveRegistrationResponses(Long personId) {
     List<RegistrationResponse> registrationResponses = new ArrayList<>();
-//    log.info("inc@getUserInactiveRegistrationResponses");
     List<Registration> registrations =
       registrationRepo.findAllByParticipantAndActiveAndEventArchivedAndEventActive(
         personService.findByPersonId(personId)
@@ -1003,7 +949,6 @@ public class RegistrationService {
         ,false
       );
 
-//    log.info("inc@getUserInactiveRegistrationResponses, registrations: {}", registrations);
     if (registrations != null) {
       registrations.forEach(registration -> {
         registrationResponses.add(getRegistrationResponse(registration));

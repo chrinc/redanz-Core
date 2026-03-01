@@ -46,12 +46,8 @@ public class BundleService {
     }
 
     public void save(EventDanceRole eventDanceRole) {
-//        log.info(eventDanceRole.toString());
         eventDanceRoleRepo.save(eventDanceRole);
     }
-//    public void save(BundleSpecial bundleSpecial) {
-//        bundleSpecialRepo.save(bundleSpecial);
-//    }
 
     public List<Bundle> getAllByEvent(Event event) {
         List<EventBundle> eventBundles;
@@ -170,8 +166,6 @@ public class BundleService {
 
                       case "color":
                           field = getField(key);
-//                          log.info("isjsonnull, {}", request.get(key).isJsonNull());
-//                          log.info("is json object?, {}", request.get(key).isJsonObject());
                           field.set(bundle, request.get(key).isJsonNull() ? null :
                             request.get(key).isJsonObject() ? request.get(key).getAsJsonObject().get("hex").getAsString()
                               : request.get(key).getAsString())
@@ -206,14 +200,8 @@ public class BundleService {
 
                       case "multiselectText":
                           // tracks
-//                             log.info(key);
                           if (request.get(key) != null && request.get(key).isJsonArray()) {
                              switch(key) {
-//                                 case "bundleEventTrack":
-//                                   request.get(key).getAsJsonArray().forEach(item -> {
-//                                       newBundleEventTracks.add(bundleEventTrackService.findByBundleEventTrackId(item.getAsLong()));
-//                                   });
-//                                   break;
                                  case "bundleDanceRole":
                                    request.get(key).getAsJsonArray().forEach(item -> {
                                       newDanceRoles.add(danceRoleService.findByDanceRoleId(item.getAsLong()));
@@ -223,8 +211,6 @@ public class BundleService {
                           }
                           break;
                       case "multiselectInfo":
-//                          log.info("eventPartKey, {}", key);
-//                          log.info("eventPartKey, {}", request.get(key));
                           if (request.get(key) != null && request.get(key).isJsonArray()) {
                               if (key.equals("bundleSpecial")) {
                                   request.get(key).getAsJsonArray().forEach(item -> {

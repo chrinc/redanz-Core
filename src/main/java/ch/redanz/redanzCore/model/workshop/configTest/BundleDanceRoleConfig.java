@@ -27,9 +27,6 @@ public enum BundleDanceRoleConfig {
 
   public static void setup(BundleService bundleService, DanceRoleService danceRoleService) {
     for (BundleDanceRoleConfig bundleDanceRoleConfig : BundleDanceRoleConfig.values()) {
-//      log.info("inc@setubBundleDance getBundleConfig().getName(): " + bundleDanceRoleConfig.getBundleConfig().getName());
-//      log.info("inc@setubBundleDance getDanceRoleConfig().getName(): " + bundleDanceRoleConfig.getDanceRoleConfig().getName());
-//      log.info("inc@setubBundleDance Roles");
       Bundle bundle = bundleService.findByName(bundleDanceRoleConfig.getBundleConfig().getName());
       DanceRole danceRole = danceRoleService.findByName(bundleDanceRoleConfig.getDanceRoleConfig().getName());
 //      track.getTrackDanceRoles().add(danceRole);

@@ -30,7 +30,6 @@ public class EODMatchingJob {
   public void runMatching() {
     eventService.getActiveEventsFuture().forEach(event -> {
       if (baseParService.doEODMatching(event)) {
-        log.info("Job: runMatching");
         registrationService.updateSoldOut(event);
         registrationMatchingService.doMatching(event);
       }

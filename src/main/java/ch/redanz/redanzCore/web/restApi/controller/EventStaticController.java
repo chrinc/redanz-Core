@@ -369,12 +369,7 @@ public class EventStaticController {
     @RequestBody String jsonString
   ) {
     try {
-      log.info("inc@upsertBaseParData");
-      log.info("inc@upsert, jsonArray: {}", jsonString);
-//      log.info("inc@upsert, object: {} ", jsonArray.get(0));
       JsonArray jsonArray = JsonParser.parseString(jsonString).getAsJsonArray();
-      log.info("inc@upsert, object: {} ", jsonArray.get(0));
-
       baseParService.upsert(jsonArray);
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);

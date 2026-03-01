@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
+import ch.redanz.redanzCore.model.profile.api.FieldPropertyDto;
 import ch.redanz.redanzCore.model.profile.entities.*;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.profile.service.*;
@@ -40,6 +41,7 @@ public class ProfileController {
   private final LanguageService languageService;
   private final ErrorLogService errorLogService;
   private final EventService eventService;
+  private final FieldPropertyService fieldPropertyService;
 
   @Autowired
   private Environment environment;
@@ -77,7 +79,6 @@ public class ProfileController {
   public void resetPasswordRequest(
     @RequestParam("email") String email
   ) {
-//    log.info("email: "+ email);
     try {
       User user = userService.getUser(email);
       if (user == null) {
@@ -243,6 +244,26 @@ public class ProfileController {
   ) {
     try {
       personService.findByUser(userService.findByUserId(userId)).setPersonLang(languageService.findLanguageByLanguageKey(languageKey.toUpperCase()));
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/field/property/list")
+  @Transactional
+  public List<FieldPropertyDto> fieldProperties() {
+    try {
+      return fieldPropertyService.findAllEnriched();
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/displayed-columns")
+  @Transactional
+  public List<String> displayedColumns() {
+    try {
+      return fieldPropertyService.displayedColumns();
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }

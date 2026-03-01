@@ -82,8 +82,6 @@ public class EventController {
     @RequestParam("eventId") Long eventId,
     @RequestParam("eventPartKey") String eventPartKey
   ) {
-    // log.info(eventPartKey);
-    // log.info(eventId.toString());
     EventPartInfo eventPartInfo = eventPartService.findByEventAndEventPart(
       eventService.findByEventId(eventId)
       ,eventPartService.findByKey(eventPartKey)
@@ -96,9 +94,6 @@ public class EventController {
     @RequestParam("eventId") Long eventId,
     @RequestParam("eventPartKey") String eventPartKey
   ) {
-//    log.info("evnPartData");
-//    log.info("eventPartKey");
-    // log.info(eventPartKey);
     return eventPartService.getEventPartInfoData(
       eventPartService.findByEventAndEventPart(eventService.findByEventId(eventId)
         , eventPartService.findByKey(eventPartKey)
@@ -385,7 +380,6 @@ public class EventController {
   ) {
     try {
       JsonObject jsonEventDiscountObject = JsonParser.parseString(jsonObject).getAsJsonObject();
-//      log.info(jsonEventDiscountObject.toString());
       bundleEventTrackService.updateBundleEventTrack(
         jsonEventDiscountObject,
         bundleService.findByBundleId(jsonEventDiscountObject.get("bundleId").getAsLong())
@@ -471,7 +465,6 @@ public class EventController {
 
   @GetMapping(path = "/all")
   public List<Event> getAllEvents() {
-//    log.info(eventService.getAllEvents().toString());
     return eventService.getAllEvents();
   }
 
@@ -616,7 +609,6 @@ public class EventController {
     @RequestBody String jsonObject
   ) {
     try {
-//      log.info(JsonParser.parseString(jsonObject).getAsJsonObject().toString());
       eventService.updateEvent(
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
@@ -802,8 +794,6 @@ public class EventController {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
       Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-//      log.info(request.toString());
-//      log.info(id.toString());
       if (id != null && id != 0 && eventRegistrationService.discountIsUsedAndHasRegistration(discountService.findByDiscountId(id))) {
         throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
       } else {

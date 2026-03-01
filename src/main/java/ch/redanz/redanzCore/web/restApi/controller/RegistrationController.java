@@ -287,24 +287,16 @@ public class RegistrationController {
 
       // match
       if (baseParService.doAutoMatch(registration.getEvent())) {
-//        log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
-//        log.info("bfr doMatching");
         registrationMatchingService.doMatching(registration);
       }
 
-//      log.info("inc@update Registration 3");
-//      log.info("bfr release");
       // release
       if (baseParService.doAutoRelease(registration.getEvent())) {
-//      log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
-//      log.info("bfr doRelease");
         registrationReleaseService.doRelease(registration);
-//      log.info("bfr updateSoldOut");
         registrationService.updateSoldOut(event);
       }
-//      log.info("inc@update Registration 4");
 
     } catch (ApiRequestException apiRequestException) {
       errorLogService.addLog("registrationUpdate", apiRequestException.getMessage());
@@ -313,7 +305,6 @@ public class RegistrationController {
       errorLogService.addLog("registrationUpdate", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_SUBMIT_GE.getOutTextKey());
     }
-//      log.info("inc@update Registration 5");
   }
 
   @PostMapping(path = "/staff/update")
@@ -397,7 +388,6 @@ public class RegistrationController {
     @RequestBody String guestJsonObject
   ) {
     try {
-      // log.info("remove guest");
       Event event = eventService.findByEventId(eventId);
       guestService.removeGuest(JsonParser.parseString(guestJsonObject).getAsJsonObject(), event);
     } catch (ApiRequestException apiRequestException) {
@@ -416,7 +406,6 @@ public class RegistrationController {
     @RequestBody String guestJsonObject
   ) {
     try {
-      // log.info("remove guest");
       Event event = eventService.findByEventId(eventId);
       checkInService.checkInRequest(JsonParser.parseString(guestJsonObject).getAsJsonObject());
     } catch (ApiRequestException apiRequestException) {
@@ -435,7 +424,6 @@ public class RegistrationController {
     @RequestBody String guestJsonObject
   ) {
     try {
-      // log.info("remove guest");
       Event event = eventService.findByEventId(eventId);
       checkInService.resetCheckInRequest(JsonParser.parseString(guestJsonObject).getAsJsonObject());
     } catch (ApiRequestException apiRequestException) {

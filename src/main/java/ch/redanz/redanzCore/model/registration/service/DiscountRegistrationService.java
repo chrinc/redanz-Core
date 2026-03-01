@@ -87,7 +87,6 @@ public class DiscountRegistrationService {
   }
 
   public List<DiscountRegistration> discountRegistrations(Registration registration, JsonObject discountRegistrationRequest) {
-    // log.info(discountRegistrationRequest.toString());
     List<DiscountRegistration> discountRegistrations = new ArrayList<>();
     if (discountRegistrationRequest.get("discountRegistration") != null
       && !discountRegistrationRequest.get("discountRegistration").getAsJsonArray().isEmpty()) {
@@ -131,10 +130,7 @@ public class DiscountRegistrationService {
 
   public void updateDiscountRegistrationRequest(Registration registration, JsonObject request) {
     List<DiscountRegistration> requestDiscountRegistrations = discountRegistrations(registration, request);
-//    log.info("requestDiscountRegistrations, size {}", requestDiscountRegistrations.size());
     List<DiscountRegistration> discountRegistrationsNoCapacity = discountRegistrationsNoCapacity(registration);
-//    log.info("discountRegistrationsNoCapacity, size {}", discountRegistrationsNoCapacity.size());
-
 
     // delete in current if not in request
     discountRegistrationsNoCapacity.forEach(

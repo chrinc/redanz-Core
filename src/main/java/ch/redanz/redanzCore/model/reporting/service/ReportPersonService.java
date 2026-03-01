@@ -36,8 +36,9 @@ public class ReportPersonService {
           person.getUser() == null ? "NO USER" : person.getUser().getUserRole().toString(),
           person.getPersonLang().getLanguageKey(),
           person.getPersonId(),
-          person.getCountry().getId(),
-          person.getMobile()
+          person.getCountry() == null ? "" : person.getCountry().getSortName(),
+          person.getMobile(),
+          person.getPronouns()
         )
       );
     });
@@ -65,6 +66,7 @@ public class ReportPersonService {
           , outTextService.getOutTextMapByKey(registration.getParticipant().getCountry().getOutTextKey()).toString()
           , registration.getParticipant().getPersonLang().getLanguageKey()
           , registration.getDanceRole() == null ? null : registration.getDanceRole().getName()
+          , registration.getParticipant().getPronouns()
         )
       );
     });

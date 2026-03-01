@@ -148,9 +148,6 @@ public class FoodRegistrationService {
 
     // delete in current if not in request
     foodRegistrations.forEach(foodRegistration -> {
-      // log.info("foodRegistrations: " + foodRegistration.getFood().getName());
-
-      // log.info("foodRegistrations, is in other list?: " + hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
       if (!hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
         foodRegistrationRepo.deleteAllByRegistrationAndFoodAndSlot(registration, foodRegistration.getFood(), foodRegistration.getSlot());
       }
@@ -158,8 +155,6 @@ public class FoodRegistrationService {
 
     // add new from request
     requestFoodRegistrations.forEach(foodRegistration -> {
-      // log.info("requestFoodRegistrations: " + foodRegistration.getFood().getName());
-      // log.info("requestFoodRegistrations, is in other list?: " + hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot()));
       if (!hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
         save(registration, foodRegistration.getFood(), foodRegistration.getSlot());
       }

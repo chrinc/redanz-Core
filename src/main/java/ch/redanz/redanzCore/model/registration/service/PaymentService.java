@@ -106,8 +106,6 @@ public class PaymentService {
         price = matchingEventSpecial.get().getPrice();
       }
 
-      // log.info("Found special " + special + " with price " + price);
-
       totalAmount.addAndGet((int) price);
       specials.add(
         List.of(

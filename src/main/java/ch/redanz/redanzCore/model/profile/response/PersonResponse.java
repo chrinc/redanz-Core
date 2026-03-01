@@ -16,12 +16,13 @@ public class PersonResponse {
   private final String street;
   private final String postalCode;
   private final String city;
-  private final Long countryId;
+  private final String countryKey;
   private final String language;
   private final String mobile;
   private final Long personId;
   private final String email;
   private final String role;
+  private final String pronouns;
 
   @JsonCreator
   public PersonResponse(
@@ -30,12 +31,13 @@ public class PersonResponse {
     @JsonProperty("street") String street,
     @JsonProperty("postalCode") String postalCode,
     @JsonProperty("city") String city,
-    @JsonProperty("countryId") Long countryId,
+    @JsonProperty("country") String countryKey,
     @JsonProperty("language") String language,
     @JsonProperty("mobile") String mobile,
     @JsonProperty("personId") Long personId,
     @JsonProperty("email") String email,
-    @JsonProperty("role") String role
+    @JsonProperty("role") String role,
+    @JsonProperty("pronouns") String pronouns
   )
 
   {
@@ -44,11 +46,12 @@ public class PersonResponse {
     this.street = street;
     this.postalCode = postalCode;
     this.city = city;
-    this.countryId = countryId;
+    this.countryKey = countryKey;
     this.language = language;
     this.mobile = mobile;
     this.personId = personId;
     this.email = email;
     this.role = role;
+    this.pronouns = pronouns;
   }
 }

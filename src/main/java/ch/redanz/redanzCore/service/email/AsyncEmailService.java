@@ -14,7 +14,6 @@ public class AsyncEmailService {
 //  @Async
   public void sendEmail(MimeMessage msg) {
     try {
-//      log.info("other session to send?");
       Transport.send(msg);
     } catch (Exception e) {
       e.printStackTrace();
