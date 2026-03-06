@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public enum UserConfig {
 
   // PARTICIPANTS
-  FRANKY_USER("franky_user@gmail.com", "password", UserRole.PARTICIPANT, false, true),
+  FRANKY_USER("zeus522@gmail.com", "password", UserRole.PARTICIPANT, false, true),
   CLAUDIA_USER("claudia_user@gmail.com", "password", UserRole.PARTICIPANT, false, true),
   NORMA_USER("norma_user@gmail.com", "password", UserRole.PARTICIPANT, false, true),
   EDDIE_USER("eddie_user@gmail.com", "password", UserRole.PARTICIPANT, false, true),

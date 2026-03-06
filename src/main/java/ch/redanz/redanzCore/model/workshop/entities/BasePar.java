@@ -32,21 +32,27 @@ public class BasePar {
   @Column(name = "name")
   private String name;
 
+  @Column(name = "type")
+  private String type;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id")
   @JsonIgnore
   private Event event;
 
-  public BasePar(String val, String name, Event event) {
+
+  public BasePar(String val, String name, Event event, String type) {
     this.val = val;
     this.name = name;
     this.event = event;
+    this.type = type;
   }
 
   public Map<String, String> dataMap() {
     return new HashMap<>() {
       {
         put("val", val);
+        put("type", type);
       }
     };
   }

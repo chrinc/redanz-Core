@@ -29,9 +29,8 @@
             ${header}
         </p>
 
-        <!-- BASE MESSAGE -->
+        <!-- SPECIALS MESSAGE -->
         ${specials}
-        <br>
 
         <!-- BASE TEXT -->
         <p style="margin:0 0 15px 0; font-size:16px; line-height:22px;">
@@ -55,7 +54,15 @@
         </p>
 
         <p style="margin:0 0 15px 0; font-size:16px; line-height:22px;">
-            ${details} <a href="${loginLink}" style="color:#0000ee; text-decoration:none;">${account}</a>.
+            ${details}
+        </p>
+
+        <p style="margin:0 0 15px 0; font-size:16px; line-height:22px;">
+            ${registrationList}
+        </p>
+
+        <p style="margin:0 0 15px 0; font-size:16px; line-height:22px;">
+            ${details2} <a href="${loginLink}" style="color:#0000ee; text-decoration:none;">${account}</a>.
         </p>
 
         <!-- CLOSING LINE -->

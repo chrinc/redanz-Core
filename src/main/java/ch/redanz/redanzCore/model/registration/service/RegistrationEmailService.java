@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
@@ -7,6 +8,9 @@ import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationEmailRepo;
+import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
+import ch.redanz.redanzCore.model.workshop.config.EventPartConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.EventPartInfoConfig;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.email.EmailService;
@@ -133,9 +137,9 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,userService.emailIsTester(registration.getParticipant().getEmail())
-      ,!registration.getEvent().isActive()
-      ,null
+      , userService.emailIsTester(registration.getParticipant().getEmail())
+      , !registration.getEvent().isActive()
+      , null
     );
     update(
       new RegistrationEmail(registration, OffsetDateTime.now().toZonedDateTime())
@@ -145,7 +149,8 @@ public class RegistrationEmailService {
   public void sendEmailBookingConfirmation(
     Person person,
     RegistrationEmail registrationEmail,
-    Registration registration
+    Registration registration,
+    PaymentDetailsResponse paymentDetailsResponse
   ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
@@ -168,17 +173,41 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText().replace("{1}", eventService.findEventName(registration.getEvent()))
-    );
-    model.put("base",
-      outTextService.getOutTextByKeyAndLangKey(
-        OutTextConfig.LABEL_EMAIL_DONE_BASE_EN.getOutTextKey(),
-        languageKey
       ).getOutText()
     );
+    if (baseParService.bookletLink(registration.getEvent(), languageKey).isEmpty()) {
+      model.put("base",
+        outTextService.getOutTextByKeyAndLangKey(
+          OutTextConfig.LABEL_EMAIL_DONE_BASE_EN.getOutTextKey(),
+          languageKey
+        ).getOutText()
+      );
+    } else {
+      model.put("base",
+        outTextService.getOutTextByKeyAndLangKey(
+          OutTextConfig.LABEL_EMAIL_DONE_BASE_BOOKLET_READY_EN.getOutTextKey(),
+          languageKey
+        ).getOutText().replace(
+        "{1}"
+          , "<a href=\"" + baseParService.bookletLink(registration.getEvent(), languageKey)
+            + "\">" + outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_BOOKLET_EN.getOutTextKey(), languageKey).getOutText()
+            + "</a>"
+        )
+      );
+    }
     model.put("details",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_DETAILS01_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("registrationList",
+      getEmailOverview(registration, paymentDetailsResponse, languageKey)
+    );
+
+    model.put("details2",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_DETAILS02_EN.getOutTextKey(),
         languageKey
       ).getOutText()
     );
@@ -311,8 +340,9 @@ public class RegistrationEmailService {
           specialsHtml.append(" (<a href=\""
             + outTextService.getOutTextByKeyAndLangKey(url, languageKey).getOutText()
             + "\">"
-            + outTextService.getOutTextByKeyAndLangKey("LABEL_LINK", languageKey).getOutText()
-            + "</a>)");
+            + outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_LINK_EN.getOutTextKey(), languageKey).getOutText()
+            + "</a>)"
+            + "<br/><br/>");
         }
         specialsHtml.append("</div>");
       }
@@ -332,9 +362,9 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,userService.emailIsTester(person.getEmail())
-      ,!eventService.findIsActive(registration.getEvent())
-      ,null
+      , userService.emailIsTester(person.getEmail())
+      , !eventService.findIsActive(registration.getEvent())
+      , null
     );
     registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
@@ -427,9 +457,9 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,userService.emailIsTester(registration.getParticipant().getEmail())
-      ,!registration.getEvent().isActive()
-      ,null
+      , userService.emailIsTester(registration.getParticipant().getEmail())
+      , !registration.getEvent().isActive()
+      , null
     );
 
     registrationEmail.setReminderSentDate(OffsetDateTime.now().toZonedDateTime());
@@ -503,9 +533,9 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,userService.emailIsTester(registration.getParticipant().getEmail())
-      ,!registration.getEvent().isActive()
-      ,null
+      , userService.emailIsTester(registration.getParticipant().getEmail())
+      , !registration.getEvent().isActive()
+      , null
     );
     registrationEmail.setCancelledSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
@@ -599,9 +629,9 @@ public class RegistrationEmailService {
         languageKey
       ).getOutText(),
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-      ,userService.emailIsTester(registration.getParticipant().getEmail())
-      ,!eventService.findIsActive(registration.getEvent())
-      ,null
+      , userService.emailIsTester(registration.getParticipant().getEmail())
+      , !eventService.findIsActive(registration.getEvent())
+      , null
     );
 
     registrationEmail.setReleasedSentDate(OffsetDateTime.now().toZonedDateTime());
@@ -614,14 +644,14 @@ public class RegistrationEmailService {
       emailContent.get("subject") != null ?
         (
           !emailContent.get("subject").isJsonNull() ?
-          emailContent.get("subject").getAsString() : ""
+            emailContent.get("subject").getAsString() : ""
         )
         : "";
     String content =
       emailContent.get("content") != null ?
         (
           !emailContent.get("content").isJsonNull() ?
-          emailContent.get("content").getAsString() : ""
+            emailContent.get("content").getAsString() : ""
         )
         : "";
 
@@ -649,17 +679,17 @@ public class RegistrationEmailService {
     model.put("hostEmail", environment.getProperty("email.host.email"));
 
     model.put("content", content);
-      Template template = null;
-      try {
-        template = mailConfig.getTemplate("generic.ftl");
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+    Template template = null;
+    try {
+      template = mailConfig.getTemplate("generic.ftl");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
 
-      String languageKey =
-        receiver.getPersonLang() == null ?
+    String languageKey =
+      receiver.getPersonLang() == null ?
         languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
-          receiver.getPersonLang().getLanguageKey();
+        receiver.getPersonLang().getLanguageKey();
 
     model.put("regards",
       outTextService.getOutTextByKeyAndLangKey(
@@ -679,20 +709,20 @@ public class RegistrationEmailService {
         languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
     );
 
-      try {
-        emailService.sendEmail(
-          receiver.getEmail(),
-          subject,
-          FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
-          ,userService.emailIsTester(receiver.getEmail())
-          ,false
-          ,personService.findByUser(userService.findByUserId(senderUser)).getEmail()
-        );
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      } catch (TemplateException e) {
-        throw new RuntimeException(e);
-      }
+    try {
+      emailService.sendEmail(
+        receiver.getEmail(),
+        subject,
+        FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+        , userService.emailIsTester(receiver.getEmail())
+        , false
+        , personService.findByUser(userService.findByUserId(senderUser)).getEmail()
+      );
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (TemplateException e) {
+      throw new RuntimeException(e);
+    }
 
   }
 
@@ -704,4 +734,165 @@ public class RegistrationEmailService {
     }
   }
 
+  public String getEmailOverview(Registration registration, PaymentDetailsResponse paymentDetailsResponse, String languageKey) {
+    StringBuilder sb = new StringBuilder(2048);
+
+    sb.append("""
+        <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;">
+          <div style="border:1px solid #e6e6e6;border-radius:16px;padding:20px;">
+    """);
+
+    sb.append("<div style=\"font-size:20px;font-weight:700;margin:0 0 4px 0;\">")
+      .append(escapeHtml(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_YOUR_BOOKING_EN.getOutTextKey(), languageKey).getOutText()))
+      .append("</div>");
+
+    // optional small line showing paid/due breakdown
+    sb.append("<div style=\"color:#666;font-size:14px;margin:0 0 8px 0;\">")
+      .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_PAID_EN.getOutTextKey(), languageKey).getOutText() + ": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountPaid())))
+      .append(" &nbsp;|&nbsp; ")
+      .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_DUE_EN.getOutTextKey(), languageKey).getOutText() +": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountDue())))
+      .append("</div>");
+
+    // Sections (only render if present)
+
+    renderSection(sb, "", safePairs(paymentDetailsResponse.getItems()), false, languageKey, false, true, false);
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.SPECIAL.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getSpecials()), false, languageKey, true, false, false);
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.PRIVATE.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getPrivateClasses()), false, languageKey, true, false, false);
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.SOLIDARITY_FUND.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getDonation()), false, languageKey,true, false, false);
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.FOOD.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getFoodSlots()), false, languageKey, true, false, false);
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.DISCOUNT.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getDiscounts()), true, languageKey, true, false, true);
+
+    // Divider
+    sb.append("<div style=\"border-top:1px solid #222;margin:8px 0;\"></div>");
+
+    // Total
+    sb.append("<div style=\"display:flex;justify-content:space-between;align-items:flex-end;\">")
+      .append("<div style=\"font-size:16px;font-weight:700;\">Total</div>")
+      .append("<div style=\"font-size:16px;font-weight:700;\">")
+      .append(escapeHtml(chf(paymentDetailsResponse.getTotalAmount())))
+      .append("</div></div>");
+
+    sb.append("""
+          </div>
+        </div>
+    """);
+
+    return sb.toString();
+  }
+
+  /* ---------------- Rendering helpers ---------------- */
+
+  /**
+   * Renders a section with rows like "Label" .... "CHF 123.-"
+   * If asDiscounts=true, amounts are shown as "- CHF x.-"
+   */
+  private void renderSection(StringBuilder sb, String title, List<Pair> items, boolean asDiscounts, String languageKey, boolean hasTitle, boolean bold, boolean italic) {
+    if (items == null || items.isEmpty()) return;
+    if (hasTitle) {
+      sb.append("<div style=\"margin:14px 0 0 0;font-size:15px;font-weight:700;color:#111;\">")
+        .append(escapeHtml(title))
+        .append("</div>");
+    }
+
+    for (Pair it : items) {
+      if (it == null || isBlank(it.label) || it.amount == null) continue;
+
+      String humanizedLabel = asDiscounts ?
+        "- " + humanizeLabel(it.label, languageKey)
+        : humanizeLabel(it.label, languageKey);
+
+      sb.append("<div style=\"display:flex;justify-content:space-between;gap:16px;padding:3px 0;\">")
+        .append("<div style=\"color:#222"
+          + (bold ? ";font-weight:700" : "")
+          + (italic ? ";font-style:italic" : "")
+          + "\">")
+        .append(escapeHtml(humanizedLabel))
+        .append("</div>")
+        .append("<div style=\"white-space:nowrap;color:#222"
+          + (italic ? ";font-style:italic" : "")
+          +"\">")
+        .append(escapeHtml(chf(it.amount)))
+        .append("</div>")
+        .append("</div>");
+    }
+
+  }
+
+/* ---------------- Data shape helpers ----------------
+   Your response shows list-of-lists like [[Half Pass, 250]]
+   So we convert Object pairs into Pair(label, amount).
+*/
+
+  private List<Pair> safePairs(List<List<String>> raw) {
+    if (raw == null || raw.isEmpty()) return Collections.emptyList();
+
+    return raw.stream()
+      .map(this::toPair)
+      .filter(p -> p != null && !isBlank(p.label) && p.amount != null)
+      .toList();
+  }
+
+  private Pair toPair(List<String> row) {
+    if (row == null || row.size() < 2) return null;
+
+    String label = row.get(0) == null ? null : row.get(0).toString();
+
+    Long amount = null;
+    Object a = row.get(1);
+    if (a instanceof Long bd) amount = bd;
+    else if (a instanceof Number n) amount = Long.valueOf((long) n.doubleValue());
+    else if (a != null) {
+      try {
+        amount = Long.parseLong((String) a);
+      } catch (Exception ignore) { /* leave null */ }
+    }
+
+    return new Pair(label, amount);
+  }
+
+  private static Long coalesce(Long v) {
+    return v == null ? 0 : v;
+  }
+
+  /* ---------------- Formatting helpers ---------------- */
+
+  private static String chf(Long amount) {
+    if (amount == null) return "CHF 0.-";
+    return "CHF " + amount + ".-";
+  }
+
+  private static boolean isBlank(String s) {
+    return s == null || s.trim().isEmpty();
+  }
+
+  private static String escapeHtml(String s) {
+    if (s == null) return "";
+    return s.replace("&", "&amp;")
+      .replace("<", "&lt;")
+      .replace(">", "&gt;")
+      .replace("\"", "&quot;")
+      .replace("'", "&#39;");
+  }
+
+  /**
+   * Optional: map internal labels to nice display strings.
+   * Keep as-is if you don't need it.
+   */
+  private String humanizeLabel(String label, String langKey) {
+    if (label == null) return "";
+
+    return outTextService.outTextExists(label, langKey) ? outTextService.getOutTextByKeyAndLangKey(label, langKey).getOutText() : label;
+  }
+
+  /* ---------------- Minimal internal DTO for rendering ---------------- */
+
+  private class Pair {
+    final String label;
+    final Long amount;
+    Pair(String label, Long amount) {
+      this.label = label;
+      this.amount = amount;
+    }
+  }
 }
+

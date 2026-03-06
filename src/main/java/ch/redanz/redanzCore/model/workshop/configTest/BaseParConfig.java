@@ -12,21 +12,23 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum BaseParConfig {
-  DOAUTOMATCH("false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_AUTO_MATCH_EN.getOutTextKey()),
-  DOAUTORELEASE("false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_AUTO_RELEASE_EN.getOutTextKey()),
-  TESTMAILONLY( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_TEST_MAIL_ONLY_EN.getOutTextKey()),
-  DOEODCANCEL( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_CANCEL_EN.getOutTextKey()),
-  DOEODMATCHING( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_MATCHING_EN.getOutTextKey()),
-  DOEODRELEASE( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_RELEASE_EN.getOutTextKey()),
-  DOEODREMINDER( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_REMINDER_EN.getOutTextKey()),
-  REMINDERAFTERDAYS( "5", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_REMINDER_AFTER_DAYS_EN.getOutTextKey()),
-  CANCELAFTERDAYS( "3", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_CANCEL_AFTER_DAYS_EN.getOutTextKey()),
-  WAITLISTLENGTH( "2", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_WAIT_LIST_LENGTH_EN.getOutTextKey()),
+  DOAUTOMATCH("false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_AUTO_MATCH_EN.getOutTextKey(), "bool"),
+  DOAUTORELEASE("false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_AUTO_RELEASE_EN.getOutTextKey(), "bool"),
+  TESTMAILONLY( "true", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_TEST_MAIL_ONLY_EN.getOutTextKey(), "bool"),
+  DOEODCANCEL( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_CANCEL_EN.getOutTextKey(),"bool"),
+  DOEODMATCHING( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_MATCHING_EN.getOutTextKey(),"bool"),
+  DOEODRELEASE( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_RELEASE_EN.getOutTextKey(),"bool"),
+  DOEODREMINDER( "false", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_EOD_REMINDER_EN.getOutTextKey(),"bool"),
+  REMINDERAFTERDAYS( "5", EventConfig.REDANZ_EVENT,OutTextConfig.LABEL_BASE_PAR_REMINDER_AFTER_DAYS_EN.getOutTextKey(), "number"),
+  CANCELAFTERDAYS( "3", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_CANCEL_AFTER_DAYS_EN.getOutTextKey(),"number"),
+  WAITLISTLENGTH( "2", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_WAIT_LIST_LENGTH_EN.getOutTextKey(), "number"),
+  BOOKLETREADY( "[{\"EN\":\"https://www.redanz.ch/booklet_en.pdf\",\"GE\":\"https://www.redanz.ch/booklet_de.pdf\"}]", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_BOOKLET_LINK_EN.getOutTextKey(),"label"),
 ;
 
   private final String val;
   private final EventConfig event;
   private final String name;
+  private final String type;
 
   public static void setup(BaseParService baseParService, EventService eventService) {
 
@@ -39,7 +41,8 @@ public enum BaseParConfig {
           new BasePar(
             baseParConfig.val,
             baseParConfig.name,
-            eventService.findByName(baseParConfig.getEvent().getName())
+            eventService.findByName(baseParConfig.getEvent().getName()),
+            baseParConfig.type
           )
         );
       }
@@ -57,7 +60,8 @@ public enum BaseParConfig {
           new BasePar(
             baseParConfig.val,
             baseParConfig.name,
-            event
+            event,
+            baseParConfig.type
           )
         );
       }

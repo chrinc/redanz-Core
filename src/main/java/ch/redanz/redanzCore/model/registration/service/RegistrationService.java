@@ -1308,4 +1308,9 @@ public class RegistrationService {
       && !hostingService.hasHostRegistration(registration)
       && !volunteerService.hasVolunteerRegistration(registration);
   }
+
+
+  public boolean hasBundle(Registration registration) {
+    return registration.getBundle() != null;
+  }
 }

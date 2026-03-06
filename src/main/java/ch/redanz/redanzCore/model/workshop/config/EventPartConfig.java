@@ -24,7 +24,6 @@ public enum EventPartConfig {
     FOOD                ("food"             , OutTextConfig.LABEL_FOOD_INFO_EN.getOutTextKey()),
     ACCOMMODATION       ("accommodation"    , OutTextConfig.LABEL_ACCOMMODATION_INFO_EN.getOutTextKey()),
     VOLUNTEER           ("volunteer"        , OutTextConfig.LABEL_VOLUNTEER_INFO_EN.getOutTextKey()),
-    SCHOLARSHIP         ("scholarship"      , OutTextConfig.LABEL_SCHOLARSHIP_INFO_EN.getOutTextKey()),
     DONATION            ("donation"         , OutTextConfig.LABEL_DONATION_INFO_EN.getOutTextKey()),
     TERMS               ("terms"            , OutTextConfig.LABEL_TERMS_INFO_EN.getOutTextKey()),
     PRIVATE             ("private"          , OutTextConfig.LABEL_PRIVATE_INFO_EN.getOutTextKey()),

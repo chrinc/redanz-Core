@@ -27,13 +27,15 @@ public class EventPartService {
   public void save(EventPart eventPart) {
     eventPartRepo.save(eventPart);
   }
-   public EventPart findByKey(String key) {
+
+  public EventPart findByKey(String key) {
     return eventPartRepo.findByEventPartKey(key);
   }
 
-  public void save (EventPartInfo eventPartInfo) {
+  public void save(EventPartInfo eventPartInfo) {
     eventPartInfoRepo.save(eventPartInfo);
   }
+
   public EventPartInfo findByEventAndEventPart(Event event, EventPart eventPart) {
     return eventPartInfoRepo.findByEventAndEventPart(event, eventPart);
   }
@@ -50,6 +52,7 @@ public class EventPartService {
       .filter(map -> key.equals(map.get("key")))
       .forEach(map -> map.put("hide", "true"));
   }
+
   public boolean existsByKey(String eventPartKey) {
     return eventPartRepo.existsByEventPartKey(eventPartKey);
   }
@@ -57,23 +60,48 @@ public class EventPartService {
   public String terms(Event event) {
     return eventPartInfoRepo.findByEventAndEventPart(event, eventPartRepo.findByEventPartKey(EventPartConfig.TERMS.getEventPartKey())).getHintLink();
   }
+
   public List<Map<String, String>> getEventPartInfoSchema(EventPartInfo eventPartInfo) {
     List<Map<String, String>> eventPartInfoSchema = EventPartInfo.schema();
     eventPartInfoSchema.stream()
       .filter(map -> "title".equals(map.get("type")) && "plural".equals(map.get("key")))
       .forEach(map -> map.put("label", eventPartInfo.getEventPart().getName()));
 
-    if (!eventPartInfo.isTitleActive()) {hideSchemaItem(eventPartInfoSchema, "title");}
-    if (!eventPartInfo.isTitleExistActive()) {hideSchemaItem(eventPartInfoSchema, "titleExist");}
-    if (!eventPartInfo.isInvalidActive()) {hideSchemaItem(eventPartInfoSchema, "invalid");}
-    if (!eventPartInfo.isSubtitleActive()) {hideSchemaItem(eventPartInfoSchema, "subtitle");}
-    if (!eventPartInfo.isSubtitleLinkActive()) {hideSchemaItem(eventPartInfoSchema, "subtitleLink");}
-    if (!eventPartInfo.isHintActive()) {hideSchemaItem(eventPartInfoSchema, "hint");}
-    if (!eventPartInfo.isHintLinkActive()) {hideSchemaItem(eventPartInfoSchema, "hintLink");}
-    if (!eventPartInfo.isHint2Active()) {hideSchemaItem(eventPartInfoSchema, "hint2");}
-    if (!eventPartInfo.isHint2LinkActive()) {hideSchemaItem(eventPartInfoSchema, "hint2Link");}
+    if (!eventPartInfo.isTitleActive()) {
+      hideSchemaItem(eventPartInfoSchema, "title");
+    }
+    if (!eventPartInfo.isTitleExistActive()) {
+      hideSchemaItem(eventPartInfoSchema, "titleExist");
+    }
+    if (!eventPartInfo.isInvalidActive()) {
+      hideSchemaItem(eventPartInfoSchema, "invalid");
+    }
+    if (!eventPartInfo.isSubtitleActive()) {
+      hideSchemaItem(eventPartInfoSchema, "subtitle");
+    }
+    if (!eventPartInfo.isSubtitleLinkActive()) {
+      hideSchemaItem(eventPartInfoSchema, "subtitleLink");
+    }
+    if (!eventPartInfo.isHintActive()) {
+      hideSchemaItem(eventPartInfoSchema, "hint");
+    }
+    if (!eventPartInfo.isHintLinkActive()) {
+      hideSchemaItem(eventPartInfoSchema, "hintLink");
+    }
+    if (!eventPartInfo.isHint2Active()) {
+      hideSchemaItem(eventPartInfoSchema, "hint2");
+    }
+    if (!eventPartInfo.isHint2LinkActive()) {
+      hideSchemaItem(eventPartInfoSchema, "hint2Link");
+    }
 
     return eventPartInfoSchema;
+  }
+
+  public String eventPartTitleExist(Event event, String eventPartKey, String langKey) {
+    return outTextService.getOutTextByKeyAndLangKey(
+      eventPartInfoRepo.findByEventAndEventPart(event, findByKey(eventPartKey)).getTitleExist()
+      ,langKey).getOutText();
   }
 
   public void newBaseEventPartInfo(Event newEvent) {

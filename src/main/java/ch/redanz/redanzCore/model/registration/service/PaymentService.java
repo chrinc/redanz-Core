@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class PaymentService {
   private final FoodRegistrationRepo foodRegistrationRepo;
-  private final FoodService foodService;
   private final DonationRegistrationRepo donationRegistrationRepo;
   private final RegistrationService registrationService;
   private final WorkflowStatusService workflowStatusService;
@@ -46,7 +45,6 @@ public class PaymentService {
   private final EventService eventService;
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationPaymentRepo registrationPaymentRepo;
-  private final BundleService bundleService;
   private final EventDiscountRepo eventDiscountRepo;
 
 
@@ -254,27 +252,29 @@ public class PaymentService {
   }
 
   public void onPaymentReceived(Registration registration, Long amount) throws IOException, TemplateException {
-    if (amount > 0) {
 
       // Update payment stats
       updatePayment(registration, amount);
 
       // Update workflow
-      workflowTransitionService.setWorkflowStatus(
-        registration,
-        workflowStatusService.getDone()
-      );
+     if (amountDue(registration) == 0) {
 
-      // Email confirmation
-      registrationEmailService.sendEmailBookingConfirmation(
-        registration.getParticipant(),
-        registrationEmailService.findByRegistration(registration),
-        registration
-      );
+       workflowTransitionService.setWorkflowStatus(
+         registration,
+         workflowStatusService.getDone()
+       );
 
-      // Update SoldOut stats
-      registrationService.updateSoldOut(registration.getEvent());
-    }
+       // Email confirmation
+       registrationEmailService.sendEmailBookingConfirmation(
+         registration.getParticipant(),
+         registrationEmailService.findByRegistration(registration),
+         registration,
+         getPaymentDetails(registration)
+       );
+
+       // Update SoldOut stats
+       registrationService.updateSoldOut(registration.getEvent());
+     }
   }
   public void onPaymentConfirmed(JsonObject request) throws IOException, TemplateException {
     JsonObject transaction = request.get("transaction").getAsJsonObject();
