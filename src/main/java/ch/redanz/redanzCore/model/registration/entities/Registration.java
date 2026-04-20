@@ -1,6 +1,5 @@
 package ch.redanz.redanzCore.model.registration.entities;
 
-import ch.redanz.redanzCore.model.workshop.entities.Discount;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
 import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
@@ -63,14 +62,6 @@ public class Registration implements Serializable {
   private RegistrationType registrationType;
 
   private Boolean active;
-
-  @ManyToMany(cascade=CascadeType.ALL)
-  @JoinTable(
-    name="discount_registration",
-    joinColumns = @JoinColumn(name="registration_id"),
-    inverseJoinColumns = @JoinColumn(name="discount_id")
-  )
-  private List<Discount> discountList;
 
   public Registration(Event event, Bundle bundle, Person participant, RegistrationType registrationType) {
     this.event = event;

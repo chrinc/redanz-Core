@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.config.SlotType;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
@@ -13,9 +14,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,7 +29,6 @@ public class AccommodationService {
   private final FoodService foodService;
   private final OutTextService outTextService;
   private final EventRepo eventRepo;
-  private final EventTypeSlotService eventTypeSlotService;
 
   public AccommodationResponse getResponse(Event event) {
     return new AccommodationResponse(
@@ -59,7 +56,7 @@ public class AccommodationService {
   public void updateHosting(JsonObject request, Event event) throws IOException, TemplateException {
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    Set<Slot> newHostingDays = new HashSet<>();
+    Set<EventSlot> newHostingDays = new HashSet<>();
 
     getHostingSchema(event).forEach(
       stringStringMap -> {
@@ -121,10 +118,9 @@ public class AccommodationService {
               break;
 
             case "multiselect":
-
               if (request.get(key) != null && request.get(key).isJsonArray()) {
                 request.get(key).getAsJsonArray().forEach(item -> {
-                  newHostingDays.add(slotService.findBySlotId(item.getAsLong()));
+                  newHostingDays.add(slotService.findByEventSlotId(item.getAsLong()));
                 });
               }
               break;
@@ -139,43 +135,35 @@ public class AccommodationService {
       }
     );
     eventRepo.save(event);
-
-    List<Slot> existingHostingDays
-      = eventTypeSlotService.findByEventAndType(event, "accommodation").stream()
-      .map(EventTypeSlot::getTypeSlot)
-      .map(TypeSlot::getSlot)
-      .filter(Objects::nonNull) // Filter out any null slots, if necessary
-      .collect(Collectors.toList());
-
-    // Save new discounts
-    newHostingDays.stream()
-      .filter(hostingDay -> !existingHostingDays.contains(hostingDay))
-      .forEach(hostingDay -> slotService.save(new EventTypeSlot(slotService.findByTypeAndSlot("accommodation", hostingDay), event, hostingDay.getSeqNr())));
-
-    // Remove existing discounts not in new discounts
-    existingHostingDays.stream()
-      .filter(existingHostingDay -> !newHostingDays.contains(existingHostingDay))
-      .forEach(existingHostingDay -> {
-        EventTypeSlot eventTypeSlot = eventTypeSlotService.findByEventAndTypeSlot(event, slotService.findByTypeAndSlot("accommodation", existingHostingDay));
-        eventTypeSlotService.delete(eventTypeSlot);
-      });
+//
+//    List<EventSlot> existingHostingDays = slotService.getAllEventSlots(SlotType.ACCOMMODATION event);
+//
+//    // Save new discounts
+//    newHostingDays.stream()
+//      .filter(hostingDay -> !existingHostingDays.contains(hostingDay))
+//      .forEach(hostingDay -> event);
+//
+//    // Remove existing discounts not in new discounts
+//    existingHostingDays.stream()
+//      .filter(existingHostingDay -> !newHostingDays.contains(existingHostingDay))
+//      .forEach(existingHostingDay -> {
+//        EventSlot eventSlot = eventTypeSlotService.findByEventAndTypeSlot(event, slotService.findByTypeAndSlot("accommodation", existingHostingDay));
+//        eventTypeSlotService.delete(eventSlot);
+//      });
   }
 
   public void deleteHosting(JsonObject request, Event event) {
     event.setHosting(false);
     eventRepo.save(event);
-    eventTypeSlotService.deleteByEventAndType(event, "accommodation");
+//    eventTypeSlotService.deleteByEventAndType(event, "accommodation");
   }
 
   public List<Map<String, String>> getHostingSchema(Event event) {
       return new ArrayList<>() {
         {
           add(new HashMap<>() {{put("key", "id");            put("type", "id");             put("label", "id");}});
-          add(new HashMap<>() {{put("key", "hosting");       put("type", "bool");                                   put("labelTrue", "Enable Hosting"); put("labelFalse", "Disable Hosting");}});
-          add(new HashMap<>() {{put("key", "hostingDays");   put("type", "multiselect");  put("required", "false"); put("label", "Hosting Days");  put("list", getHostingDays().toString());}});
           add(new HashMap<>() {{put("key", "count");         put("type", "single");}});
           add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "accommodation");  put("label", OutTextConfig.LABEL_ACCOMMODATION_INFO_EN.getOutTextKey());}});
-//          add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "host");           put("label", OutTextConfig.LABEL_HOST_INFO_EN.getOutTextKey());}});
           add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostYes");        put("label", OutTextConfig.LABEL_HOSTYES_INFO_EN.getOutTextKey());}});
           add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostCount");      put("label", OutTextConfig.LABEL_HOSTCOUNT_INFO_EN.getOutTextKey());}});
           add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "hostDays");       put("label", OutTextConfig.LABEL_HOSTDAYS_INFO_EN.getOutTextKey());}});
@@ -195,10 +183,10 @@ public class AccommodationService {
       };
   }
 
-  public List<Map<String, String>> getHostingDays() {
-    return slotService.findAllByType("accommodation")
+  public List<Map<String, String>> getHostingDays(Event event) {
+    return slotService.getAllEventSlots(SlotType.ACCOMMODATION, event)
       .stream()
-      .map(typeSlot -> typeSlot.getSlot().dataMap())
+      .map(typeSlot -> typeSlot.dataMap())
       .collect(Collectors.toList());
   }
 
@@ -214,8 +202,8 @@ public class AccommodationService {
     return hostingData;
   }
 
-  public List<EventTypeSlot> eventHostingList (Event event) {
-    return eventTypeSlotService.findByEventAndType(event, "accommodation");
+  public List<EventSlot> eventHostingList (Event event) {
+    return slotService.getAllEventSlots(SlotType.ACCOMMODATION, event );
   }
 
   public Map<String, String> dataMap(Event event) {
@@ -223,7 +211,7 @@ public class AccommodationService {
       {
         put("id", String.valueOf(event.getEventId()));
         put("hosting", String.valueOf(event.isHosting()));
-        put("hostingDays", slotService.getAllSlots("accommodation", event).stream().map(slot -> slot.getSlotId()).collect(Collectors.toList()).toString());
+        put("hostingDays", eventHostingList(event).stream().map(eventSlot -> eventSlot.getEventSlotId()).collect(Collectors.toList()).toString());
       }
     };
   }

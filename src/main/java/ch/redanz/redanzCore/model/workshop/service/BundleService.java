@@ -111,7 +111,7 @@ public class BundleService {
         Bundle bundle;
         boolean isNew = false;
         AtomicInteger capacity = new AtomicInteger();
-        Set<Slot> newPartySlots = new HashSet<>();
+        Set<EventSlot> newPartySlots = new HashSet<>();
         Set<EventSpecial> newEventSpecials = new HashSet<>();
         Set<BundleEventTrack> newBundleEventTracks = new HashSet<>();
         Set<DanceRole> newDanceRoles = new HashSet<>();
@@ -193,7 +193,7 @@ public class BundleService {
                       case "multiselect":
                           if (request.get(key) != null && request.get(key).isJsonArray()) {
                               request.get(key).getAsJsonArray().forEach(item -> {
-                                  newPartySlots.add(slotService.findBySlotId(item.getAsLong()));
+                                  newPartySlots.add(slotService.findByEventSlotId(item.getAsLong()));
                               });
                           }
                           break;
@@ -263,7 +263,7 @@ public class BundleService {
     public Bundle clone(Event event, Bundle baseBundle, Map<BundleEventTrack, EventTrack> baseBundleEventTrackNewEventTrackMap) {
 
         String description = outTextService.clone(baseBundle.getDescription());
-        Set<Slot> newPartySlots = new HashSet<>(baseBundle.getPartySlots());
+        Set<EventSlot> newPartySlots = new HashSet<>(baseBundle.getPartySlots());
         Bundle newBundle = new Bundle(
           baseBundle.getName() + " [Clone]",
           baseBundle.getPrice(),
@@ -277,13 +277,6 @@ public class BundleService {
 
         // Clone Event Specials
         Set<EventSpecial> newEventSpecials = new HashSet<>(event.getEventSpecials());
-        Set<Special> oldSpecials = baseBundle.getEventSpecials().stream()
-          .map(EventSpecial::getSpecial)
-          .collect(Collectors.toSet());
-
-        newEventSpecials.stream()
-          .filter(eventSpecial -> oldSpecials.contains(eventSpecial.getSpecial()))
-          .collect(Collectors.toSet());
         newBundle.setEventSpecials(newEventSpecials);
 
         // Clone Tracks
@@ -360,7 +353,7 @@ public class BundleService {
     }
     public List<Long> partySlotIds(Bundle bundle) {
         return bundle.getPartySlots().stream()
-          .map(Slot::getSlotId)
+          .map(EventSlot::getEventSlotId)
           .collect(Collectors.toList());
     }
 

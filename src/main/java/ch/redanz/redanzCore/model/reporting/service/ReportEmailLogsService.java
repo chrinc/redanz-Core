@@ -25,11 +25,6 @@ public class ReportEmailLogsService {
 
   public List<ResponseEmailLogs> getEmailLogs(Event event) {
     List<ResponseEmailLogs> responseEmailLogs = new ArrayList<>();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-    // hack hack hack @todo: change timestamps to timezone.
-    Integer timeDifference = 2;
-
     registrationService.findAllByEvent(event).forEach(registration -> {
         RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
         responseEmailLogs.add(

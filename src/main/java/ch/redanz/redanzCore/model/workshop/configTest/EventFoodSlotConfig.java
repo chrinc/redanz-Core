@@ -1,10 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.configTest;
 
-import ch.redanz.redanzCore.model.workshop.config.SlotConfig;
+import ch.redanz.redanzCore.model.workshop.config.EventSlotConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
-import ch.redanz.redanzCore.model.workshop.service.FoodService;
-import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,21 +12,21 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum EventFoodSlotConfig {
-  SAT_VARIETY(EventConfig.REDANZ_EVENT, FoodConfig.FOOD_VARIETY, SlotConfig.SLOT_SATURDAY_LUNCH, 25, 1),
-  SUN_ORIENTAL(EventConfig.REDANZ_EVENT, FoodConfig.FOOD_ORIENTAL, SlotConfig.SLOT_SUNDAY_LUNCH, 15, 2);
+  SAT_VARIETY(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_FOOD_ORIENTAL_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FOOD_ORIENTAL_DESC_EN.getOutTextKey(), EventSlotConfig.SLOT_SATURDAY_LUNCH, 25, 1),
+  SUN_ORIENTAL(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_FOOD_VARIETY_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_FOOD_VARIETY_DESC_EN.getOutTextKey(), EventSlotConfig.SLOT_SUNDAY_LUNCH, 15, 2);
 
   private final EventConfig eventConfig;
-  private final FoodConfig foodConfig;
-  private final SlotConfig slotConfig;
+  private final String name;
+  private final String description;
+  private final EventSlotConfig eventSlotConfig;
   private final double price;
   private final int sequence;
 
-  public static void setup(EventService eventService, FoodService foodService, SlotService slotService) {
+  public static void setup(EventService eventService, SlotService slotService) {
     for (EventFoodSlotConfig eventFoodSlotConfig : EventFoodSlotConfig.values()) {
       Event event = eventService.findByName(eventFoodSlotConfig.eventConfig.getName());
-      Food food = foodService.findByName(eventFoodSlotConfig.foodConfig.getName());
-      Slot slot = slotService.findByName(eventFoodSlotConfig.slotConfig.getName());
-      eventService.save(new EventFoodSlot(food, slot, event, eventFoodSlotConfig.price, eventFoodSlotConfig.sequence));
+      EventSlot eventSlot = slotService.findEventSlotByName(eventFoodSlotConfig.eventSlotConfig.getName());
+      eventService.save(new EventFoodSlot(eventFoodSlotConfig.name, eventFoodSlotConfig.description, eventSlot, event, eventFoodSlotConfig.price, eventFoodSlotConfig.sequence));
     }
   }
 }

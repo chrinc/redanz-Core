@@ -27,18 +27,14 @@ import java.util.stream.Collectors;
 public class FoodRegistrationService {
   private final FoodRegistrationRepo foodRegistrationRepo;
   private final FoodService foodService;
-  private final SlotService slotService;
   private final WorkflowStatusService workflowStatusService;
   private final OutTextService outTextService;
-  private final SpecialRegistrationRepo specialRegistrationRepo;
-  private final DiscountRegistrationRepo discountRegistrationRepo;
 
-  public void save(Registration registration, Food food, Slot slot) {
+  public void save(Registration registration, EventFoodSlot eventFoodSlot) {
     foodRegistrationRepo.save(
       new FoodRegistration(
         registration,
-        food,
-        slot
+        eventFoodSlot
       )
     );
   }
@@ -55,24 +51,24 @@ public class FoodRegistrationService {
     return registrations;
   }
 
-  public Boolean hasRegistrations(Food food, Boolean active) {
+  public Boolean hasRegistrations(EventFoodSlot eventFoodSlot, Boolean active) {
     return foodRegistrationRepo
       .findAllByRegistrationActive(active)
       .stream()
-      .anyMatch(fr -> fr.getFood().equals(food));
+      .anyMatch(fr -> fr.getEventFoodSlot().equals(eventFoodSlot));
   }
-  public Boolean hasRegistrations(Event event, Food food, Boolean active) {
+  public Boolean hasRegistrations(Event event, EventFoodSlot eventFoodSlot, Boolean active) {
     return foodRegistrationRepo
       .findAllByRegistrationEventAndRegistrationActive(event, active)
       .stream()
-      .anyMatch(fr -> fr.getFood().equals(food));
+      .anyMatch(fr -> fr.getEventFoodSlot().equals(eventFoodSlot));
   }
 
   public String getReportFoodSlots(Registration registration) {
     Map<String, StringBuilder> merged = new HashMap<>();
     foodRegistrationRepo.findAllByRegistration(registration).forEach(fr -> {
       List<Map<String, String>> slotOutText =
-        outTextService.getOutTextMapByKey(fr.getSlot().getName());
+        outTextService.getOutTextMapByKey(fr.getEventFoodSlot().getName());
       if (slotOutText == null || slotOutText.isEmpty()) return;
       Map<String, String> map = slotOutText.get(0); // your structure
 
@@ -88,7 +84,6 @@ public class FoodRegistrationService {
 
   public List<FoodRegistration> foodRegistrations(Registration registration, JsonObject foodRegistrationRequest) {
     List<FoodRegistration> foodRegistrations = new ArrayList<>();
-
     if (foodRegistrationRequest.get("foodRegistration") != null
       && !foodRegistrationRequest.get("foodRegistration").getAsJsonArray().isEmpty()) {
       JsonArray foodSlotsJson = foodRegistrationRequest.get("foodRegistration")
@@ -100,8 +95,7 @@ public class FoodRegistrationService {
         foodRegistrations.add(
           new FoodRegistration(
             registration,
-            foodService.findByFoodId(foodSlot.getAsJsonObject().get("food").getAsJsonObject().get("foodId").getAsLong()),
-            slotService.findBySlotId(foodSlot.getAsJsonObject().get("slot").getAsJsonObject().get("slotId").getAsLong())
+            foodService.findEventFoodSlotById(foodSlot.getAsJsonObject().get("eventFoodSlotId").getAsLong())
           )
         );
       });
@@ -109,32 +103,32 @@ public class FoodRegistrationService {
     return foodRegistrations;
   }
 
-  public int countFoodSlotSubmitted(Food food, Slot slot, Event event){
-    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-      food, slot, workflowStatusService.getSubmitted(), event
+  public int countFoodSlotSubmitted(EventFoodSlot eventFoodSlot, Event event){
+    return foodRegistrationRepo.countAllByEventFoodSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      eventFoodSlot, workflowStatusService.getSubmitted(), event
     );
   }
-  public int countFoodSlotConfirming(Food food, Slot slot, Event event){
-    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-      food, slot, workflowStatusService.getConfirming(), event
+  public int countFoodSlotConfirming(EventFoodSlot eventFoodSlot, Event event){
+    return foodRegistrationRepo.countAllByEventFoodSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      eventFoodSlot, workflowStatusService.getConfirming(), event
     );
   }
-  public int countFoodSlotDone(Food food, Slot slot, Event event){
-    return foodRegistrationRepo.countAllByFoodAndAndSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
-      food, slot, workflowStatusService.getDone(), event
+  public int countFoodSlotDone(EventFoodSlot eventFoodSlot, Event event){
+    return foodRegistrationRepo.countAllByEventFoodSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      eventFoodSlot, workflowStatusService.getDone(), event
     );
   }
-  public int countFoodSlotConfirmingAndDone(Food food, Slot slot, Event event) {
-    return countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
+  public int countFoodSlotConfirmingAndDone(EventFoodSlot eventFoodSlot, Event event) {
+    return countFoodSlotConfirming(eventFoodSlot, event) + countFoodSlotDone(eventFoodSlot, event);
   }
-  public int countFoodSlotSubmittedConfirmingAndDone(Food food, Slot slot, Event event) {
-    return countFoodSlotSubmitted(food, slot, event) + countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event);
+  public int countFoodSlotSubmittedConfirmingAndDone(EventFoodSlot eventFoodSlot, Event event) {
+    return countFoodSlotSubmitted(eventFoodSlot, event) + countFoodSlotConfirming(eventFoodSlot, event) + countFoodSlotDone(eventFoodSlot, event);
   }
 
-  private boolean hasFoodRegistration(List<FoodRegistration> foodRegistrations, Food food, Slot slot) {
+  private boolean hasFoodRegistration(List<FoodRegistration> foodRegistrations, EventFoodSlot eventFoodSlot) {
     AtomicBoolean hasFoodRegistration = new AtomicBoolean(false);
     foodRegistrations.forEach(foodRegistration -> {
-      if (foodRegistration.getFood() == food && foodRegistration.getSlot() == slot) {
+      if (foodRegistration.getEventFoodSlot() == eventFoodSlot) {
         hasFoodRegistration.set(true);
       }
     });
@@ -148,15 +142,15 @@ public class FoodRegistrationService {
 
     // delete in current if not in request
     foodRegistrations.forEach(foodRegistration -> {
-      if (!hasFoodRegistration(requestFoodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
-        foodRegistrationRepo.deleteAllByRegistrationAndFoodAndSlot(registration, foodRegistration.getFood(), foodRegistration.getSlot());
+      if (!hasFoodRegistration(requestFoodRegistrations, foodRegistration.getEventFoodSlot())){
+        foodRegistrationRepo.deleteAllByRegistrationAndEventFoodSlot(registration, foodRegistration.getEventFoodSlot());
       }
     });
 
     // add new from request
     requestFoodRegistrations.forEach(foodRegistration -> {
-      if (!hasFoodRegistration(foodRegistrations, foodRegistration.getFood(), foodRegistration.getSlot())){
-        save(registration, foodRegistration.getFood(), foodRegistration.getSlot());
+      if (!hasFoodRegistration(foodRegistrations, foodRegistration.getEventFoodSlot())){
+        save(registration, foodRegistration.getEventFoodSlot());
       }
     });
   }
@@ -165,25 +159,25 @@ public class FoodRegistrationService {
     return foodRegistrationRepo.findAllByRegistration(registration);
   }
 
-  public List<String> countFoodSlotSubmittedAsList(Food food, Slot slot, Event event){
+  public List<String> countFoodSlotSubmittedAsList(EventFoodSlot eventFoodSlot, Event event){
     List<String> foodList = new ArrayList<>();
-    foodList.add(String.valueOf(countFoodSlotSubmitted(food, slot, event)));
+    foodList.add(String.valueOf(countFoodSlotSubmitted(eventFoodSlot, event)));
     return foodList;
 
   }
-  public List<String>  countFoodSlotConfirmingAsList(Food food, Slot slot, Event event){
+  public List<String>  countFoodSlotConfirmingAsList(EventFoodSlot eventFoodSlot, Event event){
     List<String> foodList = new ArrayList<>();
-    foodList.add(String.valueOf(countFoodSlotConfirming(food, slot, event)));
+    foodList.add(String.valueOf(countFoodSlotConfirming(eventFoodSlot, event)));
     return foodList;
   }
-  public List<String> countFoodSlotDoneAsList(Food food, Slot slot, Event event){
+  public List<String> countFoodSlotDoneAsList(EventFoodSlot eventFoodSlot, Event event){
     List<String> foodList = new ArrayList<>();
-    foodList.add(String.valueOf(countFoodSlotDone(food, slot, event)));
+    foodList.add(String.valueOf(countFoodSlotDone(eventFoodSlot, event)));
     return foodList;
   }
-  public List<String> countFoodSlotSubmittedConfirmingAndDoneAsList(Food food, Slot slot, Event event) {
+  public List<String> countFoodSlotSubmittedConfirmingAndDoneAsList(EventFoodSlot eventFoodSlot, Event event) {
     List<String> foodList = new ArrayList<>();
-    foodList.add(String.valueOf(countFoodSlotSubmitted(food, slot, event) + countFoodSlotConfirming(food, slot, event) + countFoodSlotDone(food, slot, event)));
+    foodList.add(String.valueOf(countFoodSlotSubmitted(eventFoodSlot, event) + countFoodSlotConfirming(eventFoodSlot, event) + countFoodSlotDone(eventFoodSlot, event)));
     return foodList;
   }
 }

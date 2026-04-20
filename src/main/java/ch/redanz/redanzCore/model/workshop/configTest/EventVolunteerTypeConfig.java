@@ -1,9 +1,9 @@
 package ch.redanz.redanzCore.model.workshop.configTest;
 
-import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.VolunteerType;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,38 +14,21 @@ import java.util.Map;
 
 @Slf4j
 @Getter
+@AllArgsConstructor
 public enum EventVolunteerTypeConfig {
-  EVENT_TWO_HOURS(EventConfig.REDANZ_EVENT, VolunteerTypeConfig.TWO_HOURS),
-  EVENT_FIVE_HOURS(EventConfig.REDANZ_EVENT, VolunteerTypeConfig.FIVE_HOURS),
-  EVENT_NO_PREF_HOURS(EventConfig.REDANZ_EVENT, VolunteerTypeConfig.NO_PREFS);
+  EVENT_TWO_HOURS(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_VOL_TYPE_FOUR_HOURS_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_VOL_TYPE_FOUR_HOURS_DESC_EN.getOutTextKey()),
+  EVENT_FIVE_HOURS(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_VOL_TYPE_FIVE_HOURS_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_VOL_TYPE_FIVE_HOURS_DESC_EN.getOutTextKey()),
+  EVENT_NO_PREF_HOURS(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_VOL_TYPE_NO_PREF_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_VOL_TYPE_NO_PREF_DESC_EN.getOutTextKey());
 
   private final EventConfig eventConfig;
-  private final VolunteerTypeConfig volunteerTypeConfig;
+  private final String name;
+  private final String description;
 
 
-  EventVolunteerTypeConfig(EventConfig eventConfig, VolunteerTypeConfig volunteerTypeConfig) {
-    this.eventConfig = eventConfig;
-    this.volunteerTypeConfig = volunteerTypeConfig;
-  }
-
-  public static void setup(EventService eventService, VolunteerService volunteerService) {
-    Map<Long, List<VolunteerType>> eventVolunteerTypeMap = new HashMap<>();
-
+  public static void setup(EventService eventService) {
     for (EventVolunteerTypeConfig eventVolunteerTypeConfig : EventVolunteerTypeConfig.values()) {
-      Event myEvent = eventService.findByName(eventVolunteerTypeConfig.getEventConfig().getName());
-      VolunteerType volunteerType = volunteerService.findTypeByName(eventVolunteerTypeConfig.volunteerTypeConfig.getName());
-      if (eventVolunteerTypeMap.containsKey(myEvent.getEventId())) {
-        eventVolunteerTypeMap.get(myEvent.getEventId()).add(volunteerType);
-      } else {
-        List<VolunteerType> myTypes = new ArrayList<>();
-        myTypes.add(volunteerType);
-        eventVolunteerTypeMap.put(myEvent.getEventId(), myTypes);
-      }
+      Event event = eventService.findByName(eventVolunteerTypeConfig.getEventConfig().getName());
+      eventService.save(new VolunteerType(eventVolunteerTypeConfig.getName(), eventVolunteerTypeConfig.getDescription(), event));
     }
-    eventVolunteerTypeMap.keySet().forEach(eventId -> {
-      Event myEvent = eventService.findByEventId(eventId);
-      myEvent.setVolunteerTypes(eventVolunteerTypeMap.get(eventId));
-      eventService.save(myEvent);
-    });
   }
 }

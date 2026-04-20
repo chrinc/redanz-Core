@@ -4,9 +4,6 @@ import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,13 +21,6 @@ public class Event implements Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "event_id")
   private Long eventId;
-
-  @ManyToMany
-  @JoinTable(
-    name = "event_volunteer_type",
-    joinColumns = @JoinColumn(name = "event_id"),
-    inverseJoinColumns = @JoinColumn(name = "volunteer_type_id"))
-  private List<VolunteerType> volunteerTypes;
 
   private String name;
 
@@ -72,11 +62,14 @@ public class Event implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventDiscount> eventDiscounts;
 
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  private Set<VolunteerType> volunteerTypes;
+
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventBundle> eventBundles;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
-  private Set<EventTypeSlot> eventTypeSlots;
+  private Set<EventSlot> eventSlots;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
   private Set<EventFoodSlot> eventFoodSlots;
@@ -105,7 +98,6 @@ public class Event implements Serializable {
     boolean hosting,
     boolean volunteering,
     boolean scholarship,
-    List<VolunteerType> volunteerTypes,
     boolean requireTerms
   ) {
     this.name = name;
@@ -119,7 +111,6 @@ public class Event implements Serializable {
     this.hosting = hosting;
     this.volunteering = volunteering;
     this.scholarship = scholarship;
-    this.volunteerTypes = volunteerTypes;
     this.requireTerms = requireTerms;
   }
 
@@ -133,18 +124,23 @@ public class Event implements Serializable {
         add(new HashMap<>() {{put("key", "registrationStart");    put("type", "datetime");    put("required", "true");   put("label", "Registration Start");}});
         add(new HashMap<>() {{put("key", "active");               put("type", "bool");                                   put("labelTrue", "Active");              put("labelFalse", "Inactive"); }});
         add(new HashMap<>() {{put("key", "archived");             put("type", "bool");                                   put("labelTrue", "Archived");            put("labelFalse", "Not Archived"); }});
+        add(new HashMap<>() {{put("key", "volunteering");         put("type", "bool");                                   put("labelTrue", "Volunteering");            put("labelFalse", "No Volunteering"); }});
+        add(new HashMap<>() {{put("key", "hosting");              put("type", "bool");                                   put("labelTrue", "Hosting");            put("labelFalse", "No Hosting"); }});
+        add(new HashMap<>() {{put("key", "scholarship");          put("type", "bool");                                   put("labelTrue", "Scholarship");            put("labelFalse", "No Scholarship"); }});
+        add(new HashMap<>() {{put("key", "requireTerms");         put("type", "bool");                                   put("labelTrue", "Terms");            put("labelFalse", "No Terms"); }});
         add(new HashMap<>() {{put("key", "description");          put("type", "text");        put("required", "false");  put("label", "Description");}});
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                     put("label", "id");}});
         add(new HashMap<>() {{put("key", "isEdit");               put("type", "isEdit");                                 put("label", "");}});
         add(new HashMap<>() {{put("key", "bundle");               put("type", "attribute");                              put("label", "Bundles");}});
         add(new HashMap<>() {{put("key", "track");                put("type", "attribute");                              put("label", "Tracks");}});
         add(new HashMap<>() {{put("key", "foodSlot");             put("type", "attribute");                              put("label", "Food");}});
-        add(new HashMap<>() {{put("key", "eventDanceRole");         put("type", "attribute");                              put("label", "Dance Roles");}});
-        add(new HashMap<>() {{put("key", "eventPrivate");         put("type", "attribute");                              put("label", "Private Classes");}});
-        add(new HashMap<>() {{put("key", "eventSpecial");         put("type", "attribute");                              put("label", "Specials");}});
         add(new HashMap<>() {{put("key", "eventDiscount");        put("type", "attribute");                              put("label", "Discounts");}});
-        add(new HashMap<>() {{put("key", "hosting");              put("type", "attribute");                              put("label", "Accommodation");}});
-        add(new HashMap<>() {{put("key", "volunteering");         put("type", "attribute");                              put("label", "Volunteering");}});
+        add(new HashMap<>() {{put("key", "eventSpecial");         put("type", "attribute");                              put("label", "Specials");}});
+        add(new HashMap<>() {{put("key", "eventSlot");            put("type", "attribute");                              put("label", "Slots");}});
+        add(new HashMap<>() {{put("key", "eventDanceRole");       put("type", "attribute");                              put("label", "Dance Roles");}});
+        add(new HashMap<>() {{put("key", "eventPrivate");         put("type", "attribute");                              put("label", "Private Classes");}});
+        add(new HashMap<>() {{put("key", "hosting");              put("type", "attribute");                              put("label", "Hosting");}});
+        add(new HashMap<>() {{put("key", "volunteerType");        put("type", "attribute");                              put("label", "Volunteering");}});
         add(new HashMap<>() {{put("key", "scholarship");          put("type", "attribute");                              put("label", "Solidarity Fund");}});
         add(new HashMap<>() {{put("key", "requireTerms");         put("type", "attribute");                              put("label", "Terms");}});
         add(new HashMap<>() {{put("key", "clone");                put("type", "action");         put("show", "true");}});
@@ -165,6 +161,10 @@ public class Event implements Serializable {
         put("registrationStart", getRegistrationStart().toString());
         put("active", String.valueOf(active));
         put("archived", String.valueOf(archived));
+        put("volunteering", String.valueOf(volunteering));
+        put("hosting", String.valueOf(hosting));
+        put("scholarship", String.valueOf(scholarship));
+        put("requireTerms", String.valueOf(requireTerms));
         put("description", description);
         put("id", String.valueOf(eventId));
       }

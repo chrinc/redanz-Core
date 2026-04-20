@@ -2,7 +2,7 @@ package ch.redanz.redanzCore.model.registration.entities;
 
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,9 +45,9 @@ public class Guest implements Serializable {
   @JoinTable(
     name="guest_slots",
     joinColumns = @JoinColumn(name="guest_id"),
-    inverseJoinColumns = @JoinColumn(name="slot_id")
+    inverseJoinColumns = @JoinColumn(name="event_slot_id")
   )
-  private List<Slot> slots;
+  private List<EventSlot> slots;
 
   private String description;
 
@@ -58,7 +58,7 @@ public class Guest implements Serializable {
     String name,
     String description,
     Event event,
-    List<Slot> slots,
+    List<EventSlot> slots,
     boolean active,
     Person person
 
@@ -74,7 +74,7 @@ public class Guest implements Serializable {
   public Guest(
     Event event,
     Person person,
-    List<Slot> slots,
+    List<EventSlot> slots,
     boolean active
   ) {
     this.person = person;

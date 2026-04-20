@@ -28,6 +28,9 @@ public class BaseParService {
   public boolean existsByNameAndEvent(String name, Event event) {
     return baseParRepo.existsByEventAndName(event, name);
   }
+  public boolean existsByName(String name) {
+    return baseParRepo.existsByName(name);
+  }
 
   public boolean doAutoMatch(Event event) {
     return existsByNameAndEvent(OutTextConfig.LABEL_BASE_PAR_AUTO_MATCH_EN.getOutTextKey(), event) ?

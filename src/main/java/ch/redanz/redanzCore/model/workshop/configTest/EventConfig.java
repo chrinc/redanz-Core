@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.configTest;
 
-import ch.redanz.redanzCore.model.workshop.entities.Discount;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import lombok.AllArgsConstructor;
@@ -19,8 +19,8 @@ public enum EventConfig {
   REDANZ_EVENT(
   "Redanz Workshop"
   , 350
-  , LocalDate.parse("2026-11-01")
-  , LocalDate.parse("2026-11-04")
+  , LocalDate.parse("2026-11-06")
+  , LocalDate.parse("2026-11-08")
     ,ZonedDateTime.parse("2023-07-29T11:00:00.000+01:00[Europe/Paris]")
   ,true
     ,false
@@ -46,7 +46,7 @@ public enum EventConfig {
 
   public static void setup(EventService eventService, DiscountService discountService) {
 
-    List<Discount> discounts = new ArrayList<>();
+    List<EventDiscount> discounts = new ArrayList<>();
 
 
     for (EventConfig eventConfig : EventConfig.values()) {
@@ -66,7 +66,6 @@ public enum EventConfig {
             eventConfig.hosting,
             eventConfig.volunteering,
             eventConfig.scholarship,
-            null,
             eventConfig.requireTerms
           )
         );

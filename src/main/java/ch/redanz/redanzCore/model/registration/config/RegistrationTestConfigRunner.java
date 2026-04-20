@@ -48,7 +48,7 @@ public class RegistrationTestConfigRunner implements CommandLineRunner {
     RegistrationConfig.setup(
       personService, registrationService, bundleService, trackService, danceRoleService
       ,userService, eventService, registrationEmailService, discountService, discountRegistrationService
-      ,foodService, slotService, foodRegistrationService, donationRegistrationService
+      ,foodService, foodRegistrationService, donationRegistrationService
     );
 
 

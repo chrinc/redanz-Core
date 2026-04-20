@@ -10,20 +10,21 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @AllArgsConstructor
 public enum BundleEventSpecialConfig {
-  FULL_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, BundleConfig.FULL_PASS),
-  HALF_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, BundleConfig.HALF_PASS),
+  FULL_MASSAGE(EventConfig.REDANZ_EVENT, EventSpecialsConfig.EVENT_MASSAGE, BundleConfig.FULL_PASS),
+  HALF_MASSAGE(EventConfig.REDANZ_EVENT, EventSpecialsConfig.EVENT_MASSAGE, BundleConfig.HALF_PASS),
+  HALF_MAGAZINE_DESIGN(EventConfig.REDANZ_EVENT, EventSpecialsConfig.EVENT_MAGAZINE_DESIGN, BundleConfig.HALF_PASS),
+  HALF_BRUNCH(EventConfig.REDANZ_EVENT, EventSpecialsConfig.EVENT_BRUNCH, BundleConfig.HALF_PASS),
   ;
 
   private final EventConfig eventConfig;
-  private final SpecialConfig specialConfig;
+  private final EventSpecialsConfig eventSpecialsConfig;
   private final BundleConfig bundleConfig;
 
   public static void setup(EventService eventService, SpecialService specialService, BundleService bundleService) {
     for (BundleEventSpecialConfig bundleEventSpecialConfig : BundleEventSpecialConfig.values()) {
       Event event = eventService.findByName(bundleEventSpecialConfig.getEventConfig().getName());
       Bundle bundle = bundleService.findByName(bundleEventSpecialConfig.getBundleConfig().getName());
-      Special special = specialService.findByName(bundleEventSpecialConfig.getSpecialConfig().getName());
-      EventSpecial eventSpecial = eventService.findByEventAndSpecial(event, special);
+      EventSpecial eventSpecial = specialService.findByName(bundleEventSpecialConfig.getEventSpecialsConfig().getName());
       bundle.getEventSpecials().add(eventSpecial);
       bundleService.save(bundle);
     }

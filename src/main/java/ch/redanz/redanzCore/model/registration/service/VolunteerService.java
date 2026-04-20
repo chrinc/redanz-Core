@@ -68,7 +68,7 @@ public class VolunteerService {
     Map<String, StringBuilder> merged = new HashMap<>();
     volunteerSlotRegistrationRepo.findAllByVolunteerRegistration(volunteerRegistration).forEach(slot -> {
       List<Map<String, String>> slotOutText =
-        outTextService.getOutTextMapByKey(slot.getSlot().getName());
+        outTextService.getOutTextMapByKey(slot.getEventSlot().getName());
       if (slotOutText == null || slotOutText.isEmpty()) return;
       Map<String, String> map = slotOutText.get(0); // your structure
 
@@ -115,10 +115,10 @@ public class VolunteerService {
   }
 
   // Update Volunteer Request
-  private boolean hasVolunteerSlotRegistration(List<VolunteerSlotRegistration> volunteerSlotRegistrations, Slot slot) {
+  private boolean hasVolunteerSlotRegistration(List<VolunteerSlotRegistration> volunteerSlotRegistrations, EventSlot eventSlot) {
     AtomicBoolean hasVolunteerSlotRegistration = new AtomicBoolean(false);
     volunteerSlotRegistrations.forEach(volunteerSlotRegistration -> {
-      if (volunteerSlotRegistration.getSlot() == slot) {
+      if (volunteerSlotRegistration.getEventSlot() == eventSlot) {
         hasVolunteerSlotRegistration.set(true);
       }
     });
@@ -126,7 +126,7 @@ public class VolunteerService {
     return hasVolunteerSlotRegistration.get();
   }
 
-  public List<VolunteerSlotRegistration> volunteerSlotRegistrations (Registration registration, JsonObject volunteerRegistration) {
+  public List<VolunteerSlotRegistration> volunteerSlotRegistrations(Registration registration, JsonObject volunteerRegistration) {
     List<VolunteerSlotRegistration> volunteerSlotRegistrations = new ArrayList<>();
     JsonArray slotsJson = volunteerRegistration.get("slots").getAsJsonArray();
 
@@ -136,7 +136,7 @@ public class VolunteerService {
         volunteerSlotRegistrations.add(
           new VolunteerSlotRegistration(
             volunteerRegistrationRepo.findByRegistration(registration),
-            slotService.findBySlotId(slot.getAsJsonObject().get("slotId").getAsLong())
+            slotService.findByEventSlotId(slot.getAsJsonObject().get("eventSlotId").getAsLong())
           )
         );
       });
@@ -154,14 +154,14 @@ public class VolunteerService {
 
     // delete in current if not in request
     volunteerSlotRegistrations.forEach(volunteerSlotRegistration -> {
-      if (!hasVolunteerSlotRegistration(requestVolunteerSlotRegistrations, volunteerSlotRegistration.getSlot())){
-        volunteerSlotRegistrationRepo.deleteAllByVolunteerRegistrationAndSlot(existingVolunteerRegistration, volunteerSlotRegistration.getSlot());
+      if (!hasVolunteerSlotRegistration(requestVolunteerSlotRegistrations, volunteerSlotRegistration.getEventSlot())){
+        volunteerSlotRegistrationRepo.deleteAllByVolunteerRegistrationAndEventSlot(existingVolunteerRegistration, volunteerSlotRegistration.getEventSlot());
       }
     });
 
     // add new from request
     requestVolunteerSlotRegistrations.forEach(volunteerSlotRegistration -> {
-      if (!hasVolunteerSlotRegistration(volunteerSlotRegistrations, volunteerSlotRegistration.getSlot())){
+      if (!hasVolunteerSlotRegistration(volunteerSlotRegistrations, volunteerSlotRegistration.getEventSlot())){
         volunteerSlotRegistrationRepo.save(volunteerSlotRegistration);
       }
     });
@@ -356,6 +356,11 @@ public class VolunteerService {
       }
     );
     saveVolunteerType(volunteerType);
+  }
+
+  public Boolean volunteerTypeIsUsedAndHasRegistration(VolunteerType volunteerType) {
+    return volunteerRegistrationRepo.existsByTypeAndRegistrationActive(volunteerType,true);
+
   }
 
 }

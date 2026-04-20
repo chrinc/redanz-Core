@@ -9,6 +9,7 @@ import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +70,7 @@ public class PayrexxPaymentController {
     try {
       Registration registration = registrationService.findByRegistrationId(registrationId);
       paymentService.onPaymentReceived(registration, paymentService.amountDue(registration));
+      registrationService.updateSoldOut(registration.getEvent());
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
@@ -79,9 +81,16 @@ public class PayrexxPaymentController {
     @RequestBody String jsonObject
   ) {
     try {
+      JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+      JsonObject transaction = request.get("transaction").getAsJsonObject();
+      Long registrationId = transaction.get("referenceId").getAsLong();
+      Registration registration = registrationService.findByRegistrationId(registrationId);
       paymentService.onPaymentConfirmed(
-        JsonParser.parseString(jsonObject).getAsJsonObject()
+        registration,
+        transaction.get("amount").getAsLong() / 100,
+        transaction.get("status").getAsString()
       );
+      registrationService.updateSoldOut(registration.getEvent());
     } catch (Exception exception) {
       errorLogService.addLog("/confirmPayment", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());

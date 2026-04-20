@@ -26,9 +26,8 @@ public class EventDiscount implements Serializable {
   @Column(name = "event_discount_id")
   private Long eventDiscountId;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "discount_id")
-  private Discount discount;
+  private String name;
+  private String description;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id")
@@ -42,18 +41,21 @@ public class EventDiscount implements Serializable {
 
   public EventDiscount() {
   }
-  public EventDiscount(Discount discount, Event event, double discountAmount, Integer capacity) {
-    this.discount = discount;
+  public EventDiscount(Event event, double discountAmount, Integer capacity, String name, String description) {
     this.event = event;
     this.discountAmount = discountAmount;
     this.capacity = capacity;
+    this.name = name;
+    this.description = description;
   }
 
   public static List<Map<String, String>> schema() {
     return new ArrayList<>() {
       {
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                 put("label", "id");}});
-        add(new HashMap<>() {{put("key", "discount");             put("type", "list");    put("required", "true");   put("label", "Discount");    put("list", null);}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "label");  put("required", "true");      put("label", "Name");}});
+        add(new HashMap<>() {{put("key", "description");          put("type", "label");  put("required", "false");     put("label", "Description");}});
+
         add(new HashMap<>() {{put("key", "discountAmount");       put("type", "double");  put("required", "true");   put("label", "Discount");}});
         add(new HashMap<>() {{put("key", "eventPartInfo"); put("type", "partInfo");        put("eventPartKey", "discount");                          put("label", OutTextConfig.LABEL_DISCOUNT_INFO_EN.getOutTextKey());}});
         add(new HashMap<>() {{put("key", "capacity");             put("type", "number");  put("required", "false");  put("label", "Capacity");}});
@@ -68,6 +70,8 @@ public class EventDiscount implements Serializable {
     return new HashMap<>() {
       {
         put("id", String.valueOf(eventDiscountId));
+        put("name", name);
+        put("description", description);
         put("discount", null);
         put("discountAmount", String.valueOf(discountAmount));
         put("capacity", String.valueOf(capacity));

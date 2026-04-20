@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.model.registration.entities;
 
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
-import ch.redanz.redanzCore.model.workshop.entities.Special;
+import ch.redanz.redanzCore.model.workshop.entities.EventSpecial;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,11 +27,11 @@ public class SpecialRegistration {
   private Registration registration;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "special_id")
-  private Special special;
+  @JoinColumn(name = "event_special_id")
+  private EventSpecial eventSpecial;
 
-  public SpecialRegistration(Registration registration, Special special) {
+  public SpecialRegistration(Registration registration, EventSpecial eventSpecial) {
     this.registration = registration;
-    this.special = special;
+    this.eventSpecial = eventSpecial;
   }
 }

@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.model.registration.entities;
 
 
-import ch.redanz.redanzCore.model.workshop.entities.PrivateClass;
+import ch.redanz.redanzCore.model.workshop.entities.EventPrivateClass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,10 +29,10 @@ public class PrivateClassRegistration {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "private_class_id")
-  private PrivateClass privateClass;
+  private EventPrivateClass eventPrivateClass;
 
-  public PrivateClassRegistration(Registration registration, PrivateClass privateClass) {
+  public PrivateClassRegistration(Registration registration, EventPrivateClass eventPrivateClass) {
     this.registration = registration;
-    this.privateClass = privateClass;
+    this.eventPrivateClass = eventPrivateClass;
   }
 }

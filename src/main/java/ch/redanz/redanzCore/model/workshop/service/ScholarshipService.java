@@ -18,11 +18,7 @@ import java.util.*;
 @Slf4j
 @AllArgsConstructor
 public class ScholarshipService {
-  private final OutTextService outTextService;
-  private final EventTypeSlotService eventTypeSlotService;
   private final EventRepo eventRepo;
-  private final SlotService slotService;
-  private final VolunteerTypeRepo volunteerTypeRepo;
 
   public Field getField(String key) {
     Field field;
@@ -70,7 +66,6 @@ public class ScholarshipService {
     return new ArrayList<>() {
       {
         add(new HashMap<>() {{put("key", "id");               put("type", "id");            put("label", "id");}});
-        add(new HashMap<>() {{put("key", "scholarship");      put("type", "bool");          put("labelTrue", "Enable Scholarship"); put("labelFalse", "Disable Scholarship");}});
         add(new HashMap<>() {{put("key", "count");            put("type", "single");}});
         add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "solidarityFund");                          put("label", OutTextConfig.LABEL_SOLIDARITYFUND_INFO_EN.getOutTextKey());}});
         add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_SOLIDARITY_FUND_EN.getOutTextKey()); }});

@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class PaymentService {
   private final FoodRegistrationRepo foodRegistrationRepo;
   private final DonationRegistrationRepo donationRegistrationRepo;
-  private final RegistrationService registrationService;
   private final WorkflowStatusService workflowStatusService;
   private final WorkflowTransitionService workflowTransitionService;
   private final DiscountRegistrationRepo discountRegistrationRepo;
@@ -92,23 +91,12 @@ public class PaymentService {
 
     // specials
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
-      Special special = specialRegistration.getSpecial();
-      double price = 0.0;
-      Optional<EventSpecial> matchingEventSpecial =
-        registration.getBundle()
-          .getEventSpecials()
-          .stream()
-          .filter(es -> es.getSpecial().equals(specialRegistration.getSpecial()))
-          .findFirst();
-      if (matchingEventSpecial.isPresent()) {
-        price = matchingEventSpecial.get().getPrice();
-      }
-
+      double price = specialRegistration.getEventSpecial().getPrice();
       totalAmount.addAndGet((int) price);
       specials.add(
         List.of(
-          special.getName(),
-          special.getDescription(),
+          specialRegistration.getEventSpecial().getName(),
+          specialRegistration.getEventSpecial().getDescription(),
           String.valueOf((int) price)
         )
       );
@@ -116,14 +104,13 @@ public class PaymentService {
 
     // private class
     privateClassService.findAllByRegistrations(registration).forEach(privateClassRegistration -> {
-      PrivateClass privateClass = privateClassRegistration.getPrivateClass();
-      EventPrivateClass eventPrivateClass = eventService.findByEventAndPrivate(registration.getEvent(), privateClass);
+      EventPrivateClass eventPrivateClass = privateClassRegistration.getEventPrivateClass();
       totalAmount.addAndGet((int) eventPrivateClass.getPrice());
 
       privateClasses.add(
         List.of(
-          privateClass.getName(),
-          privateClass.getDescription(),
+          eventPrivateClass.getName(),
+          eventPrivateClass.getDescription(),
           String.valueOf((int) eventPrivateClass.getPrice())
         )
       );
@@ -131,20 +118,12 @@ public class PaymentService {
 
     // food
     foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
-      totalAmount.addAndGet((int) eventService.findEventFoodSlotByEventAndFood(
-         registration.getEvent()
-        ,foodRegistration.getFood()
-        ,foodRegistration.getSlot()
-      ).getPrice());
+      totalAmount.addAndGet((int) foodRegistration.getEventFoodSlot().getPrice());
       foodSlots.add(
         List.of(
-          foodRegistration.getFood().getName(),
-          foodRegistration.getSlot().getName(),
-          String.valueOf((int) eventService.findEventFoodSlotByEventAndFood(
-            registration.getEvent()
-            ,foodRegistration.getFood()
-            ,foodRegistration.getSlot()
-          ).getPrice())
+          foodRegistration.getEventFoodSlot().getName(),
+          foodRegistration.getEventFoodSlot().getName(),
+          String.valueOf((int) foodRegistration.getEventFoodSlot().getPrice())
         )
       );
     });
@@ -164,11 +143,11 @@ public class PaymentService {
     // discounts
     discountRegistrationRepo.findAllByRegistration(registration).forEach(
       discountRegistration -> {
-        int discount = (int) eventDiscountRepo.findByEventAndDiscount(registration.getEvent(), discountRegistration.getDiscount()).getDiscountAmount();
+        int discount = (int) discountRegistration.getEventDiscount().getDiscountAmount();
         totalAmount.addAndGet(discount * (-1));
         discounts.add(
           List.of(
-            discountRegistration.getDiscount().getName(),
+            discountRegistration.getEventDiscount().getName(),
             String.valueOf(discount)
           )
       );
@@ -196,29 +175,17 @@ public class PaymentService {
 
     // specials
     specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
-      Optional<EventSpecial> matchingEventSpecial =
-        registration.getBundle()
-          .getEventSpecials()
-          .stream()
-          .filter(es -> es.getSpecial().equals(specialRegistration.getSpecial()))
-          .findFirst();
-      if (matchingEventSpecial.isPresent()) {
-          totalAmount.addAndGet((int) matchingEventSpecial.get().getPrice());
-      }
+      totalAmount.addAndGet((int) specialRegistration.getEventSpecial().getPrice());
     });
 
     // private class
     privateClassService.findAllByRegistrations(registration).forEach(privateClassRegistration -> {
-      totalAmount.addAndGet((int) eventService.findByEventAndPrivate(registration.getEvent(), privateClassRegistration.getPrivateClass()).getPrice());
+      totalAmount.addAndGet((int) privateClassRegistration.getEventPrivateClass().getPrice());
     });
 
     // food
     foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
-      totalAmount.addAndGet((int) eventService.findEventFoodSlotByEventAndFood(
-        registration.getEvent()
-        ,foodRegistration.getFood()
-        ,foodRegistration.getSlot()
-      ).getPrice());
+      totalAmount.addAndGet((int) foodRegistration.getEventFoodSlot().getPrice());
     });
 
     // donation
@@ -228,7 +195,7 @@ public class PaymentService {
 
     // discount
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
-      int discount = (int) eventDiscountRepo.findByEventAndDiscount(registration.getEvent(), discountRegistration.getDiscount()).getDiscountAmount();
+      int discount = (int) discountRegistration.getEventDiscount().getDiscountAmount();
       totalAmount.addAndGet(discount * (-1));
     });
 
@@ -271,23 +238,13 @@ public class PaymentService {
          registration,
          getPaymentDetails(registration)
        );
-
-       // Update SoldOut stats
-       registrationService.updateSoldOut(registration.getEvent());
      }
   }
-  public void onPaymentConfirmed(JsonObject request) throws IOException, TemplateException {
-    JsonObject transaction = request.get("transaction").getAsJsonObject();
-    Long registrationId = transaction.get("referenceId").getAsLong();
-    Registration registration = registrationService.findByRegistrationId(registrationId);
-
-    // receive incl. raps
-    Long amount = transaction.get("amount").getAsLong() / 100;
-
+  public void onPaymentConfirmed(Registration registration, Long amount, String status) throws IOException, TemplateException {
     //    @todo referenceId not found
     //    @todo check amount first
     //    @todo check payment method
-    if (Objects.equals(transaction.get("status").getAsString(), "confirmed")) {
+    if (Objects.equals(status, "confirmed")) {
       onPaymentReceived(registration, amount);
     }
   }

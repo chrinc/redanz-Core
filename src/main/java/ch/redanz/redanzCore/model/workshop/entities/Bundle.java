@@ -37,7 +37,7 @@ public class Bundle implements Serializable {
     joinColumns = @JoinColumn(name="bundle_id"),
     inverseJoinColumns = @JoinColumn(name="slot_id")
   )
-  private Set<Slot> partySlots;
+  private Set<EventSlot> partySlots;
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -70,7 +70,7 @@ public class Bundle implements Serializable {
     String description,
     Boolean simpleTicket,
     Integer seqNr,
-    Set<Slot> partySlots,
+    Set<EventSlot> partySlots,
     String color,
     Boolean active
   ) {
@@ -97,7 +97,7 @@ public class Bundle implements Serializable {
         add(new HashMap<>() {{put("key", "active");        put("type", "bool");                                      put("labelTrue", "Active");               put("labelFalse", "Inactive"); }});
         add(new HashMap<>() {{put("key", "color");         put("type", "color");           put("required", "false"); put("label", "Wrist Band Color"); }});
         add(new HashMap<>() {{put("key", "bundleSpecial"); put("type", "multiselectInfo");                           put("label", "Specials");                 put("infoKey", "price");}});
-        add(new HashMap<>() {{put("key", "bundleEventTrack");        put("type", "attribute"); put("required", "false"); put("label", "Choose Tracks"); put("list", null);}});
+        add(new HashMap<>() {{put("key", "bundleEventTrack"); put("type", "attribute"); put("required", "false"); put("label", "Choose Tracks"); put("list", null);}});
         add(new HashMap<>() {{put("key", "partySlots");    put("type", "multiselect");     put("required", "false"); put("label", "Party Slots");              put("list", null);}});
         add(new HashMap<>() {{put("key", "seqNr");         put("type", "number");          put("required", "true");  put("label", "Sequence Number");  }});
         add(new HashMap<>() {{put("key", "eventPartInfo"); put("type", "partInfo");        put("eventPartKey", "bundle");                          put("label", OutTextConfig.LABEL_BUNDLE_INFO_EN.getOutTextKey());}});

@@ -1,7 +1,7 @@
 package ch.redanz.redanzCore.model.registration.entities;
 
 
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,10 +30,10 @@ public class HosteeSlotRegistration implements Serializable {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "hostee_slot_id")
-  private Slot slot;
+  private EventSlot eventSlot;
 
-  public HosteeSlotRegistration(HosteeRegistration hosteeRegistration, Slot slot) {
+  public HosteeSlotRegistration(HosteeRegistration hosteeRegistration, EventSlot eventSlot) {
     this.hosteeRegistration = hosteeRegistration;
-    this.slot = slot;
+    this.eventSlot = eventSlot;
   }
 }

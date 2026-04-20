@@ -30,7 +30,7 @@ public enum RegistrationConfig {
     BundleConfig.HALF_PASS,
     TrackConfig.INTERMEDIATE,
     DanceRoleConfig.FOLLOWER,
-    List.of(DiscountConfig.EARLY_BIRD),
+    List.of(EventDiscountConfig.EARLY_BIRD),
     null,
     90
   ),
@@ -41,17 +41,17 @@ public enum RegistrationConfig {
     TrackConfig.INTERMEDIATE,
     DanceRoleConfig.FOLLOWER,
     List.of(
-      DiscountConfig.STUDENT,
-      DiscountConfig.ABROAD,
-      DiscountConfig.EARLY_BIRD
+      EventDiscountConfig.STUDENT,
+      EventDiscountConfig.ABROAD,
+      EventDiscountConfig.EARLY_BIRD
     ),
     List.of(
-      Map.of(FoodConfig.FOOD_VARIETY, SlotConfig.SLOT_SATURDAY_LUNCH),
-      Map.of(FoodConfig.FOOD_ORIENTAL, SlotConfig.SLOT_SUNDAY_LUNCH)
+      EventFoodSlotConfig.SAT_VARIETY, EventFoodSlotConfig.SUN_ORIENTAL
     ),
     100
   ),
-  ESTHER_REGISTRATION(UserConfig.ESTHER_USER,
+  ESTHER_REGISTRATION(
+    UserConfig.ESTHER_USER,
     EventConfig.REDANZ_EVENT,
     BundleConfig.PARTY_PASS,
     null,
@@ -68,9 +68,9 @@ public enum RegistrationConfig {
     , TrackConfig.INTERMEDIATE
     , DanceRoleConfig.FOLLOWER
     , List.of(
-    DiscountConfig.STUDENT
-    ,DiscountConfig.EARLY_BIRD
-    , DiscountConfig.ABROAD
+    EventDiscountConfig.STUDENT
+    ,EventDiscountConfig.EARLY_BIRD
+    , EventDiscountConfig.ABROAD
   ), null
     , 20
   ),
@@ -80,9 +80,9 @@ public enum RegistrationConfig {
     ,BundleConfig.FULL_PASS
     ,TrackConfig.INTERMEDIATE
     ,DanceRoleConfig.SWITCH
-    ,List.of(DiscountConfig.STUDENT
-    ,DiscountConfig.ABROAD
-    ,DiscountConfig.EARLY_BIRD
+    ,List.of(EventDiscountConfig.STUDENT
+    ,EventDiscountConfig.ABROAD
+    ,EventDiscountConfig.EARLY_BIRD
   ), null
   , 0
   ),
@@ -94,7 +94,7 @@ public enum RegistrationConfig {
     TrackConfig.INTERMEDIATE,
     DanceRoleConfig.LEADER,
     List.of(
-      DiscountConfig.EARLY_BIRD
+      EventDiscountConfig.EARLY_BIRD
     ),
     null,
     20
@@ -106,7 +106,7 @@ public enum RegistrationConfig {
     TrackConfig.INTERMEDIATE,
     DanceRoleConfig.SWITCH,
     List.of(
-      DiscountConfig.EARLY_BIRD
+      EventDiscountConfig.EARLY_BIRD
     ), null,
     160
   );
@@ -116,8 +116,8 @@ public enum RegistrationConfig {
   private final BundleConfig bundleConfig;
   private final TrackConfig trackConfig;
   private final DanceRoleConfig danceRoleConfig;
-  private final List<DiscountConfig> discountConfigList;
-  private final List<Map<FoodConfig, SlotConfig>> foodSlotConfigList;
+  private final List<EventDiscountConfig> eventDiscountConfigList;
+  private final List<EventFoodSlotConfig> eventFoodSlotConfigList;
   private final double donationAmount;
 
   public static void setup(
@@ -132,7 +132,6 @@ public enum RegistrationConfig {
     DiscountService discountService,
     DiscountRegistrationService discountRegistrationService,
     FoodService foodService,
-    SlotService slotService,
     FoodRegistrationService foodRegistrationService,
     DonationRegistrationService donationRegistrationService
   ) {
@@ -160,23 +159,20 @@ public enum RegistrationConfig {
       }
       registrationService.update(newRegistration);
 
-      if (registrationConfig.discountConfigList != null) {
-        registrationConfig.discountConfigList.forEach(
+      if (registrationConfig.eventDiscountConfigList != null) {
+        registrationConfig.eventDiscountConfigList.forEach(
           discountConfig -> discountRegistrationService.save(
             newRegistration,
             discountService.findByName(discountConfig.getName())
           ));
       }
 
-      if (registrationConfig.foodSlotConfigList != null) {
-        registrationConfig.foodSlotConfigList.forEach(
-          foodSlotConfig -> {
-            FoodConfig foodConfig = (FoodConfig) foodSlotConfig.keySet().toArray()[0];
-            SlotConfig slotConfig = (SlotConfig) foodSlotConfig.values().toArray()[0];
+      if (registrationConfig.eventFoodSlotConfigList != null) {
+        registrationConfig.eventFoodSlotConfigList.forEach(
+          eventFoodSlotConfig -> {
             foodRegistrationService.save(
               newRegistration
-              ,foodService.findByName(foodConfig.getName())
-              ,slotService.findByName(slotConfig.getName())
+              ,foodService.findByName(eventFoodSlotConfig.getName())
             );
           });
       }

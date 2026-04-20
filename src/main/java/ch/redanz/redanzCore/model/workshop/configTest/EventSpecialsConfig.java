@@ -2,7 +2,6 @@ package ch.redanz.redanzCore.model.workshop.configTest;
 
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.EventSpecial;
-import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.SpecialService;
 import lombok.AllArgsConstructor;
@@ -18,11 +17,14 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum EventSpecialsConfig {
-  EVENT_MASSAGE(EventConfig.REDANZ_EVENT, SpecialConfig.SPECIAL_CHINESE_MASSAGE, 45.0, false, 30, OutTextConfig.LABEL_SPECIALS_URL_EN.getOutTextKey(), true)
+  EVENT_MASSAGE(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_SPECIAL_CHINESE_MASSAGE_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_SPECIAL_CHINESE_MASSAGE_DESC_EN.getOutTextKey(), 45.0, false, 30, OutTextConfig.LABEL_SPECIALS_MASSAGE_URL_EN.getOutTextKey(), true),
+  EVENT_MAGAZINE_DESIGN(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_SPECIAL_MAGAZINE_DESIGN_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_SPECIAL_MAGAZINE_DESIGN_DESC_EN.getOutTextKey(), 15.0, false, 30, null, false),
+  EVENT_BRUNCH(EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_SPECIAL_BRUNCH_NAME_EN.getOutTextKey(), OutTextConfig.LABEL_SPECIAL_BRUNCH_DESC_EN.getOutTextKey(), 120.0, false, 30, null, false)
   ;
 
   private final EventConfig eventConfig;
-  private final SpecialConfig specialConfig;
+  private final String name;
+  private final String description;
   private final double price;
   private final boolean soldOut;
   private final int capacity;
@@ -32,9 +34,9 @@ public enum EventSpecialsConfig {
   public static void setup(SpecialService specialService, EventService eventService) {
     for (EventSpecialsConfig eventSpecialsConfig : EventSpecialsConfig.values()) {
       Event event = eventService.findByName(eventSpecialsConfig.eventConfig.getName());
-      Special special = specialService.findByName(eventSpecialsConfig.specialConfig.getName());
       eventService.save(new EventSpecial(
-        special
+         eventSpecialsConfig.name
+        ,eventSpecialsConfig.description
         ,event
         ,eventSpecialsConfig.price
         ,eventSpecialsConfig.soldOut

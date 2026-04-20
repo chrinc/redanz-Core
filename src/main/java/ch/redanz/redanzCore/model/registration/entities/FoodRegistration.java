@@ -1,7 +1,6 @@
 package ch.redanz.redanzCore.model.registration.entities;
 
-import ch.redanz.redanzCore.model.workshop.entities.Food;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.EventFoodSlot;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,16 +27,11 @@ public class FoodRegistration {
   private Registration registration;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "food_id")
-  private Food food;
+  @JoinColumn(name = "event_food_slot_id")
+  private EventFoodSlot eventFoodSlot;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "slot_id")
-  private Slot slot;
-
-  public FoodRegistration(Registration registration, Food food, Slot slot) {
+  public FoodRegistration(Registration registration, EventFoodSlot eventFoodSlot) {
     this.registration = registration;
-    this.food = food;
-    this.slot = slot;
+    this.eventFoodSlot = eventFoodSlot;
   }
 }

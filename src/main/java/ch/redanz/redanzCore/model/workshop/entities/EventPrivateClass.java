@@ -24,12 +24,11 @@ public class EventPrivateClass {
   @JsonIgnore
   private Event event;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "private_class_id")
-//  @JsonIgnore
-  private PrivateClass privateClass;
-
   private double price;
+  private String name;
+  private String description;
+  @Column(name = "partner_required")
+  private Boolean partnerRequired;
 
   private Integer capacity;
 
@@ -39,19 +38,24 @@ public class EventPrivateClass {
   public EventPrivateClass() {
   }
 
-  public EventPrivateClass(PrivateClass privateClass, Event event, double price, boolean soldOut, int capacity) {
+  public EventPrivateClass(Event event, double price, boolean soldOut, int capacity, String name, String description, Boolean partnerRequired) {
     this.event = event;
-    this.privateClass = privateClass;
     this.price = price;
     this.soldOut = soldOut;
     this.capacity = capacity;
+    this.name = name;
+    this.description = description;
+    this.partnerRequired = partnerRequired;
   }
 
   public static List<Map<String, String>> schema() {
     return new ArrayList<>() {
       {
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                 put("label", "id");}});
-        add(new HashMap<>() {{put("key", "privateClass");         put("type", "list");    put("required", "true");   put("label", "Private Class"); put("list", null);}});
+//        add(new HashMap<>() {{put("key", "privateClass");         put("type", "list");    put("required", "true");   put("label", "Private Class"); put("list", null);}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "text");   put("required", "true");   put("label", "Name");}});
+        add(new HashMap<>() {{put("key", "description");          put("type", "label");  put("required", "true");   put("label", "Description");}});
+        add(new HashMap<>() {{put("key", "partnerRequired");      put("type", "bool");                              put("labelTrue", "Partner required"); put("labelFalse", "No Partner required"); }});
         add(new HashMap<>() {{put("key", "price");                put("type", "double");  put("required", "true");   put("label", "Price");}});
         add(new HashMap<>() {{put("key", "capacity");             put("type", "number");  put("required", "true");      put("label", "Capacity");}});
         add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "private");                          put("label", OutTextConfig.LABEL_PRIVATE_INFO_EN.getOutTextKey());}});
@@ -67,6 +71,9 @@ public class EventPrivateClass {
         put("id", String.valueOf(eventPrivateClassId));
         put("privateClass", null);
         put("price", String.valueOf(price));
+        put("name", name);
+        put("description", description);
+        put("partnerRequired", String.valueOf(partnerRequired));
         put("capacity", String.valueOf(capacity));
       }
     };

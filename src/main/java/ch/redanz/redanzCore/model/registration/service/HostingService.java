@@ -4,8 +4,8 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.*;
 import ch.redanz.redanzCore.model.registration.repository.*;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import ch.redanz.redanzCore.model.workshop.entities.SleepUtil;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.SleepUtilService;
@@ -39,9 +39,9 @@ public class HostingService {
 
   public String getSlots(HostRegistration hostRegistration) {
     Map<String, StringBuilder> merged = new HashMap<>();
-    hostSlotRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(slot -> {
+    hostSlotRegistrationRepo.findAllByHostRegistration(hostRegistration).forEach(hostSlotRegistration -> {
       List<Map<String, String>> outText =
-        outTextService.getOutTextMapByKey(slot.getSlot().getName());
+        outTextService.getOutTextMapByKey(hostSlotRegistration.getEventSlot().getName());
       if (outText == null || outText.isEmpty()) return;
       Map<String, String> map = outText.get(0); // your structure
 
@@ -57,9 +57,9 @@ public class HostingService {
 
   public String getSlots(HosteeRegistration hosteeRegistration) {
     Map<String, StringBuilder> merged = new HashMap<>();
-    hosteeSlotRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(slot -> {
+    hosteeSlotRegistrationRepo.findAllByHosteeRegistration(hosteeRegistration).forEach(hosteeSlotRegistration -> {
       List<Map<String, String>> outText =
-        outTextService.getOutTextMapByKey(slot.getSlot().getName());
+        outTextService.getOutTextMapByKey(hosteeSlotRegistration.getEventSlot().getName());
       if (outText == null || outText.isEmpty()) return;
       Map<String, String> map = outText.get(0); // your structure
 
@@ -209,10 +209,10 @@ public class HostingService {
   }
 
 
-  private boolean hasHostSlotRegistration(List<HostSlotRegistration> hostSlotRegistrations, Slot slot) {
+  private boolean hasHostSlotRegistration(List<HostSlotRegistration> hostSlotRegistrations, EventSlot eventSlot) {
     AtomicBoolean hasHostSlotRegistration = new AtomicBoolean(false);
     hostSlotRegistrations.forEach(hostSlotRegistration -> {
-      if (hostSlotRegistration.getSlot() == slot) {
+      if (hostSlotRegistration.getEventSlot() == eventSlot) {
         hasHostSlotRegistration.set(true);
       }
     });
@@ -227,14 +227,14 @@ public class HostingService {
 
     // delete in current if not in request
     hostSlotRegistrations.forEach(hostSlotRegistration -> {
-      if (!hasHostSlotRegistration(requestHostSlotRegistrations, hostSlotRegistration.getSlot())){
-        hostSlotRegistrationRepo.deleteAllByHostRegistrationAndSlot(existingHostRegistration, hostSlotRegistration.getSlot());
+      if (!hasHostSlotRegistration(requestHostSlotRegistrations, hostSlotRegistration.getEventSlot())){
+        hostSlotRegistrationRepo.deleteAllByHostRegistrationAndEventSlot(existingHostRegistration, hostSlotRegistration.getEventSlot());
       }
     });
 
     // add new from request
     requestHostSlotRegistrations.forEach(hostSlotRegistration -> {
-      if (!hasHostSlotRegistration(hostSlotRegistrations, hostSlotRegistration.getSlot())){
+      if (!hasHostSlotRegistration(hostSlotRegistrations, hostSlotRegistration.getEventSlot())){
         hostSlotRegistrationRepo.save(hostSlotRegistration);
       }
     });
@@ -274,7 +274,7 @@ public class HostingService {
         hostSlotRegistrations.add(
           new HostSlotRegistration(
             hostRegistrationRepo.findAllByRegistration(registration),
-            slotService.findBySlotId(slot.getAsJsonObject().get("slotId").getAsLong())
+            slotService.findByEventSlotId(slot.getAsJsonObject().get("eventSlotId").getAsLong())
           )
         );
       });
@@ -338,10 +338,10 @@ public class HostingService {
   }
 
   // Hostee Registration
-  private boolean hasHosteeSlotRegistration(List<HosteeSlotRegistration> hosteeSlotRegistrations, Slot slot) {
+  private boolean hasHosteeSlotRegistration(List<HosteeSlotRegistration> hosteeSlotRegistrations, EventSlot eventSlot) {
     AtomicBoolean hasHosteeSlotRegistration = new AtomicBoolean(false);
     hosteeSlotRegistrations.forEach(hosteeSlotRegistration -> {
-      if (hosteeSlotRegistration.getSlot() == slot) {
+      if (hosteeSlotRegistration.getEventSlot() == eventSlot) {
         hasHosteeSlotRegistration.set(true);
       }
     });
@@ -355,11 +355,11 @@ public class HostingService {
 
     // host slot registration
     if (slotsJson.get("slots") != null) {
-      slotsJson.get("slots").getAsJsonArray().forEach(slot -> {
+      slotsJson.get("slots").getAsJsonArray().forEach(eventSlot -> {
         hosteeSlotRegistrations.add(
           new HosteeSlotRegistration(
             hosteeRegistrationRepo.findByRegistration(registration),
-            slotService.findBySlotId(slot.getAsJsonObject().get("slotId").getAsLong())
+            slotService.findByEventSlotId(eventSlot.getAsJsonObject().get("eventSlotId").getAsLong())
           )
         );
       });
@@ -374,14 +374,14 @@ public class HostingService {
 
     // delete in current if not in request
     hosteeSlotRegistrations.forEach(hosteeSlotRegistration -> {
-      if (!hasHosteeSlotRegistration(requestHosteeSlotRegistrations, hosteeSlotRegistration.getSlot())){
-        hosteeSlotRegistrationRepo.deleteAllByHosteeRegistrationAndSlot(existingHosteeRegistration, hosteeSlotRegistration.getSlot());
+      if (!hasHosteeSlotRegistration(requestHosteeSlotRegistrations, hosteeSlotRegistration.getEventSlot())){
+        hosteeSlotRegistrationRepo.deleteAllByHosteeRegistrationAndEventSlot(existingHosteeRegistration, hosteeSlotRegistration.getEventSlot());
       }
     });
 
     // add new from request
     requestHosteeSlotRegistrations.forEach(hosteeSlotRegistration -> {
-      if (!hasHosteeSlotRegistration(hosteeSlotRegistrations, hosteeSlotRegistration.getSlot())){
+      if (!hasHosteeSlotRegistration(hosteeSlotRegistrations, hosteeSlotRegistration.getEventSlot())){
         hosteeSlotRegistrationRepo.save(hosteeSlotRegistration);
       }
     });
@@ -540,5 +540,9 @@ public class HostingService {
   }
   public boolean hasHostRegistration(Registration registration) {
     return hostRegistrationRepo.existsByRegistration(registration);
+  }
+
+  public boolean hasRegistration(EventSlot eventSlot) {
+    return hosteeSlotRegistrationRepo.existsByEventSlotAndHosteeRegistrationRegistrationActive(eventSlot, true);
   }
 }

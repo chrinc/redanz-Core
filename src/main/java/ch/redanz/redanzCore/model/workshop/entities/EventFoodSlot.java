@@ -31,13 +31,13 @@ public class EventFoodSlot implements Serializable {
   @JsonIgnore
   private Event event;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "food_id")
-  private Food food;
+  private String name;
+
+  private String description;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "slot_id")
-  private Slot slot;
+  @JoinColumn(name = "event_slot_id")
+  private EventSlot eventSlot;
 
   @Column(name = "price")
   private double price;
@@ -47,9 +47,10 @@ public class EventFoodSlot implements Serializable {
 
   public EventFoodSlot() {
   }
-  public EventFoodSlot(Food food, Slot slot, Event event, double price, Integer seqNr) {
-    this.food = food;
-    this.slot = slot;
+  public EventFoodSlot(String name, String description, EventSlot eventSlot, Event event, double price, Integer seqNr) {
+    this.name = name;
+    this.description = description;
+    this.eventSlot = eventSlot;
     this.event = event;
     this.price = price;
     this.seqNr = seqNr;
@@ -59,8 +60,9 @@ public class EventFoodSlot implements Serializable {
     return new ArrayList<>() {
       {
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                 put("label", "id");}});
-        add(new HashMap<>() {{put("key", "food");                 put("type", "list");    put("required", "true");   put("label", "Food");    put("list", null);}});
-        add(new HashMap<>() {{put("key", "slot");                 put("type", "list");    put("required", "true");   put("label", "Slot");    put("list", null);}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "label");   put("required", "true");   put("label", "Name");}});
+        add(new HashMap<>() {{put("key", "description");          put("type", "label");   put("required", "true");   put("label", "Description");}});
+        add(new HashMap<>() {{put("key", "eventSlot");            put("type", "list");    put("required", "true");   put("label", "Slot");    put("list", null);}});
         add(new HashMap<>() {{put("key", "price");                put("type", "double");  put("required", "true");   put("label", "Price");}});
         add(new HashMap<>() {{put("key", "seqNr");                put("type", "number");  put("required", "true");   put("label", "Sequence");}});
         add(new HashMap<>() {{put("key", "eventPartInfo"); put("type", "partInfo");        put("eventPartKey", "food"); put("label", OutTextConfig.LABEL_FOOD_INFO_EN.getOutTextKey());}});
@@ -75,7 +77,7 @@ public class EventFoodSlot implements Serializable {
     return new HashMap<>() {
       {
         put("id", String.valueOf(eventFoodSlotId));
-        put("foodSlot", null);
+        put("eventSlot", null);
         put("price", String.valueOf(price));
         put("seqNr", String.valueOf(seqNr));
       }

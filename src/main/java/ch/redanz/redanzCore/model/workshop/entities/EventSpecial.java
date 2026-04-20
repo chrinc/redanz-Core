@@ -24,9 +24,9 @@ public class EventSpecial {
   @JsonIgnore
   private Event event;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "special_id")
-  private Special special;
+  private String name;
+
+  private String description;
 
   private double price;
 
@@ -42,9 +42,10 @@ public class EventSpecial {
   public EventSpecial() {
   }
 
-  public EventSpecial(Special special, Event event, double price, boolean soldOut, int capacity, String url, Boolean infoOnly) {
+  public EventSpecial(String name, String description, Event event, double price, boolean soldOut, int capacity, String url, Boolean infoOnly) {
     this.event = event;
-    this.special = special;
+    this.name = name;
+    this.description = description;
     this.price = price;
     this.soldOut = soldOut;
     this.capacity = capacity;
@@ -56,7 +57,8 @@ public class EventSpecial {
     return new ArrayList<>() {
       {
         add(new HashMap<>() {{put("key", "id");                   put("type", "id");                                 put("label", "id");}});
-        add(new HashMap<>() {{put("key", "special");              put("type", "list");    put("required", "true");   put("label", "Special"); put("list", null);}});
+        add(new HashMap<>() {{put("key", "name");                 put("type", "label");  put("required", "true");   put("label", "Name");}});
+        add(new HashMap<>() {{put("key", "description");          put("type", "label");  put("required", "true");   put("label", "Description");}});
         add(new HashMap<>() {{put("key", "price");                put("type", "double");  put("required", "false");   put("label", "Price");}});
         add(new HashMap<>() {{put("key", "capacity");             put("type", "number");  put("required", "true");   put("label", "Capacity");}});
         add(new HashMap<>() {{put("key", "url");                  put("type", "label");   put("required", "false");  put("label", "Web Url");}});
@@ -74,6 +76,8 @@ public class EventSpecial {
       {
         put("id", String.valueOf(eventSpecialId));
         put("special", null);
+        put("name", String.valueOf(name));
+        put("description", String.valueOf(description));
         put("price", String.valueOf(price));
         put("capacity", String.valueOf(capacity));
         put("url", url);

@@ -4,10 +4,7 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
-import ch.redanz.redanzCore.model.workshop.entities.Discount;
-import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
-import ch.redanz.redanzCore.model.workshop.entities.Special;
 import ch.redanz.redanzCore.model.workshop.repository.EventDiscountRepo;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
 import ch.redanz.redanzCore.model.workshop.service.OutTextService;
@@ -34,20 +31,17 @@ public class DiscountRegistrationService {
   private final OutTextService outTextService;
   private final EventDiscountRepo eventDiscountRepo;
 
-  public void save(Registration registration, Discount discount) {
+  public void save(Registration registration, EventDiscount eventDiscount) {
     discountRegistrationRepo.save(
       new DiscountRegistration(
         registration,
-        discount
+        eventDiscount
       )
     );
   }
 
-  public Boolean hasRegistrations(Event event, Discount discount, Boolean active) {
-    return discountRegistrationRepo
-      .findAllByRegistrationEventAndRegistrationActive(event, active)
-      .stream()
-      .anyMatch(fr -> fr.getDiscount().equals(discount));
+  public Boolean hasRegistrations(EventDiscount eventDiscount, Boolean active) {
+    return discountRegistrationRepo.existsByEventDiscountAndRegistrationActive(eventDiscount, active);
   }
 
 
@@ -56,13 +50,13 @@ public class DiscountRegistrationService {
       registration.getTrack().getEventDiscounts().forEach(eventDiscount -> {
         if (
           eventDiscountRepo.existsByEventDiscountIdAndCapacityNotNull(eventDiscount.getEventDiscountId())
-          && !discountRegistrationRepo.existsByRegistrationAndDiscount(registration, eventDiscount.getDiscount())
-          && countDiscountSubmittedConfirmingDone(eventDiscount.getDiscount(), registration.getEvent()) < eventDiscount.getCapacity()
+          && !discountRegistrationRepo.existsByRegistrationAndEventDiscount(registration, eventDiscount)
+          && countEventDiscountSubmittedConfirmingDone(eventDiscount) < eventDiscount.getCapacity()
         ) {
           discountRegistrationRepo.save(
             new DiscountRegistration(
               registration,
-              eventDiscount.getDiscount()
+              eventDiscount
             )
           );
         }
@@ -74,11 +68,7 @@ public class DiscountRegistrationService {
     List<DiscountRegistration> discountRegistrations = new ArrayList<>();
     discountRegistrationRepo.findAllByRegistration(registration).forEach(
       discountRegistration -> {
-
-        EventDiscount eventDiscount = eventDiscountRepo.findByEventAndDiscount(
-          registration.getEvent(), discountRegistration.getDiscount()
-        );
-      if (eventDiscountRepo.existsByEventDiscountIdAndCapacityIsNull(eventDiscount.getEventDiscountId()))  {
+      if (eventDiscountRepo.existsByEventDiscountIdAndCapacityIsNull(discountRegistration.getEventDiscount().getEventDiscountId()))  {
         discountRegistrations.add(discountRegistration);
       }
     });
@@ -95,17 +85,14 @@ public class DiscountRegistrationService {
         .getAsJsonArray();
 
       discountRequests.forEach(discount -> {
-        Discount newDiscount = null;
-        if (discount.getAsJsonObject().get("checked") == null) {
-          newDiscount = discountService.findByDiscountId(discount.getAsJsonObject().get("discountId").getAsLong());
-        } else if (discount.getAsJsonObject().get("checked").getAsBoolean()) {
-          newDiscount = discountService.findByDiscountId(discount.getAsJsonObject().get("discount").getAsJsonObject().get("discountId").getAsLong());
+        EventDiscount newDiscount = null;
+        if (discount.getAsJsonObject().get("checked") == null ||discount.getAsJsonObject().get("checked").getAsBoolean()) {
+          newDiscount = discountService.findByEventDiscountId(discount.getAsJsonObject().get("eventDiscountId").getAsLong());
         }
+
         if (
           newDiscount != null
-            && eventDiscountRepo.existsByEventDiscountIdAndCapacityIsNull(
-            eventDiscountRepo.findByEventAndDiscount(registration.getEvent(), newDiscount).getEventDiscountId()
-          )
+            && newDiscount.getCapacity() == null
         ) {
           discountRegistrations.add(new DiscountRegistration(
             registration,
@@ -117,15 +104,10 @@ public class DiscountRegistrationService {
     return discountRegistrations;
   }
 
-  private boolean hasDiscountRegistration(List<DiscountRegistration> discountRegistrations, Discount discount) {
-    AtomicBoolean hasDiscountRegistration = new AtomicBoolean(false);
-    discountRegistrations.forEach(discountRegistration -> {
-      if (discountRegistration.getDiscount() == discount) {
-        hasDiscountRegistration.set(true);
-      }
-    });
-
-    return hasDiscountRegistration.get();
+  private boolean hasDiscountRegistration(List<DiscountRegistration> discountRegistrations, EventDiscount eventDiscount) {
+    return discountRegistrations.stream()
+      .anyMatch(discountRegistration ->
+        java.util.Objects.equals(discountRegistration.getEventDiscount(), eventDiscount));
   }
 
   public void updateDiscountRegistrationRequest(Registration registration, JsonObject request) {
@@ -135,16 +117,16 @@ public class DiscountRegistrationService {
     // delete in current if not in request
     discountRegistrationsNoCapacity.forEach(
       discountRegistration -> {
-      if (!hasDiscountRegistration(requestDiscountRegistrations, discountRegistration.getDiscount())){
-        discountRegistrationRepo.deleteAllByRegistrationAndDiscount(registration, discountRegistration.getDiscount());
+      if (!hasDiscountRegistration(requestDiscountRegistrations, discountRegistration.getEventDiscount())){
+        discountRegistrationRepo.deleteAllByRegistrationAndEventDiscount(registration, discountRegistration.getEventDiscount());
       }
     });
 
     // add new from request
     requestDiscountRegistrations.forEach(
       discountRegistration -> {
-      if (!hasDiscountRegistration(discountRegistrationsNoCapacity, discountRegistration.getDiscount())){
-        save(registration, discountRegistration.getDiscount());
+      if (!hasDiscountRegistration(discountRegistrationsNoCapacity, discountRegistration.getEventDiscount())){
+        save(registration, discountRegistration.getEventDiscount());
       }
     });
   }
@@ -153,7 +135,7 @@ public class DiscountRegistrationService {
     discountRegistration.forEach(discount -> {
       save(
         registration,
-        discountService.findByDiscountId(discount.getAsJsonObject().get("discountId").getAsLong())
+        discountService.findByEventDiscountId(discount.getAsJsonObject().get("eventDiscountId").getAsLong())
       );
     });
   }
@@ -162,56 +144,56 @@ public class DiscountRegistrationService {
     return discountRegistrationRepo.findAllByRegistration(registration);
   }
 
-  public int countDiscountSubmitted(Discount discount, Event event){
-    return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
-      discount, workflowStatusService.getSubmitted(), event
+  public int countEventDiscountSubmitted(EventDiscount eventDiscount){
+    return discountRegistrationRepo.countAllByEventDiscountAndRegistrationWorkflowStatus(
+      eventDiscount, workflowStatusService.getSubmitted()
     );
   }
-  public int countDiscountConfirming(Discount discount, Event event){
-    return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
-      discount, workflowStatusService.getConfirming(), event
+  public int countEventDiscountConfirming(EventDiscount eventDiscount){
+    return discountRegistrationRepo.countAllByEventDiscountAndRegistrationWorkflowStatus(
+      eventDiscount, workflowStatusService.getConfirming()
     );
   }
-  public int countDiscountDone(Discount discount, Event event){
-    return discountRegistrationRepo.countAllByDiscountAndRegistrationWorkflowStatusAndRegistrationEvent(
-      discount, workflowStatusService.getDone(), event
+  public int countEventDiscountDone(EventDiscount eventDiscount){
+    return discountRegistrationRepo.countAllByEventDiscountAndRegistrationWorkflowStatus(
+      eventDiscount, workflowStatusService.getDone()
     );
   }
-  public int countDiscountSubmittedConfirmingAndDone(Discount discount, Event event) {
-    return countDiscountConfirming(discount,event) + countDiscountDone(discount, event) + countDiscountSubmitted(discount, event);
+  public int countEventDiscountSubmittedConfirmingAndDone(EventDiscount eventDiscount) {
+    return countEventDiscountConfirming(eventDiscount) + countEventDiscountDone(eventDiscount) + countEventDiscountSubmitted(eventDiscount);
   }
-  public int countDiscountConfirmingAndDone(Discount discount, Event event) {
-    return countDiscountConfirming(discount, event) + countDiscountDone(discount, event);
+  public int countEventDiscountConfirmingAndDone(EventDiscount eventDiscount) {
+    return countEventDiscountConfirming(eventDiscount) + countEventDiscountDone(eventDiscount);
   }
 
 
-  public int countDiscountSubmittedConfirmingDone(Discount discount, Event event) {
-    return countDiscountSubmitted(discount, event)
-      + countDiscountConfirming(discount, event)
-      + countDiscountDone(discount, event)
+  public int countEventDiscountSubmittedConfirmingDone(EventDiscount eventDiscount) {
+    return countEventDiscountSubmitted(eventDiscount)
+      + countEventDiscountConfirming(eventDiscount)
+      + countEventDiscountDone(eventDiscount)
       ;
   }
 
-  public List<String> countDiscountSubmittedAsList(Discount discount, Event event){
+  public List<String> countEventDiscountSubmittedAsList(EventDiscount eventDiscount){
     List<String> discountList = new ArrayList<>();
-    discountList.add(String.valueOf(countDiscountSubmitted(discount, event)));
+    discountList.add(String.valueOf(countEventDiscountSubmitted(eventDiscount)));
     return discountList;
 
   }
-  public List<String>  countDiscountConfirmingAsList(Discount discount, Event event){
+  public List<String>  countEventDiscountConfirmingAsList(EventDiscount eventDiscount){
     List<String> discountList = new ArrayList<>();
-    discountList.add(String.valueOf(countDiscountConfirming(discount, event)));
+    discountList.add(String.valueOf(countEventDiscountConfirming(eventDiscount)));
     return discountList;
   }
-  public List<String> countDiscountDoneAsList(Discount discount, Event event){
-    List<String> discountList = new ArrayList<>();
-    discountList.add(String.valueOf(countDiscountDone(discount, event)));
-    return discountList;
+  public List<String> countEventDiscountDoneAsList(EventDiscount eventDiscount){
+    List<String> eventDiscountList = new ArrayList<>();
+    eventDiscountList.add(String.valueOf(countEventDiscountDone(eventDiscount)));
+    return eventDiscountList;
   }
-  public List<String> countDiscountSubmittedConfirmingAndDoneAsList(Discount discount, Event event) {
-    List<String> discountList = new ArrayList<>();
-    discountList.add(String.valueOf(countDiscountSubmittedConfirmingAndDone(discount, event)));
-    return discountList;
+  public List<String> countEventDiscountSubmittedConfirmingAndDoneAsList(EventDiscount eventDiscount) {
+    List<String> eventDiscountList = new ArrayList<>();
+    eventDiscountList.add(String.valueOf(countEventDiscountSubmittedConfirmingAndDone(eventDiscount)));
+    return eventDiscountList;
   }
 
   public String getReportDiscounts(Registration registration, Language language) {
@@ -219,7 +201,7 @@ public class DiscountRegistrationService {
 
     AtomicReference<String> discounts = new AtomicReference<>();
     discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
-      String specialOutText = outTextService.getOutTextByKeyAndLangKey(discountRegistration.getDiscount().getName(), language.getLanguageKey()).getOutText();
+      String specialOutText = outTextService.getOutTextByKeyAndLangKey(discountRegistration.getEventDiscount().getName(), language.getLanguageKey()).getOutText();
       if (discounts.get() == null)
         discounts.set(specialOutText);
       else {

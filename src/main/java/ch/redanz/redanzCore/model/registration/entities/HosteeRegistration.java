@@ -18,8 +18,8 @@ import java.io.Serializable;
 public class HosteeRegistration implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "workflow_status_id")
-  private Long hostRegistrationId;
+  @Column(name = "hostee_registration_id")
+  private Long hosteeRegistrationId;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "registration_id")

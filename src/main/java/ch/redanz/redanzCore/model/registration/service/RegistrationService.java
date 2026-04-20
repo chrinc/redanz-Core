@@ -61,6 +61,7 @@ public class RegistrationService {
   private final CountryService countryService;
   private final BaseParService baseParService;
   private final BundleEventTrackService bundleEventTrackService;
+  private final PaymentService paymentService;
 
   public void update(Registration registration) {
     registrationRepo.save(registration);
@@ -218,7 +219,7 @@ public class RegistrationService {
 
         boolean privateClassSoldOut =
           eventPrivateClass.getCapacity()
-            <= specialRegistrationService.countPrivateClassRegistrations(event, eventPrivateClass.getPrivateClass());
+            <= specialRegistrationService.countPrivateClassRegistrations(eventPrivateClass);
 
         if (privateClassSoldOut != eventPrivateClass.getSoldOut()) {
           eventPrivateClass.setSoldOut(privateClassSoldOut);
@@ -231,11 +232,10 @@ public class RegistrationService {
       eventSpecial -> {
         boolean specialSoldOut =
           eventSpecial.getCapacity()
-            <= specialRegistrationService.countSpecialRegistrations(eventSpecial.getSpecial(), event);
+            <= specialRegistrationService.countEventSpecialRegistrations(eventSpecial, event);
 
         if (specialSoldOut != eventSpecial.getSoldOut()) {
           eventSpecial.setSoldOut(specialSoldOut);
-//          eventService.save(eventBundle);
         }
       });
   }
@@ -560,7 +560,7 @@ public class RegistrationService {
 
   public void onManualRelease(Registration registration) throws TemplateException, IOException {
     releaseToConfirming(registration);
-    registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration));
+    registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration), paymentService.getPaymentDetails(registration));
   }
 
   public void onManualDone(Registration registration) throws TemplateException, IOException {
@@ -606,7 +606,6 @@ public class RegistrationService {
     // ignore if user already has a registration
     Registration registration;
     RegistrationRequest registrationRequest = new RegistrationRequest(
-//      request.get("event").getAsJsonObject().get("eventId").getAsLong(),
       event.getEventId(),
       request.get("bundleId").getAsLong(),
       request.get("trackId").isJsonNull() ? null : request.get("trackId").getAsLong(),
@@ -1293,13 +1292,13 @@ public class RegistrationService {
     return count;
   }
 
-
-  public List<Registration> findAllByEventAndSlot(Event event, Slot slot) {
-    return findAllByEvent(event)
-      .stream()
-      .filter(registration -> registration.getBundle().getPartySlots().contains(slot))
-      .collect(Collectors.toList());
-  }
+//
+//  public List<Registration> findAllByEventAndSlot(Event event, Slot slot) {
+//    return findAllByEvent(event)
+//      .stream()
+//      .filter(registration -> registration.getBundle().getPartySlots().contains(slot))
+//      .collect(Collectors.toList());
+//  }
 
   public boolean isEmptyStaffRegistration(Registration registration){
     return
@@ -1308,7 +1307,6 @@ public class RegistrationService {
       && !hostingService.hasHostRegistration(registration)
       && !volunteerService.hasVolunteerRegistration(registration);
   }
-
 
   public boolean hasBundle(Registration registration) {
     return registration.getBundle() != null;

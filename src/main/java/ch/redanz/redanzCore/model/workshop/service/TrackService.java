@@ -309,7 +309,7 @@ public class TrackService {
     List<Map<String, String>> trackSchema = Track.schema();
     trackSchema.forEach(item -> {
       if (item.get("key").equals("discounts")) {
-        item.put("list", discountService.getDiscountsMap(event).toString());
+        item.put("list", discountService.getEventDiscountsMap(event).toString());
       }
       if (item.get("key").equals("danceRoles")) {
         item.put("list", danceRoleService.getDanceRolesMap().toString());
@@ -392,13 +392,6 @@ public class TrackService {
 
     // clone EventDiscounts
     List<EventDiscount>  newEventDiscounts = new ArrayList<>(newEvent.getEventDiscounts());
-    Set<Discount> oldDiscounts = baseTrack.getEventDiscounts().stream()
-      .map(EventDiscount::getDiscount)
-      .collect(Collectors.toSet());
-
-    newEventDiscounts.stream()
-      .filter(eventDiscount -> oldDiscounts.contains(eventDiscount.getDiscount()))
-      .collect(Collectors.toList());
     newTrack.setEventDiscounts(newEventDiscounts);
 
 //    // clone Dance Roles

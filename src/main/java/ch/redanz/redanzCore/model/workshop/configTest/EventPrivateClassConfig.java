@@ -16,10 +16,12 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum EventPrivateClassConfig {
-  EVENT_ELZE(EventConfig.REDANZ_EVENT, PrivateClassConfig.NORMA, 90.0, false, 1);
+  EVENT_ELZE(EventConfig.REDANZ_EVENT, "Norma", OutTextConfig.LABEL_PRIVATE_NORMA_DESC_EN.getOutTextKey(), false, 90.0, false, 1);
 
   private final EventConfig eventConfig;
-  private final PrivateClassConfig privateClassConfig;
+  private final String name;
+  private final String description;
+  private final boolean partnerRequired;
   private final double price;
   private final boolean soldOut;
   private final int capacity;
@@ -27,8 +29,7 @@ public enum EventPrivateClassConfig {
   public static void setup(PrivateClassService privateClassService, EventService eventService) {
     for (EventPrivateClassConfig eventPrivateClassConfig : EventPrivateClassConfig.values()) {
       Event event = eventService.findByName(eventPrivateClassConfig.eventConfig.getName());
-      PrivateClass privateClass = privateClassService.findByName(eventPrivateClassConfig.privateClassConfig.getName());
-      eventService.save(new EventPrivateClass(privateClass, event, eventPrivateClassConfig.price, eventPrivateClassConfig.soldOut, eventPrivateClassConfig.capacity));
+      eventService.save(new EventPrivateClass(event, eventPrivateClassConfig.price, eventPrivateClassConfig.soldOut, eventPrivateClassConfig.capacity, eventPrivateClassConfig.name, eventPrivateClassConfig.description, eventPrivateClassConfig.partnerRequired));
     }
   }
 }

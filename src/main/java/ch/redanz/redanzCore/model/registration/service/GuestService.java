@@ -5,7 +5,7 @@ import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.entities.Guest;
 import ch.redanz.redanzCore.model.registration.repository.GuestRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -35,9 +35,9 @@ public class GuestService {
 
   }
 
-  public List<Guest> findAllByEventAndSlot(Event event, Slot slot) {
-    return guestRepo.findAllByEventAndActiveAndSlotsContains(event, true, slot);
-  }
+//  public List<Guest> findAllByEventAndEventSlot(Event event, EventSlot eventSlot) {
+//    return guestRepo.findAllByEventAndActiveAndSlotsContains(event, true, eventSlot);
+//  }
 
 
   public void save(Guest guest) {
@@ -72,16 +72,16 @@ public class GuestService {
 
     Person person = personService.findByPersonId(personId);
 
-    List<Slot> newSlots = new ArrayList<>();
-    JsonArray mySlots = myGuest.get("slots").isJsonNull() ? null
-      : myGuest.get("slots").isJsonObject() ?
-        myGuest.get("slots").getAsJsonObject().get("extractedKeys").getAsJsonArray()
-      : myGuest.get("slots").getAsJsonArray();
+    List<EventSlot> newSlots = new ArrayList<>();
+    JsonArray mySlots = myGuest.get("eventSlots").isJsonNull() ? null
+      : myGuest.get("eventSlots").isJsonObject() ?
+        myGuest.get("eventSlots").getAsJsonObject().get("extractedKeys").getAsJsonArray()
+      : myGuest.get("eventSlots").getAsJsonArray();
 
     if (mySlots != null) {
       mySlots.forEach(mySlot -> {
-          newSlots.add(slotService.findBySlotId(
-            mySlot.isJsonObject() ?  mySlot.getAsJsonObject().get("slotId").getAsLong()
+          newSlots.add(slotService.findByEventSlotId(
+            mySlot.isJsonObject() ?  mySlot.getAsJsonObject().get("eventSlotId").getAsLong()
             : mySlot.getAsLong()
             )
           );
@@ -116,7 +116,7 @@ public class GuestService {
         myExistingGuest.setDescription(description);
         doUpdate.set(true);
       }
-      List<Slot> updateSlots = new ArrayList<>();
+      List<EventSlot> updateSlots = new ArrayList<>();
       newSlots.forEach(newSlot -> {
         if (!myExistingGuest.getSlots().contains(newSlot)) {
           updateSlots.add(newSlot);

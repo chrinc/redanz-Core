@@ -41,6 +41,8 @@ public class RegistrationController {
 
   @Autowired
   Configuration mailConfig;
+  @Autowired
+  private PaymentService paymentService;
 
   @GetMapping(path = "/registration")
   @Transactional
@@ -245,6 +247,34 @@ public class RegistrationController {
       );
     } catch (Exception exception) {
       errorLogService.addLog("manual-confirming", exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/manual-done-update-email")
+  @Transactional
+  public void manualDoneUpdate(
+    @RequestParam("registrationId") Long registrationId
+  ) {
+    try {
+      Registration registration = registrationService.findByRegistrationId(registrationId);
+      registrationEmailService.sendEmailBookingDoneUpdate(registration.getParticipant(), registrationEmailService.findByRegistration(registration), registration, paymentService.getPaymentDetails(registration));
+    } catch (Exception exception) {
+      errorLogService.addLog("manual-update", exception.toString());
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/manual-conf-update-email")
+  @Transactional
+  public void manualConfirmingUpdate(
+    @RequestParam("registrationId") Long registrationId
+  ) {
+    try {
+      Registration registration = registrationService.findByRegistrationId(registrationId);
+      registrationEmailService.sendEmailBookingConfirmingUpdate(registration.getParticipant(), registrationEmailService.findByRegistration(registration), registration, paymentService.getPaymentDetails(registration));
+    } catch (Exception exception) {
+      errorLogService.addLog("manual-update", exception.toString());
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }

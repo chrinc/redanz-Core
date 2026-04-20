@@ -59,7 +59,13 @@ public class EmailController {
               jsonEmail.get("allStatus").getAsBoolean() : false
           )
           : false;
-
+      Boolean includeCalendar =
+        jsonEmail.get("includeCalendar") != null ?
+          (
+            !jsonEmail.get("includeCalendar").isJsonNull() ?
+              jsonEmail.get("includeCalendar").getAsBoolean() : false
+          )
+          : false;
       Registration registration = registrationService.findByRegistrationId(registrationId);
 
       List<Registration> registrationList = new ArrayList<Registration>();
@@ -101,7 +107,8 @@ public class EmailController {
       registrationEmailService.sendGenericEmail(
         senderUserId,
         registrationList,
-        jsonEmail
+        jsonEmail,
+        includeCalendar
       );
 
     } catch (Exception exception) {
@@ -122,7 +129,9 @@ public class EmailController {
             senderUserId,
             personService.findByPersonId(Long.valueOf(receiver.get("personId").toString())),
             emailContent.get("subject").toString(),
-            emailContent.get("content").toString()
+            emailContent.get("content").toString(),
+            null,
+            null
           );
         } catch (IOException e) {
           throw new RuntimeException(e);

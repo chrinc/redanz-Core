@@ -84,18 +84,17 @@ public class ReportStatsService {
       );
     });
 
-    // Event Specials
+    // Event
     event.getEventSpecials().forEach(eventSpecial -> {
       if (!eventSpecial.getInfoOnly()) {
-        Special special = eventSpecial.getSpecial();
         stats.add(
           new ResponseStats(
             "Special"
-            , outTextService.getOutTextByKeyAndLangKey(special.getName(), language.getLanguageKey()).getOutText()
-            , specialRegistrationService.countSpecialRegistrationsAndSplitRoles(special, event)
-            , specialRegistrationService.countSpecialsSubmittedAndSplitRoles(special, event)
-            , specialRegistrationService.countSpecialsConfirmingAndSplitRoles(special, event)
-            , specialRegistrationService.countSpecialsDoneAndSplitRoles(special, event)
+            , outTextService.getOutTextByKeyAndLangKey(eventSpecial.getName(), language.getLanguageKey()).getOutText()
+            , specialRegistrationService.countEventSpecialRegistrationsAndSplitRoles(eventSpecial, event)
+            , specialRegistrationService.countEventSpecialsSubmittedAndSplitRoles(eventSpecial, event)
+            , specialRegistrationService.countEventSpecialsConfirmingAndSplitRoles(eventSpecial, event)
+            , specialRegistrationService.countEventSpecialsDoneAndSplitRoles(eventSpecial, event)
             , eventSpecial.getCapacity()
             , eventSpecial.getSoldOut() ? yes : no
           )
@@ -107,11 +106,11 @@ public class ReportStatsService {
       stats.add(
         new ResponseStats(
           "Food"
-          , outTextService.getOutTextByKeyAndLangKey(eventFoodSlot.getSlot().getName(), language.getLanguageKey()).getOutText()
-          , foodRegistrationService.countFoodSlotSubmittedConfirmingAndDoneAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
-          , foodRegistrationService.countFoodSlotSubmittedAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
-          , foodRegistrationService.countFoodSlotConfirmingAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
-          , foodRegistrationService.countFoodSlotDoneAsList(eventFoodSlot.getFood(), eventFoodSlot.getSlot(), event)
+          , outTextService.getOutTextByKeyAndLangKey(eventFoodSlot.getName(), language.getLanguageKey()).getOutText()
+          , foodRegistrationService.countFoodSlotSubmittedConfirmingAndDoneAsList(eventFoodSlot, event)
+          , foodRegistrationService.countFoodSlotSubmittedAsList(eventFoodSlot, event)
+          , foodRegistrationService.countFoodSlotConfirmingAsList(eventFoodSlot, event)
+          , foodRegistrationService.countFoodSlotDoneAsList(eventFoodSlot, event)
           , null
           , no
         )
@@ -119,41 +118,38 @@ public class ReportStatsService {
     });
 
     // Track Discounts
-    Set<Discount> discounts = new HashSet<>();
-    event.getEventTracks().forEach(eventTrack -> {
-      eventTrack.getTrack().getEventDiscounts().forEach(eventDiscount -> {
-        Discount discount = eventDiscount.getDiscount();
-        discounts.add(discount);
-      });
-    });
+//    Set<EventDiscount> eventDiscounts = new HashSet<>();
+//    event.getEventTracks().forEach(eventTrack -> {
+//      eventTrack.getTrack().getEventDiscounts().forEach(eventDiscount -> {
+//        eventDiscounts.add(eventDiscount);
+//      });
+//    });
     event.getEventDiscounts().forEach(eventDiscount -> {
-      Discount discount = eventDiscount.getDiscount();
       stats.add(
         new ResponseStats(
           "Discount"
-          , outTextService.getOutTextByKeyAndLangKey(discount.getName(), language.getLanguageKey()).getOutText()
-          , discountRegistrationService.countDiscountSubmittedConfirmingAndDoneAsList(discount, event)
-          , discountRegistrationService.countDiscountSubmittedAsList(discount, event)
-          , discountRegistrationService.countDiscountConfirmingAsList(discount, event)
-          , discountRegistrationService.countDiscountDoneAsList(discount, event)
+          , outTextService.getOutTextByKeyAndLangKey(eventDiscount.getName(), language.getLanguageKey()).getOutText()
+          , discountRegistrationService.countEventDiscountSubmittedConfirmingAndDoneAsList(eventDiscount)
+          , discountRegistrationService.countEventDiscountSubmittedAsList(eventDiscount)
+          , discountRegistrationService.countEventDiscountConfirmingAsList(eventDiscount)
+          , discountRegistrationService.countEventDiscountDoneAsList(eventDiscount)
           , eventDiscount.getCapacity()
           , eventDiscount.getCapacity() == null ? no
-            : discountRegistrationService.countDiscountSubmittedConfirmingAndDone(discount, event) >= eventDiscount.getCapacity() ? yes : no
+            : discountRegistrationService.countEventDiscountSubmittedConfirmingAndDone(eventDiscount) >= eventDiscount.getCapacity() ? yes : no
         )
       );
     });
     // Private Classes
     event.getEventPrivates().forEach(
       eventPrivateClass -> {
-        PrivateClass privateClass = eventPrivateClass.getPrivateClass();
         stats.add(
           new ResponseStats(
             "Private Class"
-            ,privateClass.getName()
-            ,specialRegistrationService.countPrivateRegistrationsAndSplitRoles(privateClass, event)
-            ,specialRegistrationService.countPrivatesSubmittedAndSplitRoles(privateClass, event)
-            ,specialRegistrationService.countPrivatesConfirmingAndSplitRoles(privateClass, event)
-            ,specialRegistrationService.countPrivatesDoneAndSplitRoles(privateClass, event)
+            ,eventPrivateClass.getName()
+            ,specialRegistrationService.countPrivateRegistrationsAndSplitRoles(eventPrivateClass)
+            ,specialRegistrationService.countPrivatesSubmittedAndSplitRoles(eventPrivateClass)
+            ,specialRegistrationService.countPrivatesConfirmingAndSplitRoles(eventPrivateClass)
+            ,specialRegistrationService.countPrivatesDoneAndSplitRoles(eventPrivateClass)
             ,eventPrivateClass.getCapacity()
             ,eventPrivateClass.getSoldOut() ? yes : no
           )

@@ -13,4 +13,5 @@ public interface BaseParRepo  extends JpaRepository<BasePar, Long> {
   BasePar findByEventAndName(Event event, String name);
   BasePar findByBaseParId(Long id);
   Boolean existsByEventAndName(Event event, String name);
+  Boolean existsByName(String name);
 }

@@ -1,9 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.configTest;
 
-import ch.redanz.redanzCore.model.workshop.config.SlotConfig;
+import ch.redanz.redanzCore.model.workshop.config.EventSlotConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Bundle;
-import ch.redanz.redanzCore.model.workshop.entities.DanceRole;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import lombok.AllArgsConstructor;
@@ -29,18 +28,18 @@ public enum BundleConfig {
   private final Integer capacity;
   private final Boolean simpleTicket;
   private final Integer seqNr;
-  private final List<SlotConfig> partySlots;
+  private final List<EventSlotConfig> partySlots;
   private final String color;
 
   public static void setup(BundleService bundleService, SlotService slotService) {
-    Set<Slot> partySlots = new HashSet<>();
+    Set<EventSlot> partySlots = new HashSet<>();
 
     for (BundleConfig bundleConfig : BundleConfig.values()) {
       partySlots.clear();
 
       if (bundleConfig.partySlots != null) {
         bundleConfig.partySlots.forEach(slotConfig -> {
-          partySlots.add(slotService.findByName(slotConfig.getName()));
+          partySlots.add(slotService.findEventSlotByName(slotConfig.getName()));
         });
       };
 
@@ -61,7 +60,6 @@ public enum BundleConfig {
         );
       } else {
         Bundle bundle = bundleService.findByName(bundleConfig.name);
-//        bundle.setCapacity(bundleConfig.capacity);
         bundle.setDescription(bundleConfig.getDescription());
         bundle.setPrice(bundleConfig.getPrice());
         bundle.setSimpleTicket(bundleConfig.simpleTicket);

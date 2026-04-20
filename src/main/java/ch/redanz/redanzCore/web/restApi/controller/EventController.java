@@ -5,6 +5,7 @@ import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.service.VolunteerService;
+import ch.redanz.redanzCore.model.workshop.config.SlotType;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.response.AccommodationResponse;
@@ -31,9 +32,7 @@ public class EventController {
   private final SlotService slotService;
   private final OutTextService outTextService;
   private final AccommodationService accommodationService;
-  private final SpecialService specialService;
   private final BundleService bundleService;
-  private final PrivateClassService privateClassService;
   private final VolunteeringService volunteeringService;
   private final ScholarshipService scholarshipService;
   private final VolunteerService volunteerService;
@@ -41,7 +40,6 @@ public class EventController {
   private final FoodService foodService;
   private final DiscountService discountService;
   private final EventRegistrationService eventRegistrationService;
-  private final EventTypeSlotService eventTypeSlotService;
   private final EventPartService eventPartService;
   private final BundleEventTrackService bundleEventTrackService;
   private final RegistrationService registrationService;
@@ -150,7 +148,7 @@ public class EventController {
   public List<Map<String, String>> getFoodSlotSchema(
     @RequestParam("eventId") Long eventId
   ) {
-    return foodService.getFoodSlotSchema();
+    return foodService.getFoodSlotSchema(eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/data/foodSlot")
@@ -222,6 +220,13 @@ public class EventController {
     @RequestParam("eventId") Long eventId
   ) {
     return eventService.eventSpecialSchema();
+  }
+
+  @GetMapping(path = "/schema/eventSlot")
+  public List<Map<String, String>> getEventSlotSchema(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.getEventSlotSchema();
   }
 
   @GetMapping(path = "/schema/eventDiscount")
@@ -322,6 +327,24 @@ public class EventController {
     }
   }
 
+  @PostMapping(path = "/eventSlot/upsert")
+  @Transactional
+  public void upsertEventSlot(
+    @RequestBody String jsonObject
+  ) {
+    try {
+      JsonObject jsonEventSlotObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+      eventService.updateEventSlot(
+        jsonEventSlotObject,
+        eventService.findByEventId(jsonEventSlotObject.get("eventId").getAsLong())
+      );
+    } catch (ApiRequestException apiRequestException) {
+      throw new ApiRequestException(apiRequestException.getMessage());
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
 //  @PostMapping(path = "/trackDanceRole/upsert")
 //  @Transactional
 //  public void upsertTrackDanceRole(
@@ -404,6 +427,12 @@ public class EventController {
   ) {
     return eventService.eventSpecialData(eventService.findByEventId(eventId));
   }
+  @GetMapping(path = "/data/eventSlot")
+  public List<Map<String, String>> getEVentSlotData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.eventSlotData(eventService.findByEventId(eventId));
+  }
 
   @GetMapping(path = "/data/eventDiscount")
   public List<Map<String, String>> getEventDiscountData(
@@ -428,7 +457,7 @@ public class EventController {
   @GetMapping(path = "/schema/volunteering")
   public List<Map<String, String>> getVolunteerSchema(
     @RequestParam("eventId") Long eventId) {
-    return volunteeringService.getVolunteerSchema();
+    return volunteeringService.getVolunteerSchema(eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/data/volunteering")
@@ -436,6 +465,19 @@ public class EventController {
     @RequestParam("eventId") Long eventId
   ) {
     return volunteeringService.getVolunteerData(new ArrayList<>(){{ add(eventService.findByEventId(eventId)); }});
+  }
+
+  @GetMapping(path = "/schema/volunteerType")
+  public List<Map<String, String>> getVolunteerTypeSchema(
+    @RequestParam("eventId") Long eventId) {
+    return eventService.volunteerTypeSchema();
+  }
+
+  @GetMapping(path = "/data/volunteerType")
+  public List<Map<String, String>> getVolunteerTypeData(
+    @RequestParam("eventId") Long eventId
+  ) {
+    return eventService.volunteerTypeData(eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/schema/requireTerms")
@@ -518,24 +560,24 @@ public class EventController {
     return outTextService.getOutTextMapByType(types);
   }
 
-  @GetMapping(path = "/slots/all")
-  public List<Slot> getAllSlots(
-    @RequestParam("eventId") Long eventId
-  ) {
-    return slotService.getAllSlots(eventService.findByEventId(eventId));
-  }
+//  @GetMapping(path = "/slots/all")
+//  public List<Slot> getAllSlots(
+//    @RequestParam("eventId") Long eventId
+//  ) {
+//    return slotService.getAllSlots(eventService.findByEventId(eventId));
+//  }
   @GetMapping(path = "/slots/party")
-  public List<Slot> getAllPartySlots(
+  public List<EventSlot> getAllPartySlots(
     @RequestParam("eventId") Long eventId
   ) {
-    return slotService.getAllSlots("party", eventService.findByEventId(eventId));
+    return slotService.getAllEventSlots(SlotType.PARTY, eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/volunteer/slot/all")
-  public List<Slot> getAllVolunteerSlots(
+  public List<EventSlot> getAllVolunteerSlots(
     @RequestParam("eventId") Long eventId
   ) {
-    return slotService.getAllVolunteerSlots(eventService.findByEventId(eventId));
+    return slotService.getAllEventSlots(SlotType.VOLUNTEER, eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/volunteer/type/all")
@@ -605,11 +647,11 @@ public class EventController {
 
   @PostMapping(path = "/event/upsert")
   @Transactional
-  public void upsertEvent(
+  public Long upsertEvent(
     @RequestBody String jsonObject
   ) {
     try {
-      eventService.updateEvent(
+      return eventService.updateEvent(
         JsonParser.parseString(jsonObject).getAsJsonObject()
       );
 
@@ -786,18 +828,62 @@ public class EventController {
 
   }
 
-  @PostMapping(path = "/discount/upsert")
+  @PostMapping(path = "/eventSlot/delete")
   @Transactional
-  public void upsertDiscount(
+  public void deleteEventSlot(
+    @RequestBody String jsonObject
+  ) {
+    JsonObject jsonFoodObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+    eventService.deleteEventSlot(
+      jsonFoodObject
+    );
+
+  }
+  @PostMapping(path = "/volunteerType/delete")
+  @Transactional
+  public void deleteVolunteerType(
+    @RequestBody String jsonObject
+  ) {
+    JsonObject jsonFoodObject = JsonParser.parseString(jsonObject).getAsJsonObject();
+    eventService.deleteEventVolunteerType(
+      jsonFoodObject
+    );
+  }
+
+//  @PostMapping(path = "/discount/upsert")
+//  @Transactional
+//  public void upsertDiscount(
+//    @RequestBody String jsonObject
+//  ) {
+//    try {
+//      JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+//      Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
+//      if (id != null && id != 0 && eventRegistrationService.discountIsUsedAndHasRegistration(discountService.findByDiscountId(id))) {
+//        throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
+//      } else {
+//        discountService.update(request);
+//      }
+//    } catch (HasRegistrationException hasRegistrationException) {
+//      throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
+//    } catch (ApiRequestException apiRequestException) {
+//      throw new ApiRequestException(apiRequestException.getMessage());
+//    } catch (Exception exception) {
+//      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+//    }
+//  }
+
+  @PostMapping(path = "/volunteerType/upsert")
+  @Transactional
+  public void upsertVolunteertypes(
     @RequestBody String jsonObject
   ) {
     try {
       JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
       Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      if (id != null && id != 0 && eventRegistrationService.discountIsUsedAndHasRegistration(discountService.findByDiscountId(id))) {
+      if (id != null && id != 0 && volunteerService.volunteerTypeIsUsedAndHasRegistration(volunteerService.findVolunteerTypeById(id))) {
         throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
       } else {
-        discountService.update(request);
+        volunteerService.updateVolunteerType(request);
       }
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);
@@ -928,10 +1014,10 @@ public class EventController {
 
   @GetMapping(path = "/event/clone")
   @Transactional
-  public void cloneEvent(
+  public Long cloneEvent(
     @RequestParam("eventId") Long eventId
   ) {
-    eventService.clone(eventService.findByEventId(eventId));
+    return eventService.clone(eventService.findByEventId(eventId));
   }
 
   @GetMapping(path = "/bundle/clone")

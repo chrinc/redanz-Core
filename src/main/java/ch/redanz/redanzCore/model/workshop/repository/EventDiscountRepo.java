@@ -8,10 +8,8 @@ import java.util.List;
 public interface EventDiscountRepo extends JpaRepository<EventDiscount, Long> {
   List<EventDiscount> findAllByEvent(Event event);
   EventDiscount findByEventDiscountId(Long eventDiscountId);
-  boolean existsByEventAndDiscount(Event event, Discount discount);
-  EventDiscount findByEventAndDiscount(Event event, Discount discount);
   boolean existsByEventDiscountIdAndCapacityIsNull(Long eventDiscountId);
   boolean existsByEventDiscountIdAndCapacityNotNull(Long eventDiscountId);
-
-  boolean existsByDiscount(Discount discount);
+  boolean existsByName(String name);
+  EventDiscount findByName(String name);
 }

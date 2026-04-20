@@ -19,6 +19,7 @@ public class RegistrationReleaseService {
   private final EventService eventService;
   private final RegistrationEmailService registrationEmailService;
   private final WorkflowStatusService workflowStatusService;
+  private final PaymentService paymentService;
 
   public void doRelease(Registration registration){
     if (
@@ -32,13 +33,13 @@ public class RegistrationReleaseService {
         ) {
           Registration partnerRegistration = registrationMatchingService.findByRegistration1(registration).get().getRegistration2();
           registrationService.releaseToConfirming(partnerRegistration);
-          registrationEmailService.sendEmailConfirmation(partnerRegistration , registrationEmailService.findByRegistration(partnerRegistration));
+          registrationEmailService.sendEmailConfirmation(partnerRegistration , registrationEmailService.findByRegistration(partnerRegistration), paymentService.getPaymentDetails(partnerRegistration));
           // releasedRegistrations.add(partnerRegistration);
         }
 
         // release registration
         registrationService.releaseToConfirming(registration);
-        registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration));
+        registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration), paymentService.getPaymentDetails(registration));
 
 //        releasedRegistrations.add(registration);
       } catch (IOException | TemplateException e) {

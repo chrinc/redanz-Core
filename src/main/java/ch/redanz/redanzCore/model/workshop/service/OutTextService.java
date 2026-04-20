@@ -1,6 +1,8 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
 import ch.redanz.redanzCore.model.profile.entities.Language;
+import ch.redanz.redanzCore.model.workshop.configTest.LanguageConfig;
+import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.OutText;
 import ch.redanz.redanzCore.model.workshop.entities.OutTextId;
 import ch.redanz.redanzCore.model.workshop.repository.OutTextRepo;
@@ -113,10 +115,44 @@ public class OutTextService {
     });
     return hasLabel.get();
   }
+  public String newLabel(JsonObject labelObject) {
+    String newLabelKey = "LABEL-USER-GEN-" + System.currentTimeMillis();
+    List<OutText> outTexts = new ArrayList<>();
+    outTexts.add(
+      new OutText(
+        new OutTextId(
+          newLabelKey, "EN"
+        ),
+        labelObject.get("EN").getAsString(),
+        "FRONT_LOGIN"
+      )
+    );
+    outTexts.add(
+      new OutText(
+        new OutTextId(
+          newLabelKey, "GE"
+        ),
+        labelObject.get("GE").getAsString(),
+        "FRONT_LOGIN"
+      )
+    );
+    saveAll(outTexts);
+    return newLabelKey;
+  }
+
+  public void updateLabel(JsonObject labelObject, String key) {
+    OutText outTextEN = getOutTextByKeyAndLangKey(key, LanguageConfig.ENGLISH.getKey());
+    OutText outTextGE = getOutTextByKeyAndLangKey(key, LanguageConfig.GERMAN.getKey());
+    outTextGE.setOutText(labelObject.get("GE").getAsString());
+    outTextEN.setOutText(labelObject.get("EN").getAsString());
+    List<OutText> outTexts = new ArrayList<>();
+    outTexts.add(outTextEN);
+    outTexts.add(outTextGE);
+    saveAll(outTexts);
+  }
 
   public String updateLabelArray(JsonArray labelArray, String key) {
     String newLabelKey = "LABEL-USER-GEN-" + System.currentTimeMillis();
-    boolean hasLabel = hasLabel(labelArray, key);
     if (!hasLabel(labelArray, key)) {
       return null;
     }

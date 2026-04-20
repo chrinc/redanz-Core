@@ -1,6 +1,6 @@
 package ch.redanz.redanzCore.model.registration.entities;
 
-import ch.redanz.redanzCore.model.workshop.entities.Discount;
+import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,10 +29,10 @@ public class DiscountRegistration {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "discount_id")
-  private Discount discount;
+  private EventDiscount eventDiscount;
 
-  public DiscountRegistration(Registration registration, Discount discount) {
+  public DiscountRegistration(Registration registration, EventDiscount eventDiscount) {
     this.registration = registration;
-    this.discount = discount;
+    this.eventDiscount = eventDiscount;
   }
 }

@@ -6,9 +6,10 @@ import ch.redanz.redanzCore.model.registration.service.CheckInService;
 import ch.redanz.redanzCore.model.registration.service.GuestService;
 import ch.redanz.redanzCore.model.reporting.response.*;
 import ch.redanz.redanzCore.model.reporting.service.*;
+import ch.redanz.redanzCore.model.workshop.config.SlotType;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
+import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.SlotService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
@@ -168,12 +169,12 @@ public class ReportController {
 
   @GetMapping (path = "/checkIn/slots")
   @Transactional
-  public List<Slot> getCheckInSlots(
+  public List<EventSlot> getCheckInSlots(
     @RequestParam("eventId") Long eventId
   ) {
     try {
       Event event = eventService.findByEventId(eventId);
-      return slotService.getAllSlots("Party", event);
+      return slotService.getAllEventSlots(SlotType.PARTY, event);
     } catch (ApiRequestException apiRequestException) {
       throw new ApiRequestException(apiRequestException.getMessage());
     } catch (Exception exception) {

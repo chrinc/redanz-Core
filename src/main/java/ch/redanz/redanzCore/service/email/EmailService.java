@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
@@ -55,7 +57,9 @@ public class EmailService {
     String body,
     Boolean emailIsTester,
     Boolean eventInactive,
-    String bccEmail
+    String bccEmail,
+    byte[] icsAttachment,
+    String icsFilename
   ) {
     try {
       if (eventInactive) {
@@ -69,6 +73,7 @@ public class EmailService {
       msg.setFrom(new InternetAddress(hostEmail, emailHostName));
       msg.setReplyTo(InternetAddress.parse(hostEmail, false));
       msg.setSubject(subject, "UTF-8");
+
       msg.setContent(body, "text/html; charset=UTF-8");
       msg.setSentDate(new Date());
 
@@ -89,6 +94,26 @@ public class EmailService {
           msg.addRecipients(Message.RecipientType.BCC, bccEmail);
         }
       }
+
+      MimeBodyPart htmlPart = new MimeBodyPart();
+      htmlPart.setContent(body, "text/html; charset=UTF-8");
+
+      MimeMultipart multipart = new MimeMultipart();
+      multipart.addBodyPart(htmlPart);
+
+      if (icsAttachment != null && icsAttachment.length > 0) {
+        MimeBodyPart calendarPart = new MimeBodyPart();
+        calendarPart.setFileName(icsFilename);
+        calendarPart.setContent(
+          icsAttachment,
+          "text/calendar; charset=UTF-8; method=PUBLISH"
+        );
+        multipart.addBodyPart(calendarPart);
+      }
+
+      msg.setContent(multipart);
+      msg.saveChanges();
+
       if (sendEmail && Arrays.stream(msg.getRecipients(Message.RecipientType.TO)).count() > 0) {
         asyncEmailService.sendEmail(msg);
       }

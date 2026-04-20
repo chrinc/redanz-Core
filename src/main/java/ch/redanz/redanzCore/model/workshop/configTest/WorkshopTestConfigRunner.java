@@ -39,6 +39,7 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
   private final PrivateClassService privateClassService;
   private final EventPartService eventPartService;
   private final BundleEventTrackService bundleEventTrackService;
+  private final CalendarService calendarService;
 
   @Override
   public void run(String... args) {
@@ -49,19 +50,17 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       CountryConfig.setup(countryService, languageService);
       DanceRoleConfig.setup(danceRoleService);
       SleepUtilConfig.setup(sleepUtilService);
-      SlotConfig.setup(slotService);
 
       EventConfig.setup(eventService, discountService);
       BaseParConfig.setup(baseParService, eventService);
       EventDanceRoleConfig.setup(danceRoleService, eventService);
 
       TrackConfig.setup(trackService);
+      EventSlotConfig.setup(slotService, eventService);
       EventTrackConfig.setup(eventService, trackService);
-      DiscountConfig.setup(discountService);
       EventDiscountConfig.setup(discountService, eventService);
       TrackEventDiscountConfig.setup(eventService, trackService, discountService);
 
-      SpecialConfig.setup(specialService);
       EventSpecialsConfig.setup(specialService, eventService);
 
       BundleConfig.setup(bundleService, slotService);
@@ -71,20 +70,17 @@ public class WorkshopTestConfigRunner implements CommandLineRunner {
       BundlePartySlotConfig.setup(slotService, bundleService);
       BundleDanceRoleConfig.setup(bundleService, danceRoleService);
 
-      PrivateClassConfig.setup(privateClassService);
       EventPrivateClassConfig.setup(privateClassService, eventService);
 
-      FoodConfig.setup(foodService);
-      EventFoodSlotConfig.setup(eventService, foodService, slotService);
-      TypeSlotConfig.setup(slotService, foodService, outTextService, languageService);
+      EventFoodSlotConfig.setup(eventService, slotService);
       SleepUtilConfig.setup(sleepUtilService);
 
-      EventTypeSlotConfig.setup(slotService, eventService, foodService);
-      VolunteerTypeConfig.setup(volunteerService);
-      EventVolunteerTypeConfig.setup(eventService, volunteerService);
+      EventVolunteerTypeConfig.setup(eventService);
       EventPartConfig.setup(eventPartService);
       EventPartInfoConfig.setup(eventService, eventPartService);
 
+      CalendarConfig.setup(eventService,calendarService);
+      CalendarBookItemConfig.setup(bundleService,calendarService);
     }
   }
 }

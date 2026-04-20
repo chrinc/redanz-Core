@@ -28,6 +28,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -41,6 +42,7 @@ public class RegistrationEmailService {
   private final EmailService emailService;
   private final EventService eventService;
   private final EventPartService eventPartService;
+  private final RegistrationCalendarService registrationCalendarService;
   @Autowired
   Environment environment;
 
@@ -140,6 +142,8 @@ public class RegistrationEmailService {
       , userService.emailIsTester(registration.getParticipant().getEmail())
       , !registration.getEvent().isActive()
       , null
+      , null
+      , null
     );
     update(
       new RegistrationEmail(registration, OffsetDateTime.now().toZonedDateTime())
@@ -173,8 +177,13 @@ public class RegistrationEmailService {
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_DONE_HEADER_EN.getOutTextKey(),
         languageKey
-      ).getOutText()
+      ).getOutText().replace("{1}", eventService.findEventName(registration.getEvent()))
     );
+
+    model.put("registrationList",
+      getEmailOverview(registration, paymentDetailsResponse, languageKey)
+    );
+
     if (baseParService.bookletLink(registration.getEvent(), languageKey).isEmpty()) {
       model.put("base",
         outTextService.getOutTextByKeyAndLangKey(
@@ -188,7 +197,7 @@ public class RegistrationEmailService {
           OutTextConfig.LABEL_EMAIL_DONE_BASE_BOOKLET_READY_EN.getOutTextKey(),
           languageKey
         ).getOutText().replace(
-        "{1}"
+          "{1}"
           , "<a href=\"" + baseParService.bookletLink(registration.getEvent(), languageKey)
             + "\">" + outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_BOOKLET_EN.getOutTextKey(), languageKey).getOutText()
             + "</a>"
@@ -200,9 +209,6 @@ public class RegistrationEmailService {
         OutTextConfig.LABEL_EMAIL_DONE_DETAILS01_EN.getOutTextKey(),
         languageKey
       ).getOutText()
-    );
-    model.put("registrationList",
-      getEmailOverview(registration, paymentDetailsResponse, languageKey)
     );
 
     model.put("details2",
@@ -324,8 +330,8 @@ public class RegistrationEmailService {
 
     // "specials"
     specialService.findByEventInfoOnly(registration.getEvent(), true).forEach(eventSpecial -> {
-      String name = eventSpecial.getSpecial().getName();
-      String description = eventSpecial.getSpecial().getDescription();
+      String name = eventSpecial.getName();
+      String description = eventSpecial.getDescription();
       String url = eventSpecial.getUrl();
       if (name != null && !name.isEmpty()) {
         specialsHtml.append("<div class=\"indented\">\uD83D\uDC49 <b>"
@@ -364,6 +370,371 @@ public class RegistrationEmailService {
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       , userService.emailIsTester(person.getEmail())
       , !eventService.findIsActive(registration.getEvent())
+      , null
+      , null
+      , null
+    );
+    registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
+    update(registrationEmail);
+  }
+
+  public void sendEmailBookingConfirmingUpdate(
+    Person person,
+    RegistrationEmail registrationEmail,
+    Registration registration,
+    PaymentDetailsResponse paymentDetailsResponse
+  ) throws IOException, TemplateException {
+    Map<String, Object> model = new HashMap<>();
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
+    model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
+    model.put("firstName", person.getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
+    Template template = mailConfig.getTemplate("registrationBookConfirmingUpdate.ftl");
+
+    String languageKey =
+      person.getPersonLang() == null ?
+        languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
+        person.getPersonLang().getLanguageKey();
+    model.put("header",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_UPDATE_CONF_HEADER_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("registrationList",
+      getEmailOverview(registration, paymentDetailsResponse, languageKey)
+    );
+
+    model.put("details",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_RELEASED_DETAILS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("thankPayment",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_UPDATE_CONF_THANK_PAY_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("account",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
+    );
+    model.put("doneHappy",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_HAPPY_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("see_you",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("regards",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("team",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
+        languageKey
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
+    );
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
+    StringBuilder specialsHtml = new StringBuilder();
+
+    // "specials"
+    specialService.findByEventInfoOnly(registration.getEvent(), true).forEach(eventSpecial -> {
+      String name = eventSpecial.getName();
+      String description = eventSpecial.getDescription();
+      String url = eventSpecial.getUrl();
+      if (name != null && !name.isEmpty()) {
+        specialsHtml.append("<div class=\"indented\">\uD83D\uDC49 <b>"
+          + outTextService.getOutTextByKeyAndLangKey(name, languageKey).getOutText()
+          + "</b>");
+        if (description != null && !description.isEmpty()) {
+          specialsHtml.append("<b>: </b>"
+            + outTextService.getOutTextByKeyAndLangKey(description, languageKey).getOutText()
+          );
+        }
+        if (url != null && !url.isEmpty()) {
+          specialsHtml.append(" (<a href=\""
+            + outTextService.getOutTextByKeyAndLangKey(url, languageKey).getOutText()
+            + "\">"
+            + outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_LINK_EN.getOutTextKey(), languageKey).getOutText()
+            + "</a>)"
+            + "<br/><br/>");
+        }
+        specialsHtml.append("</div>");
+      }
+    });
+    if (specialsHtml.length() > 0) {
+      specialsHtml.insert(0,
+        outTextService.getOutTextByKeyAndLangKey("LABEL_SPECIALS_INTRO", languageKey).getOutText()
+          + "<br/><br/>");
+
+    }
+    model.put("specials", specialsHtml.toString());
+
+    emailService.sendEmail(
+      person.getEmail(),
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText(),
+      FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      , userService.emailIsTester(person.getEmail())
+      , !eventService.findIsActive(registration.getEvent())
+      , null
+      , null
+      , null
+    );
+    registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
+    update(registrationEmail);
+  }
+
+
+  public void sendEmailBookingDoneUpdate(
+    Person person,
+    RegistrationEmail registrationEmail,
+    Registration registration,
+    PaymentDetailsResponse paymentDetailsResponse
+  ) throws IOException, TemplateException {
+    Map<String, Object> model = new HashMap<>();
+    model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
+    model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
+    model.put("firstName", person.getFirstName());
+
+    model.put("omsFbLink", environment.getProperty("oms.fb.link"));
+    model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
+    model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
+    model.put("omsHostName", environment.getProperty("oms.host.name"));
+    model.put("hostEmail", environment.getProperty("email.host.email"));
+
+    Template template = mailConfig.getTemplate("registrationBookDoneUpdate.ftl");
+
+    String languageKey =
+      person.getPersonLang() == null ?
+        languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
+        person.getPersonLang().getLanguageKey();
+    model.put("header",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_UPDATE_DONE_HEADER_EN.getOutTextKey(),
+        languageKey
+      ).getOutText().replace("{1}", eventService.findEventName(registration.getEvent()))
+    );
+
+    model.put("registrationList",
+      getEmailOverview(registration, paymentDetailsResponse, languageKey)
+    );
+
+    if (baseParService.bookletLink(registration.getEvent(), languageKey).isEmpty()) {
+      model.put("base",
+        outTextService.getOutTextByKeyAndLangKey(
+          OutTextConfig.LABEL_EMAIL_DONE_BASE_EN.getOutTextKey(),
+          languageKey
+        ).getOutText()
+      );
+    } else {
+      model.put("base",
+        outTextService.getOutTextByKeyAndLangKey(
+          OutTextConfig.LABEL_EMAIL_DONE_BASE_BOOKLET_READY_EN.getOutTextKey(),
+          languageKey
+        ).getOutText().replace(
+          "{1}"
+          , "<a href=\"" + baseParService.bookletLink(registration.getEvent(), languageKey)
+            + "\">" + outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_BOOKLET_EN.getOutTextKey(), languageKey).getOutText()
+            + "</a>"
+        )
+      );
+    }
+    model.put("details",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_DETAILS01_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("details2",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_DETAILS02_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("account",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_ACCOUNT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
+    );
+
+    model.put("questions",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_QUESTIONS_ABOUT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("cancellation",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CANCELLATION_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("refund",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REFUND_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("ticketTransfer",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TICKET_TRANSFER_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("waitingLists",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_WAITING_LISTS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("photoVideo",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_PHOTO_VIDEO_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("andMore",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_AND_MORE_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("checkOutTerms",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CHECK_TERMS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("checkOutTermsAt",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_CHECK_TERMS_AT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("termsUrl",
+      outTextService.getOutTextByKeyAndLangKey(
+        eventPartService.terms(registration.getEvent()),
+        languageKey
+      ).getOutText()
+    );
+    model.put("termsWebsite",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TERMS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("doneHappy",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_HAPPY_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+
+    model.put("see_you",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("regards",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_REGARDS_EN.getOutTextKey(),
+        languageKey
+      ).getOutText()
+    );
+    model.put("team",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_TEAM_EN.getOutTextKey(),
+        languageKey
+      ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
+    );
+    model.put("changeLanguage",
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_CHANGE_LANGUAGE_EN.getOutTextKey(),
+        languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
+    );
+    StringBuilder specialsHtml = new StringBuilder();
+
+    // "specials"
+    specialService.findByEventInfoOnly(registration.getEvent(), true).forEach(eventSpecial -> {
+      String name = eventSpecial.getName();
+      String description = eventSpecial.getDescription();
+      String url = eventSpecial.getUrl();
+      if (name != null && !name.isEmpty()) {
+        specialsHtml.append("<div class=\"indented\">\uD83D\uDC49 <b>"
+          + outTextService.getOutTextByKeyAndLangKey(name, languageKey).getOutText()
+          + "</b>");
+        if (description != null && !description.isEmpty()) {
+          specialsHtml.append("<b>: </b>"
+            + outTextService.getOutTextByKeyAndLangKey(description, languageKey).getOutText()
+          );
+        }
+        if (url != null && !url.isEmpty()) {
+          specialsHtml.append(" (<a href=\""
+            + outTextService.getOutTextByKeyAndLangKey(url, languageKey).getOutText()
+            + "\">"
+            + outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_LINK_EN.getOutTextKey(), languageKey).getOutText()
+            + "</a>)"
+            + "<br/><br/>");
+        }
+        specialsHtml.append("</div>");
+      }
+    });
+    if (specialsHtml.length() > 0) {
+      specialsHtml.insert(0,
+        outTextService.getOutTextByKeyAndLangKey("LABEL_SPECIALS_INTRO", languageKey).getOutText()
+          + "<br/><br/>");
+
+    }
+    model.put("specials", specialsHtml.toString());
+
+    emailService.sendEmail(
+      person.getEmail(),
+      outTextService.getOutTextByKeyAndLangKey(
+        OutTextConfig.LABEL_EMAIL_DONE_SUBJECT_EN.getOutTextKey(),
+        languageKey
+      ).getOutText(),
+      FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
+      , userService.emailIsTester(person.getEmail())
+      , !eventService.findIsActive(registration.getEvent())
+      , null
+      , null
       , null
     );
     registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
@@ -460,6 +831,8 @@ public class RegistrationEmailService {
       , userService.emailIsTester(registration.getParticipant().getEmail())
       , !registration.getEvent().isActive()
       , null
+      , null
+      , null
     );
 
     registrationEmail.setReminderSentDate(OffsetDateTime.now().toZonedDateTime());
@@ -526,7 +899,6 @@ public class RegistrationEmailService {
         languageKey).getOutText().replace("{1}", environment.getProperty("link.login") + "/app/login/profile")
     );
     emailService.sendEmail(
-//      EmailService.getSession(),
       registration.getParticipant().getEmail(),
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_CANCEL_SUBJECT_EN.getOutTextKey(),
@@ -536,12 +908,14 @@ public class RegistrationEmailService {
       , userService.emailIsTester(registration.getParticipant().getEmail())
       , !registration.getEvent().isActive()
       , null
+      , null
+      , null
     );
     registrationEmail.setCancelledSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
   }
 
-  public void sendEmailConfirmation(Registration registration, RegistrationEmail registrationEmail) throws IOException, TemplateException {
+  public void sendEmailConfirmation(Registration registration, RegistrationEmail registrationEmail, PaymentDetailsResponse paymentDetailsResponse) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("loginLink", environment.getProperty("link.login") + "/" + registration.getParticipant().getPersonLang().getLanguageKey().toLowerCase());
@@ -591,6 +965,10 @@ public class RegistrationEmailService {
       ).getOutText().replace("{1}", environment.getProperty("oms.host.name"))
     );
 
+    model.put("registrationList",
+      getEmailOverview(registration, paymentDetailsResponse, languageKey)
+    );
+
     model.put("see_you",
       outTextService.getOutTextByKeyAndLangKey(
         OutTextConfig.LABEL_EMAIL_SEE_YOU_EN.getOutTextKey(),
@@ -632,6 +1010,8 @@ public class RegistrationEmailService {
       , userService.emailIsTester(registration.getParticipant().getEmail())
       , !eventService.findIsActive(registration.getEvent())
       , null
+      , null
+      , null
     );
 
     registrationEmail.setReleasedSentDate(OffsetDateTime.now().toZonedDateTime());
@@ -639,7 +1019,13 @@ public class RegistrationEmailService {
 
   }
 
-  public void sendGenericEmail(Long senderUser, List<Registration> registrationList, JsonObject emailContent) throws IOException, TemplateException {
+  public void sendGenericEmail(
+    Long senderUser,
+    List<Registration> registrationList,
+    JsonObject emailContent,
+    Boolean includeCalendar
+
+  ) {
     String subject =
       emailContent.get("subject") != null ?
         (
@@ -655,9 +1041,28 @@ public class RegistrationEmailService {
         )
         : "";
 
+
     registrationList.forEach(registration -> {
+      byte[] icsAttachment = null;
+      if (includeCalendar) {
+        String languageKey =
+          registration.getParticipant().getPersonLang() == null ?
+            languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
+            registration.getParticipant().getPersonLang().getLanguageKey();
+          icsAttachment = registrationCalendarService.createCalendarFile(
+            registration, languageKey
+          );
+      }
+
       try {
-        sendGenericEmail(senderUser, registration.getParticipant(), subject, content);
+        sendGenericEmail(
+          senderUser,
+          registration.getParticipant(),
+          subject,
+          content,
+          icsAttachment,
+          registration.getEvent().getName()
+        );
       } catch (IOException e) {
         throw new RuntimeException(e);
       } catch (TemplateException e) {
@@ -666,12 +1071,17 @@ public class RegistrationEmailService {
     });
   }
 
-  public void sendGenericEmail(Long senderUser, Person receiver, String subject, String content) throws IOException, TemplateException {
+  public void sendGenericEmail(
+    Long senderUser,
+    Person receiver,
+    String subject,
+    String content,
+    byte[] icsAttachment,
+    String icsFilename
+  ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
-    // Name withough special chars, underscore instead of space
     model.put("firstName", receiver.getFirstName());
-
     model.put("omsFbLink", environment.getProperty("oms.fb.link"));
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
@@ -679,7 +1089,7 @@ public class RegistrationEmailService {
     model.put("hostEmail", environment.getProperty("email.host.email"));
 
     model.put("content", content);
-    Template template = null;
+    Template template;
     try {
       template = mailConfig.getTemplate("generic.ftl");
     } catch (IOException e) {
@@ -717,6 +1127,8 @@ public class RegistrationEmailService {
         , userService.emailIsTester(receiver.getEmail())
         , false
         , personService.findByUser(userService.findByUserId(senderUser)).getEmail()
+        , icsAttachment
+        , icsFilename
       );
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -738,11 +1150,11 @@ public class RegistrationEmailService {
     StringBuilder sb = new StringBuilder(2048);
 
     sb.append("""
-        <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;">
-          <div style="border:1px solid #e6e6e6;border-radius:16px;padding:20px;">
-    """);
+          <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;">
+            <div style="border:1px solid #898383;border-radius:16px;padding:20px">
+      """);
 
-    sb.append("<div style=\"font-size:20px;font-weight:700;margin:0 0 4px 0;\">")
+    sb.append("<div style=\"font-size:18px;font-weight:700;margin:0 0 4px 0;\">")
       .append(escapeHtml(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_YOUR_BOOKING_EN.getOutTextKey(), languageKey).getOutText()))
       .append("</div>");
 
@@ -750,16 +1162,41 @@ public class RegistrationEmailService {
     sb.append("<div style=\"color:#666;font-size:14px;margin:0 0 8px 0;\">")
       .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_PAID_EN.getOutTextKey(), languageKey).getOutText() + ": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountPaid())))
       .append(" &nbsp;|&nbsp; ")
-      .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_DUE_EN.getOutTextKey(), languageKey).getOutText() +": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountDue())))
+      .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_DUE_EN.getOutTextKey(), languageKey).getOutText() + ": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountDue())))
       .append("</div>");
 
     // Sections (only render if present)
 
     renderSection(sb, "", safePairs(paymentDetailsResponse.getItems()), false, languageKey, false, true, false);
-    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.SPECIAL.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getSpecials()), false, languageKey, true, false, false);
-    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.PRIVATE.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getPrivateClasses()), false, languageKey, true, false, false);
-    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.SOLIDARITY_FUND.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getDonation()), false, languageKey,true, false, false);
-    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.FOOD.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getFoodSlots()), false, languageKey, true, false, false);
+    List<List<String>> specials = paymentDetailsResponse.getSpecials()
+      .stream()
+      .map(special -> List.of(
+        special.get(0), // special name
+        special.get(2)  // price
+      ))
+      .collect(Collectors.toList());
+
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.SPECIAL.getEventPartKey(), languageKey), safePairs(specials), false, languageKey, true, false, false);
+
+    List<List<String>> privates = paymentDetailsResponse.getPrivateClasses()
+      .stream()
+      .map(privateClass -> List.of(
+        privateClass.get(1), // private desc
+        privateClass.get(2)  // price
+      ))
+      .collect(Collectors.toList());
+
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.PRIVATE.getEventPartKey(), languageKey), safePairs(privates), false, languageKey, true, false, false);
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.SOLIDARITY_FUND.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getDonation()), false, languageKey, true, false, false);
+
+    List<List<String>> foodSlotList = paymentDetailsResponse.getFoodSlots()
+      .stream()
+      .map(foodSlot -> List.of(
+        foodSlot.get(1), // slot
+        foodSlot.get(2)  // price
+      ))
+      .collect(Collectors.toList());
+    renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.FOOD.getEventPartKey(), languageKey), safePairs(foodSlotList), false, languageKey, true, false, false);
     renderSection(sb, eventPartService.eventPartTitleExist(registration.getEvent(), EventPartConfig.DISCOUNT.getEventPartKey(), languageKey), safePairs(paymentDetailsResponse.getDiscounts()), true, languageKey, true, false, true);
 
     // Divider
@@ -773,9 +1210,9 @@ public class RegistrationEmailService {
       .append("</div></div>");
 
     sb.append("""
+            </div>
           </div>
-        </div>
-    """);
+      """);
 
     return sb.toString();
   }
@@ -789,7 +1226,7 @@ public class RegistrationEmailService {
   private void renderSection(StringBuilder sb, String title, List<Pair> items, boolean asDiscounts, String languageKey, boolean hasTitle, boolean bold, boolean italic) {
     if (items == null || items.isEmpty()) return;
     if (hasTitle) {
-      sb.append("<div style=\"margin:14px 0 0 0;font-size:15px;font-weight:700;color:#111;\">")
+      sb.append("<div style=\"margin:8px 0 0 0;font-size:15px;font-weight:700;color:#111;\">")
         .append(escapeHtml(title))
         .append("</div>");
     }
@@ -810,7 +1247,7 @@ public class RegistrationEmailService {
         .append("</div>")
         .append("<div style=\"white-space:nowrap;color:#222"
           + (italic ? ";font-style:italic" : "")
-          +"\">")
+          + "\">")
         .append(escapeHtml(chf(it.amount)))
         .append("</div>")
         .append("</div>");
@@ -889,6 +1326,7 @@ public class RegistrationEmailService {
   private class Pair {
     final String label;
     final Long amount;
+
     Pair(String label, Long amount) {
       this.label = label;
       this.amount = amount;

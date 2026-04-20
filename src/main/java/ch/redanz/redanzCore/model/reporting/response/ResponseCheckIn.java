@@ -1,6 +1,5 @@
 package ch.redanz.redanzCore.model.reporting.response;
 
-import ch.redanz.redanzCore.model.workshop.entities.Slot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,13 +73,13 @@ public class ResponseCheckIn {
 
         add(new HashMap<>() {{
           put("key", "food");
-          put("type", "text");
+          put("type", "label");
           put("label", "Food");
         }});
 
         add(new HashMap<>() {{
           put("key", "addons");
-          put("type", "text");
+          put("type", "label");
           put("label", "Addons");
         }});
 

@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.workshop.entities;
 
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,11 +25,17 @@ public class VolunteerType implements Serializable {
   private String name;
   private String description;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "event_id")
+  @JsonIgnore
+  private Event event;
+
   public VolunteerType() {
   }
-  public VolunteerType(String name, String description) {
+  public VolunteerType(String name, String description, Event event) {
     this.name = name;
     this.description = description;
+    this.event = event;
   }
 
   public static List<Map<String, String>> schema() {
@@ -37,8 +44,9 @@ public class VolunteerType implements Serializable {
         add(new HashMap<>() {{ put("key", "id");              put("type", "id");                               put("label", "Volunteer Type Id"); }});
         add(new HashMap<>() {{ put("key", "name");            put("type", "label");   put("required", "true");  put("label", "Name");     }});
         add(new HashMap<>() {{ put("key", "description");     put("type", "label");   put("required", "false");  put("label", "Description"); }});
-        add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_VOLUNTEER_TYPES_EN.getOutTextKey()); }});
-        add(new HashMap<>() {{put("key", "singular");            put("type", "title");         put("label", OutTextConfig.LABEL_VOLUNTEER_TYPE_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{put("key", "eventPartInfo");        put("type", "partInfo");        put("eventPartKey", "volunteer");                          put("label", OutTextConfig.LABEL_VOLUNTEER_INFO_EN.getOutTextKey());}});
+        add(new HashMap<>() {{put("key", "plural");              put("type", "title");           put("label", OutTextConfig.LABEL_VOLUNTEERING_EN.getOutTextKey()); }});
+        add(new HashMap<>() {{put("key", "singular");            put("type", "title");         put("label", OutTextConfig.LABEL_VOLUNTEERING_EN.getOutTextKey()); }});
       }
     };
   }

@@ -29,6 +29,11 @@
             ${header01}. ${header02}.
         </p>
 
+        <!-- BOOKING DETAILS -->
+        <p style="margin:15px 0 25px 0; font-size:16px; line-height:22px;">
+            ${registrationList}
+        </p>
+
         <!-- BASE MESSAGE -->
         <p style="margin:0 0 15px 0; font-size:16px; line-height:22px;">
             ${details} <a href="${loginLink}" style="color:#0000ee; text-decoration:none;">${account}</a>. ${makePayment}
