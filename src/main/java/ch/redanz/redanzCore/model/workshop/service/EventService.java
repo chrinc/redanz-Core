@@ -1406,6 +1406,7 @@ public class EventService {
       });
     });
     save(newEvent);
+
     // Clone Bundles
     Set<EventBundle> eventBundles = new HashSet<>();
     baseEvent.getEventBundles().forEach(

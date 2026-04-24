@@ -371,10 +371,6 @@ public class TrackService {
         eventTrackData.put("eventId", Long.toString(event.getEventId()));
         eventTrackData.put("name",  eventTrack.getTrack().getName());
         eventTrackData.put("trackId",  eventTrack.getTrack().getTrackId().toString());
-//        eventTrackData.put("track", eventTrack.getTrack().simpleDataMap().toString());
-//        eventTrackData.put("bundleId", trackEventDiscountIdList(eventTrack.getTrack()).toString());
-//        trackData.put("capacity", bundleEventTrackCapacity());
-//        trackData.put("danceRoles", trackDanceRoleIdList(eventTrack.getTrack()).toString());
         eventTracksData.add(eventTrackData);
       });
     return eventTracksData;
@@ -384,7 +380,6 @@ public class TrackService {
     Track newTrack = new Track(
       baseTrack.getName(),
       baseTrack.getDescription(),
-//      baseTrack.getCapacity(),
       baseTrack.getPartnerRequired(),
       baseTrack.getOwnPartnerRequired(),
       baseTrack.getRequiredDanceLevel()
@@ -394,15 +389,6 @@ public class TrackService {
     List<EventDiscount>  newEventDiscounts = new ArrayList<>(newEvent.getEventDiscounts());
     newTrack.setEventDiscounts(newEventDiscounts);
 
-//    // clone Dance Roles
-//    Set<TrackDanceRole>  newTrackDanceRoles = new HashSet<>(baseTrack.getTrackDanceRoles());
-//    Set<DanceRole> oldDanceRoles = baseTrack.getTrackDanceRoles().stream()
-//      .map(TrackDanceRole::getDanceRole)
-//      .collect(Collectors.toSet());
-//    newTrackDanceRoles.stream().filter(trackDanceRole -> oldDanceRoles.contains(trackDanceRole.getDanceRole()))
-//        .collect(Collectors.toSet());
-//    newTrack.setTrackDanceRoles(newTrackDanceRoles);
-
     // clone EventTracks
     EventTrack newEventTrack = new EventTrack(newTrack, newEvent);
     newEvent.getEventTracks().add(newEventTrack);
@@ -410,11 +396,5 @@ public class TrackService {
     eventTrackRepo.save(newEventTrack);
     return newEventTrack;
   }
-
-//  public void deleteTrackDanceRole(JsonObject request) {
-//    Long trackDanceRole = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-//    delete(trackDanceRoleRepo.findByTrackDanceRoleId(trackDanceRole));
-//  }
-
 
 }

@@ -10,5 +10,6 @@ public interface EventSpecialRepo extends JpaRepository<EventSpecial, Long> {
   EventSpecial findByName(String name);
   List<EventSpecial> findAllByEvent(Event event);
   List<EventSpecial> findAllByEventAndInfoOnly(Event event, Boolean infoOnly);
+  EventSpecial findFirstByNameAndEvent(String name, Event event);
   Boolean existsByName(String name);
 }

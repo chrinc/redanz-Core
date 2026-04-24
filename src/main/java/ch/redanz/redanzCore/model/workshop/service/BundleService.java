@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.service;
 
+import ch.redanz.redanzCore.model.workshop.config.SlotType;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.*;
 import com.google.gson.JsonObject;
@@ -36,6 +37,7 @@ public class BundleService {
     private final DanceRoleService danceRoleService;
     private final EventRepo eventRepo;
     private final BundleEventTrackService bundleEventTrackService;
+    private final SpecialService specialService;
 //    private final BundleSpecialRepo bundleSpecialRepo;
 
     public List<Bundle> getAll(){
@@ -276,8 +278,25 @@ public class BundleService {
         );
 
         // Clone Event Specials
-        Set<EventSpecial> newEventSpecials = new HashSet<>(event.getEventSpecials());
+        Set<EventSpecial> newEventSpecials = new HashSet<>();
+        baseBundle.getEventSpecials().forEach(eventSpecial -> {
+            newEventSpecials.add(specialService.findFirstByNameAndEvent(eventSpecial.getName(), event));
+
+        });
         newBundle.setEventSpecials(newEventSpecials);
+
+
+
+        // Clone Party Slots
+        Set<EventSlot> partySlots = new HashSet<>();
+        baseBundle.getPartySlots().forEach(partySlot -> {
+            partySlots.add(slotService.findFirstByNameAndTypeAndEvent(partySlot.getName(), SlotType.PARTY, event));
+        });
+        log.info(newBundle.getName());
+        log.info(partySlots.toString());
+        log.info("party slots cnt: " + partySlots.size());
+        newBundle.setPartySlots(partySlots);
+
 
         // Clone Tracks
         if (baseBundleEventTrackNewEventTrackMap == null) {

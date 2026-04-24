@@ -11,6 +11,6 @@ public interface EventSlotRepo extends JpaRepository<EventSlot, Long> {
   Boolean existsByName(String name);
   EventSlot findByName(String name);
   EventSlot findByEventSlotId(Long eventSlotId);
-
+  EventSlot findFirstByNameAndSlotTypeAndEvent(String name, SlotType slotType, Event event);
   List<EventSlot> findAllByEventAndSlotType(Event event, SlotType slotType);
 }

@@ -3,25 +3,13 @@ package ch.redanz.redanzCore.model.workshop.service;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.repository.EventRepo;
 import ch.redanz.redanzCore.model.workshop.repository.EventSpecialRepo;
-import com.google.gson.JsonObject;
-import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -50,6 +38,11 @@ public class SpecialService {
     eventSpecialRepo.delete(eventSpecial);
   }
 
+  public EventSpecial findFirstByNameAndEvent(String name, Event event) {
+    return eventSpecialRepo.findFirstByNameAndEvent(name, event);
+
+  }
+
 
   public boolean existsByName(String name) {
     return eventSpecialRepo.existsByName(name);
@@ -61,113 +54,6 @@ public class SpecialService {
   public EventSpecial findByEventSpecialId(Long eventSpecialId) {
     return eventSpecialRepo.findByEventSpecialId(eventSpecialId);
   }
-
-//  public Field getField(String key) {
-//    Field field;
-//    try {
-//      field = Special.class.getDeclaredField(key);
-//    } catch (NoSuchFieldException e) {
-//      throw new RuntimeException(e);
-//    }
-//    field.setAccessible(true);
-//    return field;
-//  }
-
-//  public void update(JsonObject request) throws IOException, TemplateException {
-//    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-//    EventSpecial special;
-//    Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-//
-//    if (eventSpecialId == null || eventSpecialId == 0) {
-//      special = new EventSpecial();
-//    } else {
-//      special = findByEventSpecialId(eventSpecialId);
-//    }
-//
-//    EventSpecial.schema().forEach(
-//      stringStringMap -> {
-//        String key = stringStringMap.get("key");
-//        String type = stringStringMap.get("type");
-//        Field field;
-//
-//        try {
-//          switch(type) {
-//            case "label":
-//              if (request.get("label") != null && request.get("label").isJsonArray()) {
-//                String outTextKey = outTextService.updateLabelArray(request.get("label").getAsJsonArray(), request.get(key).getAsString());
-//
-//                if (outTextKey != null) {
-//                  field = getField(key);
-//                  field.set(special, outTextKey);
-//                }
-//              }
-//              break;
-//            case "text":
-//              field = getField(key);
-//
-//              field.set(special, request.get(key).isJsonNull() ? "" : request.get(key).getAsString());
-//              break;
-//
-//            case "number":
-//              field = getField(key);
-//              field.set(special, request.get(key).isJsonNull() ? null : Integer.parseInt(request.get(key).getAsString()));
-//              break;
-//
-//            case "double":
-//              field = getField(key);
-//              field.set(special, request.get(key).isJsonNull() ? 0.0 : Double.parseDouble(request.get(key).getAsString()));
-//              break;
-//
-//            case "color":
-//              field = getField(key);
-//              field.set(special, request.get(key).isJsonNull() ? null :
-//                request.get(key).getAsJsonObject().isJsonNull() ? request.get(key).getAsString() :
-//                  request.get(key).getAsJsonObject().get("hex").getAsString());
-//              break;
-//
-//            case "date":
-//              field = getField(key);
-//
-//              // Assuming request.get(eventPartKey).getAsString() retrieves the date string
-//              String dateString = request.get(key).getAsString();
-//
-//              // Parse the string into a LocalDate object
-//              // hack hack hack, need fix
-//              LocalDate localDate = LocalDate.parse(dateString.substring(0, 10), dateFormatter).plusDays(1);
-//
-//              field.set(special, request.get(key).isJsonNull() ? null : localDate);
-//              break;
-//
-//
-//            case "bool":
-//              field = getField(key);
-//              field.set(special, request.get(key).isJsonNull() ? null : Boolean.valueOf(request.get(key).getAsString()));
-//              break;
-//
-//            default:
-//              // Nothing will happen here
-//          }
-//        } catch (IllegalAccessException e) {
-//          throw new RuntimeException(e);
-//        }
-//      }
-//    );
-//    save(special);
-//  }
-
-//  public boolean isUsed(Special special) {
-//    AtomicBoolean isUsed = new AtomicBoolean(false);
-//    eventRepo.findAll().forEach(event -> {
-//      event.getEventSpecials().forEach(eventSpecial -> {
-//        if (eventSpecial.getSpecial().equals(special)) {
-//          isUsed.set(true);
-//        }
-//      });
-//    });
-//    return isUsed.get();
-//  }
-
   public List<Map<String, String>> getEventSpecialSchema(){
     return EventSpecial.schema();
   }
@@ -181,31 +67,4 @@ public class SpecialService {
     });
     return eventSpecialsData;
   }
-//
-//  public List<Map<String, String>> getSpecialsMap() {
-//    return specialRepo.findAll().stream()
-//      .map(Special::dataMap)
-//      .collect(Collectors.toList());
-//  }
-//
-//  public List<Map<String, String>> getAllSpecials() {
-//    List<Map<String, String>> specials = new ArrayList<>();
-//
-//    findAll().forEach(special -> {
-//      Map<String, String> specialData = special.dataMap();
-//      specials.add(specialData);
-//    });
-//    return specials;
-//  }
-
-//  public List<Map<String, String>> getAllSpecials(Event event) {
-//    List<Map<String, String>> specials = new ArrayList<>();
-//    event.getEventSpecials().forEach(eventSpecial -> {
-//      specials.add(eventSpecial.getSpecial().dataMap());
-//
-//    });
-//    return specials;
-//  }
-
-
 }
