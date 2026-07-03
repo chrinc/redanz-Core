@@ -15,8 +15,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Objects;
-import java.util.Properties;
 
 @Service
 @Slf4j

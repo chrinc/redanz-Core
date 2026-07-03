@@ -1061,7 +1061,7 @@ public class RegistrationEmailService {
           subject,
           content,
           icsAttachment,
-          registration.getEvent().getName()
+          eventService.findEventName(registration.getEvent())
         );
       } catch (IOException e) {
         throw new RuntimeException(e);
