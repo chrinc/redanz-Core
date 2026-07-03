@@ -291,7 +291,7 @@ public class VolunteerService {
     return field;
   }
 
-  public void updateVolunteerType(JsonObject request) throws IOException, TemplateException {
+  public void updateVolunteerType(JsonObject request, Event event) throws IOException, TemplateException {
     Long id = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
     VolunteerType volunteerType;
 
@@ -355,6 +355,7 @@ public class VolunteerService {
         }
       }
     );
+    volunteerType.setEvent(event);
     saveVolunteerType(volunteerType);
   }
 

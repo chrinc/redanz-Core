@@ -883,7 +883,7 @@ public class EventController {
       if (id != null && id != 0 && volunteerService.volunteerTypeIsUsedAndHasRegistration(volunteerService.findVolunteerTypeById(id))) {
         throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_SAVE_GE.getOutTextKey());
       } else {
-        volunteerService.updateVolunteerType(request);
+        volunteerService.updateVolunteerType(request, eventService.findByEventId(request.get("eventId").getAsLong()));
       }
     } catch (HasRegistrationException hasRegistrationException) {
       throw new ApiRequestException(hasRegistrationException.getMessage(), HttpStatus.CONFLICT);

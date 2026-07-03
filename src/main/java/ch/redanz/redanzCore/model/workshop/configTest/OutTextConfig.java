@@ -463,6 +463,8 @@ public enum OutTextConfig {
   LABEL_PARTNER_EMAIL_TITLE_EXIST_GE("FRONT_LOGIN"     , "LABEL-PARTNER-EMAIL-TITLE-EXIST" , "Email-Adresse Partner*in"                     , "GE"),
   LABEL_PARTNER_EMAIL_HINT_EN("FRONT_LOGIN"     , "LABEL-PARTNER-EMAIL-HINT" , "ex. frankie.manning@ballroom.com"                                 , "EN"),
   LABEL_PARTNER_EMAIL_HINT_GE("FRONT_LOGIN"     , "LABEL-PARTNER-EMAIL-HINT" , "bspw. frankie.manning@ballroom.ch"                     , "GE"),
+ LABEL_PARTNER_EMAIL_HINT2_EN("FRONT_LOGIN"     , "LABEL-PARTNER-EMAIL-HINT2" , "Both partners must register individually"                                 , "EN"),
+  LABEL_PARTNER_EMAIL_HINT2_GE("FRONT_LOGIN"     , "LABEL-PARTNER-EMAIL-HINT2" , "Beide Partner*innen müssen sich individuell anmelden"                     , "GE"),
 
 
   LABEL_TERMS_TITLE_EN(        "FRONT_LOGIN"       , "LABEL-TERMS-TITLE"           , "Terms and conditions"                     , "EN"),
