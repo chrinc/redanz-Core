@@ -708,7 +708,7 @@ public class RegistrationService {
         , personRequest.get("mobile") == null || personRequest.get("mobile").isJsonNull() ? null : personRequest.get("mobile").getAsString()
         , languageService.findLanguageByLanguageKey(personRequest.get("language").getAsString())
         , true
-        , personRequest.get("pronouns").getAsString()
+        , personRequest.get("pronouns") == null || personRequest.get("pronouns").isJsonNull() ? null : personRequest.get("pronouns").getAsString()
       );
     }
 
