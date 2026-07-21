@@ -22,7 +22,9 @@ public class RegistrationCancelService {
   public void doCancel(Event event){
     registrationService.getAllConfirmingRegistrations(event).forEach(registration -> {
       RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
-      LocalDateTime reminderSentDate = registrationEmail.getReminderSentDate().toLocalDateTime();
+      LocalDateTime reminderSentDate = registrationEmail != null && registrationEmail.getReminderSentDate() != null
+        ? registrationEmail.getReminderSentDate().toLocalDateTime()
+        : null;
       LocalDateTime deadline = LocalDateTime.now().minusDays(
         baseParService.cancelAfterDays(event)
       );

@@ -2,16 +2,20 @@ package ch.redanz.redanzCore.model.registration.service;
 
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
+import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationMatchingRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.workshop.config.DanceRoleConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
+import ch.redanz.redanzCore.model.workshop.entities.EventSpecial;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.service.SpecialService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,6 +24,7 @@ public class RegistrationMatchingService {
 
   private final RegistrationMatchingRepo registrationMatchingRepo;
   private final WorkflowStatusService workflowStatusService;
+  private final SpecialRegistrationService specialRegistrationService;
 
   public void save(RegistrationMatching registrationMatching) {
     registrationMatchingRepo.save(registrationMatching);
@@ -179,7 +184,6 @@ public class RegistrationMatchingService {
               && !baseRegistration.getTrack().getTrackId().equals(lookupRegistration.getTrack().getTrackId())
                )
           )
-//          && !baseRegistration.getTrack().isSoldOut()
           &&
           (
             // check dance roles
@@ -193,6 +197,7 @@ public class RegistrationMatchingService {
               // exception own partner required
               || baseRegistration.getTrack().getOwnPartnerRequired()
           )
+          && specialRegistrationService.registrationHasSpecialSpot(baseRegistration, lookupRegistration)
       );
   }
 

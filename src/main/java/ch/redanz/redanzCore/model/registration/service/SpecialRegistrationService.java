@@ -1,6 +1,5 @@
 package ch.redanz.redanzCore.model.registration.service;
 
-import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -227,14 +225,50 @@ public class SpecialRegistrationService {
         + countPrivatesDone(eventPrivateClass, danceRole);
   }
 
-//  public void soldOut(PrivateClass privateClass, boolean soldOut) {
-//    privateClass.setSoldOut(soldOut);
-//    privateClassService.save(privateClass);
-//  }
-//  public void soldOut(Special special, boolean soldOut) {
-//    special.setSoldOut(soldOut);
-//    specialService.save(special);
-//  }
+  public boolean specialHasSpot(EventSpecial eventSpecial, DanceRole danceRole) {
+    int currentCountSwitch =
+      countEventSpecialsConfirming(eventSpecial, eventSpecial.getEvent(), danceRoleService.getSwitchDanceRole())
+        + countEventSpecialsDone(eventSpecial, eventSpecial.getEvent(), danceRoleService.getSwitchDanceRole());
+
+    int currentCountLead =
+      countEventSpecialsConfirming(eventSpecial, eventSpecial.getEvent(), danceRoleService.getLeadDanceRole())
+        + countEventSpecialsDone(eventSpecial, eventSpecial.getEvent(), danceRoleService.getLeadDanceRole());
+
+    int currentCountFollow =
+      countEventSpecialsConfirming(eventSpecial, eventSpecial.getEvent(), danceRoleService.getFollowDanceRole())
+        + countEventSpecialsDone(eventSpecial, eventSpecial.getEvent(), danceRoleService.getFollowDanceRole());
+
+    if (eventSpecial.getSoldOut()) {
+      return false;
+    }
+
+    if (danceRole.equals(danceRoleService.getSwitchDanceRole())) {
+      return true;
+    }
+
+    if (danceRole.equals(danceRoleService.getLeadDanceRole())) {
+       return (currentCountFollow + currentCountSwitch) >= currentCountLead;
+    }
+
+    if (danceRole.equals(danceRoleService.getFollowDanceRole())) {
+       return (currentCountLead + currentCountSwitch) >= currentCountFollow;
+    }
+    return false;
+  }
+
+
+  public boolean registrationHasSpecialSpot(Registration baseRegistration, Registration lookupRegistration) {
+    boolean baseHasSpot = findAllByRegistration(baseRegistration).stream()
+      .allMatch(specialRegistration ->
+        specialHasSpot(specialRegistration.getEventSpecial(), baseRegistration.getDanceRole())
+      );
+    boolean lookupHasSpot = findAllByRegistration(lookupRegistration).stream()
+      .allMatch(specialRegistration ->
+        specialHasSpot(specialRegistration.getEventSpecial(), lookupRegistration.getDanceRole())
+      );
+
+    return baseHasSpot && lookupHasSpot;
+  }
 
   public void updateSpecialRegistrationRequest(Registration registration, JsonObject request) {
     List<SpecialRegistration> requestSpecialRegistrations = specialRegistrations(registration, request);

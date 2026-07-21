@@ -230,9 +230,13 @@ public class RegistrationService {
     // Specials
     eventService.findAllEventSpecials(event).forEach(
       eventSpecial -> {
+
         boolean specialSoldOut =
-          eventSpecial.getCapacity()
-            <= specialRegistrationService.countEventSpecialRegistrations(eventSpecial, event);
+          // all done
+          specialRegistrationService.countEventSpecialsDone(eventSpecial, event) >= eventSpecial.getCapacity()
+          || specialRegistrationService.countEventSpecialRegistrations(eventSpecial, event)
+            >= (eventSpecial.getCapacity() + waitListLength);
+          ;
 
         if (specialSoldOut != eventSpecial.getSoldOut()) {
           eventSpecial.setSoldOut(specialSoldOut);

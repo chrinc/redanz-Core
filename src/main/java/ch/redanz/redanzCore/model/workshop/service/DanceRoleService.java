@@ -38,6 +38,14 @@ public class DanceRoleService {
     return findByName(DanceRoleConfig.SWITCH.getName());
   }
 
+  public DanceRole getLeadDanceRole(){
+    return findByName(DanceRoleConfig.LEADER.getName());
+  }
+
+  public DanceRole getFollowDanceRole(){
+    return findByName(DanceRoleConfig.FOLLOWER.getName());
+  }
+
   public List<DanceRole> all() {
     return danceRoleRepo.findAll();
   }
