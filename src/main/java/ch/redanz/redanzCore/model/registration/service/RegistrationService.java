@@ -6,10 +6,8 @@ import ch.redanz.redanzCore.model.profile.service.CountryService;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
-import ch.redanz.redanzCore.model.registration.entities.Registration;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
-import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
-import ch.redanz.redanzCore.model.registration.entities.WorkflowStatus;
+import ch.redanz.redanzCore.model.registration.entities.*;
+import ch.redanz.redanzCore.model.registration.repository.RegistrationMatchingRepo;
 import ch.redanz.redanzCore.model.registration.repository.RegistrationRepo;
 import ch.redanz.redanzCore.model.registration.response.RegistrationRequest;
 import ch.redanz.redanzCore.model.registration.response.RegistrationResponse;
@@ -29,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -46,7 +44,6 @@ public class RegistrationService {
   private final DanceRoleService danceRoleService;
   private final PersonService personService;
   private final UserService userService;
-  private final RegistrationMatchingService registrationMatchingService;
   private final FoodRegistrationService foodRegistrationService;
   private final HostingService hostingService;
   private final VolunteerService volunteerService;
@@ -54,14 +51,13 @@ public class RegistrationService {
   private final DiscountRegistrationService discountRegistrationService;
   private final RegistrationEmailService registrationEmailService;
   private final SpecialRegistrationService specialRegistrationService;
-  private final SpecialService specialService;
   private final ErrorLogService errorLogService;
-//  private final PrivateClassService privateClassService;
   private final LanguageService languageService;
   private final CountryService countryService;
   private final BaseParService baseParService;
   private final BundleEventTrackService bundleEventTrackService;
   private final PaymentService paymentService;
+  private final RegistrationMatchingRepo registrationMatchingRepo;
 
   public void update(Registration registration) {
     registrationRepo.save(registration);
@@ -74,6 +70,19 @@ public class RegistrationService {
     Registration registration
   ) {
     return registrationRepo.getFullName(registration.getRegistrationId());
+  }
+
+  public void setIsRelease(Registration registration) {
+    registration.setIsRelease(true);
+    registrationRepo.save(registration);
+  }
+  public void removeIsRelease(Registration registration) {
+    registration.setIsRelease(false);
+    registrationRepo.save(registration);
+  }
+
+  public void save(RegistrationMatching registrationMatching) {
+    registrationMatchingRepo.save(registrationMatching);
   }
 
   public String bundleName(
@@ -107,9 +116,58 @@ public class RegistrationService {
     return registrationRepo.existsByActiveAndEventAndDanceRole(activ, event, danceRole);
   }
 
+  public boolean reachedCapacity(Registration registration) {
+    return
+      countConfirmingAndDone(registration.getEvent()) >= registration.getEvent().getCapacity()
+        || (registration.getBundle() != null && countBundlesConfirmingAndDone(registration.getBundle(), registration.getEvent()) >= eventService.findByEventAndBundle(registration.getEvent(), registration.getBundle()).getCapacity()
+        || (registration.getBundle() != null
+        && bundleService.hasTrack(registration.getBundle())
+        && countTracksConfirmingAndDone(registration.getTrack(), registration.getEvent()) >= bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(), registration.getTrack()).getCapacity()
+      )
+        || specialRegistrationService
+        .findAllPrivateClassesByRegistration(registration)
+        .stream()
+        .filter(Objects::nonNull)
+        .map(PrivateClassRegistration::getEventPrivateClass)
+        .anyMatch(privateClass -> privateClass.getCapacity() <= specialRegistrationService.countPrivatesConfirmingAndDone(privateClass)))
+        || specialRegistrationService
+        .findAllByRegistration(registration)
+        .stream()
+        .filter(Objects::nonNull)
+        .map(SpecialRegistration::getEventSpecial)
+        .anyMatch(eventSpecial -> eventSpecial.getCapacity() <= specialRegistrationService.countEventSpecialsConfirmingAndDone(eventSpecial, eventSpecial.getEvent()));
+  }
 
-  public int getBunldePrice(Registration registration) {
-    return  registrationRepo.getBundlePrice(registration.getRegistrationId());
+  public boolean isSoldOut(Registration registration) {
+   return
+        // event
+        eventService.getEventSoldOut(registration.getEvent())
+
+        // bundle
+     || registration.getBundle() != null && eventService.findByEventAndBundle(registration.getEvent(), registration.getBundle()).isSoldOut()
+
+     // Track
+     || registration.getBundle() != null
+          && bundleService.hasTrack(registration.getBundle())
+          && bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(), registration.getTrack()).isSoldOut()
+
+     // Private Class
+     || specialRegistrationService
+          .findAllPrivateClassesByRegistration(registration)
+          .stream()
+          .filter(Objects::nonNull)
+          .map(PrivateClassRegistration::getEventPrivateClass)
+          .anyMatch(epc -> Boolean.TRUE.equals(epc.getSoldOut()))
+
+     // Specials
+     || specialRegistrationService
+          .findAllByRegistration(registration)
+          .stream()
+          .filter(Objects::nonNull)
+          .map(SpecialRegistration::getEventSpecial)
+          .anyMatch(epc -> Boolean.TRUE.equals(epc.getSoldOut()))
+
+     ;
   }
 
   public void updateSoldOut(Event event) {
@@ -145,10 +203,18 @@ public class RegistrationService {
           int trackCapacity = bundleEventTrack.getCapacity();
           Track track = bundleEventTrack.getEventTrack().getTrack();
           int countTracksDone = countTracksDone(track, bundle, event);
+          long noSwitchDanceRoleCount = bundleEventTrack.getBundleEventTrackDanceRoles().stream()
+            .filter(bundleEventTrackDanceRole -> !bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().equals(danceRoleService.getSwitchDanceRole()))
+            .count();
 
           boolean trackSoldOut =
             countTracksDone >= trackCapacity
-              || countTracksSubmittedConfirmingAndDone(track, bundle, event) >= (trackCapacity + waitListLength);
+
+              // no dance roles: Sold out if waiting list full
+              || (
+                noSwitchDanceRoleCount == 0
+                  &&  countTracksSubmittedConfirmingAndDone(track, bundle, event) >= (trackCapacity + waitListLength)
+            );
 
           if (trackSoldOut != bundleEventTrack.isSoldOut()) {
             bundleEventTrack.setSoldOut(trackSoldOut);
@@ -156,17 +222,21 @@ public class RegistrationService {
           }
 
           // Dance Roles
-          long noSwitchDanceRoleCount = bundleEventTrack.getBundleEventTrackDanceRoles().stream()
-            .filter(bundleEventTrackDanceRole -> !bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().equals(danceRoleService.getSwitchDanceRole()))
-            .count();
-          int danceRolesCount = noSwitchDanceRoleCount > 0 ? (int) noSwitchDanceRoleCount : 1;
-          int open = trackCapacity - countTracksDone;
-
+          double roleCapacity = bundleEventTrack.getCapacity() / noSwitchDanceRoleCount;
+          double leadCount = countTracksSubmittedConfirmingAndDone(track, bundle, event, danceRoleService.getLeadDanceRole());
+          double followCount = countTracksSubmittedConfirmingAndDone(track, bundle, event, danceRoleService.getFollowDanceRole());
+          double switchCount = countTracksSubmittedConfirmingAndDone(track, bundle, event, danceRoleService.getSwitchDanceRole());
           bundleEventTrack.getBundleEventTrackDanceRoles().forEach(bundleEventTrackDanceRole -> {
-            int roleOpen = countTracksSubmittedAndConfirmingByDanceRole(track, bundle, event, bundleEventTrackDanceRole.getEventDanceRole().getDanceRole());
-            boolean danceRoleSoldOut = !bundleEventTrack.isSoldOut()
-              && bundleEventTrackDanceRole.getEventDanceRole().getDanceRole() != danceRoleService.getSwitchDanceRole()
-              && roleOpen >= (open / danceRolesCount) + waitListLength;
+
+            boolean danceRoleSoldOut = false;
+            if (bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().equals(danceRoleService.getFollowDanceRole())) {
+              danceRoleSoldOut = (roleCapacity + waitListLength) < (followCount + (baseParService.switchWeight(event) * switchCount));
+            } else if (bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().equals(danceRoleService.getLeadDanceRole())) {
+              danceRoleSoldOut = (roleCapacity + waitListLength) < (leadCount + ((1-baseParService.switchWeight(event)) * switchCount));
+            } else if (bundleEventTrackDanceRole.getEventDanceRole().getDanceRole().equals(danceRoleService.getSwitchDanceRole())) {
+              danceRoleSoldOut = (roleCapacity + waitListLength) < (followCount + (baseParService.switchWeight(event) * switchCount))
+                || (roleCapacity + waitListLength) < (followCount + ((1- baseParService.switchWeight(event)) * switchCount));
+            }
             if (danceRoleSoldOut != bundleEventTrackDanceRole.isSoldOut()) {
               bundleEventTrackDanceRole.setSoldOut(danceRoleSoldOut);
               bundleEventTrackService.save(bundleEventTrackDanceRole);
@@ -223,7 +293,6 @@ public class RegistrationService {
 
         if (privateClassSoldOut != eventPrivateClass.getSoldOut()) {
           eventPrivateClass.setSoldOut(privateClassSoldOut);
-//          eventService.save(eventBundle);
         }
       });
 
@@ -232,6 +301,7 @@ public class RegistrationService {
       eventSpecial -> {
 
         boolean specialSoldOut =
+
           // all done
           specialRegistrationService.countEventSpecialsDone(eventSpecial, event) >= eventSpecial.getCapacity()
           || specialRegistrationService.countEventSpecialRegistrations(eventSpecial, event)
@@ -492,6 +562,12 @@ public class RegistrationService {
       + countTracksConfirming(track, event, danceRole)
       + countTracksSubmitted(track, event, danceRole);
   }
+
+  public int countTracksConfirmingAndDone(Track track, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return countTracksDone(track, event, danceRole)
+      + countTracksConfirming(track, event, danceRole);
+  }
   public int countTracksSubmittedConfirmingAndDone(Track track, Bundle bundle, Event event, DanceRole danceRole) {
     if (track == null) return 0;
     return countTracksDone(track, bundle, event, danceRole)
@@ -563,6 +639,7 @@ public class RegistrationService {
   }
 
   public void onManualRelease(Registration registration) throws TemplateException, IOException {
+    setIsRelease(registration);
     releaseToConfirming(registration);
     registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration), paymentService.getPaymentDetails(registration));
   }
@@ -601,6 +678,48 @@ public class RegistrationService {
       event,
       RegistrationType.PARTICIPANT
     );
+  }
+
+  void cleanupMatchingRequest(Registration registration, boolean totalCleanup) {
+    if (registrationMatchingRepo.findByRegistration1(registration).isPresent()) {
+
+      if (totalCleanup) {
+        registrationMatchingRepo.deleteAllByRegistration1(registration);
+      } else {
+        RegistrationMatching registration1Matching = registrationMatchingRepo.findByRegistration1(registration).get();
+        registration1Matching.setRegistration2(null);
+        registration1Matching.setPartnerEmail(null);
+        save(registration1Matching);
+      }
+    }
+
+    if (registrationMatchingRepo.findByRegistration2(registration).isPresent()) {
+      RegistrationMatching registration2Matching = registrationMatchingRepo.findByRegistration2(registration).get();
+      registration2Matching.setRegistration2(null);
+      save(registration2Matching);
+    }
+  }
+
+  public void updateMatchingRequest(Registration registration, RegistrationRequest request) {
+    if (
+      request.getTrackId() != null && registration.getTrack().getPartnerRequired()
+    && request.getPartnerEmail() != null
+    ) {
+      RegistrationMatching registrationMatching
+        = registrationMatchingRepo.findByRegistration1(registration).isPresent() ?
+        registrationMatchingRepo.findByRegistration1(registration).get() :
+        new RegistrationMatching(registration);
+
+      if (request.getPartnerEmail() != null) {
+        registrationMatching.setPartnerEmail(String.valueOf(request.getPartnerEmail()));
+      } else {
+        registrationMatching.setPartnerEmail(null);
+      }
+
+      save(registrationMatching);
+    } else {
+      cleanupMatchingRequest(registration, true);
+    }
   }
 
   @Transactional
@@ -658,7 +777,7 @@ public class RegistrationService {
     volunteerService.updateVolunteerRequest(registration, request);
     donationRegistrationService.updateScholarshipRequest(registration, request);
     donationRegistrationService.updateDonationRequest(registration, request);
-    registrationMatchingService.updateMatchingRequest(registration, registrationRequest);
+    updateMatchingRequest(registration, registrationRequest);
     if (isNewRegistration) {
       try {
         workflowTransitionService.setWorkflowStatus(
@@ -824,7 +943,7 @@ public class RegistrationService {
     }
 
     // partner Email
-    RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
+    RegistrationMatching registrationMatching = registrationMatchingRepo.findByRegistration1(registration).orElse(null);
     if (registrationMatching != null) {
       registrationResponse.setPartnerEmail(registrationMatching.getPartnerEmail());
     }

@@ -174,6 +174,16 @@ public class SpecialRegistrationService {
   public int countEventSpecialsConfirming(EventSpecial eventSpecial, Event event, DanceRole danceRole) {
     return specialRegistrationRepo.countAllByEventSpecialAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(eventSpecial, workflowStatusService.getConfirming(), event, danceRole);
   }
+  public int countEventSpecialsSubmittedConfirmingDone(EventSpecial eventSpecial, Event event, DanceRole danceRole) {
+    return countEventSpecialsSubmitted(eventSpecial, event, danceRole)
+      + countEventSpecialsConfirming(eventSpecial, event, danceRole)
+      + countEventSpecialsDone(eventSpecial, event, danceRole);
+  }
+  public int countEventSpecialsConfirmingDone(EventSpecial eventSpecial, Event event, DanceRole danceRole) {
+    return countEventSpecialsConfirming(eventSpecial, event, danceRole)
+      + countEventSpecialsDone(eventSpecial, event, danceRole);
+  }
+
 
   public int countPrivatesDone(EventPrivateClass eventPrivateClass) {
     return privateClassRegistrationRepo.countAllByEventPrivateClassAndRegistration_WorkflowStatus(eventPrivateClass, workflowStatusService.getDone());
@@ -183,6 +193,10 @@ public class SpecialRegistrationService {
   }
   public int countPrivatesConfirming(EventPrivateClass eventPrivateClass) {
     return privateClassRegistrationRepo.countAllByEventPrivateClassAndRegistration_WorkflowStatus(eventPrivateClass, workflowStatusService.getConfirming());
+  }
+  public int countPrivatesConfirmingAndDone(EventPrivateClass eventPrivateClass) {
+    return countPrivatesConfirming(eventPrivateClass)
+      + countPrivatesDone(eventPrivateClass);
   }
   public int countPrivatesDone(EventPrivateClass eventPrivateClass, DanceRole danceRole) {
     return privateClassRegistrationRepo.countAllByEventPrivateClassAndRegistration_WorkflowStatusAndRegistrationDanceRole(eventPrivateClass, workflowStatusService.getDone(), danceRole);

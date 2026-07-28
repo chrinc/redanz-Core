@@ -23,6 +23,7 @@ public enum BaseParConfig {
   CANCELAFTERDAYS( "3", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_CANCEL_AFTER_DAYS_EN.getOutTextKey(),"number"),
   WAITLISTLENGTH( "2", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_WAIT_LIST_LENGTH_EN.getOutTextKey(), "number"),
   ORGANIZERNAME( "Redanz", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_ORGANIZER_NAME_EN.getOutTextKey(), "string"),
+  SWITCHWEIGHT( "Redanz", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_SWITCH_WEIGHT_EN.getOutTextKey(), "number"),
   BOOKLETREADY( "[{\"EN\":\"https://www.redanz.ch/booklet_en.pdf\",\"GE\":\"https://www.redanz.ch/booklet_de.pdf\"}]", EventConfig.REDANZ_EVENT, OutTextConfig.LABEL_BASE_PAR_BOOKLET_LINK_EN.getOutTextKey(),"label"),
 ;
 

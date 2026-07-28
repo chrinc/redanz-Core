@@ -63,6 +63,9 @@ public class Registration implements Serializable {
 
   private Boolean active;
 
+  @Column(name="is_release")
+  private Boolean isRelease;
+
   public Registration(Event event, Bundle bundle, Person participant, RegistrationType registrationType) {
     this.event = event;
     this.bundle = bundle;

@@ -85,6 +85,12 @@ public class BaseParService {
       Integer.valueOf(baseParRepo.findByEventAndName(event, OutTextConfig.LABEL_BASE_PAR_REMINDER_AFTER_DAYS_EN.getOutTextKey()).getVal()) :
       5; // default: 5
   }
+
+  public Double switchWeight(Event event) {
+    return existsByNameAndEvent(OutTextConfig.LABEL_BASE_PAR_SWITCH_WEIGHT_EN.getOutTextKey(), event) ?
+      Double.valueOf(baseParRepo.findByEventAndName(event, OutTextConfig.LABEL_BASE_PAR_SWITCH_WEIGHT_EN.getOutTextKey()).getVal()) :
+      0.66; // default: 0.66
+  }
   public String bookletLink(Event event, String langKey) throws JsonProcessingException {
     if (!existsByNameAndEvent(OutTextConfig.LABEL_BASE_PAR_BOOKLET_LINK_EN.getOutTextKey(), event)) {
       return null;

@@ -16,37 +16,33 @@ import java.io.IOException;
 public class RegistrationReleaseService {
   private final RegistrationMatchingService registrationMatchingService;
   private final RegistrationService registrationService;
-  private final EventService eventService;
   private final RegistrationEmailService registrationEmailService;
   private final WorkflowStatusService workflowStatusService;
   private final PaymentService paymentService;
 
-  public void doRelease(Registration registration){
-    if (
-         isRelease(registration)
-    ) {
+  public boolean doRelease(Registration registration){
+    if (isRelease(registration)) {
       try {
-
         // release partner first
         if (
           registrationMatchingService.findByRegistration1(registration).isPresent()
+          && registrationMatchingService.findByRegistration1(registration).get().getRegistration2() != null
+          && isRelease(registrationMatchingService.findByRegistration1(registration).get().getRegistration2())
         ) {
           Registration partnerRegistration = registrationMatchingService.findByRegistration1(registration).get().getRegistration2();
           registrationService.releaseToConfirming(partnerRegistration);
           registrationEmailService.sendEmailConfirmation(partnerRegistration , registrationEmailService.findByRegistration(partnerRegistration), paymentService.getPaymentDetails(partnerRegistration));
-          // releasedRegistrations.add(partnerRegistration);
         }
 
         // release registration
         registrationService.releaseToConfirming(registration);
         registrationEmailService.sendEmailConfirmation(registration, registrationEmailService.findByRegistration(registration), paymentService.getPaymentDetails(registration));
-
-//        releasedRegistrations.add(registration);
+        return true;
       } catch (IOException | TemplateException e) {
         e.printStackTrace();
       }
-    } else {
     }
+    return false;
   }
 
   public void doRelease(Event event) {
@@ -57,19 +53,17 @@ public class RegistrationReleaseService {
 
   private boolean isRelease(Registration registration) {
     return
-      registration.getWorkflowStatus().getWorkflowStatusId().equals(workflowStatusService.getSubmitted().getWorkflowStatusId()) &&
-      isMatchingOK(registration) &&
-        isCapacityOK(registration)
+      registration.getWorkflowStatus().getWorkflowStatusId().equals(workflowStatusService.getSubmitted().getWorkflowStatusId())
+        && isMatchingOK(registration)
+        && isEventCapacityOK(registration)
       ;
   }
 
   private boolean isMatchingOK (Registration registration) {
-    if (registrationMatchingService.findByRegistration1(registration).isPresent()) {
-      return registrationMatchingService.findByRegistration1(registration).get().getRegistration2() != null;
-    } else return true;
+    return registration.getIsRelease();
   }
 
-  private boolean isCapacityOK (Registration registration) {
+  private boolean isEventCapacityOK (Registration registration) {
     return
       registrationService.countConfirmingAndDone(
         registration.getEvent()

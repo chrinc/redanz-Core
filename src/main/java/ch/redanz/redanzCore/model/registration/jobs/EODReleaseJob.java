@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.registration.jobs;
 
+import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
 import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationReleaseService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
@@ -26,6 +27,8 @@ public class EODReleaseJob {
 
   @Autowired
   Configuration mailConfig;
+  @Autowired
+  private RegistrationMatchingService registrationMatchingService;
 
 //  @Scheduled(cron = "0 50 15 * * MON-SUN")
 //  @Scheduled(cron = "0 0/2 * * * *")
@@ -35,9 +38,10 @@ public class EODReleaseJob {
     eventService.findAll().forEach(event -> {
       if (baseParService.doEODRelease(event)) {
         registrationService.getAllSubmittedRegistrations(event).forEach(registration -> {
+          registrationMatchingService.checkIsRelease(registration);
           registrationReleaseService.doRelease(registration);
+          registrationService.updateSoldOut(event);
         });
-        registrationService.updateSoldOut(event);
       }
     });
   }

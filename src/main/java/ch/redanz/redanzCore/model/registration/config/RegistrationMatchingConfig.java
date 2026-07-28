@@ -5,7 +5,6 @@ import ch.redanz.redanzCore.model.profile.config.UserConfig;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
-import ch.redanz.redanzCore.model.registration.jobs.EODMatchingJob;
 import ch.redanz.redanzCore.model.registration.service.RegistrationMatchingService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;

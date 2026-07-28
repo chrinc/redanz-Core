@@ -286,6 +286,7 @@ public class RegistrationController {
   ) {
     try {
       Registration registration = registrationService.findByRegistrationId(registrationId);
+      registrationService.removeIsRelease(registration);
       registrationMatchingService.removePartnerRegistration(registration);
       workflowTransitionService.setWorkflowStatus(
         registration,
@@ -318,7 +319,7 @@ public class RegistrationController {
       // match
       if (baseParService.doAutoMatch(registration.getEvent())) {
         registrationService.updateSoldOut(event);
-        registrationMatchingService.doMatching(registration);
+        registrationMatchingService.checkIsRelease(registration);
       }
 
       // release
