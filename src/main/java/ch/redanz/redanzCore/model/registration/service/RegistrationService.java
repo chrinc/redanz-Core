@@ -736,14 +736,19 @@ public class RegistrationService {
       (request.get("partnerEmail") == null || request.get("partnerEmail").isJsonNull()) ? null : request.get("partnerEmail").getAsString()
     );
 
-    if (registrationId != null) {
-      registration = findByParticipantAndEvent(
-        personService.findByPersonId(personId),
-        event,
-        RegistrationType.PARTICIPANT
-      ).get();
+    registration = findByParticipantAndEvent(
+      personService.findByPersonId(personId),
+      event,
+      RegistrationType.PARTICIPANT
+    ).orElse(null);
+
+    if (registration == null && registrationId != null) {
+      registration = findByRegistrationId(registrationId);
+    }
+
+    if (registration != null) {
       updateRegistration(
-        findByRegistrationId(registrationId),
+        registration,
         registrationRequest,
         request.get("personId").isJsonNull() ? personId : request.get("personId").getAsLong(),
         RegistrationType.PARTICIPANT

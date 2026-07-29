@@ -72,6 +72,7 @@ public class Registration implements Serializable {
     this.participant = participant;
     this.active = true;
     this.registrationType = registrationType;
+    this.isRelease = false;
   }
 
   public Registration(Person participant, Event event, Bundle bundle, Track track, DanceRole danceRole, RegistrationType registrationType) {
@@ -82,6 +83,7 @@ public class Registration implements Serializable {
     this.danceRole = danceRole;
     this.active = true;
     this.registrationType = registrationType;
+    this.isRelease = false;
 
   }
 
@@ -90,6 +92,7 @@ public class Registration implements Serializable {
     this.event = event;
     this.active = true;
     this.registrationType = registrationType;
+    this.isRelease = false;
   }
 
   public Registration () {}
