@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.restApi.controller;
 
+import ch.redanz.redanzCore.model.registration.entities.PaymentStatus;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
@@ -74,6 +75,28 @@ public class PayrexxPaymentController {
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
+  }
+
+  @GetMapping(path = "/reset-pending")
+  @Transactional
+  public void resetPending(
+    @RequestParam("registrationId") Long registrationId
+  ) {
+    try {
+     Registration registration = registrationService.findByRegistrationId(registrationId);
+      paymentService.updateRegistrationPaymentStatus(registration, PaymentStatus.PENDING);
+    } catch (Exception exception) {
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  @GetMapping(path = "/payment-status")
+  @Transactional
+  public ResponseEntity<PaymentStatus>  getPaymentStatus(
+    @RequestParam Long registrationId
+  ) {
+    Registration registration = registrationService.findByRegistrationId(registrationId);
+   return ResponseEntity.ok(registration.getPaymentStatus());
   }
 
   @PostMapping("/checkout/confirm")

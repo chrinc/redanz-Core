@@ -656,6 +656,7 @@ public class RegistrationService {
       registration,
       workflowStatusService.getConfirming()
     );
+    paymentService.updateRegistrationPaymentStatus(registration, PaymentStatus.PENDING);
     updateSoldOut(registration.getEvent());
   }
 

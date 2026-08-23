@@ -1,11 +1,9 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.registration.entities.PaymentStatus;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationPayment;
-import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
-import ch.redanz.redanzCore.model.registration.repository.DonationRegistrationRepo;
-import ch.redanz.redanzCore.model.registration.repository.FoodRegistrationRepo;
-import ch.redanz.redanzCore.model.registration.repository.RegistrationPaymentRepo;
+import ch.redanz.redanzCore.model.registration.repository.*;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
@@ -41,11 +39,9 @@ public class PaymentService {
   private final DiscountRegistrationRepo discountRegistrationRepo;
   private final PrivateClassService privateClassService;
   private final SpecialRegistrationService specialRegistrationService;
-  private final EventService eventService;
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationPaymentRepo registrationPaymentRepo;
-  private final EventDiscountRepo eventDiscountRepo;
-
+  private final RegistrationRepo registrationRepo;
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
     // Timout 4 Minutes, gateway timeout should be 5 minutes
@@ -62,6 +58,11 @@ public class PaymentService {
       wait(waitTime);
     }
     return true;
+  }
+
+  public void updateRegistrationPaymentStatus(Registration registration, PaymentStatus paymentStatus) {
+    registration.setPaymentStatus(paymentStatus);
+    registrationRepo.save(registration);
   }
 
   private synchronized boolean checkPaymentConfirmed(Registration registration) {
@@ -225,6 +226,7 @@ public class PaymentService {
 
       // Update workflow
      if (amountDue(registration) == 0) {
+       updateRegistrationPaymentStatus(registration, PaymentStatus.PAID);
 
        workflowTransitionService.setWorkflowStatus(
          registration,
@@ -239,13 +241,28 @@ public class PaymentService {
          getPaymentDetails(registration)
        );
      }
+     else {
+       updateRegistrationPaymentStatus(registration, PaymentStatus.PENDING);
+     }
   }
+
   public void onPaymentConfirmed(Registration registration, Long amount, String status) throws IOException, TemplateException {
-    //    @todo referenceId not found
-    //    @todo check amount first
-    //    @todo check payment method
-    if (Objects.equals(status, "confirmed")) {
-      onPaymentReceived(registration, amount);
+    switch (status.toLowerCase()) {
+      case "confirmed":
+        onPaymentReceived(registration, amount);
+        break;
+
+      case "declined":
+        updateRegistrationPaymentStatus(registration, PaymentStatus.DECLINED);
+        break;
+
+      case "failed":
+        updateRegistrationPaymentStatus(registration, PaymentStatus.FAILED);
+        break;
+
+      default:
+        updateRegistrationPaymentStatus(registration, PaymentStatus.UNKNOWN);
+        break;
     }
   }
 }
