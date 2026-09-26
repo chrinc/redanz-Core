@@ -12,7 +12,7 @@ import java.util.List;
 public interface PersonRepo extends JpaRepository<Person, Long> {
   Person findByPersonId(Long personId);
   List<Person> findAllByActive(boolean active);
-  List<Person> findAllByUserUserRole(UserRole userRole);
+  List<Person> findAllByUserUserRoleIn(List<UserRole> userRoles);
 
   Person findByUser(User user);
   boolean existsByUser(User user);

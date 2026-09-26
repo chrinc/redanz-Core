@@ -79,7 +79,7 @@ public class PersonService {
 
   public List<Person> getAlOrganizers(Event event) {
     // @Todo, event currently not used;
-    return personRepo.findAllByUserUserRole(UserRole.ORGANIZER);
+    return personRepo.findAllByUserUserRoleIn(List.of(UserRole.ORGANIZER, UserRole.ADMIN));
   }
 
 }

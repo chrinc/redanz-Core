@@ -73,10 +73,10 @@ public class GuestService {
     Person person = personService.findByPersonId(personId);
 
     List<EventSlot> newSlots = new ArrayList<>();
-    JsonArray mySlots = myGuest.get("eventSlots").isJsonNull() ? null
-      : myGuest.get("eventSlots").isJsonObject() ?
-        myGuest.get("eventSlots").getAsJsonObject().get("extractedKeys").getAsJsonArray()
-      : myGuest.get("eventSlots").getAsJsonArray();
+    JsonArray mySlots = myGuest.get("slots") == null || myGuest.get("slots").isJsonNull() ? null
+      : myGuest.get("slots").isJsonObject() ?
+        myGuest.get("slots").getAsJsonObject().get("extractedKeys").getAsJsonArray()
+      : myGuest.get("slots").getAsJsonArray();
 
     if (mySlots != null) {
       mySlots.forEach(mySlot -> {

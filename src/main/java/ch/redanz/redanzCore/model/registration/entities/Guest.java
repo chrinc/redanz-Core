@@ -102,7 +102,7 @@ public class Guest implements Serializable {
           put("type", "multiple");
           put("restriction", "party");
           put("label", "Slots");
-          put("elemKey", "slotId");
+          put("elemKey", "eventSlotId");
           put("elemLabel", "name");
         }});
         add(new HashMap<>() {{
