@@ -252,10 +252,12 @@ public class PaymentService {
         onPaymentReceived(registration, amount);
         break;
 
+      case "expired":
       case "declined":
         updateRegistrationPaymentStatus(registration, PaymentStatus.DECLINED);
         break;
 
+      case "cancelled":
       case "failed":
         updateRegistrationPaymentStatus(registration, PaymentStatus.FAILED);
         break;
