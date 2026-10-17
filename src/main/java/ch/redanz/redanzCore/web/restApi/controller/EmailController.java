@@ -9,6 +9,7 @@ import ch.redanz.redanzCore.model.registration.service.HostingService;
 import ch.redanz.redanzCore.model.registration.service.WorkflowStatusService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationEmailService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.VolunteerService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.service.email.EmailAccountService;
@@ -42,6 +43,7 @@ public class EmailController {
   private final DonationRegistrationService donationRegistrationService;
   private final OutTextService outTextService;
   private final HostingService hostingService;
+  private final VolunteerService volunteerService;
   private final WorkflowStatusService workflowStatusService;
   private final EmailAccountService emailAccountService;
 
@@ -90,6 +92,7 @@ public class EmailController {
       context.put("donor", donationRegistrationService.isDonor(registration));
       context.put("host", hostingService.hasHostRegistration(registration));
       context.put("hostee", hostingService.hasHosteeRegistration(registration));
+      context.put("volunteer", volunteerService.hasVolunteerRegistration(registration));
       return context;
     } catch (Exception exception) {
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
@@ -160,11 +163,12 @@ public class EmailController {
         : false;
     Boolean allHosts = getFlag(jsonEmail, "allHosts");
     Boolean allHostees = getFlag(jsonEmail, "allHostees");
+    Boolean allVolunteers = getFlag(jsonEmail, "allVolunteers");
     Registration registration = registrationService.findByRegistrationId(registrationId);
 
     // several flags: the intersection applies
     List<Registration> registrationList = new ArrayList<Registration>();
-    if (allWithBundle || allWithLang || allStatus || allDonors || allHosts || allHostees) {
+    if (allWithBundle || allWithLang || allStatus || allDonors || allHosts || allHostees || allVolunteers) {
       registrationList = null;
       if (allWithBundle || allWithLang || allStatus) {
         registrationList = allStatus && allWithLang && allWithBundle ?
@@ -198,7 +202,7 @@ public class EmailController {
           : null;
       }
 
-      // donors, hosts, hostees: only registrations with status done
+      // donors, hosts, hostees, volunteers: only registrations with status done
       Long doneStatusId = workflowStatusService.getDone().getWorkflowStatusId();
       if (allDonors) {
         registrationList = intersect(registrationList,
@@ -219,6 +223,14 @@ public class EmailController {
         registrationList = intersect(registrationList,
           hostingService.getAllHosteeRegistrationsByEvent(registration.getEvent()).stream()
             .map(hosteeRegistration -> hosteeRegistration.getRegistration())
+            .filter(r -> r.getWorkflowStatus().getWorkflowStatusId().equals(doneStatusId))
+            .collect(Collectors.toList())
+        );
+      }
+      if (allVolunteers) {
+        registrationList = intersect(registrationList,
+          volunteerService.getAllByEvent(registration.getEvent()).stream()
+            .map(volunteerRegistration -> volunteerRegistration.getRegistration())
             .filter(r -> r.getWorkflowStatus().getWorkflowStatusId().equals(doneStatusId))
             .collect(Collectors.toList())
         );
