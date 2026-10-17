@@ -2,6 +2,8 @@ package ch.redanz.redanzCore.model.workshop.entities;
 
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import lombok.Getter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +24,8 @@ public class Bundle implements Serializable {
   private Long bundleId;
 
   @ManyToMany(fetch = FetchType.EAGER)
+
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(
     name = "bundle_event_special",
     joinColumns = @JoinColumn(name = "bundle_id"),
@@ -29,9 +33,13 @@ public class Bundle implements Serializable {
   private Set<EventSpecial> eventSpecials;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundle", fetch = FetchType.EAGER)
+
+  @Fetch(FetchMode.SUBSELECT)
   private Set<BundleEventTrack> bundleEventTracks;
 
   @ManyToMany(fetch = FetchType.EAGER)
+
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(
     name="bundle_party_slots",
     joinColumns = @JoinColumn(name="bundle_id"),
@@ -40,6 +48,8 @@ public class Bundle implements Serializable {
   private Set<EventSlot> partySlots;
 
   @ManyToMany(fetch = FetchType.EAGER)
+
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(
     name="bundle_dance_role",
     joinColumns = @JoinColumn(name="bundle_id"),

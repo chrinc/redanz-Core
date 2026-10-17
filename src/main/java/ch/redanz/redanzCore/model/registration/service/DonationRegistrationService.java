@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,6 +32,20 @@ public class DonationRegistrationService {
 
   public List<DonationRegistration> allDonationRegistrations(Event event) {
     return donationRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true);
+  }
+
+  // registrations with a donation (amount > 0)
+  public List<Registration> allDonors(Event event) {
+    return allDonationRegistrations(event).stream()
+      .filter(donationRegistration -> donationRegistration.getAmount() > 0)
+      .map(DonationRegistration::getRegistration)
+      .distinct()
+      .collect(Collectors.toList());
+  }
+
+  public boolean isDonor(Registration registration) {
+    DonationRegistration donationRegistration = donationRegistrationRepo.findByRegistration(registration);
+    return donationRegistration != null && donationRegistration.getAmount() > 0;
   }
 
   public List<ScholarshipRegistration> allScholarshipRegistrations(Event event) {

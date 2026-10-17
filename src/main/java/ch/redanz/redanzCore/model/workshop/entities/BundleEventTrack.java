@@ -3,6 +3,8 @@ package ch.redanz.redanzCore.model.workshop.entities;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +34,8 @@ public class BundleEventTrack {
   private EventTrack eventTrack;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "bundleEventTrack", fetch = FetchType.EAGER)
+
+  @Fetch(FetchMode.SUBSELECT)
   private Set<BundleEventTrackDanceRole> bundleEventTrackDanceRoles;
 
   @Column(name = "sold_out")

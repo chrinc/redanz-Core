@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -44,7 +44,7 @@ public class CheckInService {
     return checkInRepo.findAllByEvent(event);
   }
   public void deleteAllByEvent(Event event) {
-    checkInRepo.deleteAllByEvent(event);
+    checkInRepo.bulkDeleteByEvent(event);
   }
   public void checkIn(CheckIn checkIn) {
     checkIn.setCheckInTime(ZonedDateTime.now());
@@ -111,7 +111,7 @@ public class CheckInService {
         registrationService.workflowStatusName(registration),
         paymentService.amountDue(registration),
         paymentService.totalAmount(registration),
-        bundleService.hasTrack(registration.getBundle()) ? bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(),registration.getTrack()).getColor() : registration.getBundle().getColor(),
+        registration.getBundle().getColor() /* wrist band color of the bundle */,
         registration.getDanceRole() != null ? registration.getDanceRole().getName() : ""
        )
       );
@@ -125,10 +125,18 @@ public class CheckInService {
     List<CheckIn> checkIns = new ArrayList<>();
     List<CheckIn> currentCheckIns = checkInRepo.findAllByEvent(event);
 
+    // existing check-ins by guest / registration (instead of two queries per person)
+    Map<Long, CheckIn> checkInByGuestId = new HashMap<>();
+    Map<Long, CheckIn> checkInByRegistrationId = new HashMap<>();
+    currentCheckIns.forEach(checkIn -> {
+      if (checkIn.getGuest() != null) checkInByGuestId.putIfAbsent(checkIn.getGuest().getGuestId(), checkIn);
+      if (checkIn.getRegistration() != null) checkInByRegistrationId.putIfAbsent(checkIn.getRegistration().getRegistrationId(), checkIn);
+    });
+
     // Guests
     guestService.findAllByEvent(event).forEach(guest -> {
-      if (checkInRepo.existsByGuest(guest)) {
-        CheckIn existingCheckIn = checkInRepo.findByGuest(guest);
+      CheckIn existingCheckIn = checkInByGuestId.get(guest.getGuestId());
+      if (existingCheckIn != null) {
         existingCheckIn.setEvent(guest.getEvent());
         existingCheckIn.setCheckinName(guest.getName());
         existingCheckIn.setDescription(guest.getDescription());
@@ -151,8 +159,8 @@ public class CheckInService {
 
     // Staff
     registrationService.findStaffByEvent(event).forEach(staff -> {
-      if (checkInRepo.existsByRegistration(staff)) {
-        CheckIn existingCheckIn = checkInRepo.findByRegistration(staff);
+      CheckIn existingCheckIn = checkInByRegistrationId.get(staff.getRegistrationId());
+      if (existingCheckIn != null) {
         existingCheckIn.setEvent(staff.getEvent());
         existingCheckIn.setCheckinName(staff.getParticipant().getFirstName() + " " + staff.getParticipant().getLastName());
         existingCheckIn.setType(RegistrationType.STAFF.name());
@@ -177,8 +185,8 @@ public class CheckInService {
 
     // Participants
     registrationService.findAllByEvent(event).forEach(registration -> {
-      if (checkInRepo.existsByRegistration(registration)) {
-        CheckIn existingCheckIn = checkInRepo.findByRegistration(registration);
+      CheckIn existingCheckIn = checkInByRegistrationId.get(registration.getRegistrationId());
+      if (existingCheckIn != null) {
         existingCheckIn.setEvent(registration.getEvent());
         existingCheckIn.setCheckinName(
                   registration.getParticipant().getFirstName()
@@ -195,7 +203,7 @@ public class CheckInService {
         existingCheckIn.setStatus(registrationService.workflowStatusName(registration));
         existingCheckIn.setAmountDue(paymentService.amountDue(registration));
         existingCheckIn.setTotalAmount(paymentService.totalAmount(registration));
-        existingCheckIn.setColor(bundleService.hasTrack(registration.getBundle()) ? bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(), registration.getTrack()).getColor() : registration.getBundle().getColor());
+        existingCheckIn.setColor(registration.getBundle().getColor() /* wrist band color of the bundle */);
         existingCheckIn.setDanceRole(registration.getDanceRole() != null ? registration.getDanceRole().getName() : "");
         checkIns.add(existingCheckIn);
       } else {
@@ -216,19 +224,21 @@ public class CheckInService {
             registrationService.workflowStatusName(registration),
             paymentService.amountDue(registration),
             paymentService.totalAmount(registration),
-            bundleService.hasTrack(registration.getBundle()) ? bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(), registration.getTrack()).getColor() : registration.getBundle().getColor(),
+            registration.getBundle().getColor() /* wrist band color of the bundle */,
             registration.getDanceRole() != null ? registration.getDanceRole().getName() : ""
           )
         );
       }
     });
 
-    if (currentCheckIns.size() != 0) {
-      for (CheckIn currentCheckIn : currentCheckIns) {
-        if (!checkIns.contains(currentCheckIn)) {
-          checkInRepo.deleteByCheckInId(currentCheckIn.getCheckInId());
-        }
-      }
+    // remove check-ins that no longer exist (one delete statement)
+    Set<CheckIn> keptCheckIns = Collections.newSetFromMap(new IdentityHashMap<>());
+    keptCheckIns.addAll(checkIns);
+    List<CheckIn> removedCheckIns = currentCheckIns.stream()
+      .filter(checkIn -> !keptCheckIns.contains(checkIn))
+      .collect(Collectors.toList());
+    if (!removedCheckIns.isEmpty()) {
+      checkInRepo.deleteAllInBatch(removedCheckIns);
     }
 
     checkInRepo.saveAll(checkIns);

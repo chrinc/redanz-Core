@@ -4,6 +4,8 @@ import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -54,33 +56,43 @@ public class Event implements Serializable {
   private String description;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventPrivateClass> eventPrivates;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventSpecial> eventSpecials;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventDiscount> eventDiscounts;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<VolunteerType> volunteerTypes;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventBundle> eventBundles;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventSlot> eventSlots;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventFoodSlot> eventFoodSlots;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventTrack> eventTracks;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventPartInfo> eventPartInfoSet;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event", fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   private Set<EventDanceRole> eventDanceRoles;
 
   public Event() {

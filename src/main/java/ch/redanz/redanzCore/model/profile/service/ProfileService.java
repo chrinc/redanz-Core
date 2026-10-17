@@ -1,6 +1,7 @@
 package ch.redanz.redanzCore.model.profile.service;
 
 
+import ch.redanz.redanzCore.model.workshop.entities.EmailAccount;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.workshop.service.BaseParService;
@@ -137,7 +138,7 @@ public class ProfileService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     model.put("base", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_BASE_EN.getOutTextKey(), languageKey).getOutText());
     model.put("activate_now", outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_EMAIL_CONFIRM_EMAIL_ACTIVATE_NOW_EN.getOutTextKey(), languageKey).getOutText());
@@ -164,9 +165,10 @@ public class ProfileService {
       FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
       , userService.emailIsTester(person.getEmail())
       , false
+      ,null
+      ,null
+      , EmailAccount.Type.REGISTRATION
       , null
-      ,null
-      ,null
     );
   }
 }

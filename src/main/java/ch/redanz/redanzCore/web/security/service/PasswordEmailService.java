@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.security.service;
 
+import ch.redanz.redanzCore.model.workshop.entities.EmailAccount;
 import ch.redanz.redanzCore.model.profile.entities.Person;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
@@ -56,7 +57,7 @@ public class PasswordEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     Template template = mailConfig.getTemplate("resetPassword.ftl");
 
@@ -119,7 +120,8 @@ public class PasswordEmailService {
       ,false
       ,null
       ,null
-      ,null
+      , EmailAccount.Type.REGISTRATION
+      , null
     );
   }
 }

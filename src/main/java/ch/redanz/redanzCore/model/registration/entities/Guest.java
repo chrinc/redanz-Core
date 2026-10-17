@@ -6,6 +6,8 @@ import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -42,6 +44,8 @@ public class Guest implements Serializable {
   private boolean active;
 
   @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(
     name="guest_slots",
     joinColumns = @JoinColumn(name="guest_id"),

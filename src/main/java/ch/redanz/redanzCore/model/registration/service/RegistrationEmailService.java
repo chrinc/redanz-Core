@@ -12,6 +12,8 @@ import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.workshop.config.EventPartConfig;
 import ch.redanz.redanzCore.model.workshop.configTest.EventPartInfoConfig;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.EmailAccount;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.service.*;
 import ch.redanz.redanzCore.service.email.EmailService;
 import com.google.gson.JsonObject;
@@ -20,6 +22,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -43,6 +46,8 @@ public class RegistrationEmailService {
   private final EventService eventService;
   private final EventPartService eventPartService;
   private final RegistrationCalendarService registrationCalendarService;
+  // ObjectProvider breaks the circular dependency (PaymentService -> RegistrationEmailService)
+  private final ObjectProvider<PaymentService> paymentServiceProvider;
   @Autowired
   Environment environment;
 
@@ -52,6 +57,9 @@ public class RegistrationEmailService {
   private SpecialService specialService;
   @Autowired
   private PersonService personService;
+
+  // email template, inserted by the frontend (email component)
+  private static final String TEMPLATE_BOOKING = "{{booking}}";
 
   public void update(RegistrationEmail registrationEmail) {
     registrationEmailRepo.save(registrationEmail);
@@ -73,7 +81,7 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
 
     Template template = mailConfig.getTemplate("registrationSubmitted.ftl");
@@ -143,7 +151,8 @@ public class RegistrationEmailService {
       , !registration.getEvent().isActive()
       , null
       , null
-      , null
+      , EmailAccount.Type.REGISTRATION
+      , registration.getEvent()
     );
     update(
       new RegistrationEmail(registration, OffsetDateTime.now().toZonedDateTime())
@@ -165,7 +174,7 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     Template template = mailConfig.getTemplate("registrationDone.ftl");
 
@@ -372,7 +381,8 @@ public class RegistrationEmailService {
       , !eventService.findIsActive(registration.getEvent())
       , null
       , null
-      , null
+      , EmailAccount.Type.REGISTRATION
+      , registration.getEvent()
     );
     registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
@@ -393,7 +403,7 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     Template template = mailConfig.getTemplate("registrationBookConfirmingUpdate.ftl");
 
@@ -506,7 +516,8 @@ public class RegistrationEmailService {
       , !eventService.findIsActive(registration.getEvent())
       , null
       , null
-      , null
+      , EmailAccount.Type.REGISTRATION
+      , registration.getEvent()
     );
     registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
@@ -528,7 +539,7 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     Template template = mailConfig.getTemplate("registrationBookDoneUpdate.ftl");
 
@@ -735,7 +746,8 @@ public class RegistrationEmailService {
       , !eventService.findIsActive(registration.getEvent())
       , null
       , null
-      , null
+      , EmailAccount.Type.REGISTRATION
+      , registration.getEvent()
     );
     registrationEmail.setDoneSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
@@ -751,7 +763,7 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     Template template = mailConfig.getTemplate("registrationReminder.ftl");
 
@@ -832,7 +844,8 @@ public class RegistrationEmailService {
       , !registration.getEvent().isActive()
       , null
       , null
-      , null
+      , EmailAccount.Type.REGISTRATION
+      , registration.getEvent()
     );
 
     registrationEmail.setReminderSentDate(OffsetDateTime.now().toZonedDateTime());
@@ -848,7 +861,7 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     Template template = mailConfig.getTemplate("registrationCancelled.ftl");
 
@@ -909,7 +922,8 @@ public class RegistrationEmailService {
       , !registration.getEvent().isActive()
       , null
       , null
-      , null
+      , EmailAccount.Type.REGISTRATION
+      , registration.getEvent()
     );
     registrationEmail.setCancelledSentDate(OffsetDateTime.now().toZonedDateTime());
     update(registrationEmail);
@@ -925,7 +939,7 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(EmailAccount.Type.REGISTRATION));
 
     Template template = mailConfig.getTemplate("registrationReleased.ftl");
 
@@ -1011,7 +1025,8 @@ public class RegistrationEmailService {
       , !eventService.findIsActive(registration.getEvent())
       , null
       , null
-      , null
+      , EmailAccount.Type.REGISTRATION
+      , registration.getEvent()
     );
 
     registrationEmail.setReleasedSentDate(OffsetDateTime.now().toZonedDateTime());
@@ -1022,9 +1037,7 @@ public class RegistrationEmailService {
   public void sendGenericEmail(
     Long senderUser,
     List<Registration> registrationList,
-    JsonObject emailContent,
-    Boolean includeCalendar
-
+    JsonObject emailContent
   ) {
     String subject =
       emailContent.get("subject") != null ?
@@ -1041,27 +1054,48 @@ public class RegistrationEmailService {
         )
         : "";
 
+    // calendar attachments, e.g. ["EVENT", "FOOD"]
+    Set<RegistrationCalendarService.CalendarScope> calendarScopes = new HashSet<>();
+    if (emailContent.get("calendarAttachments") != null && emailContent.get("calendarAttachments").isJsonArray()) {
+      emailContent.get("calendarAttachments").getAsJsonArray().forEach(scope ->
+        calendarScopes.add(RegistrationCalendarService.CalendarScope.valueOf(scope.getAsString()))
+      );
+    }
+    EmailAccount.Type accountType =
+      emailContent.get("sender") != null && !emailContent.get("sender").isJsonNull() ?
+        EmailAccount.Type.valueOf(emailContent.get("sender").getAsString()) : null;
+    boolean includeBooking = content.contains(TEMPLATE_BOOKING);
+    String genericContent = content;
 
     registrationList.forEach(registration -> {
-      byte[] icsAttachment = null;
-      if (includeCalendar) {
-        String languageKey =
-          registration.getParticipant().getPersonLang() == null ?
-            languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
-            registration.getParticipant().getPersonLang().getLanguageKey();
-          icsAttachment = registrationCalendarService.createCalendarFile(
-            registration, languageKey
-          );
-      }
+      String languageKey =
+        registration.getParticipant().getPersonLang() == null ?
+          languageService.findLanguageByLanguageKey("GE").getLanguageKey() :
+          registration.getParticipant().getPersonLang().getLanguageKey();
+
+      byte[] icsAttachment = calendarScopes.isEmpty() ? null :
+        registrationCalendarService.createCalendarFile(registration, languageKey, calendarScopes);
+
+      // booking template: replaced in place by the individual booking overview
+      String personalContent = !includeBooking ? genericContent :
+        genericContent
+          .replace("<p>" + TEMPLATE_BOOKING + "</p>", TEMPLATE_BOOKING)
+          .replace(TEMPLATE_BOOKING, "<div style=\"margin:15px 0;\">" + getEmailOverview(
+            registration,
+            paymentServiceProvider.getObject().getPaymentDetails(registration),
+            languageKey
+          ) + "</div>");
 
       try {
         sendGenericEmail(
           senderUser,
           registration.getParticipant(),
           subject,
-          content,
+          personalContent,
           icsAttachment,
-          eventService.findEventName(registration.getEvent())
+          eventService.findEventName(registration.getEvent()) + " - " + registration.getParticipant().getFirstName(),
+          accountType,
+          registration.getEvent()
         );
       } catch (IOException e) {
         throw new RuntimeException(e);
@@ -1079,6 +1113,19 @@ public class RegistrationEmailService {
     byte[] icsAttachment,
     String icsFilename
   ) throws IOException, TemplateException {
+    sendGenericEmail(senderUser, receiver, subject, content, icsAttachment, icsFilename, null, null);
+  }
+
+  public void sendGenericEmail(
+    Long senderUser,
+    Person receiver,
+    String subject,
+    String content,
+    byte[] icsAttachment,
+    String icsFilename,
+    EmailAccount.Type accountType,
+    Event event
+  ) throws IOException, TemplateException {
     Map<String, Object> model = new HashMap<>();
     model.put("headerLink", environment.getProperty("link.login") + "/assets/graphics/" + environment.getProperty("oms.host.key"));
     model.put("firstName", receiver.getFirstName());
@@ -1086,9 +1133,10 @@ public class RegistrationEmailService {
     model.put("omsInstaLink", environment.getProperty("oms.insta.link"));
     model.put("omsHostDomain", environment.getProperty("oms.host.domain"));
     model.put("omsHostName", environment.getProperty("oms.host.name"));
-    model.put("hostEmail", environment.getProperty("email.host.email"));
+    model.put("hostEmail", emailService.senderAddress(accountType));
 
-    model.put("content", content);
+    // empty paragraphs (blank lines from the editor) have no height in emails
+    model.put("content", content == null ? "" : content.replaceAll("<p([^>]*)>\\s*</p>", "<p$1>&nbsp;</p>"));
     Template template;
     try {
       template = mailConfig.getTemplate("generic.ftl");
@@ -1126,9 +1174,10 @@ public class RegistrationEmailService {
         FreeMarkerTemplateUtils.processTemplateIntoString(template, model)
         , userService.emailIsTester(receiver.getEmail())
         , false
-        , personService.findByUser(userService.findByUserId(senderUser)).getEmail()
         , icsAttachment
         , icsFilename
+        , accountType
+        , event
       );
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -1168,6 +1217,15 @@ public class RegistrationEmailService {
     // Sections (only render if present)
 
     renderSection(sb, "", safePairs(paymentDetailsResponse.getItems()), false, languageKey, false, true, false);
+
+    // dance role (lead / follow / switch), if any
+    if (registration.getDanceRole() != null && !isBlank(registration.getDanceRole().getName())) {
+      sb.append("<div style=\"color:#222;padding:3px 0;\">")
+        .append(escapeHtml(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_DANCE_ROLE_EN.getOutTextKey(), languageKey).getOutText()))
+        .append(": ")
+        .append(escapeHtml(registration.getDanceRole().getName()))
+        .append("</div>");
+    }
     List<List<String>> specials = paymentDetailsResponse.getSpecials()
       .stream()
       .map(special -> List.of(

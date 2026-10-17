@@ -9,6 +9,7 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
+import net.fortuna.ical4j.model.property.immutable.ImmutableMethod;
 import net.fortuna.ical4j.model.property.immutable.ImmutableVersion;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +27,20 @@ public class RegistrationCalendarService {
   private final VolunteerService volunteerService;
   private final HostingService hostingService;
 
-  private List<VEvent> calendarEvents(Registration registration, String languageKey) {
+  // which calendar entries go into the ics file
+  public enum CalendarScope {
+    EVENT,      // bundle, track, special, private class
+    FOOD,
+    VOLUNTEER,
+    HOST        // hosts and hostees
+  }
+
+  private List<VEvent> calendarEvents(Registration registration, String languageKey, Set<CalendarScope> scopes) {
     List<VEvent> events = new ArrayList<>();
     Set<EventCalendar> eventCalendars = new HashSet<>();
 
     // Bundles
-    if (calendarService.existsByEventAndBundle(registration.getEvent(), registration.getBundle())) {
+    if (scopes.contains(CalendarScope.EVENT) && calendarService.existsByEventAndBundle(registration.getEvent(), registration.getBundle())) {
       List<EventCalendarBookItem> bundleEventCalendarBookItems = calendarService.findByEventAndBundle(registration.getEvent(), registration.getBundle());
       bundleEventCalendarBookItems.forEach(bundleEventCalendarBookItem -> {
         eventCalendars.add(bundleEventCalendarBookItem.getEventCalendar());
@@ -40,7 +49,7 @@ public class RegistrationCalendarService {
     ;
 
     // Tracks
-    if (registration.getTrack() != null) {
+    if (scopes.contains(CalendarScope.EVENT) && registration.getTrack() != null) {
       if (calendarService.existsByEventAndTrack(registration.getEvent(), registration.getTrack())) {
         List<EventCalendarBookItem> trackEventCalendarBookItems = calendarService.findByEventAndTrack(registration.getEvent(), registration.getTrack());
         trackEventCalendarBookItems.forEach(trackEventCalendarBookItem -> {
@@ -50,6 +59,7 @@ public class RegistrationCalendarService {
     }
 
     // Food
+    if (scopes.contains(CalendarScope.FOOD))
     foodRegistrationService.getAllByRegistration(registration).forEach(foodRegistration -> {
       if (
         calendarService.existsByEventFoodSlot(
@@ -67,6 +77,7 @@ public class RegistrationCalendarService {
 
 
     // Private
+    if (scopes.contains(CalendarScope.EVENT))
     privateClassService.findAllByRegistrations(registration).forEach(privateClassRegistration -> {
       if (calendarService.existsByPrivateClass(registration.getEvent(), privateClassRegistration.getEventPrivateClass())) {
         List<EventCalendarBookItem> privateClassCalendarBookItems = calendarService.findByPrivateClass(registration.getEvent(), privateClassRegistration.getEventPrivateClass());
@@ -78,6 +89,7 @@ public class RegistrationCalendarService {
 
 
     // Special
+    if (scopes.contains(CalendarScope.EVENT))
     specialRegistrationService.findAllByRegistration(registration).forEach(special -> {
       if (calendarService.existsBySpecial(registration.getEvent(), special.getEventSpecial())) {
         List<EventCalendarBookItem> specialCalendarBookItems = calendarService.findBySpecial(registration.getEvent(), special.getEventSpecial());
@@ -88,7 +100,7 @@ public class RegistrationCalendarService {
     });
 
     // Volunteers
-    if (volunteerService.findByRegistration(registration) != null) {
+    if (scopes.contains(CalendarScope.VOLUNTEER) && volunteerService.findByRegistration(registration) != null) {
       if (calendarService.existsByVolunteer(registration.getEvent(), registration.getParticipant())) {
         List<EventCalendarBookItem> volunteerCalendarBookItems = calendarService.findByVolunteer(registration.getEvent(), registration.getParticipant());
         volunteerCalendarBookItems.forEach(volunteerCalendarBookItem -> {
@@ -99,7 +111,7 @@ public class RegistrationCalendarService {
     ;
 
     // Hosts
-    if (hostingService.hasHostRegistration(registration)) {
+    if (scopes.contains(CalendarScope.HOST) && hostingService.hasHostRegistration(registration)) {
       if (calendarService.existsByHost(registration.getEvent(), registration.getParticipant())) {
         List<EventCalendarBookItem> hostCalendarBookItems = calendarService.findByHost(registration.getEvent(), registration.getParticipant());
         hostCalendarBookItems.forEach(hostCalendarBookItem -> {
@@ -110,7 +122,7 @@ public class RegistrationCalendarService {
     ;
 
     // Hostees
-    if (hostingService.hasHosteeRegistration(registration)) {
+    if (scopes.contains(CalendarScope.HOST) && hostingService.hasHosteeRegistration(registration)) {
       if (calendarService.existsByHostee(registration.getEvent(), registration.getParticipant())) {
         List<EventCalendarBookItem> hostCalendarBookItems = calendarService.findByHostee(registration.getEvent(), registration.getParticipant());
         hostCalendarBookItems.forEach(hostCalendarBookItem -> {
@@ -134,19 +146,28 @@ public class RegistrationCalendarService {
 
   public byte[] createCalendarFile(
     Registration registration,
-    String languageKey
+    String languageKey,
+    Set<CalendarScope> scopes
   ) {
     try {
+
+      // no calendar file without at least one event
+      List<VEvent> events = calendarEvents(registration, languageKey, scopes);
+      if (events.isEmpty()) {
+        return null;
+      }
+
       Calendar calendar = new Calendar();
       calendar.add(new ProdId(registration.getEvent().getEventId().toString()));
       calendar.add(ImmutableVersion.VERSION_2_0);
       calendar.add(ImmutableCalScale.GREGORIAN);
+      calendar.add(ImmutableMethod.PUBLISH); // information only, no invitation
 
       calendar.add(new XProperty("X-WR-TIMEZONE", "Europe/Zurich"));
       calendar.add(new XProperty("X-WR-CALNAME", registration.getEvent().getEventId().toString()));
-      calendar.add(new XProperty("NAME", registration.getEvent().getName()));
+      calendar.add(new XProperty("NAME", registration.getEvent().getName() + " - " + registration.getParticipant().getFirstName()));
 
-      calendarEvents(registration, languageKey).forEach(calendarEvent -> {
+      events.forEach(calendarEvent -> {
         calendar.add(calendarEvent);
       });
 

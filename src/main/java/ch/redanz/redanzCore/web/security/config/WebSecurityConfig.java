@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.security.config;
 
+import org.springframework.http.HttpMethod;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
@@ -44,6 +45,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests().antMatchers("/core-api/profile/**").permitAll();
     http.authorizeRequests().antMatchers("/core-api/login/check-server").permitAll();
     http.authorizeRequests().antMatchers("/core-api/login/host-key").permitAll();
+    // email accounts (smtp/imap credentials): organizers may view, only admins may change or test
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/core-api/app/email/accounts").hasAnyAuthority("ADMIN", "ORGANIZER");
+    http.authorizeRequests().antMatchers("/core-api/app/email/accounts/**", "/core-api/app/email/accounts").hasAuthority("ADMIN");
     http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
     http.cors();
     http.csrf().disable();

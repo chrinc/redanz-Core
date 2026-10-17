@@ -38,6 +38,12 @@ public class BaseParService {
       false; // default: false
   }
 
+  public boolean testMailOnly(Event event) {
+    return existsByNameAndEvent(OutTextConfig.LABEL_BASE_PAR_TEST_MAIL_ONLY_EN.getOutTextKey(), event) ?
+      Boolean.valueOf(baseParRepo.findByEventAndName(event, OutTextConfig.LABEL_BASE_PAR_TEST_MAIL_ONLY_EN.getOutTextKey()).getVal()) :
+      false; // default: false
+  }
+
   public boolean doAutoRelease(Event event) {
     return existsByNameAndEvent(OutTextConfig.LABEL_BASE_PAR_AUTO_RELEASE_EN.getOutTextKey(), event) ?
       Boolean.valueOf(baseParRepo.findByEventAndName(event, OutTextConfig.LABEL_BASE_PAR_AUTO_RELEASE_EN.getOutTextKey()).getVal()) :
