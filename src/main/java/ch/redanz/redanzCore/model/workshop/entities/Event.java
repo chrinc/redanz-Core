@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.workshop.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,10 @@ public class Event implements Serializable {
 
   @Column(name = "sold_out")
   private boolean soldOut = false;
+
+  // manual override from the overview page: null = computed, true = sold out, false = open
+  @Column(name = "sold_out_override")
+  private Boolean soldOutOverride;
 
   @Column(name = "event_from")
   private LocalDate eventFrom;
@@ -182,5 +187,14 @@ public class Event implements Serializable {
       }
     };
   }
-}
 
+  // effective value: manual override if set, otherwise computed by updateSoldOut
+  public boolean isSoldOut() {
+    return soldOutOverride != null ? soldOutOverride : soldOut;
+  }
+
+  @JsonIgnore
+  public boolean isSoldOutComputed() {
+    return soldOut;
+  }
+}

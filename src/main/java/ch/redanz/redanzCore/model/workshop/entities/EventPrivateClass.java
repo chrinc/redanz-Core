@@ -35,6 +35,10 @@ public class EventPrivateClass {
   @Column(name = "sold_out")
   private Boolean soldOut;
 
+  // manual override from the overview page: null = computed, true = sold out, false = open
+  @Column(name = "sold_out_override")
+  private Boolean soldOutOverride;
+
   public EventPrivateClass() {
   }
 
@@ -79,4 +83,13 @@ public class EventPrivateClass {
     };
   }
 
+  // effective value: manual override if set, otherwise computed by updateSoldOut
+  public Boolean getSoldOut() {
+    return soldOutOverride != null ? soldOutOverride : soldOut;
+  }
+
+  @JsonIgnore
+  public Boolean getSoldOutComputed() {
+    return soldOut;
+  }
 }

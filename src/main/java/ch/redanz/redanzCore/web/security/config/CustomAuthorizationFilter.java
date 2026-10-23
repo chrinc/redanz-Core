@@ -95,7 +95,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
           // email accounts (smtp/imap credentials): organizers may view, only admins may change or test
           if (request.getServletPath().startsWith("/core-api/app/email/accounts")) {
-            boolean viewOnly = request.getMethod().equals("GET") && request.getServletPath().equals("/core-api/app/email/accounts");
+            boolean viewOnly = request.getMethod().equals("GET")
+              && (request.getServletPath().equals("/core-api/app/email/accounts") || request.getServletPath().equals("/core-api/app/email/accounts/testers"));
             authorities.stream().filter(
               auth -> auth.getAuthority().equals(UserRole.ADMIN.name())
                 || (viewOnly && auth.getAuthority().equals(UserRole.ORGANIZER.name()))

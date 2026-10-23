@@ -36,10 +36,23 @@ public class EventBundle implements Serializable {
   @Column(name = "sold_out")
   private boolean soldOut;
 
+  // manual override from the overview page: null = computed, true = sold out, false = open
+  @Column(name = "sold_out_override")
+  private Boolean soldOutOverride;
+
   public EventBundle(Bundle bundle, Event event, Integer capacity) {
     this.bundle = bundle;
     this.event = event;
     this.capacity = capacity;
   }
-}
 
+  // effective value: manual override if set, otherwise computed by updateSoldOut
+  public boolean isSoldOut() {
+    return soldOutOverride != null ? soldOutOverride : soldOut;
+  }
+
+  @JsonIgnore
+  public boolean isSoldOutComputed() {
+    return soldOut;
+  }
+}

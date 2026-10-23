@@ -151,6 +151,16 @@ public class RegistrationService {
           && bundleService.hasTrack(registration.getBundle())
           && bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(), registration.getTrack()).isSoldOut()
 
+     // Track Dance Role (manually closed; partner only does not block)
+     || registration.getBundle() != null
+          && registration.getDanceRole() != null
+          && bundleService.hasTrack(registration.getBundle())
+          && bundleEventTrackService.findByEventBundleAndTrack(registration.getEvent(), registration.getBundle(), registration.getTrack())
+               .getBundleEventTrackDanceRoles().stream()
+               .anyMatch(danceRole ->
+                 danceRole.getEventDanceRole().getDanceRole().equals(registration.getDanceRole())
+                   && danceRole.getSoldOutStatus() == DanceRoleSoldOutStatus.SOLD_OUT)
+
      // Private Class
      || specialRegistrationService
           .findAllPrivateClassesByRegistration(registration)
@@ -175,12 +185,12 @@ public class RegistrationService {
 
     // Event
     if (countDone(event) >= eventService.getEventCapacity(event)) {
-      if (!eventService.getEventSoldOut(event)) {
+      if (!eventService.getEventSoldOutComputed(event)) {
         event.setSoldOut(true);
         eventService.save(event);
       }
     } else {
-      if (eventService.getEventSoldOut(event)) {
+      if (eventService.getEventSoldOutComputed(event)) {
         event.setSoldOut(false);
         eventService.save(event);
       }
@@ -193,7 +203,7 @@ public class RegistrationService {
       Bundle bundle = eventBundle.getBundle();
 
       if (bundleService.hasTrack(bundle)) {
-        if (eventBundle.isSoldOut()) {
+        if (eventBundle.isSoldOutComputed()) {
           eventBundle.setSoldOut(false);
           eventService.save(eventBundle);
         }
@@ -216,7 +226,7 @@ public class RegistrationService {
                   &&  countTracksSubmittedConfirmingAndDone(track, bundle, event) >= (trackCapacity + waitListLength)
             );
 
-          if (trackSoldOut != bundleEventTrack.isSoldOut()) {
+          if (trackSoldOut != bundleEventTrack.isSoldOutComputed()) {
             bundleEventTrack.setSoldOut(trackSoldOut);
             bundleEventTrackService.save(bundleEventTrack);
           }
@@ -237,7 +247,7 @@ public class RegistrationService {
               danceRoleSoldOut = (roleCapacity + waitListLength) < (followCount + (baseParService.switchWeight(event) * switchCount))
                 || (roleCapacity + waitListLength) < (followCount + ((1- baseParService.switchWeight(event)) * switchCount));
             }
-            if (danceRoleSoldOut != bundleEventTrackDanceRole.isSoldOut()) {
+            if (danceRoleSoldOut != bundleEventTrackDanceRole.isSoldOutComputed()) {
               bundleEventTrackDanceRole.setSoldOut(danceRoleSoldOut);
               bundleEventTrackService.save(bundleEventTrackDanceRole);
             }
@@ -252,7 +262,7 @@ public class RegistrationService {
             // Wait list full
             || countBundlesSubmittedConfirmingAndDone(bundle, event) >= (eventBundle.getCapacity() + waitListLength);
 
-        if (bundlesSoldOut != eventBundle.isSoldOut()) {
+        if (bundlesSoldOut != eventBundle.isSoldOutComputed()) {
           eventBundle.setSoldOut(bundlesSoldOut);
           eventService.save(eventBundle);
         }
@@ -266,7 +276,7 @@ public class RegistrationService {
           }
         });
 
-        if (allTracksSoldOut.get() != eventBundle.isSoldOut()
+        if (allTracksSoldOut.get() != eventBundle.isSoldOutComputed()
         ) {
           eventBundle.setSoldOut(allTracksSoldOut.get());
           eventService.save(eventBundle);
@@ -278,7 +288,7 @@ public class RegistrationService {
       }
     });
 
-    if (allBundlesSoldOut.get() != eventService.getEventSoldOut(event)) {
+    if (allBundlesSoldOut.get() != eventService.getEventSoldOutComputed(event)) {
       event.setSoldOut(allBundlesSoldOut.get());
       eventService.save(event);
     }
@@ -291,7 +301,7 @@ public class RegistrationService {
           eventPrivateClass.getCapacity()
             <= specialRegistrationService.countPrivateClassRegistrations(eventPrivateClass);
 
-        if (privateClassSoldOut != eventPrivateClass.getSoldOut()) {
+        if (privateClassSoldOut != eventPrivateClass.getSoldOutComputed()) {
           eventPrivateClass.setSoldOut(privateClassSoldOut);
         }
       });
@@ -308,7 +318,7 @@ public class RegistrationService {
             >= (eventSpecial.getCapacity() + waitListLength);
           ;
 
-        if (specialSoldOut != eventSpecial.getSoldOut()) {
+        if (specialSoldOut != eventSpecial.getSoldOutComputed()) {
           eventSpecial.setSoldOut(specialSoldOut);
         }
       });

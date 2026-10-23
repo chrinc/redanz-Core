@@ -4,10 +4,12 @@ import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.entities.Guest;
 import ch.redanz.redanzCore.model.registration.service.CheckInService;
 import ch.redanz.redanzCore.model.registration.service.GuestService;
+import ch.redanz.redanzCore.model.registration.service.SoldOutOverrideService;
 import ch.redanz.redanzCore.model.reporting.response.*;
 import ch.redanz.redanzCore.model.reporting.service.*;
 import ch.redanz.redanzCore.model.workshop.config.SlotType;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
+import ch.redanz.redanzCore.model.workshop.entities.DanceRoleSoldOutStatus;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.EventSlot;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
@@ -17,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +47,7 @@ public class ReportController {
   private final CheckInService checkInService;
   private final ReportCheckinService reportCheckinService;
   private final SlotService slotService;
+  private final SoldOutOverrideService soldOutOverrideService;
 
   @GetMapping(path = "/person/all")
   public List<ResponsePerson> getAllPersonsReport() {
@@ -135,6 +139,46 @@ public class ReportController {
       languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
       eventService.findByEventId(eventId)
     );
+  }
+
+  @PostMapping(path = "/stats/sold-out-override")
+  @Transactional
+  public void setSoldOutOverride(
+    @RequestParam("eventId") Long eventId,
+    @RequestParam("itemType") String itemType,
+    @RequestParam("itemId") Long itemId,
+    @RequestParam(value = "override", required = false) Boolean override
+  ) {
+    try {
+      soldOutOverrideService.setOverride(
+        eventService.findByEventId(eventId),
+        SoldOutOverrideService.ItemType.valueOf(itemType),
+        itemId,
+        override
+      );
+    } catch (Exception exception) {
+      log.error("sold out override failed", exception);
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
+  }
+
+  @PostMapping(path = "/stats/sold-out-override/dance-role")
+  @Transactional
+  public void setDanceRoleSoldOutMode(
+    @RequestParam("eventId") Long eventId,
+    @RequestParam("itemId") Long itemId,
+    @RequestParam(value = "mode", required = false) String mode
+  ) {
+    try {
+      soldOutOverrideService.setDanceRoleMode(
+        eventService.findByEventId(eventId),
+        itemId,
+        mode == null ? null : DanceRoleSoldOutStatus.valueOf(mode)
+      );
+    } catch (Exception exception) {
+      log.error("dance role sold out override failed", exception);
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
 
   @GetMapping (path = "/guest/all")

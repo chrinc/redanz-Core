@@ -39,6 +39,11 @@ public class BundleEventTrackDanceRole {
   @Column(name = "sold_out")
   private boolean soldOut;
 
+  // manual override from the overview page: null = computed
+  @Enumerated(EnumType.STRING)
+  @Column(name = "sold_out_mode")
+  private DanceRoleSoldOutStatus soldOutMode;
+
   public BundleEventTrackDanceRole() {
   }
 
@@ -71,5 +76,22 @@ public class BundleEventTrackDanceRole {
 //        put("hint", hint);
       }
     };
+  }
+
+  // effective status: manual override if set, otherwise computed by updateSoldOut (computed sold out = partner only)
+  public DanceRoleSoldOutStatus getSoldOutStatus() {
+    if (soldOutMode != null) {
+      return soldOutMode;
+    }
+    return soldOut ? DanceRoleSoldOutStatus.PARTNER_ONLY : DanceRoleSoldOutStatus.OPEN;
+  }
+
+  public boolean isSoldOut() {
+    return getSoldOutStatus() != DanceRoleSoldOutStatus.OPEN;
+  }
+
+  @JsonIgnore
+  public boolean isSoldOutComputed() {
+    return soldOut;
   }
 }

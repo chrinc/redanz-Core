@@ -1720,6 +1720,11 @@ public class EventService {
   }
 
   @Transactional(readOnly = true)
+  public boolean getEventSoldOutComputed(Event event) {
+    return eventRepo.findSoldOutComputedByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
   public Set<EventBundle> findAllEventBundles(Event event) {
     return eventRepo.findAllEventBundlesByEventId(event.getEventId());
   }

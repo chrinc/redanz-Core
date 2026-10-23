@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.profile.service;
 
+import ch.redanz.redanzCore.model.profile.entities.TestUser;
 import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.entities.UserRole;
 import ch.redanz.redanzCore.model.profile.repository.TestUserRepo;
@@ -20,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.UUID;
 
 @Service
@@ -67,13 +70,36 @@ public class UserService implements UserDetailsService {
   }
 
   public boolean userIsTester(User user) {
-    return testUserRepo.existsByUsernameIgnoreCase(user.getUsername().replace(".", ""));
+    return usernameIsTester(user.getUsername());
   }
   public boolean usernameIsTester(String username) {
-    return testUserRepo.existsByUsernameIgnoreCase(username.replace(".", ""));
+    return testUserRepo.countByNormalizedUsername(username.replace(".", "")) > 0;
   }
   public boolean emailIsTester(String email) {
-    return testUserRepo.existsByEmailIgnoreCase(email.replace(".", ""));
+    return testUserRepo.countByNormalizedEmail(email.replace(".", "")) > 0;
+  }
+
+  // tester addresses (static data "email accounts"): receive their own emails in test mode
+  public List<String> getTesterEmails() {
+    return testUserRepo.findAllByOrderByEmailAsc().stream()
+      .map(TestUser::getEmail)
+      .collect(Collectors.toList());
+  }
+
+  @Transactional
+  public void saveTesterEmails(List<String> emails) {
+    testUserRepo.deleteAllInBatch();
+    long id = 1;
+    for (String email : emails.stream()
+      .filter(Objects::nonNull)
+      .map(email -> email.trim().toLowerCase())
+      .filter(email -> !email.isBlank())
+      .distinct()
+      .collect(Collectors.toList())
+    ) {
+      // username = email (login name)
+      testUserRepo.save(new TestUser(id++, email, email));
+    }
   }
 
   public void save(User user) {

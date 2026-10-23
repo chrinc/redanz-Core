@@ -46,6 +46,7 @@ public class EmailController {
   private final VolunteerService volunteerService;
   private final WorkflowStatusService workflowStatusService;
   private final EmailAccountService emailAccountService;
+  private final UserService userService;
 
   // email accounts (static data), admins only (see CustomAuthorizationFilter)
   @GetMapping(path = "/accounts")
@@ -62,6 +63,22 @@ public class EmailController {
       throw apiRequestException;
     } catch (Exception exception) {
       log.error("email account upsert failed", exception);
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
+    }
+  }
+
+  // tester addresses: in test mode they receive their own emails (organizers may view, admins change)
+  @GetMapping(path = "/accounts/testers")
+  public List<String> getTesters() {
+    return userService.getTesterEmails();
+  }
+
+  @PostMapping(path = "/accounts/testers")
+  public void saveTesters(@RequestBody List<String> emails) {
+    try {
+      userService.saveTesterEmails(emails);
+    } catch (Exception exception) {
+      log.error("tester save failed", exception);
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_EN.getOutTextKey());
     }
   }

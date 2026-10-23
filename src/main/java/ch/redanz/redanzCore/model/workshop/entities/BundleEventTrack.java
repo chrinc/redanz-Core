@@ -41,6 +41,10 @@ public class BundleEventTrack {
   @Column(name = "sold_out")
   private boolean soldOut;
 
+  // manual override from the overview page: null = computed, true = sold out, false = open
+  @Column(name = "sold_out_override")
+  private Boolean soldOutOverride;
+
   private int capacity;
 
   private String color;
@@ -91,5 +95,15 @@ public class BundleEventTrack {
         put("capacity", String.valueOf(capacity));
       }
     };
+  }
+
+  // effective value: manual override if set, otherwise computed by updateSoldOut
+  public boolean isSoldOut() {
+    return soldOutOverride != null ? soldOutOverride : soldOut;
+  }
+
+  @JsonIgnore
+  public boolean isSoldOutComputed() {
+    return soldOut;
   }
 }

@@ -4,8 +4,10 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.service.DiscountRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.FoodRegistrationService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.SoldOutOverrideService.ItemType;
 import ch.redanz.redanzCore.model.registration.service.SpecialRegistrationService;
 import ch.redanz.redanzCore.model.reporting.response.ResponseStats;
+import ch.redanz.redanzCore.model.reporting.response.ResponseStatsDanceRole;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.*;
 import ch.redanz.redanzCore.model.workshop.service.*;
@@ -14,9 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -45,11 +49,12 @@ public class ReportStatsService {
         ,registrationService.countDoneAndSplitRoles(event)
         ,event.getCapacity()
         ,event.isSoldOut() ? yes : no
-      )
+      ).withSoldOutOverride(ItemType.EVENT.name(), event.getEventId(), event.getSoldOutOverride(), event.isSoldOutComputed())
     );
 
     eventService.findAllEventBundles(event).forEach(eventBundle -> {
       List<BundleEventTrack> bundleEventTracks = bundleEventTrackService.findAllByEventAndBundle(event, eventBundle.getBundle());
+
       bundleEventTracks.forEach(
         bundleEventTrack -> {
           Track track = bundleEventTrack.getEventTrack().getTrack();
@@ -64,12 +69,35 @@ public class ReportStatsService {
               , registrationService.countTracksByBundleDoneAndSplitRoles(track, bundle, event)
               , bundleEventTrack.getCapacity()
               , eventBundle.isSoldOut() || bundleEventTrack.isSoldOut() ? yes : no
-            )
+            ).withSoldOutOverride(ItemType.BUNDLE_EVENT_TRACK.name(), bundleEventTrack.getBundleEventTrackId(), bundleEventTrack.getSoldOutOverride(), bundleEventTrack.isSoldOutComputed())
+              // pass of the track, adjustable in the expanded row
+              .withBundle(
+                new ResponseStats("Pass", bundle.getName(), null, null, null, null, eventBundle.getCapacity(), eventBundle.isSoldOut() ? yes : no)
+                  .withSoldOutOverride(ItemType.EVENT_BUNDLE.name(), eventBundle.getEventBundleId(), eventBundle.getSoldOutOverride(), eventBundle.isSoldOutComputed())
+              )
+              .withDanceRoles(
+                bundleEventTrack.getBundleEventTrackDanceRoles().stream()
+                  .map(bundleEventTrackDanceRole -> {
+                    DanceRole danceRole = bundleEventTrackDanceRole.getEventDanceRole().getDanceRole();
+                    return new ResponseStatsDanceRole(
+                      danceRole.getDanceRoleId()
+                      , danceRole.getName()
+                      , bundleEventTrackDanceRole.getBundleEventTrackDanceRoleId()
+                      , bundleEventTrackDanceRole.getSoldOutMode() == null ? null : bundleEventTrackDanceRole.getSoldOutMode().name()
+                      , (bundleEventTrackDanceRole.isSoldOutComputed() ? DanceRoleSoldOutStatus.PARTNER_ONLY : DanceRoleSoldOutStatus.OPEN).name()
+                      , bundleEventTrackDanceRole.getSoldOutStatus().name()
+                    );
+                  })
+                  .sorted(Comparator.comparing(ResponseStatsDanceRole::getDanceRoleId))
+                  .collect(Collectors.toList())
+                , Boolean.TRUE.equals(track.getPartnerRequired()) || Boolean.TRUE.equals(track.getOwnPartnerRequired())
+              )
           );
         });
     });
 
     bundleService.getAllWithoutTracksByEvent(event).forEach(bundle -> {
+      EventBundle eventBundle = eventService.findByEventAndBundle(event, bundle);
       stats.add(
         new ResponseStats(
           "Simple Pass"
@@ -78,9 +106,9 @@ public class ReportStatsService {
           ,registrationService.countBundlesSubmittedAndSplitRoles(bundle, event)
           ,registrationService.countBundlesConfirmingAndSplitRoles(bundle, event)
           ,registrationService.countBundlesDoneAndSplitRoles(bundle, event)
-          ,eventService.findByEventAndBundle(event, bundle).getCapacity()
-          ,eventService.findByEventAndBundle(event, bundle).isSoldOut() ? yes : no
-        )
+          ,eventBundle.getCapacity()
+          ,eventBundle.isSoldOut() ? yes : no
+        ).withSoldOutOverride(ItemType.EVENT_BUNDLE.name(), eventBundle.getEventBundleId(), eventBundle.getSoldOutOverride(), eventBundle.isSoldOutComputed())
       );
     });
 
@@ -97,7 +125,7 @@ public class ReportStatsService {
             , specialRegistrationService.countEventSpecialsDoneAndSplitRoles(eventSpecial, event)
             , eventSpecial.getCapacity()
             , eventSpecial.getSoldOut() ? yes : no
-          )
+          ).withSoldOutOverride(ItemType.EVENT_SPECIAL.name(), eventSpecial.getEventSpecialId(), eventSpecial.getSoldOutOverride(), eventSpecial.getSoldOutComputed())
         );
       }
     });
@@ -152,7 +180,7 @@ public class ReportStatsService {
             ,specialRegistrationService.countPrivatesDoneAndSplitRoles(eventPrivateClass)
             ,eventPrivateClass.getCapacity()
             ,eventPrivateClass.getSoldOut() ? yes : no
-          )
+          ).withSoldOutOverride(ItemType.EVENT_PRIVATE_CLASS.name(), eventPrivateClass.getEventPrivateClassId(), eventPrivateClass.getSoldOutOverride(), eventPrivateClass.getSoldOutComputed())
         );
       });
     return stats;
