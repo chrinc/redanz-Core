@@ -106,6 +106,22 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
               );
           }
 
+          // calendar: only organizers and admins may change or delete entries
+          if (
+               request.getServletPath().startsWith("/core-api/app/calendar/upsert")
+            || request.getServletPath().startsWith("/core-api/app/calendar/delete")
+          ) {
+            authorities.stream().filter(
+              auth ->
+                   auth.getAuthority().equals(UserRole.ORGANIZER.name())
+                || auth.getAuthority().equals(UserRole.ADMIN.name())
+              )
+              .findAny()
+              .orElseThrow(
+                () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
+              );
+          }
+
           // only organizers are authorized to retrieve report data
           if (request.getServletPath().startsWith("/core-api/app/report")) {
 
