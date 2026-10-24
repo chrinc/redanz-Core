@@ -22,8 +22,9 @@ public interface EventRepo extends JpaRepository<Event, Long> {
   @Query("SELECT e.capacity FROM Event e WHERE e.eventId = :eventId")
   Integer findCapacityByEventId(@Param("eventId") Long eventId);
 
-  @Query("SELECT COALESCE(e.soldOutOverride, e.soldOut) FROM Event e WHERE e.eventId = :eventId")
-  boolean findSoldOutByEventId(@Param("eventId") Long eventId);
+  // no COALESCE: on MySQL COALESCE of BIT columns returns a binary string (read as true)
+  @Query("SELECT e.soldOutOverride FROM Event e WHERE e.eventId = :eventId")
+  Boolean findSoldOutOverrideByEventId(@Param("eventId") Long eventId);
 
   @Query("SELECT e.soldOut FROM Event e WHERE e.eventId = :eventId")
   boolean findSoldOutComputedByEventId(@Param("eventId") Long eventId);
