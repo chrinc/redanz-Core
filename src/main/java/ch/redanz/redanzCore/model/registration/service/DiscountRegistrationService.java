@@ -159,6 +159,11 @@ public class DiscountRegistrationService {
       eventDiscount, workflowStatusService.getDone()
     );
   }
+  public int countEventDiscountCancelled(EventDiscount eventDiscount){
+    return discountRegistrationRepo.countAllByEventDiscountAndRegistrationWorkflowStatus(
+      eventDiscount, workflowStatusService.getCancelled()
+    );
+  }
   public int countEventDiscountSubmittedConfirmingAndDone(EventDiscount eventDiscount) {
     return countEventDiscountConfirming(eventDiscount) + countEventDiscountDone(eventDiscount) + countEventDiscountSubmitted(eventDiscount);
   }
@@ -184,6 +189,11 @@ public class DiscountRegistrationService {
     List<String> discountList = new ArrayList<>();
     discountList.add(String.valueOf(countEventDiscountConfirming(eventDiscount)));
     return discountList;
+  }
+  public List<String> countEventDiscountCancelledAsList(EventDiscount eventDiscount){
+    List<String> eventDiscountList = new ArrayList<>();
+    eventDiscountList.add(String.valueOf(countEventDiscountCancelled(eventDiscount)));
+    return eventDiscountList;
   }
   public List<String> countEventDiscountDoneAsList(EventDiscount eventDiscount){
     List<String> eventDiscountList = new ArrayList<>();

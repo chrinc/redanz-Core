@@ -118,6 +118,11 @@ public class FoodRegistrationService {
       eventFoodSlot, workflowStatusService.getDone(), event
     );
   }
+  public int countFoodSlotCancelled(EventFoodSlot eventFoodSlot, Event event){
+    return foodRegistrationRepo.countAllByEventFoodSlotAndRegistrationWorkflowStatusAndRegistrationEvent(
+      eventFoodSlot, workflowStatusService.getCancelled(), event
+    );
+  }
   public int countFoodSlotConfirmingAndDone(EventFoodSlot eventFoodSlot, Event event) {
     return countFoodSlotConfirming(eventFoodSlot, event) + countFoodSlotDone(eventFoodSlot, event);
   }
@@ -168,6 +173,11 @@ public class FoodRegistrationService {
   public List<String>  countFoodSlotConfirmingAsList(EventFoodSlot eventFoodSlot, Event event){
     List<String> foodList = new ArrayList<>();
     foodList.add(String.valueOf(countFoodSlotConfirming(eventFoodSlot, event)));
+    return foodList;
+  }
+  public List<String> countFoodSlotCancelledAsList(EventFoodSlot eventFoodSlot, Event event){
+    List<String> foodList = new ArrayList<>();
+    foodList.add(String.valueOf(countFoodSlotCancelled(eventFoodSlot, event)));
     return foodList;
   }
   public List<String> countFoodSlotDoneAsList(EventFoodSlot eventFoodSlot, Event event){

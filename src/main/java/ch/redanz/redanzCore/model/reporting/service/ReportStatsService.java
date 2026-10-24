@@ -35,6 +35,13 @@ public class ReportStatsService {
   private final FoodService foodService;
   private final EventService eventService;
   private final BundleEventTrackService bundleEventTrackService;
+
+  // blocks of the overview report
+  public static final String BLOCK_MAIN = "MAIN";
+  public static final String BLOCK_SPECIALS = "SPECIALS";
+  public static final String BLOCK_FOOD = "FOOD";
+  public static final String BLOCK_DISCOUNTS = "DISCOUNTS";
+
   public List<ResponseStats> getStatsReport(Language language, Event event) {
     String yes = outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_YES_EN.getOutTextKey(), language.getLanguageKey()).getOutText();
     String no = outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_NO_EN.getOutTextKey(), language.getLanguageKey()).getOutText();
@@ -50,6 +57,8 @@ public class ReportStatsService {
         ,event.getCapacity()
         ,event.isSoldOut() ? yes : no
       ).withSoldOutOverride(ItemType.EVENT.name(), event.getEventId(), event.getSoldOutOverride(), event.isSoldOutComputed())
+        .withCountCancelled(registrationService.countCancelledAndSplitRoles(event))
+        .inBlock(BLOCK_MAIN)
     );
 
     eventService.findAllEventBundles(event).forEach(eventBundle -> {
@@ -59,10 +68,10 @@ public class ReportStatsService {
         bundleEventTrack -> {
           Track track = bundleEventTrack.getEventTrack().getTrack();
           Bundle bundle = bundleEventTrack.getBundle();
-          stats.add(
+          ResponseStats trackStats =
             new ResponseStats(
               bundleEventTrack.getBundle().getName()
-              , track.getName()
+              , bundleEventTracks.size() > 1 ? bundle.getName() + " / " + track.getName() : bundle.getName()
               , registrationService.countTracksByBundleSubmittedConfirmingAndDoneAndSplitRoles(track, bundle, event)
               , registrationService.countTracksByBundleSubmittedAndSplitRoles(track, bundle, event)
               , registrationService.countTracksByBundleConfirmingAndSplitRoles(track, bundle, event)
@@ -92,7 +101,10 @@ public class ReportStatsService {
                   .collect(Collectors.toList())
                 , Boolean.TRUE.equals(track.getPartnerRequired()) || Boolean.TRUE.equals(track.getOwnPartnerRequired())
               )
-          );
+              .withCountCancelled(registrationService.countTracksByBundleCancelledAndSplitRoles(track, bundle, event))
+              .inBlock(BLOCK_MAIN);
+          trackStats.setTrack(track.getName());
+          stats.add(trackStats);
         });
     });
 
@@ -109,6 +121,8 @@ public class ReportStatsService {
           ,eventBundle.getCapacity()
           ,eventBundle.isSoldOut() ? yes : no
         ).withSoldOutOverride(ItemType.EVENT_BUNDLE.name(), eventBundle.getEventBundleId(), eventBundle.getSoldOutOverride(), eventBundle.isSoldOutComputed())
+          .withCountCancelled(registrationService.countBundlesCancelledAndSplitRoles(bundle, event))
+          .inBlock(BLOCK_MAIN)
       );
     });
 
@@ -126,6 +140,8 @@ public class ReportStatsService {
             , eventSpecial.getCapacity()
             , eventSpecial.getSoldOut() ? yes : no
           ).withSoldOutOverride(ItemType.EVENT_SPECIAL.name(), eventSpecial.getEventSpecialId(), eventSpecial.getSoldOutOverride(), eventSpecial.getSoldOutComputed())
+            .withCountCancelled(specialRegistrationService.countEventSpecialsCancelledAndSplitRoles(eventSpecial, event))
+            .inBlock(BLOCK_SPECIALS)
         );
       }
     });
@@ -141,7 +157,8 @@ public class ReportStatsService {
           , foodRegistrationService.countFoodSlotDoneAsList(eventFoodSlot, event)
           , null
           , no
-        )
+        ).withCountCancelled(foodRegistrationService.countFoodSlotCancelledAsList(eventFoodSlot, event))
+          .inBlock(BLOCK_FOOD)
       );
     });
 
@@ -164,7 +181,8 @@ public class ReportStatsService {
           , eventDiscount.getCapacity()
           , eventDiscount.getCapacity() == null ? no
             : discountRegistrationService.countEventDiscountSubmittedConfirmingAndDone(eventDiscount) >= eventDiscount.getCapacity() ? yes : no
-        )
+        ).withCountCancelled(discountRegistrationService.countEventDiscountCancelledAsList(eventDiscount))
+          .inBlock(BLOCK_DISCOUNTS)
       );
     });
     // Private Classes
@@ -181,6 +199,8 @@ public class ReportStatsService {
             ,eventPrivateClass.getCapacity()
             ,eventPrivateClass.getSoldOut() ? yes : no
           ).withSoldOutOverride(ItemType.EVENT_PRIVATE_CLASS.name(), eventPrivateClass.getEventPrivateClassId(), eventPrivateClass.getSoldOutOverride(), eventPrivateClass.getSoldOutComputed())
+            .withCountCancelled(specialRegistrationService.countPrivatesCancelledAndSplitRoles(eventPrivateClass))
+            .inBlock(BLOCK_SPECIALS)
         );
       });
     return stats;

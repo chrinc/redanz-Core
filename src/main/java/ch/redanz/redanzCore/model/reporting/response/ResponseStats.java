@@ -21,6 +21,12 @@ public class ResponseStats {
   private Integer maxCount;
   private String soldOut;
 //  private String itemAttribute;
+  // block of the overview report (see ReportStatsService)
+  private String block;
+  // track name of a track row (item is "bundle / track" or only the bundle)
+  private String track;
+  // cancelled registrations (count, split by dance role), shown in the details of the overview
+  private List<String> countCancelled;
 
   // sold out override (only for items with a sold_out flag)
   private String soldOutItemType;
@@ -35,7 +41,17 @@ public class ResponseStats {
   private ResponseStats bundle;
 
   public ResponseStats(String type, String item, List<String> countAll, List<String> countSubmitted, List<String> countConfirming, List<String> countDone, Integer maxCount, String soldOut) {
-    this(type, item, countAll, countSubmitted, countConfirming, countDone, maxCount, soldOut, null, null, null, null, null, null, null);
+    this(type, item, countAll, countSubmitted, countConfirming, countDone, maxCount, soldOut, null, null, null, null, null, null, null, null, null, null);
+  }
+
+  public ResponseStats inBlock(String block) {
+    this.block = block;
+    return this;
+  }
+
+  public ResponseStats withCountCancelled(List<String> countCancelled) {
+    this.countCancelled = countCancelled;
+    return this;
   }
 
   public ResponseStats withSoldOutOverride(String soldOutItemType, Long soldOutItemId, Boolean soldOutOverride, Boolean soldOutComputed) {

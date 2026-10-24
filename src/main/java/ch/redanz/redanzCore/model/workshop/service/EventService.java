@@ -1715,6 +1715,11 @@ public class EventService {
   }
 
   @Transactional(readOnly = true)
+  public Boolean getEventSoldOutOverride(Event event) {
+    return eventRepo.findSoldOutOverrideByEventId(event.getEventId());
+  }
+
+  @Transactional(readOnly = true)
   public boolean getEventSoldOut(Event event) {
     Boolean override = eventRepo.findSoldOutOverrideByEventId(event.getEventId());
     return override != null ? override : eventRepo.findSoldOutComputedByEventId(event.getEventId());

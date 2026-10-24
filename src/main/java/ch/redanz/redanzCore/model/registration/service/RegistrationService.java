@@ -371,6 +371,16 @@ public class RegistrationService {
       workflowStatusService.getDone(),true, event, danceRole
     );
   }
+  public int countCancelled(Event event) {
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndRegistrationType(
+      workflowStatusService.getCancelled(), true, event, RegistrationType.PARTICIPANT
+    );
+  }
+  public int countCancelled(Event event, DanceRole danceRole) {
+    return registrationRepo.countAllByWorkflowStatusAndActiveAndEventAndDanceRole(
+      workflowStatusService.getCancelled(), true, event, danceRole
+    );
+  }
 
   public int countSubmittedConfirmingAndDone(Event event, DanceRole danceRole) {
     return countSubmitted(event, danceRole) + countConfirming(event, danceRole) + countDone(event, danceRole);
@@ -421,6 +431,18 @@ public class RegistrationService {
     return
       registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
         bundle, workflowStatusService.getDone(), true, event, danceRole
+      );
+  }
+  public int countBundlesCancelled(Bundle bundle, Event event) {
+    return
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        bundle, workflowStatusService.getCancelled(), true, event, RegistrationType.PARTICIPANT
+      );
+  }
+  public int countBundlesCancelled(Bundle bundle, Event event, DanceRole danceRole) {
+    return
+      registrationRepo.countAllByBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        bundle, workflowStatusService.getCancelled(), true, event, danceRole
       );
   }
   public int countBundlesConfirmingAndDone(Bundle bundle, Event event) {
@@ -546,6 +568,20 @@ public class RegistrationService {
     return
       registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
         track, bundle, workflowStatusService.getDone(),true, event, danceRole
+      );
+  }
+  public int countTracksCancelled(Track track, Bundle bundle, Event event) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndRegistrationType(
+        track, bundle, workflowStatusService.getCancelled(), true, event, RegistrationType.PARTICIPANT
+      );
+  }
+  public int countTracksCancelled(Track track, Bundle bundle, Event event, DanceRole danceRole) {
+    if (track == null) return 0;
+    return
+      registrationRepo.countAllByTrackAndBundleAndWorkflowStatusAndActiveAndEventAndDanceRole(
+        track, bundle, workflowStatusService.getCancelled(), true, event, danceRole
       );
   }
   public int countTracksConfirmingAndDone(Track track, Event event) {
@@ -1416,6 +1452,51 @@ public class RegistrationService {
     count.add(countPartBuilder.toString());
     return count;
   }
+  public List<String> countCancelledAndSplitRoles(Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countCancelled(event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countCancelled(event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countBundlesCancelledAndSplitRoles(Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countBundlesCancelled(bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countBundlesCancelled(bundle, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countTracksByBundleCancelledAndSplitRoles(Track track, Bundle bundle, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countTracksCancelled(track, bundle, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countTracksCancelled(track, bundle, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
   public List<String> countDoneAndSplitRoles(Event event) {
     StringBuilder countPartBuilder = new StringBuilder();
     List<String> count = new ArrayList<>();

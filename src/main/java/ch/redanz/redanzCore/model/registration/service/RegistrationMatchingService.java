@@ -211,7 +211,7 @@ public class RegistrationMatchingService {
       .size() > 1;
   }
 
-  private double calculateTrackBalanceScore(Registration registration, double switchWeight) {
+  public double calculateTrackBalanceScore(Registration registration, double switchWeight) {
     int leadsAll = registrationService.countTracksConfirmingAndDone(
       registration.getTrack(),
       registration.getEvent(),
@@ -233,7 +233,7 @@ public class RegistrationMatchingService {
     return leadsAll - followAll - switchWeight * switchAll;
   }
 
-  private double calculateSpecialBalanceScore(
+  public double calculateSpecialBalanceScore(
     Registration registration,
     SpecialRegistration specialRegistration,
     double switchWeight
@@ -259,7 +259,7 @@ public class RegistrationMatchingService {
     return leadsAll - followAll - switchWeight * switchAll;
   }
 
-  private boolean isMatchingOkForRole(DanceRole role, double balanceScore) {
+  public boolean isMatchingOkForRole(DanceRole role, double balanceScore) {
     if (role.equals(danceRoleService.getLeadDanceRole())) {
       return balanceScore <= 2;
     }

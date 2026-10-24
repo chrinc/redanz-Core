@@ -4,6 +4,8 @@ import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.entities.Guest;
 import ch.redanz.redanzCore.model.registration.service.CheckInService;
 import ch.redanz.redanzCore.model.registration.service.GuestService;
+import ch.redanz.redanzCore.model.registration.service.RegistrationService;
+import ch.redanz.redanzCore.model.registration.service.ReleaseCheckService;
 import ch.redanz.redanzCore.model.registration.service.SoldOutOverrideService;
 import ch.redanz.redanzCore.model.reporting.response.*;
 import ch.redanz.redanzCore.model.reporting.service.*;
@@ -48,6 +50,8 @@ public class ReportController {
   private final ReportCheckinService reportCheckinService;
   private final SlotService slotService;
   private final SoldOutOverrideService soldOutOverrideService;
+  private final ReleaseCheckService releaseCheckService;
+  private final RegistrationService registrationService;
 
   @GetMapping(path = "/person/all")
   public List<ResponsePerson> getAllPersonsReport() {
@@ -139,6 +143,17 @@ public class ReportController {
       languageService.findLanguageByLanguageKey(languageKey.toUpperCase()),
       eventService.findByEventId(eventId)
     );
+  }
+
+  // release details: why a registration is (not) released by the release job
+  @GetMapping(path = "/registration/release-check")
+  public ResponseReleaseCheck getReleaseCheck(@RequestParam("registrationId") Long registrationId) {
+    try {
+      return releaseCheckService.check(registrationService.findByRegistrationId(registrationId));
+    } catch (Exception exception) {
+      log.error("release check failed", exception);
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());
+    }
   }
 
   @PostMapping(path = "/stats/sold-out-override")

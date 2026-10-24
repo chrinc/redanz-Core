@@ -207,6 +207,18 @@ public class SpecialRegistrationService {
   public int countPrivatesConfirming(EventPrivateClass eventPrivateClass, DanceRole danceRole) {
     return privateClassRegistrationRepo.countAllByEventPrivateClassAndRegistration_WorkflowStatusAndRegistrationDanceRole(eventPrivateClass, workflowStatusService.getConfirming(), danceRole);
   }
+  public int countPrivatesCancelled(EventPrivateClass eventPrivateClass) {
+    return privateClassRegistrationRepo.countAllByEventPrivateClassAndRegistration_WorkflowStatus(eventPrivateClass, workflowStatusService.getCancelled());
+  }
+  public int countPrivatesCancelled(EventPrivateClass eventPrivateClass, DanceRole danceRole) {
+    return privateClassRegistrationRepo.countAllByEventPrivateClassAndRegistration_WorkflowStatusAndRegistrationDanceRole(eventPrivateClass, workflowStatusService.getCancelled(), danceRole);
+  }
+  public int countEventSpecialsCancelled(EventSpecial eventSpecial, Event event) {
+    return specialRegistrationRepo.countAllByEventSpecialAndRegistration_WorkflowStatusAndRegistrationEvent(eventSpecial, workflowStatusService.getCancelled(), event);
+  }
+  public int countEventSpecialsCancelled(EventSpecial eventSpecial, Event event, DanceRole danceRole) {
+    return specialRegistrationRepo.countAllByEventSpecialAndRegistration_WorkflowStatusAndRegistrationEventAndRegistrationDanceRole(eventSpecial, workflowStatusService.getCancelled(), event, danceRole);
+  }
   public int countEventSpecialRegistrations(EventSpecial eventSpecial, Event event) {
     return
          countEventSpecialsSubmitted(eventSpecial, event)
@@ -438,6 +450,36 @@ public class SpecialRegistrationService {
         formatCountToString(
           countPartBuilder.toString()
           ,countEventSpecialsConfirming(eventSpecial, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countEventSpecialsCancelledAndSplitRoles(EventSpecial eventSpecial, Event event) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countEventSpecialsCancelled(eventSpecial, event)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countEventSpecialsCancelled(eventSpecial, event, danceRole)
+          ,danceRole.getName() + ": "));
+    });
+    count.add(countPartBuilder.toString());
+    return count;
+  }
+
+  public List<String> countPrivatesCancelledAndSplitRoles(EventPrivateClass eventPrivateClass) {
+    StringBuilder countPartBuilder = new StringBuilder();
+    List<String> count = new ArrayList<>();
+    count.add(String.valueOf(countPrivatesCancelled(eventPrivateClass)));
+    danceRoleService.all().forEach(danceRole -> {
+      countPartBuilder.append(
+        formatCountToString(
+          countPartBuilder.toString()
+          ,countPrivatesCancelled(eventPrivateClass, danceRole)
           ,danceRole.getName() + ": "));
     });
     count.add(countPartBuilder.toString());
