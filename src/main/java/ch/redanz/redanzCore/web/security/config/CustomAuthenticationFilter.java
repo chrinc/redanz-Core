@@ -4,7 +4,7 @@ import ch.redanz.redanzCore.model.profile.service.UserService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +21,10 @@ import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,7 +96,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     tokens.put("access_token", access_token);
     tokens.put("refresh_token", refresh_token);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+    JsonMapper.builderWithJackson2Defaults().build().writeValue(response.getOutputStream(), tokens);
     userService.setLoginTimestamp(userService.getUser(user.getUsername()));
   }
 }

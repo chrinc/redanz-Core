@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.web.security.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.http.HttpMethod;
 import ch.redanz.redanzCore.model.profile.service.PersonService;
 import ch.redanz.redanzCore.model.profile.service.UserService;
@@ -10,12 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -28,37 +31,37 @@ import java.util.List;
 @AllArgsConstructor
 @EnableWebSecurity
 @Slf4j
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
   private final UserService userService;
   private final RegistrationService registrationService;
   private final PersonService personService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ErrorLogService errorLogService;
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), userService);
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager(), userService);
     customAuthenticationFilter.setFilterProcessesUrl("/core-api/login");
-    http.authorizeRequests().antMatchers("/core-api/profile/user/registration/**").permitAll();
-    http.authorizeRequests().antMatchers("/core-api/zahls/checkout/**").permitAll();
-    http.authorizeRequests().antMatchers("/core-api/payrexx/checkout/**").permitAll();
-    http.authorizeRequests().antMatchers("/core-api/profile/**").permitAll();
-    http.authorizeRequests().antMatchers("/core-api/login/check-server").permitAll();
-    http.authorizeRequests().antMatchers("/core-api/login/host-key").permitAll();
-    // email accounts (smtp/imap credentials): organizers may view, only admins may change or test
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/core-api/app/email/accounts", "/core-api/app/email/accounts/testers").hasAnyAuthority("ADMIN", "ORGANIZER");
-    http.authorizeRequests().antMatchers("/core-api/app/email/accounts/**", "/core-api/app/email/accounts").hasAuthority("ADMIN");
-    http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
-    http.cors();
-    http.csrf().disable();
+    http.authorizeHttpRequests(requests -> requests
+      // error pages of a request (before the upgrade not checked again)
+      .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+      .requestMatchers("/core-api/profile/user/registration/**").permitAll()
+      .requestMatchers("/core-api/zahls/checkout/**").permitAll()
+      .requestMatchers("/core-api/payrexx/checkout/**").permitAll()
+      .requestMatchers("/core-api/profile/**").permitAll()
+      .requestMatchers("/core-api/login/check-server").permitAll()
+      .requestMatchers("/core-api/login/host-key").permitAll()
+      // email accounts (smtp/imap credentials): organizers may view, only admins may change or test
+      .requestMatchers(HttpMethod.GET, "/core-api/app/email/accounts", "/core-api/app/email/accounts/testers").hasAnyAuthority("ADMIN", "ORGANIZER")
+      .requestMatchers("/core-api/app/email/accounts/**", "/core-api/app/email/accounts").hasAuthority("ADMIN")
+      .anyRequest().authenticated());
+    http.httpBasic(Customizer.withDefaults());
+    http.cors(Customizer.withDefaults());
+    http.csrf(AbstractHttpConfigurer::disable);
     http.addFilter(customAuthenticationFilter);
     http.addFilterBefore(new CustomAuthorizationFilter(userService, registrationService, personService, errorLogService), UsernamePasswordAuthenticationFilter.class);
-    http.formLogin().failureHandler(authenticationFailureHandler());
-  }
-
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userService);
+    http.formLogin(formLogin -> formLogin.failureHandler(authenticationFailureHandler()));
+    return http.build();
   }
 
   @Bean
@@ -66,19 +69,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new CustomAuthenticationFailureHandler();
   }
 
+  // users from the database, passwords with bcrypt
   @Bean
-  @Override
-  public AuthenticationManager authenticationManagerBean() throws Exception {
-    return super.authenticationManagerBean();
+  public AuthenticationManager authenticationManager() {
+    return new ProviderManager(daoAuthenticationProvider());
   }
 
-  @Bean
-  public DaoAuthenticationProvider daoAuthenticationProvider() {
-    DaoAuthenticationProvider provider =
-      new DaoAuthenticationProvider();
+  private DaoAuthenticationProvider daoAuthenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userService);
     provider.setPasswordEncoder(bCryptPasswordEncoder);
-    provider.setUserDetailsService(userService);
-
     return provider;
   }
 

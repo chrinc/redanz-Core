@@ -5,17 +5,17 @@ import ch.redanz.redanzCore.model.workshop.repository.EmailAccountRepo;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.sun.mail.imap.IMAPFolder;
+import org.eclipse.angus.mail.imap.IMAPFolder;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.iv.RandomIvGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.mail.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.*;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.util.*;
 
 /*
@@ -311,7 +311,7 @@ public class EmailAccountService {
     return value == null ? "" : value;
   }
 
-  private static void closeQuietly(javax.mail.Service service) {
+  private static void closeQuietly(jakarta.mail.Service service) {
     try {
       if (service != null && service.isConnected()) service.close();
     } catch (MessagingException ignored) {

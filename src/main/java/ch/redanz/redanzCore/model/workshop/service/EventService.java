@@ -1071,7 +1071,7 @@ public class EventService {
   public void deleteEventFoodSlot(JsonObject request) {
     try {
       Long eventFoodSlotId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      EventFoodSlot eventFoodSlot = eventFoodSlotRepo.getOne(eventFoodSlotId);
+      EventFoodSlot eventFoodSlot = eventFoodSlotRepo.getReferenceById(eventFoodSlotId);
       if (foodRegistrationService.hasRegistrations(eventFoodSlot, true)) {
         throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_GE.getOutTextKey());
       } else {
@@ -1193,7 +1193,7 @@ public class EventService {
   public void deleteEventSpecial(JsonObject request) {
     try {
       Long eventSpecialId = request.get("id").isJsonNull() ? null : request.get("id").getAsLong();
-      EventSpecial eventSpecial = eventSpecialRepo.getOne(eventSpecialId);
+      EventSpecial eventSpecial = eventSpecialRepo.getReferenceById(eventSpecialId);
       if (specialRegistrationService.hasRegistrations(eventSpecial, true)) {
         throw new HasRegistrationException(OutTextConfig.LABEL_ERROR_HAS_EVENT_GE.getOutTextKey());
       } else {

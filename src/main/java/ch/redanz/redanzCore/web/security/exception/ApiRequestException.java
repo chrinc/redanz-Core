@@ -2,7 +2,7 @@ package ch.redanz.redanzCore.web.security.exception;
 
 import org.springframework.http.HttpStatus;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 
 public class ApiRequestException extends RuntimeException{

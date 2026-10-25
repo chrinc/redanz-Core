@@ -4,9 +4,9 @@ import ch.redanz.redanzCore.model.workshop.entities.BasePar;
 import ch.redanz.redanzCore.model.workshop.repository.BaseParRepo;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
@@ -97,7 +97,7 @@ public class BaseParService {
       Double.valueOf(baseParRepo.findByEventAndName(event, OutTextConfig.LABEL_BASE_PAR_SWITCH_WEIGHT_EN.getOutTextKey()).getVal()) :
       0.66; // default: 0.66
   }
-  public String bookletLink(Event event, String langKey) throws JsonProcessingException {
+  public String bookletLink(Event event, String langKey) throws JacksonException {
     if (!existsByNameAndEvent(OutTextConfig.LABEL_BASE_PAR_BOOKLET_LINK_EN.getOutTextKey(), event)) {
       return null;
     }
@@ -109,7 +109,7 @@ public class BaseParService {
     if (val == null) {return null;};
     JsonNode root = new ObjectMapper().readTree(val);
     JsonNode label = root.path(0); // first element of the array
-    return label.path(langKey.toUpperCase()).asText(null);
+    return label.path(langKey.toUpperCase()).asString(null);
   }
 
   public void save(BasePar basePar) {

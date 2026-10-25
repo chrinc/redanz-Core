@@ -4,8 +4,9 @@ package ch.redanz.redanzCore.model.workshop.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Length;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 @Entity
 @Slf4j
@@ -18,7 +19,9 @@ public class OutText implements Serializable  {
     @EmbeddedId
     private OutTextId outTextId = new OutTextId();
 
+    // longtext as before Hibernate 6 (else tinytext with max. 255 characters)
     @Lob
+    @Column(length = Length.LONG32)
     private String outText;
 
     @JsonIgnore
