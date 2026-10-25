@@ -148,7 +148,10 @@ public class ProfileController {
     }
   }
 
+  // one transaction: if the person can not be saved, the user and token are not kept either
+  // (else the email is taken for a new try); the confirmation email is sent after the commit
   @PostMapping(path = "/profile/submit")
+  @Transactional
   public void submitProfile(
     @RequestBody Map<String, Object> payload
   ) {
