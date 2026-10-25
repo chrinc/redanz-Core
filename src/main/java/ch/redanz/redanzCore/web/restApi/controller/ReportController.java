@@ -147,9 +147,15 @@ public class ReportController {
 
   // release details: why a registration is (not) released by the release job
   @GetMapping(path = "/registration/release-check")
-  public ResponseReleaseCheck getReleaseCheck(@RequestParam("registrationId") Long registrationId) {
+  public ResponseReleaseCheck getReleaseCheck(
+    @RequestParam("languageKey") String languageKey,
+    @RequestParam("registrationId") Long registrationId
+  ) {
     try {
-      return releaseCheckService.check(registrationService.findByRegistrationId(registrationId));
+      return releaseCheckService.check(
+        registrationService.findByRegistrationId(registrationId),
+        languageService.findLanguageByLanguageKey(languageKey.toUpperCase())
+      );
     } catch (Exception exception) {
       log.error("release check failed", exception);
       throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNEXPECTED_GE.getOutTextKey());

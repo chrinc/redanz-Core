@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationMatching;
@@ -11,10 +12,12 @@ import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.workshop.service.BundleEventTrackService;
 import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 // "release details": the conditions of the release job for one registration (same rules as RegistrationMatchingService.isRelease)
@@ -29,14 +32,15 @@ public class ReleaseCheckService {
   private final BundleEventTrackService bundleEventTrackService;
   private final BaseParService baseParService;
   private final WorkflowStatusService workflowStatusService;
+  private final OutTextService outTextService;
 
   @Transactional(readOnly = true)
-  public ResponseReleaseCheck check(Registration registration) {
-    return check(registration, true);
+  public ResponseReleaseCheck check(Registration registration, Language language) {
+    return check(registration, language, true);
   }
 
   // withPartner: also check whether the partner pulls the registration into the release
-  private ResponseReleaseCheck check(Registration registration, boolean withPartner) {
+  private ResponseReleaseCheck check(Registration registration, Language language, boolean withPartner) {
     ResponseReleaseCheck result = new ResponseReleaseCheck();
     Event event = registration.getEvent();
     Bundle bundle = registration.getBundle();
@@ -131,7 +135,7 @@ public class ReleaseCheckService {
       .filter(Objects::nonNull)
       .forEach(specialRegistration -> {
         EventSpecial special = specialRegistration.getEventSpecial();
-        Check specialCheck = level("SPECIAL", special.getName(),
+        Check specialCheck = level("SPECIAL", outText(special.getName(), language),
           Boolean.TRUE.equals(special.getSoldOut()), special.getSoldOutOverride() != null,
           specialRegistrationService.countEventSpecialsConfirmingAndDone(special, event), special.getCapacity());
         if (special.getCapacity() != null) {
@@ -176,7 +180,7 @@ public class ReleaseCheckService {
     // and releases this registration together with the partner, even if its own conditions fail
     if (withPartner && !result.isWouldRelease() && partner != null && eventCapacityOk
       && partner.getWorkflowStatus().getWorkflowStatusId().equals(workflowStatusService.getSubmitted().getWorkflowStatusId())) {
-      ResponseReleaseCheck partnerResult = check(partner, false);
+      ResponseReleaseCheck partnerResult = check(partner, language, false);
       boolean partnerOk = partnerResult.isReleaseFlag() || partnerResult.getChecks().stream()
         .filter(check -> !check.getLevel().equals("PARTNER"))
         .allMatch(Check::isOk);
@@ -234,6 +238,15 @@ public class ReleaseCheckService {
   private void waitList(Check check, int count, int limit) {
     check.setWaitListCount(count);
     check.setWaitListLimit(limit);
+  }
+
+  // name of a special is an out text key (as in the overview); key itself if there is no text
+  private String outText(String key, Language language) {
+    try {
+      return outTextService.getOutTextByKeyAndLangKey(key, language.getLanguageKey()).getOutText();
+    } catch (NoSuchElementException exception) {
+      return key;
+    }
   }
 
   private String balanceLimit(DanceRole danceRole) {
