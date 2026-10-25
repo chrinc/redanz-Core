@@ -3,6 +3,7 @@ package ch.redanz.redanzCore.model.profile.service;
 
 import ch.redanz.redanzCore.model.workshop.entities.EmailAccount;
 import ch.redanz.redanzCore.model.profile.entities.Person;
+import ch.redanz.redanzCore.model.profile.entities.User;
 import ch.redanz.redanzCore.model.profile.response.PersonResponse;
 import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
@@ -95,14 +96,19 @@ public class ProfileService {
   }
 
   public void remove(Person person) {
-    if (person.getUser() != null) {
-      userService.delete(person.getUser());
+    // first remove the link to the user, then delete the user (Hibernate 7 does not delete a user that a person still references)
+    User user = person.getUser();
+    if (user != null) {
       person.setUser(null);
       person.setEmail(null);
     }
 
     person.setActive(false);
     personService.savePerson(person);
+
+    if (user != null) {
+      userService.delete(user);
+    }
   }
 
   public Person getProfile(Long personId) {
