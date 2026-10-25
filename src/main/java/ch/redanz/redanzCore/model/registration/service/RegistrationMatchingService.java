@@ -37,6 +37,14 @@ public class RegistrationMatchingService {
     return registrationMatchingRepo.findByRegistration1(registration1);
   }
 
+  // matching of each active registration of an event (key: registration id of registration1)
+  public Map<Long, RegistrationMatching> findAllByRegistration1Event(Event event) {
+    Map<Long, RegistrationMatching> matchings = new HashMap<>();
+    registrationMatchingRepo.findAllByRegistration1EventAndRegistration1Active(event, true)
+      .forEach(matching -> matchings.putIfAbsent(matching.getRegistration1().getRegistrationId(), matching));
+    return matchings;
+  }
+
   public List<RegistrationMatching> findRegistrationMatchingByRegistration2IsNull() {
     return registrationMatchingRepo.findRegistrationMatchingByRegistration2IsNull();
   }

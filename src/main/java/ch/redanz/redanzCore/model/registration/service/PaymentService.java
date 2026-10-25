@@ -1,8 +1,13 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
+import ch.redanz.redanzCore.model.registration.entities.DonationRegistration;
+import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.PaymentStatus;
+import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationPayment;
+import ch.redanz.redanzCore.model.registration.entities.SpecialRegistration;
 import ch.redanz.redanzCore.model.registration.repository.*;
 import ch.redanz.redanzCore.model.registration.response.PaymentDetailsResponse;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
@@ -22,9 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -41,6 +50,8 @@ public class PaymentService {
   private final SpecialRegistrationService specialRegistrationService;
   private final RegistrationEmailService registrationEmailService;
   private final RegistrationPaymentRepo registrationPaymentRepo;
+  private final SpecialRegistrationRepo specialRegistrationRepo;
+  private final PrivateClassRegistrationRepo privateClassRegistrationRepo;
   private final RegistrationRepo registrationRepo;
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
@@ -171,31 +182,50 @@ public class PaymentService {
   }
 
   public long totalAmount(Registration registration){
+    return totalAmount(
+      registration,
+      specialRegistrationService.findAllByRegistration(registration),
+      privateClassService.findAllByRegistrations(registration),
+      foodRegistrationRepo.findAllByRegistration(registration),
+      donationRegistrationRepo.findByRegistration(registration),
+      discountRegistrationRepo.findAllByRegistration(registration)
+    );
+  };
+
+  // price of a registration from its booked items (loaded by the caller, e.g. for all registrations of an event at once)
+  public long totalAmount(
+    Registration registration,
+    List<SpecialRegistration> specialRegistrations,
+    List<PrivateClassRegistration> privateClassRegistrations,
+    List<FoodRegistration> foodRegistrations,
+    DonationRegistration donationRegistration,
+    List<DiscountRegistration> discountRegistrations
+  ){
     AtomicLong totalAmount = new AtomicLong();
     totalAmount.set((int) registration.getBundle().getPrice());
 
     // specials
-    specialRegistrationService.findAllByRegistration(registration).forEach(specialRegistration -> {
+    specialRegistrations.forEach(specialRegistration -> {
       totalAmount.addAndGet((int) specialRegistration.getEventSpecial().getPrice());
     });
 
     // private class
-    privateClassService.findAllByRegistrations(registration).forEach(privateClassRegistration -> {
+    privateClassRegistrations.forEach(privateClassRegistration -> {
       totalAmount.addAndGet((int) privateClassRegistration.getEventPrivateClass().getPrice());
     });
 
     // food
-    foodRegistrationRepo.findAllByRegistration(registration).forEach(foodRegistration -> {
+    foodRegistrations.forEach(foodRegistration -> {
       totalAmount.addAndGet((int) foodRegistration.getEventFoodSlot().getPrice());
     });
 
     // donation
-    if (donationRegistrationRepo.findByRegistration(registration) != null) {
-      totalAmount.addAndGet((int) donationRegistrationRepo.findByRegistration(registration).getAmount());
+    if (donationRegistration != null) {
+      totalAmount.addAndGet((int) donationRegistration.getAmount());
     }
 
     // discount
-    discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
+    discountRegistrations.forEach(discountRegistration -> {
       int discount = (int) discountRegistration.getEventDiscount().getDiscountAmount();
       totalAmount.addAndGet(discount * (-1));
     });
@@ -205,6 +235,42 @@ public class PaymentService {
 
   public long amountPaid(Registration registration){
     return registrationPaymentRepo.sumAmountByRegistration(registration);
+  }
+
+  public record Amounts(long totalAmount, long amountDue) {}
+
+  // total and due amount of registrations of an event: the booked items and payments are loaded
+  // once for the whole event instead of per registration (reports)
+  public Map<Long, Amounts> amountsByRegistration(Event event, List<Registration> registrations) {
+    Map<Long, List<SpecialRegistration>> specials = byRegistration(specialRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), SpecialRegistration::getRegistration);
+    Map<Long, List<PrivateClassRegistration>> privateClasses = byRegistration(privateClassRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), PrivateClassRegistration::getRegistration);
+    Map<Long, List<FoodRegistration>> foods = byRegistration(foodRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), FoodRegistration::getRegistration);
+    Map<Long, List<DonationRegistration>> donations = byRegistration(donationRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), DonationRegistration::getRegistration);
+    Map<Long, List<DiscountRegistration>> discounts = byRegistration(discountRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), DiscountRegistration::getRegistration);
+    Map<Long, Long> paid = new HashMap<>();
+    registrationPaymentRepo.findAllByRegistrationEventAndRegistrationActive(event, true).stream()
+      .filter(payment -> payment.getAmount() != null)
+      .forEach(payment -> paid.merge(payment.getRegistration().getRegistrationId(), payment.getAmount(), Long::sum));
+
+    Map<Long, Amounts> amounts = new HashMap<>();
+    registrations.forEach(registration -> {
+      Long registrationId = registration.getRegistrationId();
+      List<DonationRegistration> donation = donations.getOrDefault(registrationId, List.of());
+      long totalAmount = totalAmount(
+        registration,
+        specials.getOrDefault(registrationId, List.of()),
+        privateClasses.getOrDefault(registrationId, List.of()),
+        foods.getOrDefault(registrationId, List.of()),
+        donation.isEmpty() ? null : donation.get(0),
+        discounts.getOrDefault(registrationId, List.of())
+      );
+      amounts.put(registrationId, new Amounts(totalAmount, totalAmount - paid.getOrDefault(registrationId, 0L)));
+    });
+    return amounts;
+  }
+
+  private static <T> Map<Long, List<T>> byRegistration(List<T> items, Function<T, Registration> registration) {
+    return items.stream().collect(Collectors.groupingBy(item -> registration.apply(item).getRegistrationId()));
   }
 
   public long amountDue(Registration registration) {

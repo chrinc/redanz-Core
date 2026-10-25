@@ -69,6 +69,14 @@ public class RegistrationEmailService {
     return registrationEmailRepo.findByRegistration(registration);
   }
 
+  // email log of each active registration of an event (key: registration id)
+  public Map<Long, RegistrationEmail> findAllByEvent(Event event) {
+    Map<Long, RegistrationEmail> registrationEmails = new HashMap<>();
+    registrationEmailRepo.findAllByRegistrationEventAndRegistrationActive(event, true)
+      .forEach(registrationEmail -> registrationEmails.putIfAbsent(registrationEmail.getRegistration().getRegistrationId(), registrationEmail));
+    return registrationEmails;
+  }
+
   public void sendRegistrationSubmittedEmail(
     Registration registration
   ) throws IOException, TemplateException {

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface FoodRegistrationRepo extends JpaRepository<FoodRegistration, Long> {
+  List<FoodRegistration> findAllByRegistrationEvent(Event event);
 void deleteAllByRegistration(Registration registration);
 
 void deleteAllByRegistrationAndEventFoodSlot(Registration registration, EventFoodSlot eventFoodSlot);

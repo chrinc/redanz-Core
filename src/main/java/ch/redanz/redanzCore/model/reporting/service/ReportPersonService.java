@@ -12,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -47,13 +49,15 @@ public class ReportPersonService {
 
   public List<ResponsePersonRegistrations> getPersonResponseReport(Language language, Event event) {
     List<ResponsePersonRegistrations> personRegistrations = new ArrayList<>();
+    // texts of workflow status and country loaded once per key (not per registration)
+    Map<String, String> outTexts = new HashMap<>();
 
     registrationService.findAllByEvent(event).forEach(registration -> {
       personRegistrations.add(
         new ResponsePersonRegistrations(
           registration.getParticipant().getPersonId()
           , registration.getRegistrationId()
-          , outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString()
+          , outTexts.computeIfAbsent(registration.getWorkflowStatus().getLabel(), key -> outTextService.getOutTextMapByKey(key).toString())
           , registration.getBundle().getName()
           , registration.getTrack() == null ? null : registration.getTrack().getName()
           , registration.getParticipant().getFirstName()
@@ -63,7 +67,7 @@ public class ReportPersonService {
           , registration.getParticipant().getStreet()
           , registration.getParticipant().getPostalCode()
           , registration.getParticipant().getCity()
-          , outTextService.getOutTextMapByKey(registration.getParticipant().getCountry().getOutTextKey()).toString()
+          , outTexts.computeIfAbsent(registration.getParticipant().getCountry().getOutTextKey(), key -> outTextService.getOutTextMapByKey(key).toString())
           , registration.getParticipant().getPersonLang().getLanguageKey()
           , registration.getDanceRole() == null ? null : registration.getDanceRole().getName()
           , registration.getParticipant().getPronouns()

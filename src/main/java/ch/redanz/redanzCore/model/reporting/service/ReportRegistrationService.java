@@ -56,11 +56,19 @@ public class ReportRegistrationService {
   private List<ResponseRegistrationDetails> getRegistrationsDetails(List<WorkflowStatus> workflowStatusList, Event event) {
     List<ResponseRegistrationDetails> registrationDetails = new ArrayList<>();
 
-    registrationService.findAllByEvent(event).forEach(registration -> {
-     RegistrationMatching registrationMatching = registrationMatchingService.findByRegistration1(registration).orElse(null);
-      WorkflowStatus workflowStatus = workflowStatusService.findById(registration.getWorkflowStatus().getWorkflowStatusId());
+    // loaded once for all registrations of the event (not per registration: slow with many registrations)
+    List<Registration> registrations = registrationService.findAllByEvent(event);
+    Map<Long, RegistrationMatching> registrationMatchings = registrationMatchingService.findAllByRegistration1Event(event);
+    Map<Long, PaymentService.Amounts> amounts = paymentService.amountsByRegistration(event, registrations);
+    Map<Long, String> workflowStatusMaps = new HashMap<>();
+    Map<Long, WorkflowStatus> workflowStatuses = new HashMap<>();
+    workflowStatusList.forEach(workflowStatus -> workflowStatuses.put(workflowStatus.getWorkflowStatusId(), workflowStatus));
+
+    registrations.forEach(registration -> {
+      RegistrationMatching registrationMatching = registrationMatchings.get(registration.getRegistrationId());
+      WorkflowStatus workflowStatus = workflowStatuses.get(registration.getWorkflowStatus().getWorkflowStatusId());
       boolean hasPartner = registrationMatching != null && registrationMatching.getRegistration2() != null;
-      if (workflowStatusList.contains(workflowStatus)) {
+      if (workflowStatus != null) {
         registrationDetails.add(
           new ResponseRegistrationDetails(
             registration.getParticipant().getPersonId(),
@@ -71,13 +79,13 @@ public class ReportRegistrationService {
             registration.getBundle().getName(),
             registration.getTrack() == null ? null : registration.getTrack().getName(),
             registration.getDanceRole() == null ? null : registration.getDanceRole().getName(),
-            getWorkflowStatusMap(registration.getWorkflowStatus()),
+            workflowStatusMaps.computeIfAbsent(workflowStatus.getWorkflowStatusId(), id -> getWorkflowStatusMap(registration.getWorkflowStatus())),
             registrationMatching == null ? null: registrationMatching.getPartnerEmail(),
             registration.getParticipant().getPersonLang().getLanguageKey(),
             hasPartner ? registrationMatching.getRegistration2().getRegistrationId() : null,
             registration.getEvent().getEventId(),
-            paymentService.amountDue(registration),
-            paymentService.totalAmount(registration)
+            amounts.get(registration.getRegistrationId()).amountDue(),
+            amounts.get(registration.getRegistrationId()).totalAmount()
           )
         );
       }

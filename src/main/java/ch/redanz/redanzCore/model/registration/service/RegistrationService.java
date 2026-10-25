@@ -328,6 +328,11 @@ public class RegistrationService {
     return registrationRepo.findAllByEventAndActiveAndRegistrationType(event, true, RegistrationType.PARTICIPANT);
   }
 
+  // all active registrations of an event (participants and staff)
+  public List<Registration> findAllActiveByEvent(Event event) {
+    return registrationRepo.findAllByEventAndActive(event, true);
+  }
+
   public List<Registration> findStaffByEvent(Event event) {
     return registrationRepo.findAllByEventAndActiveAndRegistrationType(event, true, RegistrationType.STAFF);
   }

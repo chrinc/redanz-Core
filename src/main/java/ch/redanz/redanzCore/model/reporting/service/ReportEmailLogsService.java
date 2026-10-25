@@ -1,5 +1,6 @@
 package ch.redanz.redanzCore.model.reporting.service;
 
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationEmail;
 import ch.redanz.redanzCore.model.registration.service.*;
 import ch.redanz.redanzCore.model.reporting.response.ResponseEmailLogs;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -25,8 +28,13 @@ public class ReportEmailLogsService {
 
   public List<ResponseEmailLogs> getEmailLogs(Event event) {
     List<ResponseEmailLogs> responseEmailLogs = new ArrayList<>();
-    registrationService.findAllByEvent(event).forEach(registration -> {
-        RegistrationEmail registrationEmail = registrationEmailService.findByRegistration(registration);
+    // amounts loaded once for all registrations of the event (not per registration: slow with many registrations)
+    List<Registration> registrations = registrationService.findAllByEvent(event);
+    Map<Long, PaymentService.Amounts> amounts = paymentService.amountsByRegistration(event, registrations);
+    Map<Long, RegistrationEmail> registrationEmails = registrationEmailService.findAllByEvent(event);
+    Map<String, String> workflowStatusTexts = new HashMap<>();
+    registrations.forEach(registration -> {
+        RegistrationEmail registrationEmail = registrationEmails.get(registration.getRegistrationId());
         responseEmailLogs.add(
           new ResponseEmailLogs(
             registration.getParticipant().getPersonId(),
@@ -35,9 +43,9 @@ public class ReportEmailLogsService {
             registration.getParticipant().getLastName(),
             registration.getParticipant().getEmail(),
             registration.getBundle().getName(),
-            outTextService.getOutTextMapByKey(registration.getWorkflowStatus().getLabel()).toString(),
-            paymentService.amountDue(registration),
-            paymentService.totalAmount(registration),
+            workflowStatusTexts.computeIfAbsent(registration.getWorkflowStatus().getLabel(), label -> outTextService.getOutTextMapByKey(label).toString()),
+            amounts.get(registration.getRegistrationId()).amountDue(),
+            amounts.get(registration.getRegistrationId()).totalAmount(),
             registrationEmail == null || registrationEmail.getReceivedSentDate() == null ?  "" : registrationEmail.getReceivedSentDate().toString(),
             registrationEmail == null || registrationEmail.getReleasedSentDate() == null ?  "" : registrationEmail.getReleasedSentDate().toString(),
             registrationEmail == null || registrationEmail.getDoneSentDate() == null ?  "" : registrationEmail.getDoneSentDate().toString(),

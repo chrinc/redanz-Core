@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PrivateClassRegistrationRepo extends JpaRepository<PrivateClassRegistration, Long> {
+  List<PrivateClassRegistration> findAllByEventPrivateClassEvent(Event event);
   List<PrivateClassRegistration> findAllByRegistration(Registration registration);
   List<PrivateClassRegistration> findAllByRegistrationActive(Boolean active);
   List<PrivateClassRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, Boolean active);

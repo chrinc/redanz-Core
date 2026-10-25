@@ -22,6 +22,7 @@ public interface RegistrationRepo extends JpaRepository<Registration, Long> {
     Optional<Registration> findByParticipantAndEventAndRegistrationTypeAndActive(Person participant, Event event, RegistrationType registrationType, Boolean active);
     Registration findByRegistrationId(Long registrationId);
     List<Registration> findAllByEventAndActiveAndRegistrationType(Event event, Boolean active, RegistrationType type);
+    List<Registration> findAllByEventAndActive(Event event, Boolean active);
     List<Registration> findAllByParticipantAndActiveAndEventArchivedAndEventActive(Person participant, Boolean active, Boolean archived, Boolean eventActive);
     List<Registration> findAllByParticipantAndActive(Person person, Boolean active);
     List<Registration> findAllByWorkflowStatusAndActiveAndEventAndRegistrationType(WorkflowStatus workflowStatus, Boolean active, Event event, RegistrationType type);

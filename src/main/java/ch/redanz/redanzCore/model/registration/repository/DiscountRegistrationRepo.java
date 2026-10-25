@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DiscountRegistrationRepo extends JpaRepository<DiscountRegistration, Long> {
+  List<DiscountRegistration> findAllByEventDiscountEvent(Event event);
   List<DiscountRegistration> findAllByRegistration(Registration registration);
   Optional<DiscountRegistration> findAllByRegistrationAndEventDiscount(Registration registration, EventDiscount eventDiscount);
   void deleteAllByRegistrationAndEventDiscount(Registration registration, EventDiscount eventDiscount);

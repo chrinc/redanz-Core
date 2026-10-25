@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SpecialRegistrationRepo extends JpaRepository<SpecialRegistration, Long> {
+  List<SpecialRegistration> findAllByRegistrationEvent(Event event);
   List<SpecialRegistration> findAllByRegistration(Registration registration);
   List<SpecialRegistration> findAllByRegistrationEventAndRegistrationActive(Event event, Boolean active);
   List<SpecialRegistration> findAllByEventSpecialAndRegistrationActive(Event event, Boolean active);

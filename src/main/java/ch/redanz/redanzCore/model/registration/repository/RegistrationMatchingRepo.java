@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface RegistrationMatchingRepo extends JpaRepository<RegistrationMatching, Long> {
 
   Optional<RegistrationMatching> findByRegistration1(Registration registration1);
+  List<RegistrationMatching> findAllByRegistration1EventAndRegistration1Active(Event event, Boolean active);
   Optional<RegistrationMatching> findByRegistration2(Registration registration2);
   boolean existsByRegistration1(Registration registration1);
   boolean existsByRegistration2(Registration registration2);
