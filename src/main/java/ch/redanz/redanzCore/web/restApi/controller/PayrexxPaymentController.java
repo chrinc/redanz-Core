@@ -8,6 +8,7 @@ import ch.redanz.redanzCore.model.registration.service.PaymentService;
 import ch.redanz.redanzCore.model.registration.service.RegistrationService;
 import ch.redanz.redanzCore.model.workshop.configTest.OutTextConfig;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
+import ch.redanz.redanzCore.service.payment.WebhookSignatureService;
 import ch.redanz.redanzCore.service.log.ErrorLogService;
 import ch.redanz.redanzCore.web.security.exception.ApiRequestException;
 import com.google.gson.JsonObject;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 @RestController
@@ -29,6 +31,7 @@ public class PayrexxPaymentController {
   private final RegistrationService registrationService;
   private final PaymentService paymentService;
   private final ErrorLogService errorLogService;
+  private final WebhookSignatureService webhookSignatureService;
 
 
   @GetMapping("/payment-intent")
@@ -99,12 +102,18 @@ public class PayrexxPaymentController {
    return ResponseEntity.ok(registration.getPaymentStatus());
   }
 
+  // webhook of Payrexx: only accepted with a valid signature (raw body, not re-serialized)
   @PostMapping("/checkout/confirm")
   public void confirmPayment(
-    @RequestBody String jsonObject
+    @RequestBody byte[] body,
+    @RequestHeader(value = WebhookSignatureService.SIGNATURE_HEADER, required = false) String signature
   ) {
+    if (!webhookSignatureService.isValid(body, signature)) {
+      errorLogService.addLog("/confirmPayment", "invalid webhook signature");
+      throw new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey(), HttpStatus.UNAUTHORIZED);
+    }
     try {
-      JsonObject request = JsonParser.parseString(jsonObject).getAsJsonObject();
+      JsonObject request = JsonParser.parseString(new String(body, StandardCharsets.UTF_8)).getAsJsonObject();
       JsonObject transaction = request.get("transaction").getAsJsonObject();
       Long registrationId = transaction.get("referenceId").getAsLong();
       Registration registration = registrationService.findByRegistrationId(registrationId);

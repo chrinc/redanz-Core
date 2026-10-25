@@ -44,7 +44,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     if(
          request.getServletPath().equals("/core-api/login")
       || request.getServletPath().equals("/core-api/login/token/refresh")
-      || request.getServletPath().equals("/core-api/zahls/checkout/confirm")
       || request.getServletPath().equals("/core-api/payrexx/checkout/confirm")
     ) {
       filterChain.doFilter(request, response);
@@ -154,7 +153,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(username, null, authorities);
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-          filterChain.doFilter(request, response);
         } catch (Exception exception) {
           errorLogService.addLog("AUTH", exception.getMessage());
           response.setHeader("error", exception.getMessage());
@@ -163,6 +161,16 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           error.put("error_message", exception.getMessage());
           response.setContentType(MediaType.APPLICATION_JSON_VALUE);
           JsonMapper.builderWithJackson2Defaults().build().writeValue(response.getOutputStream(), error);
+          return;
+        }
+
+        // outside the authorization: an error of the request itself (e.g. no database connection)
+        // is no authorization error (before: logged as AUTH and answered with 403)
+        try {
+          filterChain.doFilter(request, response);
+        } catch (Exception exception) {
+          errorLogService.addLog("REQUEST", request.getServletPath() + ": " + exception.getMessage());
+          throw exception;
         }
       } else {
         filterChain.doFilter(request, response);

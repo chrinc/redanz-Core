@@ -46,7 +46,6 @@ public class WebSecurityConfig {
       // error pages of a request (before the upgrade not checked again)
       .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
       .requestMatchers("/core-api/profile/user/registration/**").permitAll()
-      .requestMatchers("/core-api/zahls/checkout/**").permitAll()
       .requestMatchers("/core-api/payrexx/checkout/**").permitAll()
       .requestMatchers("/core-api/profile/**").permitAll()
       .requestMatchers("/core-api/login/check-server").permitAll()
