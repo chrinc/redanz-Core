@@ -6,8 +6,11 @@ import ch.redanz.redanzCore.model.workshop.service.BaseParService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import jakarta.activation.DataHandler;
 import jakarta.mail.*;
@@ -36,6 +39,11 @@ public class EmailService {
 
   private final EmailAccountService emailAccountService;
   private final BaseParService baseParService;
+
+  // own proxy: sendEmailNow is @Async only if called through the proxy
+  @Lazy
+  @Autowired
+  private EmailService self;
 
   @Autowired
   public EmailService(
@@ -78,8 +86,32 @@ public class EmailService {
    * subject " *** Test ***". The email is stored in the "sent" folder of the sending account.
    * If sending fails, the main account and then the configuration are used.
    */
-  @Async
+  // in a transaction the email is sent after its commit (no email for e.g. a registration that is rolled back), else now
   public void sendEmail(
+    String toEmail,
+    String subject,
+    String body,
+    Boolean emailIsTester,
+    Boolean eventInactive,
+    byte[] icsAttachment,
+    String icsFilename,
+    EmailAccount.Type accountType,
+    Event event
+  ) {
+    if (TransactionSynchronizationManager.isSynchronizationActive()) {
+      TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+        @Override
+        public void afterCommit() {
+          self.sendEmailNow(toEmail, subject, body, emailIsTester, eventInactive, icsAttachment, icsFilename, accountType, event);
+        }
+      });
+    } else {
+      self.sendEmailNow(toEmail, subject, body, emailIsTester, eventInactive, icsAttachment, icsFilename, accountType, event);
+    }
+  }
+
+  @Async
+  public void sendEmailNow(
     String toEmail,
     String subject,
     String body,
