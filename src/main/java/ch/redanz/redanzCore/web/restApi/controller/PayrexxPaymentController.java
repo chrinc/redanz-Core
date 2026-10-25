@@ -115,7 +115,15 @@ public class PayrexxPaymentController {
     try {
       JsonObject request = JsonParser.parseString(new String(body, StandardCharsets.UTF_8)).getAsJsonObject();
       JsonObject transaction = request.get("transaction").getAsJsonObject();
-      Long registrationId = transaction.get("referenceId").getAsLong();
+
+      // payments not made by a registration (e.g. QR codes of the bar): no registration id as reference, ignored
+      String referenceId = transaction.has("referenceId") && !transaction.get("referenceId").isJsonNull()
+        ? transaction.get("referenceId").getAsString().trim()
+        : "";
+      if (!referenceId.matches("\\d+")) {
+        return;
+      }
+      Long registrationId = Long.valueOf(referenceId);
       Registration registration = registrationService.findByRegistrationId(registrationId);
       paymentService.onPaymentConfirmed(
         registration,
