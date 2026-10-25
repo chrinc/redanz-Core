@@ -29,16 +29,17 @@ public interface EventRepo extends JpaRepository<Event, Long> {
   @Query("SELECT e.soldOut FROM Event e WHERE e.eventId = :eventId")
   boolean findSoldOutComputedByEventId(@Param("eventId") Long eventId);
 
-  @Query("SELECT e.eventBundles FROM Event e WHERE e.eventId = :eventId")
+  // query the children directly: selecting e.<collection> (also with a join) fails in Hibernate 7 (subselect fetch)
+  @Query("SELECT b FROM EventBundle b WHERE b.event.eventId = :eventId")
   Set<EventBundle> findAllEventBundlesByEventId(@Param("eventId") Long eventId);
 
-  @Query("SELECT e.eventTracks FROM Event e WHERE e.eventId = :eventId")
+  @Query("SELECT t FROM EventTrack t WHERE t.event.eventId = :eventId")
   Set<EventTrack> findAllEventTracksByEventId(@Param("eventId") Long eventId);
 
-  @Query("SELECT e.eventSpecials FROM Event e WHERE e.eventId = :eventId")
+  @Query("SELECT s FROM EventSpecial s WHERE s.event.eventId = :eventId")
   Set<EventSpecial> findAllEventSpecialsByEventId(@Param("eventId") Long eventId);
 
-  @Query("SELECT e.eventPrivates FROM Event e WHERE e.eventId = :eventId")
+  @Query("SELECT p FROM EventPrivateClass p WHERE p.event.eventId = :eventId")
   Set<EventPrivateClass> findAllEventPrivatesByEventId(@Param("eventId") Long eventId);
 
   @Query("SELECT e.name FROM Event e WHERE e.eventId = :eventId")
