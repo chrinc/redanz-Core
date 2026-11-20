@@ -47,7 +47,7 @@ public class CalendarController {
   private ZonedDateTime getZonedDateTime(JsonObject obj, String key) {
     String value = getString(obj, key);
     return value != null
-      ? LocalDateTime.parse(value).atZone(ZoneId.systemDefault())
+      ? LocalDateTime.parse(value).atZone(ZoneId.of("Europe/Berlin")) // (CET/CEST), not server default
       : null;
   }
   private String upsertLabel(JsonObject labelObject, String key) {
