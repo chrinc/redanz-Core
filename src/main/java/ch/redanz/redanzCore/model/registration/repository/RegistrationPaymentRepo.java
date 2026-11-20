@@ -5,7 +5,6 @@ import ch.redanz.redanzCore.model.registration.entities.RegistrationPayment;
 import ch.redanz.redanzCore.model.registration.entities.ScholarshipRegistration;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,8 +14,5 @@ public interface RegistrationPaymentRepo extends JpaRepository<RegistrationPayme
   List<RegistrationPayment> findAllByRegistration(Registration registration);
   List<RegistrationPayment> findAllByRegistrationEventAndRegistrationActive(Event event, Boolean active);
   void deleteAllByRegistration(Registration registration);
-
-  @Query("SELECT coalesce(SUM(p.amount), 0) FROM RegistrationPayment p  WHERE p.amount is not null and p.registration = :registration")
-  Long sumAmountByRegistration(Registration registration);
 }
 

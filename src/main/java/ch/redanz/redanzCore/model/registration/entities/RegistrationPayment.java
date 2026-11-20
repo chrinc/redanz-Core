@@ -23,7 +23,8 @@ public class RegistrationPayment implements Serializable{
   @Column(name = "registration_payment_id")
   private Long registrationPaymentId;
 
-  @OneToOne(fetch = FetchType.EAGER)
+  // several bookings per registration (payments, refunds, fees)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "registration_id", nullable = false)
   private Registration registration;
 
@@ -33,10 +34,29 @@ public class RegistrationPayment implements Serializable{
   @Column(name = "amount")
   Long amount;
 
+  // null: payment (bookings before refunds and fees existed)
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type")
+  PaymentType type;
+
+  // out text key of the optional comment (EN/GE), shown instead of the default label
+  @Column(name = "comment")
+  String comment;
+
   public RegistrationPayment(Registration registration, Long amount, LocalDateTime transactionDate) {
+    this(registration, amount, transactionDate, PaymentType.PAYMENT, null);
+  }
+
+  public RegistrationPayment(Registration registration, Long amount, LocalDateTime transactionDate, PaymentType type, String comment) {
     this.registration = registration;
     this.amount = amount;
     this.transactionDate = transactionDate;
+    this.type = type;
+    this.comment = comment;
+  }
+
+  public PaymentType getType() {
+    return type == null ? PaymentType.PAYMENT : type;
   }
 
 }

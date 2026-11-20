@@ -1217,7 +1217,8 @@ public class RegistrationEmailService {
 
     // optional small line showing paid/due breakdown
     sb.append("<div style=\"color:#666;font-size:14px;margin:0 0 8px 0;\">")
-      .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_PAID_EN.getOutTextKey(), languageKey).getOutText() + ": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountPaid())))
+      // paid before refunds (refunds are listed below the total, as in "your booking")
+      .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_PAID_EN.getOutTextKey(), languageKey).getOutText() + ": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountPaid() + paymentDetailsResponse.getAmountRefunded())))
       .append(" &nbsp;|&nbsp; ")
       .append(outTextService.getOutTextByKeyAndLangKey(OutTextConfig.LABEL_DUE_EN.getOutTextKey(), languageKey).getOutText() + ": ").append(escapeHtml(chf(paymentDetailsResponse.getAmountDue())))
       .append("</div>");
@@ -1275,6 +1276,12 @@ public class RegistrationEmailService {
       .append(escapeHtml(chf(paymentDetailsResponse.getTotalAmount())))
       .append("</div></div>");
 
+    // refunds: comment if entered, else default label
+    renderSection(sb, "", safePairs(withDefaultLabel(paymentDetailsResponse.getRefunds(), OutTextConfig.LABEL_REFUNDED_EN.getOutTextKey())), "+ ", languageKey, false, false, true);
+
+    // fees (e.g. cancellation fee), charged in addition to the total: comment if entered, else default label
+    renderSection(sb, "", safePairs(withDefaultLabel(paymentDetailsResponse.getFees(), OutTextConfig.LABEL_CANCELLATION_FEE_EN.getOutTextKey())), "- ", languageKey, false, false, true);
+
     sb.append("""
             </div>
           </div>
@@ -1290,6 +1297,11 @@ public class RegistrationEmailService {
    * If asDiscounts=true, amounts are shown as "- CHF x.-"
    */
   private void renderSection(StringBuilder sb, String title, List<Pair> items, boolean asDiscounts, String languageKey, boolean hasTitle, boolean bold, boolean italic) {
+    renderSection(sb, title, items, asDiscounts ? "- " : "", languageKey, hasTitle, bold, italic);
+  }
+
+  // prefix: sign in front of the label, e.g. "- " (discounts, fees) or "+ " (refunds)
+  private void renderSection(StringBuilder sb, String title, List<Pair> items, String prefix, String languageKey, boolean hasTitle, boolean bold, boolean italic) {
     if (items == null || items.isEmpty()) return;
     if (hasTitle) {
       sb.append("<div style=\"margin:8px 0 0 0;font-size:15px;font-weight:700;color:#111;\">")
@@ -1300,9 +1312,7 @@ public class RegistrationEmailService {
     for (Pair it : items) {
       if (it == null || isBlank(it.label) || it.amount == null) continue;
 
-      String humanizedLabel = asDiscounts ?
-        "- " + humanizeLabel(it.label, languageKey)
-        : humanizeLabel(it.label, languageKey);
+      String humanizedLabel = prefix + humanizeLabel(it.label, languageKey);
 
       sb.append("<div style=\"display:flex;justify-content:space-between;gap:16px;padding:3px 0;\">")
         .append("<div style=\"color:#222"
@@ -1332,6 +1342,15 @@ public class RegistrationEmailService {
     return raw.stream()
       .map(this::toPair)
       .filter(p -> p != null && !isBlank(p.label) && p.amount != null)
+      .toList();
+  }
+
+  // [comment out text key or "", amount]: empty comment replaced by the default label
+  private List<List<String>> withDefaultLabel(List<List<String>> raw, String defaultLabel) {
+    if (raw == null) return Collections.emptyList();
+
+    return raw.stream()
+      .map(row -> List.of(isBlank(row.get(0)) ? defaultLabel : row.get(0), row.get(1)))
       .toList();
   }
 

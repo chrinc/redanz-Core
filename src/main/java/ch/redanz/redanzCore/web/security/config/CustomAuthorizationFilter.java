@@ -84,7 +84,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
               auth ->
                    auth.getAuthority().equals(UserRole.ORGANIZER.name())
                 || auth.getAuthority().equals(UserRole.ADMIN.name())
-                || auth.getAuthority().equals(UserRole.VOLUNTEER.name())
               )
               .findAny()
               .orElseThrow(
@@ -99,6 +98,26 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             authorities.stream().filter(
               auth -> auth.getAuthority().equals(UserRole.ADMIN.name())
                 || (viewOnly && auth.getAuthority().equals(UserRole.ORGANIZER.name()))
+              )
+              .findAny()
+              .orElseThrow(
+                () -> new ApiRequestException(OutTextConfig.LABEL_ERROR_UNAUTHORIZED_EN.getOutTextKey())
+              );
+          }
+
+          // manual payments: only organizers and admins may book payments, refunds or fees
+          if (
+               request.getServletPath().equals("/core-api/payrexx/manual-payment")
+            || request.getServletPath().equals("/core-api/payrexx/manual-refund")
+            || request.getServletPath().equals("/core-api/payrexx/manual-fee")
+            || request.getServletPath().equals("/core-api/payrexx/bookings")
+            || request.getServletPath().equals("/core-api/payrexx/booking/update")
+            || request.getServletPath().equals("/core-api/payrexx/booking/delete")
+          ) {
+            authorities.stream().filter(
+              auth ->
+                   auth.getAuthority().equals(UserRole.ORGANIZER.name())
+                || auth.getAuthority().equals(UserRole.ADMIN.name())
               )
               .findAny()
               .orElseThrow(
@@ -129,7 +148,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                auth ->
                     auth.getAuthority().equals(UserRole.ORGANIZER.name())
                  || auth.getAuthority().equals(UserRole.ADMIN.name())
-                 || auth.getAuthority().equals(UserRole.VOLUNTEER.name())
                )
                .findAny()
                .orElseThrow(
@@ -143,7 +161,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                auth ->
                     auth.getAuthority().equals(UserRole.ORGANIZER.name())
                  || auth.getAuthority().equals(UserRole.ADMIN.name())
-                 || auth.getAuthority().equals(UserRole.VOLUNTEER.name())
                )
                .findAny()
                .orElseThrow(

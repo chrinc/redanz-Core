@@ -45,7 +45,8 @@ public class UserService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepo.findByUsername(username);
-    if (user == null) {
+    // volunteers have no access at all (no login)
+    if (user == null || user.getUserRole() == UserRole.VOLUNTEER) {
       throw new UsernameNotFoundException(OutTextConfig.LABEL_ERROR_USER_NOT_FOUND_EN.getOutTextKey());
     }
     try {
@@ -65,8 +66,7 @@ public class UserService implements UserDetailsService {
 
   public boolean userIsAdmin(User user) {
     return user.getUserRole().equals(UserRole.ADMIN)
-      || user.getUserRole().equals(UserRole.ORGANIZER)
-      || user.getUserRole().equals(UserRole.VOLUNTEER);
+      || user.getUserRole().equals(UserRole.ORGANIZER);
   }
 
   public boolean userIsTester(User user) {

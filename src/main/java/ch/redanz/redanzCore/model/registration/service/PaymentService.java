@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.entities.DonationRegistration;
 import ch.redanz.redanzCore.model.registration.entities.FoodRegistration;
 import ch.redanz.redanzCore.model.registration.entities.PaymentStatus;
+import ch.redanz.redanzCore.model.registration.entities.PaymentType;
 import ch.redanz.redanzCore.model.registration.entities.PrivateClassRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationPayment;
@@ -16,6 +17,7 @@ import ch.redanz.redanzCore.model.workshop.repository.EventDiscountRepo;
 import ch.redanz.redanzCore.model.workshop.service.BundleService;
 import ch.redanz.redanzCore.model.workshop.service.EventService;
 import ch.redanz.redanzCore.model.workshop.service.FoodService;
+import ch.redanz.redanzCore.model.workshop.service.OutTextService;
 import ch.redanz.redanzCore.model.workshop.service.PrivateClassService;
 import com.google.gson.JsonObject;
 import freemarker.template.TemplateException;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +56,7 @@ public class PaymentService {
   private final SpecialRegistrationRepo specialRegistrationRepo;
   private final PrivateClassRegistrationRepo privateClassRegistrationRepo;
   private final RegistrationRepo registrationRepo;
+  private final OutTextService outTextService;
 
   public synchronized boolean awaitPaymentConfirmation(Registration registration) throws InterruptedException, TimeoutException {
     // Timout 4 Minutes, gateway timeout should be 5 minutes
@@ -165,6 +169,25 @@ public class PaymentService {
       );
     });
 
+    // fees (e.g. cancellation fee) and refunds: [comment out text key or "", amount]
+    List<List<String>> fees = new ArrayList<>();
+    List<List<String>> refunds = new ArrayList<>();
+    registrationPaymentRepo.findAllByRegistration(registration).stream()
+      .filter(payment -> payment.getAmount() != null)
+      .forEach(payment -> {
+        List<String> booking = List.of(
+          payment.getComment() == null ? "" : payment.getComment(),
+          String.valueOf(payment.getAmount())
+        );
+        switch (payment.getType()) {
+          case FEE -> fees.add(booking);
+          case REFUND -> refunds.add(booking);
+          default -> {}
+        }
+      });
+    sumWithoutComment(fees);
+    sumWithoutComment(refunds);
+
     return
       new PaymentDetailsResponse(
         items,
@@ -177,8 +200,23 @@ public class PaymentService {
         amountPaid(registration),
         amountDue(registration),
         registration.getRegistrationId(),
-        registration.getWorkflowStatus().getWorkflowStatusId() == workflowStatusService.getConfirming().getWorkflowStatusId()
+        registration.getWorkflowStatus().getWorkflowStatusId() == workflowStatusService.getConfirming().getWorkflowStatusId(),
+        fees,
+        refunds,
+        refunds.stream().mapToLong(refund -> Long.parseLong(refund.get(1))).sum()
       );
+  }
+
+  // bookings without comment shown as one line (sum), bookings with comment separately
+  private static void sumWithoutComment(List<List<String>> bookings) {
+    long sum = bookings.stream()
+      .filter(booking -> booking.get(0).isEmpty())
+      .mapToLong(booking -> Long.parseLong(booking.get(1)))
+      .sum();
+    boolean withoutComment = bookings.removeIf(booking -> booking.get(0).isEmpty());
+    if (withoutComment) {
+      bookings.add(0, List.of("", String.valueOf(sum)));
+    }
   }
 
   public long totalAmount(Registration registration){
@@ -233,8 +271,28 @@ public class PaymentService {
     return totalAmount.get();
   };
 
+  // payments minus refunds
   public long amountPaid(Registration registration){
-    return registrationPaymentRepo.sumAmountByRegistration(registration);
+    return paidAmount(registrationPaymentRepo.findAllByRegistration(registration));
+  }
+
+  private static long paidAmount(List<RegistrationPayment> payments) {
+    return payments.stream()
+      .filter(payment -> payment.getAmount() != null)
+      .mapToLong(payment -> switch (payment.getType()) {
+        case PAYMENT -> payment.getAmount();
+        case REFUND -> -payment.getAmount();
+        case FEE -> 0;
+      })
+      .sum();
+  }
+
+  // fees (e.g. cancellation fee) are charged in addition to the total (amount due)
+  private static long feeAmount(List<RegistrationPayment> payments) {
+    return payments.stream()
+      .filter(payment -> payment.getAmount() != null && payment.getType() == PaymentType.FEE)
+      .mapToLong(RegistrationPayment::getAmount)
+      .sum();
   }
 
   public record Amounts(long totalAmount, long amountDue) {}
@@ -247,15 +305,13 @@ public class PaymentService {
     Map<Long, List<FoodRegistration>> foods = byRegistration(foodRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), FoodRegistration::getRegistration);
     Map<Long, List<DonationRegistration>> donations = byRegistration(donationRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), DonationRegistration::getRegistration);
     Map<Long, List<DiscountRegistration>> discounts = byRegistration(discountRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true), DiscountRegistration::getRegistration);
-    Map<Long, Long> paid = new HashMap<>();
-    registrationPaymentRepo.findAllByRegistrationEventAndRegistrationActive(event, true).stream()
-      .filter(payment -> payment.getAmount() != null)
-      .forEach(payment -> paid.merge(payment.getRegistration().getRegistrationId(), payment.getAmount(), Long::sum));
+    Map<Long, List<RegistrationPayment>> payments = byRegistration(registrationPaymentRepo.findAllByRegistrationEventAndRegistrationActive(event, true), RegistrationPayment::getRegistration);
 
     Map<Long, Amounts> amounts = new HashMap<>();
     registrations.forEach(registration -> {
       Long registrationId = registration.getRegistrationId();
       List<DonationRegistration> donation = donations.getOrDefault(registrationId, List.of());
+      List<RegistrationPayment> registrationPayments = payments.getOrDefault(registrationId, List.of());
       long totalAmount = totalAmount(
         registration,
         specials.getOrDefault(registrationId, List.of()),
@@ -264,7 +320,7 @@ public class PaymentService {
         donation.isEmpty() ? null : donation.get(0),
         discounts.getOrDefault(registrationId, List.of())
       );
-      amounts.put(registrationId, new Amounts(totalAmount, totalAmount - paid.getOrDefault(registrationId, 0L)));
+      amounts.put(registrationId, new Amounts(totalAmount, totalAmount - paidAmount(registrationPayments) + feeAmount(registrationPayments)));
     });
     return amounts;
   }
@@ -276,7 +332,7 @@ public class PaymentService {
   public long amountDue(Registration registration) {
     long amountPaid = amountPaid(registration);
     long totalAmount = totalAmount(registration);
-    return totalAmount - amountPaid;
+    return totalAmount - amountPaid + feeAmount(registrationPaymentRepo.findAllByRegistration(registration));
   }
 
   public void updatePayment(Registration registration, Long amount) {
@@ -285,10 +341,99 @@ public class PaymentService {
     );
   }
 
+  // payment, refund or fee entered by an organizer, comment: optional label {EN, GE}
+  public void addBooking(Registration registration, PaymentType type, Long amount, JsonObject comment) {
+    registrationPaymentRepo.save(
+      new RegistrationPayment(
+        registration,
+        amount,
+        LocalDateTime.now(),
+        type,
+        commentLabel(comment)
+      )
+    );
+  }
+
+  // payments, refunds and fees of a registration, for the organizer
+  public List<Map<String, Object>> bookings(Registration registration) {
+    return registrationPaymentRepo.findAllByRegistration(registration).stream()
+      .map(payment -> {
+        Map<String, Object> booking = new HashMap<>();
+        booking.put("id", payment.getRegistrationPaymentId());
+        booking.put("type", payment.getType());
+        booking.put("amount", payment.getAmount());
+        // ISO with offset (server time zone), the browser shows it in local time
+        booking.put("date", payment.getTransactionDate() == null ? null : payment.getTransactionDate().atZone(ZoneId.systemDefault()).toOffsetDateTime().toString());
+        booking.put("comment", payment.getComment() == null ? null : outTextService.getOutTextMapByKey(payment.getComment()).get(0));
+        return booking;
+      })
+      .toList();
+  }
+
+  // removes a payment, refund or fee of the registration, incl. its comment
+  public void deleteBooking(Registration registration, Long registrationPaymentId) {
+    RegistrationPayment payment = registrationPaymentRepo.findById(registrationPaymentId)
+      .filter(booking -> booking.getRegistration().getRegistrationId().equals(registration.getRegistrationId()))
+      .orElseThrow();
+    if (payment.getComment() != null) {
+      outTextService.delete(payment.getComment());
+    }
+    registrationPaymentRepo.delete(payment);
+  }
+
+  // changes a payment, refund or fee of the registration: the comment label is updated, created or removed
+  public void updateBooking(Registration registration, Long registrationPaymentId, PaymentType type, Long amount, JsonObject comment) {
+    RegistrationPayment payment = registrationPaymentRepo.findById(registrationPaymentId)
+      .filter(booking -> booking.getRegistration().getRegistrationId().equals(registration.getRegistrationId()))
+      .orElseThrow();
+    JsonObject label = commentLabelText(comment);
+    if (payment.getComment() != null && label != null) {
+      outTextService.updateLabel(label, payment.getComment());
+    } else if (payment.getComment() != null) {
+      outTextService.delete(payment.getComment());
+      payment.setComment(null);
+    } else if (label != null) {
+      payment.setComment(outTextService.newLabel(label));
+    }
+    payment.setType(type);
+    payment.setAmount(amount);
+    registrationPaymentRepo.save(payment);
+  }
+
+  // label only if a text is entered
+  private String commentLabel(JsonObject comment) {
+    JsonObject label = commentLabelText(comment);
+    return label == null ? null : outTextService.newLabel(label);
+  }
+
+  // {EN, GE} or null without text, a missing language gets the text of the other one
+  private static JsonObject commentLabelText(JsonObject comment) {
+    String en = text(comment, "EN");
+    String ge = text(comment, "GE");
+    if (en.isBlank() && ge.isBlank()) {
+      return null;
+    }
+    JsonObject label = new JsonObject();
+    label.addProperty("EN", en.isBlank() ? ge : en);
+    label.addProperty("GE", ge.isBlank() ? en : ge);
+    return label;
+  }
+
+  private static String text(JsonObject label, String langKey) {
+    return label != null && label.has(langKey) && !label.get(langKey).isJsonNull()
+      ? label.get(langKey).getAsString().trim()
+      : "";
+  }
+
   public void onPaymentReceived(Registration registration, Long amount) throws IOException, TemplateException {
 
       // Update payment stats
       updatePayment(registration, amount);
+      onPaymentUpdated(registration);
+  }
+
+  // fully paid: done and booking confirmation, else pending
+  public void onPaymentUpdated(Registration registration) throws IOException, TemplateException {
 
       // Update workflow
      if (amountDue(registration) == 0) {

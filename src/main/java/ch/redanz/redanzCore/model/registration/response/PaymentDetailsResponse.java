@@ -26,4 +26,7 @@ public class PaymentDetailsResponse {
   private long amountDue;
   private long registrationId;
   private boolean isConfirming;
+  private List<List<String>> fees;
+  private List<List<String>> refunds;
+  private long amountRefunded;
 }
