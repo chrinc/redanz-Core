@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,11 +49,25 @@ public class PrivateClassService {
   }
 
   public String getReportPrivates(Registration registration) {
-    AtomicReference<String> privates = new AtomicReference<>();
+    return reportPrivates(privateClassRegistrationRepo.findAllByRegistration(registration), outTextService::getOutTextMapByKey);
+  }
+
+  // report private classes of all registrations of an event by registration id: one query for the
+  // private class registrations, each out text loaded once (check-in)
+  public Map<Long, String> getReportPrivatesByRegistration(Event event) {
+    Map<String, List<Map<String, String>>> outTexts = new HashMap<>();
+    Function<String, List<Map<String, String>>> outText = key -> outTexts.computeIfAbsent(key, outTextService::getOutTextMapByKey);
+    return privateClassRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true).stream()
+      .collect(Collectors.groupingBy(privateRegistration -> privateRegistration.getRegistration().getRegistrationId()))
+      .entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, entry -> reportPrivates(entry.getValue(), outText)));
+  }
+
+  private static String reportPrivates(List<PrivateClassRegistration> privateRegistrations, Function<String, List<Map<String, String>>> outText) {
     Map<String, StringBuilder> merged = new HashMap<>();
-    privateClassRegistrationRepo.findAllByRegistration(registration).forEach(privateRegistration -> {
+    privateRegistrations.forEach(privateRegistration -> {
       List<Map<String, String>> privateClassOutText =
-        outTextService.getOutTextMapByKey(privateRegistration.getEventPrivateClass().getDescription());
+        outText.apply(privateRegistration.getEventPrivateClass().getDescription());
       if (privateClassOutText == null || privateClassOutText.isEmpty()) return;
       Map<String, String> map = privateClassOutText.get(0); // your structure
 

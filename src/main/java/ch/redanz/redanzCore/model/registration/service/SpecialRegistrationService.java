@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,10 +43,25 @@ public class SpecialRegistrationService {
   }
 
   public String getReportSpecials(Registration registration) {
+    return reportSpecials(specialRegistrationRepo.findAllByRegistration(registration), outTextService::getOutTextMapByKey);
+  }
+
+  // report specials of all registrations of an event by registration id: one query for the
+  // special registrations, each out text loaded once (check-in)
+  public Map<Long, String> getReportSpecialsByRegistration(Event event) {
+    Map<String, List<Map<String, String>>> outTexts = new HashMap<>();
+    Function<String, List<Map<String, String>>> outText = key -> outTexts.computeIfAbsent(key, outTextService::getOutTextMapByKey);
+    return specialRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true).stream()
+      .collect(Collectors.groupingBy(specialRegistration -> specialRegistration.getRegistration().getRegistrationId()))
+      .entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, entry -> reportSpecials(entry.getValue(), outText)));
+  }
+
+  private static String reportSpecials(List<SpecialRegistration> specialRegistrations, Function<String, List<Map<String, String>>> outText) {
     Map<String, StringBuilder> merged = new HashMap<>();
-    specialRegistrationRepo.findAllByRegistration(registration).forEach(specialRegistration -> {
+    specialRegistrations.forEach(specialRegistration -> {
       List<Map<String, String>> privateClassOutText =
-        outTextService.getOutTextMapByKey(specialRegistration.getEventSpecial().getName());
+        outText.apply(specialRegistration.getEventSpecial().getName());
       if (privateClassOutText == null || privateClassOutText.isEmpty()) return;
       Map<String, String> map = privateClassOutText.get(0);
 

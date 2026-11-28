@@ -1,8 +1,10 @@
 package ch.redanz.redanzCore.model.registration.service;
 
+import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.profile.service.LanguageService;
 import ch.redanz.redanzCore.model.registration.entities.CheckIn;
 import ch.redanz.redanzCore.model.registration.entities.Guest;
+import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.entities.RegistrationType;
 import ch.redanz.redanzCore.model.registration.repository.CheckInRepo;
 import ch.redanz.redanzCore.model.workshop.entities.Event;
@@ -55,10 +57,58 @@ public class CheckInService {
     save(checkIn);
   }
 
+  // everything the check-ins of an event need, loaded once for the whole event
+  // (instead of several queries per registration): reports by registration id, party slots by bundle id
+  private record EventCheckInData(
+    Language english,
+    List<Registration> registrations,
+    Set<Long> hostRegistrationIds,
+    Map<Long, PaymentService.Amounts> amounts,
+    Map<Long, String> foods,
+    Map<Long, String> specials,
+    Map<Long, String> discounts,
+    Map<Long, String> privates,
+    Map<Long, String> partySlotsByBundleId
+  ) {
+    boolean isHost(Registration registration) {
+      return hostRegistrationIds.contains(registration.getRegistrationId());
+    }
+  }
+
+  private EventCheckInData eventCheckInData(Event event) {
+    Language english = languageService.english();
+    List<Registration> registrations = registrationService.findAllByEvent(event);
+    return new EventCheckInData(
+      english,
+      registrations,
+      hostingService.getAllHostRegistrationsByEvent(event).stream()
+        .map(hostRegistration -> hostRegistration.getRegistration().getRegistrationId())
+        .collect(Collectors.toSet()),
+      paymentService.amountsByRegistration(event, registrations),
+      foodRegistrationService.getReportFoodSlotsByRegistration(event),
+      specialRegistrationService.getReportSpecialsByRegistration(event),
+      discountRegistrationService.getReportDiscountsByRegistration(event, english),
+      privateClassService.getReportPrivatesByRegistration(event),
+      new HashMap<>()
+    );
+  }
+
+  private String partySlots(Registration registration, EventCheckInData data) {
+    return data.partySlotsByBundleId().computeIfAbsent(
+      registration.getBundle().getBundleId(),
+      bundleId -> slotService.slotNames(registration.getBundle().getPartySlots(), data.english())
+    );
+  }
+
+  private static String workflowStatusName(Registration registration) {
+    return registration.getWorkflowStatus() != null ? registration.getWorkflowStatus().getName() : null;
+  }
+
   public void resetByEvent(Event event) {
     deleteAllByEvent(event);
 
     List<CheckIn> checkIns = new ArrayList<>();
+    EventCheckInData data = eventCheckInData(event);
 
     // Guests
     guestService.findAllByEvent(event).forEach(guest -> {
@@ -69,7 +119,7 @@ public class CheckInService {
         guest.getName(),
         "Guest",
         guest.getDescription(),
-        slotService.slotNames(guest.getSlots(), languageService.english()),
+        slotService.slotNames(guest.getSlots(), data.english()),
         "d3d3d3" // grey
       )
       );
@@ -77,14 +127,14 @@ public class CheckInService {
 
     // Staff
     registrationService.findStaffByEvent(event).forEach(staff -> {
-      if (!hostingService.hasHostRegistration(staff)) {
+      if (!data.isHost(staff)) {
         checkIns.add(
           new CheckIn(
             staff.getEvent(),
             staff,
             staff.getParticipant().getFirstName() + " " + staff.getParticipant().getLastName(),
             RegistrationType.STAFF.name(),
-            volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "",
+            volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), data.english()) : "",
             "",
             "e4e4e4"
           )
@@ -93,24 +143,26 @@ public class CheckInService {
     });
 
     // Participants
-    registrationService.findAllByEvent(event).forEach(registration -> {
+    data.registrations().forEach(registration -> {
+      Long registrationId = registration.getRegistrationId();
+      PaymentService.Amounts registrationAmounts = data.amounts().get(registrationId);
       checkIns.add(
       new CheckIn(
         registration.getEvent(),
         registration,
         registration.getParticipant().getFirstName()
           + " " +  registration.getParticipant().getLastName()
-          + (hostingService.hasHostRegistration(registration) ? " (Host)" : ""),
+          + (data.isHost(registration) ? " (Host)" : ""),
         registration.getBundle().getName(),
         registration.getTrack() != null ? registration.getTrack().getName() : "",
-        slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()),
-        foodRegistrationService.getReportFoodSlots(registration),
-        specialRegistrationService.getReportSpecials(registration),
-        discountRegistrationService.getReportDiscounts(registration, languageService.english()),
-        privateClassService.getReportPrivates(registration),
-        registrationService.workflowStatusName(registration),
-        paymentService.amountDue(registration),
-        paymentService.totalAmount(registration),
+        partySlots(registration, data),
+        data.foods().getOrDefault(registrationId, ""),
+        data.specials().getOrDefault(registrationId, ""),
+        data.discounts().getOrDefault(registrationId, ""),
+        data.privates().getOrDefault(registrationId, ""),
+        workflowStatusName(registration),
+        registrationAmounts.amountDue(),
+        registrationAmounts.totalAmount(),
         registration.getBundle().getColor() /* wrist band color of the bundle */,
         registration.getDanceRole() != null ? registration.getDanceRole().getName() : ""
        )
@@ -133,6 +185,8 @@ public class CheckInService {
       if (checkIn.getRegistration() != null) checkInByRegistrationId.putIfAbsent(checkIn.getRegistration().getRegistrationId(), checkIn);
     });
 
+    EventCheckInData data = eventCheckInData(event);
+
     // Guests
     guestService.findAllByEvent(event).forEach(guest -> {
       CheckIn existingCheckIn = checkInByGuestId.get(guest.getGuestId());
@@ -140,7 +194,7 @@ public class CheckInService {
         existingCheckIn.setEvent(guest.getEvent());
         existingCheckIn.setCheckinName(guest.getName());
         existingCheckIn.setDescription(guest.getDescription());
-        existingCheckIn.setSlots(slotService.slotNames(guest.getSlots(), languageService.english()));
+        existingCheckIn.setSlots(slotService.slotNames(guest.getSlots(), data.english()));
         checkIns.add(existingCheckIn);
       } else {
          checkIns.add(
@@ -150,7 +204,7 @@ public class CheckInService {
             guest.getName(),
             "Guest",
             guest.getDescription(),
-            slotService.slotNames(guest.getSlots(), languageService.english()),
+            slotService.slotNames(guest.getSlots(), data.english()),
             "d3d3d3" // grey
           )
         );
@@ -164,17 +218,17 @@ public class CheckInService {
         existingCheckIn.setEvent(staff.getEvent());
         existingCheckIn.setCheckinName(staff.getParticipant().getFirstName() + " " + staff.getParticipant().getLastName());
         existingCheckIn.setType(RegistrationType.STAFF.name());
-        existingCheckIn.setDescription(volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "");
+        existingCheckIn.setDescription(volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), data.english()) : "");
         checkIns.add(existingCheckIn);
       } else {
-        if (!hostingService.hasHostRegistration(staff)) {
+        if (!data.isHost(staff)) {
           checkIns.add(
             new CheckIn(
               staff.getEvent(),
               staff,
               staff.getParticipant().getFirstName() + " " + staff.getParticipant().getLastName(),
               RegistrationType.STAFF.name(),
-              volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), languageService.english()) : "",
+              volunteerService.hasVolunteerRegistration(staff) ? volunteerService.volunteerTypeName(volunteerService.findByRegistration(staff), data.english()) : "",
               "",
               "e4e4e4"
             )
@@ -184,25 +238,28 @@ public class CheckInService {
     });
 
     // Participants
-    registrationService.findAllByEvent(event).forEach(registration -> {
-      CheckIn existingCheckIn = checkInByRegistrationId.get(registration.getRegistrationId());
+    data.registrations().forEach(registration -> {
+      Long registrationId = registration.getRegistrationId();
+      CheckIn existingCheckIn = checkInByRegistrationId.get(registrationId);
+      PaymentService.Amounts registrationAmounts = data.amounts().get(registrationId);
+      boolean isHost = data.isHost(registration);
       if (existingCheckIn != null) {
         existingCheckIn.setEvent(registration.getEvent());
         existingCheckIn.setCheckinName(
                   registration.getParticipant().getFirstName()
           + " " + registration.getParticipant().getLastName()
-          + (hostingService.hasHostRegistration(registration) ? " (Host)" : "")
+          + (isHost ? " (Host)" : "")
         );
         existingCheckIn.setType(registration.getBundle().getName());
         existingCheckIn.setDescription(registration.getTrack() != null ? registration.getTrack().getName() : "");
-        existingCheckIn.setSlots(slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()));
-        existingCheckIn.setFood(foodRegistrationService.getReportFoodSlots(registration));
-        existingCheckIn.setAddons(specialRegistrationService.getReportSpecials(registration));
-        existingCheckIn.setDiscounts(discountRegistrationService.getReportDiscounts(registration, languageService.english()));
-        existingCheckIn.setPrivates(privateClassService.getReportPrivates(registration));
-        existingCheckIn.setStatus(registrationService.workflowStatusName(registration));
-        existingCheckIn.setAmountDue(paymentService.amountDue(registration));
-        existingCheckIn.setTotalAmount(paymentService.totalAmount(registration));
+        existingCheckIn.setSlots(partySlots(registration, data));
+        existingCheckIn.setFood(data.foods().getOrDefault(registrationId, ""));
+        existingCheckIn.setAddons(data.specials().getOrDefault(registrationId, ""));
+        existingCheckIn.setDiscounts(data.discounts().getOrDefault(registrationId, ""));
+        existingCheckIn.setPrivates(data.privates().getOrDefault(registrationId, ""));
+        existingCheckIn.setStatus(workflowStatusName(registration));
+        existingCheckIn.setAmountDue(registrationAmounts.amountDue());
+        existingCheckIn.setTotalAmount(registrationAmounts.totalAmount());
         existingCheckIn.setColor(registration.getBundle().getColor() /* wrist band color of the bundle */);
         existingCheckIn.setDanceRole(registration.getDanceRole() != null ? registration.getDanceRole().getName() : "");
         checkIns.add(existingCheckIn);
@@ -213,17 +270,17 @@ public class CheckInService {
             registration,
             registration.getParticipant().getFirstName()
               + " " + registration.getParticipant().getLastName()
-              + (hostingService.hasHostRegistration(registration) ? " (Host)" : ""),
+              + (isHost ? " (Host)" : ""),
             registration.getBundle().getName(),
             registration.getTrack() != null ? registration.getTrack().getName() : "",
-            slotService.slotNames(registration.getBundle().getPartySlots(), languageService.english()),
-            foodRegistrationService.getReportFoodSlots(registration),
-            specialRegistrationService.getReportSpecials(registration),
-            discountRegistrationService.getReportDiscounts(registration, languageService.english()),
-            privateClassService.getReportPrivates(registration),
-            registrationService.workflowStatusName(registration),
-            paymentService.amountDue(registration),
-            paymentService.totalAmount(registration),
+            partySlots(registration, data),
+            data.foods().getOrDefault(registrationId, ""),
+            data.specials().getOrDefault(registrationId, ""),
+            data.discounts().getOrDefault(registrationId, ""),
+            data.privates().getOrDefault(registrationId, ""),
+            workflowStatusName(registration),
+            registrationAmounts.amountDue(),
+            registrationAmounts.totalAmount(),
             registration.getBundle().getColor() /* wrist band color of the bundle */,
             registration.getDanceRole() != null ? registration.getDanceRole().getName() : ""
           )

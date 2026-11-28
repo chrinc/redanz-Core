@@ -4,6 +4,7 @@ import ch.redanz.redanzCore.model.profile.entities.Language;
 import ch.redanz.redanzCore.model.registration.entities.DiscountRegistration;
 import ch.redanz.redanzCore.model.registration.entities.Registration;
 import ch.redanz.redanzCore.model.registration.repository.DiscountRegistrationRepo;
+import ch.redanz.redanzCore.model.workshop.entities.Event;
 import ch.redanz.redanzCore.model.workshop.entities.EventDiscount;
 import ch.redanz.redanzCore.model.workshop.repository.EventDiscountRepo;
 import ch.redanz.redanzCore.model.workshop.service.DiscountService;
@@ -16,9 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -207,11 +212,27 @@ public class DiscountRegistrationService {
   }
 
   public String getReportDiscounts(Registration registration, Language language) {
+    return reportDiscounts(
+      discountRegistrationRepo.findAllByRegistration(registration),
+      key -> outTextService.getOutTextByKeyAndLangKey(key, language.getLanguageKey()).getOutText()
+    );
+  }
 
+  // report discounts of all registrations of an event by registration id: one query for the
+  // discount registrations, each out text loaded once (check-in)
+  public Map<Long, String> getReportDiscountsByRegistration(Event event, Language language) {
+    Map<String, String> outTexts = new HashMap<>();
+    Function<String, String> outText = key -> outTexts.computeIfAbsent(key, k -> outTextService.getOutTextByKeyAndLangKey(k, language.getLanguageKey()).getOutText());
+    return discountRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true).stream()
+      .collect(Collectors.groupingBy(discountRegistration -> discountRegistration.getRegistration().getRegistrationId()))
+      .entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, entry -> reportDiscounts(entry.getValue(), outText)));
+  }
 
+  private static String reportDiscounts(List<DiscountRegistration> discountRegistrations, Function<String, String> outText) {
     AtomicReference<String> discounts = new AtomicReference<>();
-    discountRegistrationRepo.findAllByRegistration(registration).forEach(discountRegistration -> {
-      String specialOutText = outTextService.getOutTextByKeyAndLangKey(discountRegistration.getEventDiscount().getName(), language.getLanguageKey()).getOutText();
+    discountRegistrations.forEach(discountRegistration -> {
+      String specialOutText = outText.apply(discountRegistration.getEventDiscount().getName());
       if (discounts.get() == null)
         discounts.set(specialOutText);
       else {

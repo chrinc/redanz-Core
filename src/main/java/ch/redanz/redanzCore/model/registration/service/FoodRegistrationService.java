@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,10 +66,25 @@ public class FoodRegistrationService {
   }
 
   public String getReportFoodSlots(Registration registration) {
+    return reportFoodSlots(foodRegistrationRepo.findAllByRegistration(registration), outTextService::getOutTextMapByKey);
+  }
+
+  // report food slots of all registrations of an event by registration id: one query for the
+  // food registrations, each out text loaded once (check-in)
+  public Map<Long, String> getReportFoodSlotsByRegistration(Event event) {
+    Map<String, List<Map<String, String>>> outTexts = new HashMap<>();
+    Function<String, List<Map<String, String>>> outText = key -> outTexts.computeIfAbsent(key, outTextService::getOutTextMapByKey);
+    return foodRegistrationRepo.findAllByRegistrationEventAndRegistrationActive(event, true).stream()
+      .collect(Collectors.groupingBy(fr -> fr.getRegistration().getRegistrationId()))
+      .entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, entry -> reportFoodSlots(entry.getValue(), outText)));
+  }
+
+  private static String reportFoodSlots(List<FoodRegistration> foodRegistrations, Function<String, List<Map<String, String>>> outText) {
     Map<String, StringBuilder> merged = new HashMap<>();
-    foodRegistrationRepo.findAllByRegistration(registration).forEach(fr -> {
+    foodRegistrations.forEach(fr -> {
       List<Map<String, String>> slotOutText =
-        outTextService.getOutTextMapByKey(fr.getEventFoodSlot().getName());
+        outText.apply(fr.getEventFoodSlot().getName());
       if (slotOutText == null || slotOutText.isEmpty()) return;
       Map<String, String> map = slotOutText.get(0); // your structure
 
